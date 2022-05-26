@@ -13,8 +13,8 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - run: tools/ci/set_up.sh
       - uses: actions/checkout@v2
+      - run: tools/ci/set_up.sh
       - run: cargo clippy -- -D warnings
   spell-check:
     runs-on: ubuntu-latest
