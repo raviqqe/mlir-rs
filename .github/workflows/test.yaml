@@ -1,0 +1,19 @@
+name: test
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: tools/ci/set_up.sh
+      - uses: actions/checkout@v2
+      - run: cargo build
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: tools/ci/set_up.sh
+      - uses: actions/checkout@v2
+      - run: cargo test
