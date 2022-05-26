@@ -179,6 +179,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "melior"
+version = "0.1.0"
+dependencies = [
+ "mlir-sys",
+]
+
+[[package]]
 name = "memchr"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -189,13 +196,6 @@ name = "minimal-lexical"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
-
-[[package]]
-name = "mlir-rs"
-version = "0.1.0"
-dependencies = [
- "mlir-sys",
-]
 
 [[package]]
 name = "mlir-sys"
