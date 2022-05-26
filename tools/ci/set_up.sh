@@ -2,5 +2,4 @@
 
 set -e
 
-# TODO
-# brew install llvm@13
+curl -fsSL https://apt.llvm.org/llvm.sh | sudo bash -s 14
