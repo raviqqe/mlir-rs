@@ -1,8 +1,10 @@
+#[derive(Debug)]
 pub struct Context {
     context: mlir_sys::MlirContext,
 }
 
 impl Context {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             context: unsafe { mlir_sys::mlirContextCreate() },
