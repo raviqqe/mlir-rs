@@ -1,3 +1,5 @@
+use mlir_sys::*;
+
 #[derive(Debug)]
 pub struct Context {
     context: mlir_sys::MlirContext,
@@ -7,14 +9,14 @@ impl Context {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            context: unsafe { mlir_sys::mlirContextCreate() },
+            context: unsafe { mlirContextCreate() },
         }
     }
 }
 
 impl Drop for Context {
     fn drop(&mut self) {
-        unsafe { mlir_sys::mlirContextDestroy(self.context) };
+        unsafe { mlirContextDestroy(self.context) };
     }
 }
 
