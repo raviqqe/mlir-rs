@@ -12,7 +12,13 @@ jobs:
       - run: tools/setup.sh
       - run: cargo build
   test:
-    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-22.04
+          - macos-12
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
       - run: tools/setup.sh
