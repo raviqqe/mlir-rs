@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: tools/ci/set_up.sh
+      - run: tools/setup.sh
       - run: cargo clippy -- -D warnings
   spell-check:
     runs-on: ubuntu-latest

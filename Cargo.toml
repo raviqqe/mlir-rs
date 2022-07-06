@@ -4,4 +4,4 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-mlir-sys = "0.1.0"
+mlir-sys = { git = "https://github.com/raviqqe/mlir-sys" }
