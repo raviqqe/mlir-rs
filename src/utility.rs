@@ -1,4 +1,4 @@
-pub unsafe fn as_string_ref(string: &str) -> mlir_sys::MlirStringRef {
+pub(crate) unsafe fn as_string_ref(string: &str) -> mlir_sys::MlirStringRef {
     let string = string.as_bytes();
 
     mlir_sys::MlirStringRef {
