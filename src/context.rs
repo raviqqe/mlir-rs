@@ -46,7 +46,7 @@ impl<'c> Deref for ContextRef<'c> {
     type Target = Context;
 
     fn deref(&self) -> &Self::Target {
-        &*self.context
+        &self.context
     }
 }
 
