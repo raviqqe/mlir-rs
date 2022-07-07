@@ -1,4 +1,4 @@
-use crate::{location::Location, utility};
+use crate::{location::Location, region::Region, utility};
 use mlir_sys::MlirOperationState;
 
 pub struct OperationState<'c> {
