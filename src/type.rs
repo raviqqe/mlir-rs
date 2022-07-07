@@ -34,11 +34,11 @@ mod tests {
 
     #[test]
     fn new() {
-        Type::parse(&Context::new(), "foo");
+        Type::parse(&Context::new(), "i8");
     }
 
     #[test]
     fn context() {
-        Type::parse(&Context::new(), "foo").context();
+        Type::parse(&Context::new(), "i8").context();
     }
 }
