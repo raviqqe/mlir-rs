@@ -1,4 +1,7 @@
-use crate::{context::Context, location::Location};
+use crate::{
+    context::{Context, ContextRef},
+    location::Location,
+};
 use std::marker::PhantomData;
 
 pub struct Module<'c> {
@@ -12,6 +15,10 @@ impl<'c> Module<'c> {
             module: unsafe { mlir_sys::mlirModuleCreateEmpty(location.to_raw()) },
             _context: Default::default(),
         }
+    }
+
+    pub fn context(&self) -> ContextRef<'c> {
+        unsafe { ContextRef::from_raw(mlir_sys::mlirModuleGetContext(self.module)) }
     }
 
     pub unsafe fn to_raw(&self) -> mlir_sys::MlirModule {
@@ -32,5 +39,10 @@ mod tests {
     #[test]
     fn new() {
         Module::new(Location::new(&Context::new(), "foo", 42, 42));
+    }
+
+    #[test]
+    fn context() {
+        Module::new(Location::new(&Context::new(), "foo", 42, 42)).context();
     }
 }

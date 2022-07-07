@@ -1,4 +1,7 @@
-use crate::{context::Context, utility};
+use crate::{
+    context::{Context, ContextRef},
+    utility,
+};
 use std::marker::PhantomData;
 
 pub struct Location<'c> {
@@ -21,6 +24,10 @@ impl<'c> Location<'c> {
         }
     }
 
+    pub fn context(&self) -> ContextRef<'c> {
+        unsafe { ContextRef::from_raw(mlir_sys::mlirLocationGetContext(self.location)) }
+    }
+
     pub unsafe fn to_raw(&self) -> mlir_sys::MlirLocation {
         self.location
     }
@@ -33,5 +40,10 @@ mod tests {
     #[test]
     fn new() {
         Location::new(&Context::new(), "foo", 42, 42);
+    }
+
+    #[test]
+    fn context() {
+        Location::new(&Context::new(), "foo", 42, 42).context();
     }
 }
