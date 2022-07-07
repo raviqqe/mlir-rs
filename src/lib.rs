@@ -5,5 +5,6 @@ pub mod module;
 pub mod operation;
 pub mod operation_state;
 pub mod region;
+pub mod r#type;
 pub mod utility;
 pub mod value;

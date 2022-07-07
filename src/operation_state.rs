@@ -1,6 +1,7 @@
 use crate::{
     attribute::Attribute,
     location::Location,
+    r#type::Type,
     region::Region,
     utility::{self, into_raw_array},
     value::Value,
@@ -10,7 +11,7 @@ use mlir_sys::MlirOperationState;
 pub struct OperationState<'c> {
     name: String,
     location: Location<'c>,
-    results: Vec<Type>,
+    results: Vec<Type<'c>>,
     operands: Vec<Value>,
     regions: Vec<Region>,
     successors: Vec<Block>,
@@ -37,8 +38,13 @@ impl<'c> OperationState<'c> {
             MlirOperationState {
                 name: utility::as_string_ref(&self.name),
                 location: self.location.to_raw(),
-                nResults: self.results.len(),
-                results: self.results,
+                nResults: self.results.len() as isize,
+                results: into_raw_array(
+                    self.results
+                        .into_iter()
+                        .map(|r#type| r#type.to_raw())
+                        .collect::<Vec<_>>(),
+                ),
                 nOperands: self.operands.len() as isize,
                 operands: into_raw_array(
                     self.operands
