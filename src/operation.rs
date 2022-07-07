@@ -31,14 +31,13 @@ impl<'c> Drop for Operation<'c> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::location::Location;
 
     #[test]
     fn new() {
-        Operation::new(Location::new(&Context::new(), "foo", 42, 42));
-    }
-
-    #[test]
-    fn context() {
-        Operation::new(Location::new(&Context::new(), "foo", 42, 42)).context();
+        Operation::new(OperationState::new(
+            "foo",
+            Location::new(&Context::new(), "foo", 42, 42),
+        ));
     }
 }
