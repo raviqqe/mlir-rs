@@ -34,7 +34,7 @@ pub struct ContextRef<'c> {
 }
 
 impl<'c> ContextRef<'c> {
-    pub unsafe fn from_raw(context: mlir_sys::MlirContext) -> Self {
+    pub(crate) unsafe fn from_raw(context: mlir_sys::MlirContext) -> Self {
         Self {
             context: ManuallyDrop::new(Context { context }),
             _context: Default::default(),
