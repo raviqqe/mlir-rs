@@ -1,8 +1,8 @@
 use crate::{
     context::{Context, ContextRef},
-    location::Location,
+    operation_state::OperationState,
 };
-use std::{marker::PhantomData, mem::forget};
+use std::marker::PhantomData;
 
 pub struct Operation<'c> {
     operation: mlir_sys::MlirOperation,
@@ -10,13 +10,9 @@ pub struct Operation<'c> {
 }
 
 impl<'c> Operation<'c> {
-    pub fn new(state: MlirOperationState) -> Self {
-        let state = &mut state;
-
-        forget(MlirOperationState);
-
+    pub fn new(state: OperationState) -> Self {
         Self {
-            operation: unsafe { mlir_sys::mlirOperationCreate(state.as_raw_mut()) },
+            operation: unsafe { mlir_sys::mlirOperationCreate(&mut state.into_raw()) },
             _context: Default::default(),
         }
     }
