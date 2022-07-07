@@ -10,6 +10,10 @@ impl Context {
             context: unsafe { mlir_sys::mlirContextCreate() },
         }
     }
+
+    pub unsafe fn to_raw(&self) -> mlir_sys::MlirContext {
+        self.context
+    }
 }
 
 impl Drop for Context {
