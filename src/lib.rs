@@ -1,4 +1,5 @@
 pub mod attribute;
+pub mod block;
 pub mod context;
 pub mod location;
 pub mod module;

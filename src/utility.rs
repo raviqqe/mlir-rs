@@ -9,7 +9,7 @@ pub(crate) unsafe fn as_string_ref(string: &str) -> mlir_sys::MlirStringRef {
     }
 }
 
-pub(crate) unsafe fn into_raw_array<T>(xs: Vec<T>) -> *mut T {
+pub(crate) unsafe fn into_raw_array<T>(mut xs: Vec<T>) -> *mut T {
     let ptr = xs.as_mut_ptr();
 
     forget(xs);
