@@ -1,4 +1,4 @@
-use crate::{location::Location, region::Region, utility};
+use crate::{attribute::Attribute, location::Location, region::Region, utility};
 use mlir_sys::MlirOperationState;
 
 pub struct OperationState<'c> {
@@ -8,7 +8,7 @@ pub struct OperationState<'c> {
     operands: Vec<Value>,
     regions: Vec<Region>,
     successors: Vec<Block>,
-    attributes: Vec<Attribute>,
+    attributes: Vec<Attribute<'c>>,
     enable_result_type_inference: bool,
 }
 
@@ -32,14 +32,14 @@ impl<'c> OperationState<'c> {
                 name: utility::as_string_ref(&self.name),
                 location: self.location.to_raw(),
                 nResults: self.results.len(),
-                results: self.types,
+                results: self.results,
                 nOperands: self.operands.len(),
-                operands: self.values,
-                nRegions: self.regions.len(),
+                operands: self.operands,
+                nRegions: self.regions.len() as isize,
                 regions: self.regions,
                 nSuccessors: self.successors.len(),
                 successors: self.blocks,
-                nAttributes: self.attributes.len(),
+                nAttributes: self.attributes.len() as isize,
                 attributes: self.attributes,
                 enableResultTypeInference: self.enable_result_type_inference,
             }
