@@ -28,7 +28,7 @@ impl<'c> Location<'c> {
         unsafe { ContextRef::from_raw(mlir_sys::mlirLocationGetContext(self.location)) }
     }
 
-    pub unsafe fn to_raw(&self) -> mlir_sys::MlirLocation {
+    pub(crate) unsafe fn to_raw(&self) -> mlir_sys::MlirLocation {
         self.location
     }
 }

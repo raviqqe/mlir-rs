@@ -11,7 +11,7 @@ impl Context {
         }
     }
 
-    pub unsafe fn to_raw(&self) -> mlir_sys::MlirContext {
+    pub(crate) unsafe fn to_raw(&self) -> mlir_sys::MlirContext {
         self.context
     }
 }

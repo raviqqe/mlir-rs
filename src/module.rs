@@ -20,10 +20,6 @@ impl<'c> Module<'c> {
     pub fn context(&self) -> ContextRef<'c> {
         unsafe { ContextRef::from_raw(mlir_sys::mlirModuleGetContext(self.module)) }
     }
-
-    pub unsafe fn to_raw(&self) -> mlir_sys::MlirModule {
-        self.module
-    }
 }
 
 impl<'c> Drop for Module<'c> {
