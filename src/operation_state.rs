@@ -43,36 +43,36 @@ impl<'c> OperationState<'c> {
         self
     }
 
-    pub fn add_operands(&mut self, operandss: Vec<Value>) -> &mut Self {
+    pub fn add_operands(&mut self, operands: Vec<Value>) -> &mut Self {
         unsafe {
             mlirOperationStateAddOperands(
                 &mut self.state,
-                operandss.len() as isize,
-                into_raw_array(operandss.iter().map(|value| value.to_raw()).collect()),
+                operands.len() as isize,
+                into_raw_array(operands.iter().map(|value| value.to_raw()).collect()),
             )
         }
 
         self
     }
 
-    pub fn add_owned_regions(&mut self, regionss: Vec<Region>) -> &mut Self {
+    pub fn add_owned_regions(&mut self, regions: Vec<Region>) -> &mut Self {
         unsafe {
             mlirOperationStateAddOwnedRegions(
                 &mut self.state,
-                regionss.len() as isize,
-                into_raw_array(regionss.iter().map(|region| region.to_raw()).collect()),
+                regions.len() as isize,
+                into_raw_array(regions.iter().map(|region| region.to_raw()).collect()),
             )
         }
 
         self
     }
 
-    pub fn add_successors(&mut self, successorss: Vec<Block>) -> &mut Self {
+    pub fn add_successors(&mut self, successors: Vec<Block>) -> &mut Self {
         unsafe {
             mlirOperationStateAddSuccessors(
                 &mut self.state,
-                successorss.len() as isize,
-                into_raw_array(successorss.iter().map(|block| block.to_raw()).collect()),
+                successors.len() as isize,
+                into_raw_array(successors.iter().map(|block| block.to_raw()).collect()),
             )
         }
 
