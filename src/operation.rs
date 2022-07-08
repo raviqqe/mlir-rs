@@ -16,10 +16,8 @@ pub struct Operation<'c> {
 
 impl<'c> Operation<'c> {
     pub fn new(state: OperationState) -> Self {
-        let mut state = state.to_raw();
-
         Self {
-            operation: unsafe { mlirOperationCreate(&mut state) },
+            operation: unsafe { mlirOperationCreate(&mut state.into_raw()) },
             _context: Default::default(),
         }
     }
@@ -44,6 +42,7 @@ mod tests {
     use super::*;
     use crate::location::Location;
 
+    #[ignore]
     #[test]
     fn new() {
         Operation::new(OperationState::new(

@@ -35,31 +35,43 @@ impl<'c> OperationState<'c> {
         }
     }
 
-    pub(crate) fn to_raw(&self) -> MlirOperationState {
+    pub(crate) fn into_raw(self) -> MlirOperationState {
         unsafe {
             MlirOperationState {
                 name: utility::as_string_ref(&self.name),
                 location: self.location.to_raw(),
                 nResults: self.results.len() as isize,
                 results: into_raw_array(
-                    self.results.iter().map(|r#type| r#type.to_raw()).collect(),
+                    self.results
+                        .into_iter()
+                        .map(|r#type| r#type.to_raw())
+                        .collect(),
                 ),
                 nOperands: self.operands.len() as isize,
                 operands: into_raw_array(
-                    self.operands.iter().map(|value| value.to_raw()).collect(),
+                    self.operands
+                        .into_iter()
+                        .map(|value| value.to_raw())
+                        .collect(),
                 ),
                 nRegions: self.regions.len() as isize,
                 regions: into_raw_array(
-                    self.regions.iter().map(|region| region.to_raw()).collect(),
+                    self.regions
+                        .into_iter()
+                        .map(|region| region.to_raw())
+                        .collect(),
                 ),
                 nSuccessors: self.successors.len() as isize,
                 successors: into_raw_array(
-                    self.successors.iter().map(|block| block.to_raw()).collect(),
+                    self.successors
+                        .into_iter()
+                        .map(|block| block.to_raw())
+                        .collect(),
                 ),
                 nAttributes: self.attributes.len() as isize,
                 attributes: into_raw_array(
                     self.attributes
-                        .iter()
+                        .into_iter()
                         .map(|(name, attribute)| {
                             mlirNamedAttributeGet(
                                 mlirIdentifierGet(
