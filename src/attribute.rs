@@ -1,6 +1,6 @@
 use crate::{
     context::{Context, ContextRef},
-    utility,
+    utility::as_string_ref,
 };
 use mlir_sys::{mlirAttributeGetContext, mlirAttributeParseGet, MlirAttribute};
 use std::marker::PhantomData;
@@ -13,9 +13,7 @@ pub struct Attribute<'c> {
 impl<'c> Attribute<'c> {
     pub fn parse(context: &Context, source: &str) -> Self {
         Self {
-            attribute: unsafe {
-                mlirAttributeParseGet(context.to_raw(), utility::as_string_ref(source))
-            },
+            attribute: unsafe { mlirAttributeParseGet(context.to_raw(), as_string_ref(source)) },
             _context: Default::default(),
         }
     }

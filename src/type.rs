@@ -1,6 +1,6 @@
 use crate::{
     context::{Context, ContextRef},
-    utility,
+    utility::as_string_ref,
 };
 use mlir_sys::{mlirTypeGetContext, mlirTypeParseGet, MlirType};
 use std::marker::PhantomData;
@@ -13,7 +13,7 @@ pub struct Type<'c> {
 impl<'c> Type<'c> {
     pub fn parse(context: &Context, source: &str) -> Self {
         Self {
-            r#type: unsafe { mlirTypeParseGet(context.to_raw(), utility::as_string_ref(source)) },
+            r#type: unsafe { mlirTypeParseGet(context.to_raw(), as_string_ref(source)) },
             _context: Default::default(),
         }
     }

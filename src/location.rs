@@ -1,6 +1,6 @@
 use crate::{
     context::{Context, ContextRef},
-    utility,
+    utility::as_string_ref,
 };
 use mlir_sys::{
     mlirLocationFileLineColGet, mlirLocationGetContext, mlirLocationUnknownGet, MlirLocation,
@@ -18,7 +18,7 @@ impl<'c> Location<'c> {
             location: unsafe {
                 mlirLocationFileLineColGet(
                     context.to_raw(),
-                    utility::as_string_ref(filename),
+                    as_string_ref(filename),
                     line as u32,
                     column as u32,
                 )
