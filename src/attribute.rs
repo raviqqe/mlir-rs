@@ -33,15 +33,15 @@ impl<'c> Attribute<'c> {
 mod tests {
     use super::*;
 
-    #[ignore]
     #[test]
     fn parse() {
-        Attribute::parse(&Context::new(), "unit");
+        for attribute in ["unit", "i32", r#""foo""#] {
+            Attribute::parse(&Context::new(), attribute);
+        }
     }
 
-    #[ignore]
     #[test]
     fn context() {
-        Attribute::parse(&Context::new(), "foo").context();
+        Attribute::parse(&Context::new(), "i32").context();
     }
 }
