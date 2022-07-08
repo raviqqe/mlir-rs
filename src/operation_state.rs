@@ -153,7 +153,7 @@ mod tests {
         let mut state = OperationState::new("foo", Location::unknown(&context));
 
         state.add_attributes(vec![(
-            Identifier::new(&context, "bar"),
+            Identifier::new(&context, "foo"),
             Attribute::parse(&context, "unit"),
         )]);
 
