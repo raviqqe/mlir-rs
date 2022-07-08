@@ -1,13 +1,18 @@
 use crate::{
     attribute::Attribute,
+    block::Block,
     context::Context,
     identifier::Identifier,
     location::Location,
+    r#type::Type,
+    region::Region,
     utility::{as_string_ref, into_raw_array},
+    value::Value,
 };
 use mlir_sys::{
-    mlirNamedAttributeGet, mlirOperationStateAddAttributes, mlirOperationStateGet,
-    MlirOperationState,
+    mlirNamedAttributeGet, mlirOperationStateAddAttributes, mlirOperationStateAddOperands,
+    mlirOperationStateAddOwnedRegions, mlirOperationStateAddResults,
+    mlirOperationStateAddSuccessors, mlirOperationStateGet, MlirOperationState,
 };
 use std::marker::PhantomData;
 
@@ -24,6 +29,54 @@ impl<'c> OperationState<'c> {
             },
             _context: Default::default(),
         }
+    }
+
+    pub fn add_results(&mut self, results: Vec<Type<'c>>) -> &mut Self {
+        unsafe {
+            mlirOperationStateAddResults(
+                &mut self.state,
+                results.len() as isize,
+                into_raw_array(results.iter().map(|r#type| r#type.to_raw()).collect()),
+            )
+        }
+
+        self
+    }
+
+    pub fn add_operands(&mut self, operandss: Vec<Value>) -> &mut Self {
+        unsafe {
+            mlirOperationStateAddOperands(
+                &mut self.state,
+                operandss.len() as isize,
+                into_raw_array(operandss.iter().map(|value| value.to_raw()).collect()),
+            )
+        }
+
+        self
+    }
+
+    pub fn add_owned_regions(&mut self, regionss: Vec<Region>) -> &mut Self {
+        unsafe {
+            mlirOperationStateAddOwnedRegions(
+                &mut self.state,
+                regionss.len() as isize,
+                into_raw_array(regionss.iter().map(|region| region.to_raw()).collect()),
+            )
+        }
+
+        self
+    }
+
+    pub fn add_successors(&mut self, successorss: Vec<Block>) -> &mut Self {
+        unsafe {
+            mlirOperationStateAddSuccessors(
+                &mut self.state,
+                successorss.len() as isize,
+                into_raw_array(successorss.iter().map(|block| block.to_raw()).collect()),
+            )
+        }
+
+        self
     }
 
     pub fn add_attributes(&mut self, attributes: Vec<(Identifier, Attribute<'c>)>) -> &mut Self {
