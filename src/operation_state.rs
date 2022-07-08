@@ -122,7 +122,7 @@ mod tests {
         let context = Context::new();
         let mut state = OperationState::new("foo", Location::unknown(&context));
 
-        state.add_results(vec![Type::parse(&context, "i32")]);
+        state.add_results(vec![Type::parse(&context, "i1")]);
 
         Operation::new(state);
     }
