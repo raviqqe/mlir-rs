@@ -1,24 +1,25 @@
+use mlir_sys::{mlirContextCreate, mlirContextDestroy, MlirContext};
 use std::{marker::PhantomData, mem::ManuallyDrop, ops::Deref};
 
 pub struct Context {
-    context: mlir_sys::MlirContext,
+    context: MlirContext,
 }
 
 impl Context {
     pub fn new() -> Self {
         Self {
-            context: unsafe { mlir_sys::mlirContextCreate() },
+            context: unsafe { mlirContextCreate() },
         }
     }
 
-    pub(crate) unsafe fn to_raw(&self) -> mlir_sys::MlirContext {
+    pub(crate) unsafe fn to_raw(&self) -> MlirContext {
         self.context
     }
 }
 
 impl Drop for Context {
     fn drop(&mut self) {
-        unsafe { mlir_sys::mlirContextDestroy(self.context) };
+        unsafe { mlirContextDestroy(self.context) };
     }
 }
 
@@ -34,7 +35,7 @@ pub struct ContextRef<'c> {
 }
 
 impl<'c> ContextRef<'c> {
-    pub(crate) unsafe fn from_raw(context: mlir_sys::MlirContext) -> Self {
+    pub(crate) unsafe fn from_raw(context: MlirContext) -> Self {
         Self {
             context: ManuallyDrop::new(Context { context }),
             _context: Default::default(),

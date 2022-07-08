@@ -42,6 +42,7 @@ mod tests {
     use super::*;
     use crate::location::Location;
 
+    #[ignore]
     #[test]
     fn new() {
         Operation::new(OperationState::new(
