@@ -49,4 +49,12 @@ mod tests {
             Location::unknown(&Context::new()),
         ));
     }
+
+    #[test]
+    fn attribute() {
+        Operation::new(OperationState::new(
+            "foo",
+            Location::unknown(&Context::new()),
+        ));
+    }
 }

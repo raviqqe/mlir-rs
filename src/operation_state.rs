@@ -35,6 +35,10 @@ impl<'c> OperationState<'c> {
         }
     }
 
+    pub fn set_attribute(&mut self, name: impl AsRef<str>, attribute: Attribute<'c>) {
+        self.attributes.insert(name.as_ref().into(), attribute);
+    }
+
     pub(crate) fn into_raw(self) -> MlirOperationState {
         unsafe {
             MlirOperationState {
@@ -86,5 +90,22 @@ impl<'c> OperationState<'c> {
                 enableResultTypeInference: self.enable_result_type_inference,
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::context::Context;
+    use crate::operation::Operation;
+
+    #[test]
+    fn new() {
+        let context = Context::new();
+        let mut state = OperationState::new("foo", Location::unknown(&context));
+
+        state.set_attribute("bar", Attribute::parse(&context, "unit"));
+
+        Operation::new(state);
     }
 }
