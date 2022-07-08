@@ -111,6 +111,44 @@ mod tests {
 
     #[test]
     fn new() {
+        Operation::new(OperationState::new(
+            "foo",
+            Location::unknown(&Context::new()),
+        ));
+    }
+
+    #[test]
+    fn add_results() {
+        let context = Context::new();
+        let mut state = OperationState::new("foo", Location::unknown(&context));
+
+        state.add_results(vec![Type::parse(&context, "i32")]);
+
+        Operation::new(state);
+    }
+
+    #[test]
+    fn add_owned_regions() {
+        let context = Context::new();
+        let mut state = OperationState::new("foo", Location::unknown(&context));
+
+        state.add_owned_regions(vec![Region::new()]);
+
+        Operation::new(state);
+    }
+
+    #[test]
+    fn add_successors() {
+        let context = Context::new();
+        let mut state = OperationState::new("foo", Location::unknown(&context));
+
+        state.add_successors(vec![Block::new(vec![])]);
+
+        Operation::new(state);
+    }
+
+    #[test]
+    fn add_attributes() {
         let context = Context::new();
         let mut state = OperationState::new("foo", Location::unknown(&context));
 
