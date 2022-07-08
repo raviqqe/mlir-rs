@@ -22,11 +22,9 @@ pub struct OperationState<'c> {
 }
 
 impl<'c> OperationState<'c> {
-    pub fn new(name: impl AsRef<str>, location: Location<'c>) -> Self {
+    pub fn new(name: &str, location: Location<'c>) -> Self {
         Self {
-            state: unsafe {
-                mlirOperationStateGet(as_string_ref(name.as_ref()), location.to_raw())
-            },
+            state: unsafe { mlirOperationStateGet(as_string_ref(name), location.to_raw()) },
             _context: Default::default(),
         }
     }
