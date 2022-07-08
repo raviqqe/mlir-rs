@@ -42,6 +42,6 @@ mod tests {
 
     #[test]
     fn context() {
-        Attribute::parse(&Context::new(), "i32").context();
+        Attribute::parse(&Context::new(), "unit").context();
     }
 }
