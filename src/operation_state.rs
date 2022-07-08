@@ -4,7 +4,7 @@ use crate::{
     location::Location,
     r#type::Type,
     region::Region,
-    utility::{self, as_string_ref, into_raw_array},
+    utility::{as_string_ref, into_raw_array},
     value::Value,
 };
 use mlir_sys::{mlirIdentifierGet, mlirNamedAttributeGet, MlirOperationState};
@@ -38,7 +38,7 @@ impl<'c> OperationState<'c> {
     pub(crate) fn into_raw(self) -> MlirOperationState {
         unsafe {
             MlirOperationState {
-                name: utility::as_string_ref(&self.name),
+                name: as_string_ref(&self.name),
                 location: self.location.to_raw(),
                 nResults: self.results.len() as isize,
                 results: into_raw_array(

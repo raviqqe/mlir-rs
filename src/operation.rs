@@ -42,12 +42,11 @@ mod tests {
     use super::*;
     use crate::location::Location;
 
-    #[ignore]
     #[test]
     fn new() {
         Operation::new(OperationState::new(
             "foo",
-            Location::new(&Context::new(), "foo", 42, 42),
+            Location::unknown(&Context::new()),
         ));
     }
 }
