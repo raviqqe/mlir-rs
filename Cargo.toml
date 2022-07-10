@@ -1,7 +1,10 @@
 [package]
 name = "melior"
+description = "MLIR wrapper in Rust"
 version = "0.1.0"
 edition = "2021"
+license-file = "LICENSE"
+repository = "https://github.com/raviqqe/mlir-sys"
 
 [dependencies]
 mlir-sys = "0.1"
