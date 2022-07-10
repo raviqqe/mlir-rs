@@ -4,7 +4,7 @@ description = "MLIR wrapper in Rust"
 version = "0.1.0"
 edition = "2021"
 license-file = "LICENSE"
-repository = "https://github.com/raviqqe/mlir-sys"
+repository = "https://github.com/raviqqe/melior"
 
 [dependencies]
 mlir-sys = "0.1"
