@@ -26,4 +26,4 @@ jobs:
       - run: curl -fsSL https://apt.llvm.org/llvm.sh | sudo bash -s 15 all
       - run: sudo apt -y install libmlir-15-dev mlir-15-tools
       # - run: tools/setup.sh
-      - run: cargo test
+      - run: PATH=/usr/lib/llvm-15/bin:$PATH cargo test
