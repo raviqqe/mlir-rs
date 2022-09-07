@@ -7,4 +7,4 @@ license-file = "LICENSE"
 repository = "https://github.com/raviqqe/melior"
 
 [dependencies]
-mlir-sys = "0.1"
+mlir-sys = { git = "https://github.com/raviqqe/mlir-sys", branch = "chore/llvm-15" }
