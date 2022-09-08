@@ -1,11 +1,13 @@
+use mlir_sys::MlirStringRef;
 use std::ffi::CString;
 use std::mem::forget;
 use std::ptr::null_mut;
 
-pub(crate) unsafe fn as_string_ref(string: &str) -> mlir_sys::MlirStringRef {
+// TODO Is this safe?
+pub(crate) unsafe fn as_string_ref(string: &str) -> MlirStringRef {
     let length = string.len() as u64;
 
-    mlir_sys::MlirStringRef {
+    MlirStringRef {
         data: CString::new(string).unwrap().into_raw(),
         length,
     }

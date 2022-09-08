@@ -1,8 +1,12 @@
 use crate::{
     context::{Context, ContextRef},
     location::Location,
+    operation::OperationRef,
 };
-use mlir_sys::{mlirModuleCreateEmpty, mlirModuleDestroy, mlirModuleGetContext, MlirModule};
+use mlir_sys::{
+    mlirModuleCreateEmpty, mlirModuleDestroy, mlirModuleGetContext, mlirModuleGetOperation,
+    MlirModule,
+};
 use std::marker::PhantomData;
 
 pub struct Module<'c> {
@@ -16,6 +20,9 @@ impl<'c> Module<'c> {
             module: unsafe { mlirModuleCreateEmpty(location.to_raw()) },
             _context: Default::default(),
         }
+    }
+    pub fn as_operation<'a>(&'a self) -> OperationRef<'c, 'a> {
+        unsafe { OperationRef::from_raw(mlirModuleGetOperation(self.module)) }
     }
 
     pub fn context(&self) -> ContextRef<'c> {
