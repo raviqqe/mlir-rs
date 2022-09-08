@@ -1,4 +1,7 @@
-use mlir_sys::{mlirContextCreate, mlirContextDestroy, MlirContext};
+use crate::dialect_registry::DialectRegistry;
+use mlir_sys::{
+    mlirContextAppendDialectRegistry, mlirContextCreate, mlirContextDestroy, MlirContext,
+};
 use std::{marker::PhantomData, mem::ManuallyDrop, ops::Deref};
 
 pub struct Context {
@@ -10,6 +13,10 @@ impl Context {
         Self {
             context: unsafe { mlirContextCreate() },
         }
+    }
+
+    pub fn append_dialect_registry(&self, registry: &DialectRegistry) {
+        unsafe { mlirContextAppendDialectRegistry(self.to_raw(), registry.to_raw()) }
     }
 
     pub(crate) unsafe fn to_raw(&self) -> MlirContext {
@@ -58,5 +65,12 @@ mod tests {
     #[test]
     fn new() {
         Context::new();
+    }
+
+    #[test]
+    fn append_dialect_registry() {
+        let context = Context::new();
+
+        context.append_dialect_registry(&DialectRegistry::new());
     }
 }
