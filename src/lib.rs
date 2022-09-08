@@ -11,3 +11,24 @@ pub mod region;
 pub mod r#type;
 pub mod utility;
 pub mod value;
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        context::Context, dialect_registry::DialectRegistry, location::Location, module::Module,
+    };
+
+    #[test]
+    fn build_module() {
+        let context = Context::new();
+        let module = Module::new(Location::unknown(&context));
+    }
+
+    #[test]
+    fn build_module_with_dialect() {
+        let registry = DialectRegistry::new();
+        let context = Context::new();
+        context.append_dialect_registry(&registry);
+        let module = Module::new(Location::unknown(&context));
+    }
+}
