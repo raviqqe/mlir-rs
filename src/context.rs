@@ -1,6 +1,7 @@
 use crate::dialect_registry::DialectRegistry;
 use mlir_sys::{
-    mlirContextAppendDialectRegistry, mlirContextCreate, mlirContextDestroy, MlirContext,
+    mlirContextAppendDialectRegistry, mlirContextCreate, mlirContextDestroy,
+    mlirContextLoadAllAvailableDialects, mlirRegisterAllLLVMTranslations, MlirContext,
 };
 use std::{marker::PhantomData, mem::ManuallyDrop, ops::Deref};
 
@@ -10,13 +11,19 @@ pub struct Context {
 
 impl Context {
     pub fn new() -> Self {
-        Self {
-            context: unsafe { mlirContextCreate() },
-        }
+        let context = unsafe { mlirContextCreate() };
+
+        unsafe { mlirRegisterAllLLVMTranslations(context) }
+
+        Self { context }
     }
 
     pub fn append_dialect_registry(&self, registry: &DialectRegistry) {
-        unsafe { mlirContextAppendDialectRegistry(self.to_raw(), registry.to_raw()) }
+        unsafe { mlirContextAppendDialectRegistry(self.context, registry.to_raw()) }
+    }
+
+    pub fn load_all_available_dialects(&self) {
+        unsafe { mlirContextLoadAllAvailableDialects(self.context) }
     }
 
     pub(crate) unsafe fn to_raw(&self) -> MlirContext {
