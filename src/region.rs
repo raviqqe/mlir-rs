@@ -11,6 +11,10 @@ impl Region {
         }
     }
 
+    pub(crate) fn from_raw(region: MlirRegion) -> Self {
+        Self { region }
+    }
+
     pub(crate) unsafe fn to_raw(&self) -> mlir_sys::MlirRegion {
         self.region
     }

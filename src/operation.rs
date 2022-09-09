@@ -1,12 +1,14 @@
 use crate::{
     context::{Context, ContextRef},
     operation_state::OperationState,
+    region::Region,
     string_ref::StringRef,
     value::Value,
 };
 use mlir_sys::{
     mlirOperationCreate, mlirOperationDestroy, mlirOperationDump, mlirOperationGetContext,
-    mlirOperationGetResult, mlirOperationPrint, MlirOperation, MlirStringRef,
+    mlirOperationGetRegion, mlirOperationGetResult, mlirOperationPrint, MlirOperation,
+    MlirStringRef,
 };
 use std::{ffi::c_void, marker::PhantomData, mem::ManuallyDrop, ops::Deref};
 
@@ -27,8 +29,12 @@ impl<'c> Operation<'c> {
         unsafe { ContextRef::from_raw(mlirOperationGetContext(self.operation)) }
     }
 
-    pub fn result(&self, index: usize) -> Value {
+    pub fn result(&self, index: usize) -> Value<'c> {
         Value::from_raw(unsafe { mlirOperationGetResult(self.operation, index as isize) })
+    }
+
+    pub fn region(&self, index: usize) -> Region {
+        Region::from_raw(unsafe { mlirOperationGetRegion(self.operation, index as isize) })
     }
 
     pub fn print(&self) -> StringRef {
