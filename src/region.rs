@@ -21,10 +21,6 @@ impl Region {
         Block::from_raw(unsafe { mlirRegionGetFirstBlock(self.region) })
     }
 
-    pub(crate) unsafe fn from_raw(region: MlirRegion) -> Self {
-        Self { region }
-    }
-
     pub(crate) unsafe fn into_raw(self) -> mlir_sys::MlirRegion {
         let region = self.region;
 
