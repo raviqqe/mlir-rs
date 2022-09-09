@@ -57,6 +57,12 @@ impl<'c> Operation<'c> {
     }
 }
 
+impl<'c> Drop for Operation<'c> {
+    fn drop(&mut self) {
+        unsafe { mlirOperationDestroy(self.operation) };
+    }
+}
+
 pub struct OperationRef<'c, 'o> {
     operation: ManuallyDrop<Operation<'c>>,
     _operation: PhantomData<&'o Operation<'c>>,
@@ -76,12 +82,6 @@ impl<'c, 'o> Deref for OperationRef<'c, 'o> {
 
     fn deref(&self) -> &Self::Target {
         &self.operation
-    }
-}
-
-impl<'c> Drop for Operation<'c> {
-    fn drop(&mut self) {
-        unsafe { mlirOperationDestroy(self.operation) };
     }
 }
 
