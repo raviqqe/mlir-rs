@@ -5,8 +5,8 @@ use crate::{
     value::Value,
 };
 use mlir_sys::{
-    mlirOperationCreate, mlirOperationDestroy, mlirOperationGetContext, mlirOperationGetResult,
-    mlirOperationPrint, MlirOperation, MlirStringRef,
+    mlirOperationCreate, mlirOperationDestroy, mlirOperationDump, mlirOperationGetContext,
+    mlirOperationGetResult, mlirOperationPrint, MlirOperation, MlirStringRef,
 };
 use std::{ffi::c_void, marker::PhantomData, mem::ManuallyDrop, ops::Deref};
 
@@ -47,6 +47,10 @@ impl<'c> Operation<'c> {
 
             StringRef::from_raw(string.unwrap())
         }
+    }
+
+    pub fn dump(&self) {
+        unsafe { mlirOperationDump(self.operation) }
     }
 
     pub(crate) unsafe fn from_raw(operation: MlirOperation) -> Self {
