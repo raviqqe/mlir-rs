@@ -58,7 +58,12 @@ impl<'c> OperationState<'c> {
             mlirOperationStateAddOwnedRegions(
                 &mut self.state,
                 regions.len() as isize,
-                into_raw_array(regions.iter().map(|region| region.to_raw()).collect()),
+                into_raw_array(
+                    regions
+                        .into_iter()
+                        .map(|region| region.into_raw())
+                        .collect(),
+                ),
             )
         }
 

@@ -34,7 +34,7 @@ impl<'c> Operation<'c> {
     }
 
     pub fn region(&self, index: usize) -> Region {
-        Region::from_raw(unsafe { mlirOperationGetRegion(self.operation, index as isize) })
+        unsafe { Region::from_raw(mlirOperationGetRegion(self.operation, index as isize)) }
     }
 
     pub fn print(&self) -> StringRef {

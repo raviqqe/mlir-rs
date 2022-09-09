@@ -1,34 +1,47 @@
-use crate::{location::Location, r#type::Type, utility::into_raw_array};
-use mlir_sys::{mlirBlockCreate, MlirBlock};
+use crate::{
+    context::Context, location::Location, r#type::Type, region::RegionRef, utility::into_raw_array,
+};
+use mlir_sys::{mlirBlockCreate, mlirBlockGetParentRegion, MlirBlock};
+use std::marker::PhantomData;
 
-pub struct Block {
+pub struct Block<'c> {
     block: MlirBlock,
+    _context: PhantomData<&'c Context>,
 }
 
-impl Block {
+impl<'c> Block<'c> {
     pub fn new(arguments: Vec<(Type, Location)>) -> Self {
-        Self {
-            block: unsafe {
-                mlirBlockCreate(
-                    arguments.len() as isize,
-                    into_raw_array(
-                        arguments
-                            .iter()
-                            .map(|(argument, _)| argument.to_raw())
-                            .collect(),
-                    ),
-                    into_raw_array(
-                        arguments
-                            .iter()
-                            .map(|(_, location)| location.to_raw())
-                            .collect(),
-                    ),
-                )
-            },
+        unsafe {
+            Self::from_raw(mlirBlockCreate(
+                arguments.len() as isize,
+                into_raw_array(
+                    arguments
+                        .iter()
+                        .map(|(argument, _)| argument.to_raw())
+                        .collect(),
+                ),
+                into_raw_array(
+                    arguments
+                        .iter()
+                        .map(|(_, location)| location.to_raw())
+                        .collect(),
+                ),
+            ))
         }
     }
 
-    pub(crate) unsafe fn to_raw(&self) -> MlirBlock {
+    pub fn parent_region(&self) -> RegionRef {
+        unsafe { RegionRef::from_raw(mlirBlockGetParentRegion(self.block)) }
+    }
+
+    pub(crate) fn from_raw(block: MlirBlock) -> Self {
+        Self {
+            block,
+            _context: Default::default(),
+        }
+    }
+
+    pub(crate) fn to_raw(&self) -> MlirBlock {
         self.block
     }
 }
