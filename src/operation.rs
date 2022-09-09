@@ -1,7 +1,7 @@
 use crate::{
     context::{Context, ContextRef},
     operation_state::OperationState,
-    region::Region,
+    region::RegionRef,
     string_ref::StringRef,
     value::Value,
 };
@@ -33,8 +33,8 @@ impl<'c> Operation<'c> {
         Value::from_raw(unsafe { mlirOperationGetResult(self.operation, index as isize) })
     }
 
-    pub fn region(&self, index: usize) -> Region {
-        unsafe { Region::from_raw(mlirOperationGetRegion(self.operation, index as isize)) }
+    pub fn region(&self, index: usize) -> RegionRef {
+        unsafe { RegionRef::from_raw(mlirOperationGetRegion(self.operation, index as isize)) }
     }
 
     pub fn print(&self) -> StringRef {
