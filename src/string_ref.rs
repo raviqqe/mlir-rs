@@ -19,6 +19,10 @@ impl StringRef {
         }
     }
 
+    pub(crate) unsafe fn to_raw(&self) -> MlirStringRef {
+        self.string
+    }
+
     pub(crate) unsafe fn from_raw(string: MlirStringRef) -> Self {
         Self { string }
     }

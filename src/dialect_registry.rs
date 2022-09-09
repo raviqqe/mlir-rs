@@ -2,7 +2,6 @@ use mlir_sys::{
     mlirDialectRegistryCreate, mlirDialectRegistryDestroy, mlirRegisterAllDialects,
     MlirDialectRegistry,
 };
-use std::{marker::PhantomData, mem::ManuallyDrop, ops::Deref};
 
 pub struct DialectRegistry {
     registry: MlirDialectRegistry,
@@ -33,28 +32,6 @@ impl Drop for DialectRegistry {
 impl Default for DialectRegistry {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-pub struct DialectRegistryRef<'r> {
-    registry: ManuallyDrop<DialectRegistry>,
-    _registry: PhantomData<&'r DialectRegistry>,
-}
-
-impl<'r> DialectRegistryRef<'r> {
-    pub(crate) unsafe fn from_raw(registry: MlirDialectRegistry) -> Self {
-        Self {
-            registry: ManuallyDrop::new(DialectRegistry { registry }),
-            _registry: Default::default(),
-        }
-    }
-}
-
-impl<'c> Deref for DialectRegistryRef<'c> {
-    type Target = DialectRegistry;
-
-    fn deref(&self) -> &Self::Target {
-        &self.registry
     }
 }
 
