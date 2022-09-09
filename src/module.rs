@@ -21,7 +21,7 @@ impl<'c> Module<'c> {
             _context: Default::default(),
         }
     }
-    pub fn as_operation<'a>(&'a self) -> OperationRef<'c, 'a> {
+    pub fn as_operation(&self) -> OperationRef {
         unsafe { OperationRef::from_raw(mlirModuleGetOperation(self.module)) }
     }
 

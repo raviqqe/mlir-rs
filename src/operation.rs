@@ -63,12 +63,12 @@ impl<'c> Drop for Operation<'c> {
     }
 }
 
-pub struct OperationRef<'c, 'o> {
-    operation: ManuallyDrop<Operation<'c>>,
-    _operation: PhantomData<&'o Operation<'c>>,
+pub struct OperationRef<'o> {
+    operation: ManuallyDrop<Operation<'o>>,
+    _operation: PhantomData<&'o Operation<'o>>,
 }
 
-impl<'c, 'o> OperationRef<'c, 'o> {
+impl<'o> OperationRef<'o> {
     pub(crate) unsafe fn from_raw(operation: MlirOperation) -> Self {
         Self {
             operation: ManuallyDrop::new(Operation::from_raw(operation)),
@@ -77,8 +77,8 @@ impl<'c, 'o> OperationRef<'c, 'o> {
     }
 }
 
-impl<'c, 'o> Deref for OperationRef<'c, 'o> {
-    type Target = Operation<'c>;
+impl<'o> Deref for OperationRef<'o> {
+    type Target = Operation<'o>;
 
     fn deref(&self) -> &Self::Target {
         &self.operation
