@@ -24,7 +24,7 @@ mod tests {
         let context = Context::new();
         let module = Module::new(Location::unknown(&context));
 
-        assert_eq!(module.as_operation().print().as_str(), "\0");
+        assert_eq!(module.as_operation().print().as_str().to_str().unwrap(), "");
     }
 
     #[test]
@@ -34,6 +34,6 @@ mod tests {
         context.append_dialect_registry(&registry);
         let module = Module::new(Location::unknown(&context));
 
-        assert_eq!(module.as_operation().print().as_str(), "\0");
+        assert_eq!(module.as_operation().print().as_str().to_str().unwrap(), "");
     }
 }

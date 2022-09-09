@@ -1,17 +1,21 @@
 use mlir_sys::{mlirStringRefCreateFromCString, MlirStringRef};
-use std::{ffi::CString, slice, str};
+use std::{
+    ffi::{CStr, CString},
+    slice, str,
+};
 
 pub struct StringRef {
     string: MlirStringRef,
 }
 
 impl StringRef {
-    pub fn as_str(&self) -> &str {
+    pub fn as_str(&self) -> &CStr {
         unsafe {
-            str::from_utf8_unchecked(slice::from_raw_parts(
+            CStr::from_bytes_with_nul(slice::from_raw_parts(
                 self.string.data as *mut u8,
                 self.string.length as usize,
             ))
+            .unwrap()
         }
     }
 
