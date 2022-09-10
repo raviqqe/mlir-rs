@@ -53,7 +53,7 @@ impl<'c> OperationState<'c> {
         self
     }
 
-    pub fn add_owned_regions(&mut self, regions: Vec<Region>) -> &mut Self {
+    pub fn add_regions(&mut self, regions: Vec<Region>) -> &mut Self {
         unsafe {
             mlirOperationStateAddOwnedRegions(
                 &mut self.state,
@@ -136,11 +136,11 @@ mod tests {
     }
 
     #[test]
-    fn add_owned_regions() {
+    fn add_regions() {
         let context = Context::new();
         let mut state = OperationState::new("foo", Location::unknown(&context));
 
-        state.add_owned_regions(vec![Region::new()]);
+        state.add_regions(vec![Region::new()]);
 
         Operation::new(state);
     }
