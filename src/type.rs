@@ -5,10 +5,10 @@ use crate::{
 use mlir_sys::{mlirTypeGetContext, mlirTypeParseGet, MlirType};
 use std::marker::PhantomData;
 
-// Types are always references.
-pub struct Type<'a> {
+// Types are always values but their internal storage is owned by contexts.
+pub struct Type<'c> {
     r#type: MlirType,
-    _parent: PhantomData<&'a MlirType>,
+    _parent: PhantomData<&'c Context>,
 }
 
 impl<'c> Type<'c> {

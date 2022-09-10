@@ -1,17 +1,18 @@
 use mlir_sys::{mlirStringRefCreateFromCString, MlirStringRef};
 use std::{
     ffi::{CStr, CString},
+    marker::PhantomData,
     slice, str,
 };
 
-pub struct StringRef {
+// https://mlir.llvm.org/docs/CAPI/#stringref
+pub struct StringRef<'a> {
     string: MlirStringRef,
+    _parent: PhantomData<&'a ()>,
 }
 
-// https://mlir.llvm.org/docs/CAPI/#stringref
-//
 // TODO Handle non-null terminated strings.
-impl StringRef {
+impl<'a> StringRef<'a> {
     pub fn as_str(&self) -> &CStr {
         unsafe {
             CStr::from_bytes_with_nul(slice::from_raw_parts(
@@ -27,16 +28,17 @@ impl StringRef {
     }
 
     pub(crate) unsafe fn from_raw(string: MlirStringRef) -> Self {
-        Self { string }
+        Self {
+            string,
+            _parent: Default::default(),
+        }
     }
 }
 
-impl From<&str> for StringRef {
+impl From<&str> for StringRef<'_> {
     fn from(string: &str) -> Self {
-        unsafe {
-            Self::from_raw(mlirStringRefCreateFromCString(
-                CString::new(string).unwrap().into_raw(),
-            ))
-        }
+        let string = CString::new(string).unwrap();
+
+        unsafe { Self::from_raw(mlirStringRefCreateFromCString(string.as_ptr())) }
     }
 }
