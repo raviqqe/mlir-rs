@@ -1,13 +1,7 @@
 use crate::{
-    attribute::Attribute,
-    block::Block,
-    context::Context,
-    identifier::Identifier,
-    location::Location,
-    r#type::Type,
-    region::Region,
-    utility::{as_string_ref, into_raw_array},
-    value::Value,
+    attribute::Attribute, block::Block, context::Context, identifier::Identifier,
+    location::Location, r#type::Type, region::Region, string_ref::StringRef,
+    utility::into_raw_array, value::Value,
 };
 use mlir_sys::{
     mlirNamedAttributeGet, mlirOperationStateAddAttributes, mlirOperationStateAddOperands,
@@ -24,7 +18,9 @@ pub struct OperationState<'c> {
 impl<'c> OperationState<'c> {
     pub fn new(name: &str, location: Location<'c>) -> Self {
         Self {
-            state: unsafe { mlirOperationStateGet(as_string_ref(name), location.to_raw()) },
+            state: unsafe {
+                mlirOperationStateGet(StringRef::from(name).to_raw(), location.to_raw())
+            },
             _context: Default::default(),
         }
     }

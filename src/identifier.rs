@@ -1,6 +1,6 @@
 use crate::{
     context::{Context, ContextRef},
-    utility::as_string_ref,
+    string_ref::StringRef,
 };
 use mlir_sys::{mlirIdentifierGet, mlirIdentifierGetContext, MlirIdentifier};
 use std::marker::PhantomData;
@@ -13,7 +13,9 @@ pub struct Identifier<'c> {
 impl<'c> Identifier<'c> {
     pub fn new(context: &Context, name: &str) -> Self {
         Self {
-            identifier: unsafe { mlirIdentifierGet(context.to_raw(), as_string_ref(name)) },
+            identifier: unsafe {
+                mlirIdentifierGet(context.to_raw(), StringRef::from(name).to_raw())
+            },
             _context: Default::default(),
         }
     }
