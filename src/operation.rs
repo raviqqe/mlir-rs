@@ -76,14 +76,14 @@ impl<'c> Drop for Operation<'c> {
 // TODO Should we split context lifetimes? Or, is it transitively proven that 'c > 'a?
 pub struct OperationRef<'o> {
     operation: ManuallyDrop<Operation<'o>>,
-    _operation: PhantomData<&'o Operation<'o>>,
+    _reference: PhantomData<&'o Operation<'o>>,
 }
 
 impl<'o> OperationRef<'o> {
     pub(crate) unsafe fn from_raw(operation: MlirOperation) -> Self {
         Self {
             operation: ManuallyDrop::new(Operation::from_raw(operation)),
-            _operation: Default::default(),
+            _reference: Default::default(),
         }
     }
 }

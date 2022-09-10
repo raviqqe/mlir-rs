@@ -63,14 +63,14 @@ impl<'c> Drop for Block<'c> {
 // TODO Should we split context lifetimes? Or, is it transitively proven that 'c > 'a?
 pub struct BlockRef<'a> {
     block: ManuallyDrop<Block<'a>>,
-    _block: PhantomData<&'a Block<'a>>,
+    _reference: PhantomData<&'a Block<'a>>,
 }
 
 impl<'a> BlockRef<'a> {
     pub(crate) unsafe fn from_raw(block: MlirBlock) -> Self {
         Self {
             block: ManuallyDrop::new(Block::from_raw(block)),
-            _block: Default::default(),
+            _reference: Default::default(),
         }
     }
 }

@@ -55,14 +55,14 @@ impl Default for Context {
 
 pub struct ContextRef<'c> {
     context: ManuallyDrop<Context>,
-    _context: PhantomData<&'c Context>,
+    _reference: PhantomData<&'c Context>,
 }
 
 impl<'c> ContextRef<'c> {
     pub(crate) unsafe fn from_raw(context: MlirContext) -> Self {
         Self {
             context: ManuallyDrop::new(Context { context }),
-            _context: Default::default(),
+            _reference: Default::default(),
         }
     }
 }
