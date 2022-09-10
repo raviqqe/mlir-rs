@@ -66,15 +66,6 @@ pub struct BlockRef<'a> {
     _reference: PhantomData<&'a Block<'a>>,
 }
 
-impl<'a> BlockRef<'a> {
-    pub(crate) unsafe fn from_raw(block: MlirBlock) -> Self {
-        Self {
-            block: ManuallyDrop::new(Block::from_raw(block)),
-            _reference: Default::default(),
-        }
-    }
-}
-
 impl<'a> Deref for BlockRef<'a> {
     type Target = Block<'a>;
 

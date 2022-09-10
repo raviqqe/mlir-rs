@@ -74,12 +74,12 @@ impl<'c> Drop for Operation<'c> {
 }
 
 // TODO Should we split context lifetimes? Or, is it transitively proven that 'c > 'a?
-pub struct OperationRef<'o> {
-    operation: ManuallyDrop<Operation<'o>>,
-    _reference: PhantomData<&'o Operation<'o>>,
+pub struct OperationRef<'a> {
+    operation: ManuallyDrop<Operation<'a>>,
+    _reference: PhantomData<&'a Operation<'a>>,
 }
 
-impl<'o> OperationRef<'o> {
+impl<'a> OperationRef<'a> {
     pub(crate) unsafe fn from_raw(operation: MlirOperation) -> Self {
         Self {
             operation: ManuallyDrop::new(Operation::from_raw(operation)),
@@ -88,8 +88,8 @@ impl<'o> OperationRef<'o> {
     }
 }
 
-impl<'o> Deref for OperationRef<'o> {
-    type Target = Operation<'o>;
+impl<'a> Deref for OperationRef<'a> {
+    type Target = Operation<'a>;
 
     fn deref(&self) -> &Self::Target {
         &self.operation
