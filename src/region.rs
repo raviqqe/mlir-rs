@@ -42,12 +42,12 @@ impl Drop for Region {
     }
 }
 
-pub struct RegionRef<'r> {
+pub struct RegionRef<'a> {
     region: ManuallyDrop<Region>,
-    _region: PhantomData<&'r Region>,
+    _region: PhantomData<&'a Region>,
 }
 
-impl<'r> RegionRef<'r> {
+impl<'a> RegionRef<'a> {
     pub(crate) unsafe fn from_raw(region: MlirRegion) -> Self {
         Self {
             region: ManuallyDrop::new(Region { region }),
@@ -56,7 +56,7 @@ impl<'r> RegionRef<'r> {
     }
 }
 
-impl<'r> Deref for RegionRef<'r> {
+impl<'a> Deref for RegionRef<'a> {
     type Target = Region;
 
     fn deref(&self) -> &Self::Target {
