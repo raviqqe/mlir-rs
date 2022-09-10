@@ -2,7 +2,11 @@ use crate::{
     context::Context, location::Location, r#type::Type, region::RegionRef, utility::into_raw_array,
 };
 use mlir_sys::{mlirBlockCreate, mlirBlockDestroy, mlirBlockGetParentRegion, MlirBlock};
-use std::marker::PhantomData;
+use std::{
+    marker::PhantomData,
+    mem::{forget, ManuallyDrop},
+    ops::Deref,
+};
 
 pub struct Block<'c> {
     block: MlirBlock,
@@ -41,8 +45,41 @@ impl<'c> Block<'c> {
         }
     }
 
-    pub(crate) fn to_raw(&self) -> MlirBlock {
-        self.block
+    pub(crate) fn into_raw(self) -> MlirBlock {
+        let block = self.block;
+
+        forget(self);
+
+        block
+    }
+}
+
+impl<'c> Drop for Block<'c> {
+    fn drop(&mut self) {
+        unsafe { mlirBlockDestroy(self.block) };
+    }
+}
+
+// TODO Should we split context lifetimes? Or, is it transitively proven that 'c > 'a?
+pub struct BlockRef<'a> {
+    block: ManuallyDrop<Block<'a>>,
+    _block: PhantomData<&'a Block<'a>>,
+}
+
+impl<'a> BlockRef<'a> {
+    pub(crate) unsafe fn from_raw(block: MlirBlock) -> Self {
+        Self {
+            block: ManuallyDrop::new(Block::from_raw(block)),
+            _block: Default::default(),
+        }
+    }
+}
+
+impl<'a> Deref for BlockRef<'a> {
+    type Target = Block<'a>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.block
     }
 }
 

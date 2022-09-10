@@ -1,5 +1,8 @@
 use crate::{
-    context::ContextRef, operation_state::OperationState, region::RegionRef, string_ref::StringRef,
+    context::{Context, ContextRef},
+    operation_state::OperationState,
+    region::RegionRef,
+    string_ref::StringRef,
     value::Value,
 };
 use mlir_sys::{
@@ -9,14 +12,16 @@ use mlir_sys::{
 };
 use std::{ffi::c_void, marker::PhantomData, mem::ManuallyDrop, ops::Deref};
 
-pub struct Operation {
+pub struct Operation<'c> {
     operation: MlirOperation,
+    _context: PhantomData<&'c Context>,
 }
 
-impl Operation {
+impl<'c> Operation<'c> {
     pub fn new(state: OperationState) -> Self {
         Self {
             operation: unsafe { mlirOperationCreate(&mut state.into_raw()) },
+            _context: Default::default(),
         }
     }
 
@@ -55,19 +60,23 @@ impl Operation {
     }
 
     pub(crate) unsafe fn from_raw(operation: MlirOperation) -> Self {
-        Self { operation }
+        Self {
+            operation,
+            _context: Default::default(),
+        }
     }
 }
 
-impl Drop for Operation {
+impl<'c> Drop for Operation<'c> {
     fn drop(&mut self) {
         unsafe { mlirOperationDestroy(self.operation) };
     }
 }
 
+// TODO Should we split context lifetimes? Or, is it transitively proven that 'c > 'a?
 pub struct OperationRef<'o> {
-    operation: ManuallyDrop<Operation>,
-    _operation: PhantomData<&'o Operation>,
+    operation: ManuallyDrop<Operation<'o>>,
+    _operation: PhantomData<&'o Operation<'o>>,
 }
 
 impl<'o> OperationRef<'o> {
@@ -80,7 +89,7 @@ impl<'o> OperationRef<'o> {
 }
 
 impl<'o> Deref for OperationRef<'o> {
-    type Target = Operation;
+    type Target = Operation<'o>;
 
     fn deref(&self) -> &Self::Target {
         &self.operation

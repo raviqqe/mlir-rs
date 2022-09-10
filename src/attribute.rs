@@ -5,6 +5,7 @@ use crate::{
 use mlir_sys::{mlirAttributeGetContext, mlirAttributeParseGet, MlirAttribute};
 use std::marker::PhantomData;
 
+// Attributes are always values but their internal storage is owned by contexts.
 pub struct Attribute<'c> {
     attribute: MlirAttribute,
     _context: PhantomData<&'c Context>,

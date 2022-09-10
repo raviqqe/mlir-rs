@@ -75,7 +75,12 @@ impl<'c> OperationState<'c> {
             mlirOperationStateAddSuccessors(
                 &mut self.state,
                 successors.len() as isize,
-                into_raw_array(successors.iter().map(|block| block.to_raw()).collect()),
+                into_raw_array(
+                    successors
+                        .into_iter()
+                        .map(|block| block.into_raw())
+                        .collect(),
+                ),
             )
         }
 
