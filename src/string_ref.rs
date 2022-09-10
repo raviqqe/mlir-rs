@@ -42,7 +42,7 @@ impl<'a> StringRef<'a> {
     }
 }
 
-impl From<&str> for StringRef<'_> {
+impl From<&str> for StringRef<'static> {
     fn from(string: &str) -> Self {
         if !STRING_CACHE.read().unwrap().contains_key(string) {
             STRING_CACHE
