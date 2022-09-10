@@ -1,7 +1,7 @@
 use mlir_sys::MlirValue;
 use std::marker::PhantomData;
 
-// Values are always non-owning references.
+// Values are always non-owning references. See the `Value` class in the MLIR C++ API.
 pub struct Value<'a> {
     value: MlirValue,
     _parent: PhantomData<&'a ()>,
