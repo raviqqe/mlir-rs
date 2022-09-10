@@ -1,7 +1,7 @@
 use crate::{
     context::Context, location::Location, r#type::Type, region::RegionRef, utility::into_raw_array,
 };
-use mlir_sys::{mlirBlockCreate, mlirBlockGetParentRegion, MlirBlock};
+use mlir_sys::{mlirBlockCreate, mlirBlockDestroy, mlirBlockGetParentRegion, MlirBlock};
 use std::marker::PhantomData;
 
 pub struct Block<'c> {

@@ -1,8 +1,5 @@
 use crate::{
-    context::{Context, ContextRef},
-    operation_state::OperationState,
-    region::RegionRef,
-    string_ref::StringRef,
+    context::ContextRef, operation_state::OperationState, region::RegionRef, string_ref::StringRef,
     value::Value,
 };
 use mlir_sys::{
@@ -12,24 +9,22 @@ use mlir_sys::{
 };
 use std::{ffi::c_void, marker::PhantomData, mem::ManuallyDrop, ops::Deref};
 
-pub struct Operation<'c> {
+pub struct Operation {
     operation: MlirOperation,
-    _context: PhantomData<&'c Context>,
 }
 
-impl<'c> Operation<'c> {
+impl Operation {
     pub fn new(state: OperationState) -> Self {
         Self {
             operation: unsafe { mlirOperationCreate(&mut state.into_raw()) },
-            _context: Default::default(),
         }
     }
 
-    pub fn context(&self) -> ContextRef<'c> {
+    pub fn context(&self) -> ContextRef {
         unsafe { ContextRef::from_raw(mlirOperationGetContext(self.operation)) }
     }
 
-    pub fn result(&self, index: usize) -> Value<'c> {
+    pub fn result(&self, index: usize) -> Value {
         Value::from_raw(unsafe { mlirOperationGetResult(self.operation, index as isize) })
     }
 
@@ -60,22 +55,19 @@ impl<'c> Operation<'c> {
     }
 
     pub(crate) unsafe fn from_raw(operation: MlirOperation) -> Self {
-        Self {
-            operation,
-            _context: Default::default(),
-        }
+        Self { operation }
     }
 }
 
-impl<'c> Drop for Operation<'c> {
+impl Drop for Operation {
     fn drop(&mut self) {
         unsafe { mlirOperationDestroy(self.operation) };
     }
 }
 
 pub struct OperationRef<'o> {
-    operation: ManuallyDrop<Operation<'o>>,
-    _operation: PhantomData<&'o Operation<'o>>,
+    operation: ManuallyDrop<Operation>,
+    _operation: PhantomData<&'o Operation>,
 }
 
 impl<'o> OperationRef<'o> {
@@ -88,7 +80,7 @@ impl<'o> OperationRef<'o> {
 }
 
 impl<'o> Deref for OperationRef<'o> {
-    type Target = Operation<'o>;
+    type Target = Operation;
 
     fn deref(&self) -> &Self::Target {
         &self.operation
@@ -98,7 +90,7 @@ impl<'o> Deref for OperationRef<'o> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::location::Location;
+    use crate::{context::Context, location::Location};
 
     #[test]
     fn new() {

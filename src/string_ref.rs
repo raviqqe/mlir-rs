@@ -8,6 +8,9 @@ pub struct StringRef {
     string: MlirStringRef,
 }
 
+// https://mlir.llvm.org/docs/CAPI/#stringref
+//
+// TODO Handle non-null terminated strings.
 impl StringRef {
     pub fn as_str(&self) -> &CStr {
         unsafe {

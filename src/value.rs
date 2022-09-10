@@ -1,17 +1,17 @@
-use crate::context::Context;
 use mlir_sys::MlirValue;
 use std::marker::PhantomData;
 
-pub struct Value<'c> {
+// Values are always non-owning references.
+pub struct Value<'a> {
     value: MlirValue,
-    _context: PhantomData<&'c Context>,
+    _parent: PhantomData<&'a ()>,
 }
 
-impl<'c> Value<'c> {
+impl<'a> Value<'a> {
     pub(crate) fn from_raw(value: MlirValue) -> Self {
         Self {
             value,
-            _context: Default::default(),
+            _parent: Default::default(),
         }
     }
 

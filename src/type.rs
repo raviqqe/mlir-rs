@@ -5,16 +5,17 @@ use crate::{
 use mlir_sys::{mlirTypeGetContext, mlirTypeParseGet, MlirType};
 use std::marker::PhantomData;
 
-pub struct Type<'c> {
+// Types are always references.
+pub struct Type<'a> {
     r#type: MlirType,
-    _context: PhantomData<&'c Context>,
+    _parent: PhantomData<&'a MlirType>,
 }
 
 impl<'c> Type<'c> {
     pub fn parse(context: &Context, source: &str) -> Self {
         Self {
             r#type: unsafe { mlirTypeParseGet(context.to_raw(), as_string_ref(source)) },
-            _context: Default::default(),
+            _parent: Default::default(),
         }
     }
 
