@@ -205,6 +205,7 @@ name = "melior"
 version = "0.1.0"
 dependencies = [
  "mlir-sys",
+ "once_cell",
 ]
 
 [[package]]

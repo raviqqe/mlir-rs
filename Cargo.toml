@@ -8,3 +8,4 @@ repository = "https://github.com/raviqqe/melior"
 
 [dependencies]
 mlir-sys = { git = "https://github.com/raviqqe/mlir-sys", branch = "chore/llvm-15" }
+once_cell = "1"
