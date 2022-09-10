@@ -13,7 +13,7 @@ static STRING_CACHE: Lazy<RwLock<HashMap<String, CString>>> = Lazy::new(|| Defau
 // https://mlir.llvm.org/docs/CAPI/#stringref
 //
 // TODO The documentation says string refs do not have to be null-terminated.
-// But it looks like some APIs do not handle strings not null-terminated?
+// But it looks like some functions do not handle strings not null-terminated?
 pub struct StringRef<'a> {
     string: MlirStringRef,
     _parent: PhantomData<&'a ()>,
