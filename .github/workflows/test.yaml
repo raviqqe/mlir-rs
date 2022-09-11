@@ -23,4 +23,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: tools/setup.sh
-      - run: PATH=/usr/lib/llvm-15/bin:$PATH cargo test
+      - run: cargo test
