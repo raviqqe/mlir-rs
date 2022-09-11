@@ -27,7 +27,7 @@ mod tests {
         let context = Context::new();
         let module = Module::new(Location::unknown(&context));
 
-        assert_eq!(module.as_operation().print().as_str().to_str().unwrap(), "");
+        assert_eq!(module.as_operation().print(), "module{}");
     }
 
     #[test]
@@ -37,7 +37,7 @@ mod tests {
         context.append_dialect_registry(&registry);
         let module = Module::new(Location::unknown(&context));
 
-        assert_eq!(module.as_operation().print().as_str().to_str().unwrap(), "");
+        assert_eq!(module.as_operation().print(), "module{}");
     }
 
     #[test]
@@ -108,8 +108,8 @@ mod tests {
             .insert_operation(0, function);
 
         module.as_operation().dump();
-        assert!(module.as_operation().verify());
 
-        assert_eq!(module.as_operation().print().as_str().to_str().unwrap(), "");
+        assert!(module.as_operation().verify());
+        assert_eq!(module.as_operation().print(), "");
     }
 }

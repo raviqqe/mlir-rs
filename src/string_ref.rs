@@ -1,12 +1,6 @@
 use mlir_sys::{mlirStringRefCreateFromCString, MlirStringRef};
 use once_cell::sync::Lazy;
-use std::{
-    collections::HashMap,
-    ffi::{CStr, CString},
-    marker::PhantomData,
-    slice, str,
-    sync::RwLock,
-};
+use std::{collections::HashMap, ffi::CString, marker::PhantomData, slice, str, sync::RwLock};
 
 static STRING_CACHE: Lazy<RwLock<HashMap<String, CString>>> = Lazy::new(|| Default::default());
 
@@ -20,12 +14,16 @@ pub struct StringRef<'a> {
 }
 
 impl<'a> StringRef<'a> {
-    pub fn as_str(&self) -> &CStr {
+    pub fn as_str(&self) -> &str {
         unsafe {
-            CStr::from_bytes_with_nul(slice::from_raw_parts(
-                self.string.data as *mut u8,
-                self.string.length as usize,
-            ))
+            let bytes =
+                slice::from_raw_parts(self.string.data as *mut u8, self.string.length as usize);
+
+            str::from_utf8(if bytes[bytes.len() - 1] == 0 {
+                &bytes[..bytes.len() - 1]
+            } else {
+                bytes
+            })
             .unwrap()
         }
     }

@@ -46,22 +46,26 @@ impl<'c> Operation<'c> {
         unsafe { mlirOperationVerify(self.operation) }
     }
 
-    pub fn print(&self) -> StringRef {
-        let mut string: Option<MlirStringRef> = None;
+    pub fn print(&self) -> String {
+        let mut strings: Vec<StringRef> = vec![];
 
         unsafe extern "C" fn callback(string: MlirStringRef, data: *mut c_void) {
-            *(data as *mut Option<MlirStringRef>) = Some(string);
+            (&mut *(data as *mut Vec<StringRef>)).push(StringRef::from_raw(string));
         }
 
         unsafe {
             mlirOperationPrint(
                 self.operation,
                 Some(callback),
-                &mut string as *mut _ as *mut c_void,
+                &mut strings as *mut _ as *mut c_void,
             );
-
-            StringRef::from_raw(string.unwrap())
         }
+
+        strings
+            .iter()
+            .map(|string| string.as_str())
+            .collect::<Vec<&str>>()
+            .concat()
     }
 
     pub fn dump(&self) {
