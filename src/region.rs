@@ -1,5 +1,8 @@
-use crate::block::Block;
-use mlir_sys::{mlirRegionCreate, mlirRegionDestroy, mlirRegionGetFirstBlock, MlirRegion};
+use crate::block::{Block, BlockRef};
+use mlir_sys::{
+    mlirRegionAppendOwnedBlock, mlirRegionCreate, mlirRegionDestroy, mlirRegionGetFirstBlock,
+    MlirRegion,
+};
 use std::{
     marker::PhantomData,
     mem::{forget, ManuallyDrop},
@@ -17,8 +20,12 @@ impl Region {
         }
     }
 
-    pub fn first_block(&self) -> Block {
-        Block::from_raw(unsafe { mlirRegionGetFirstBlock(self.region) })
+    pub fn first_block(&self) -> BlockRef {
+        unsafe { BlockRef::from_raw(mlirRegionGetFirstBlock(self.region)) }
+    }
+
+    pub fn append_block(&self, block: Block) {
+        unsafe { mlirRegionAppendOwnedBlock(self.region, block.into_raw()) }
     }
 
     pub(crate) unsafe fn into_raw(self) -> mlir_sys::MlirRegion {

@@ -1,7 +1,11 @@
 use crate::{
-    context::Context, location::Location, r#type::Type, region::RegionRef, utility::into_raw_array,
+    context::Context, location::Location, operation::Operation, r#type::Type, region::RegionRef,
+    utility::into_raw_array,
 };
-use mlir_sys::{mlirBlockCreate, mlirBlockDestroy, mlirBlockGetParentRegion, MlirBlock};
+use mlir_sys::{
+    mlirBlockAppendOwnedOperation, mlirBlockCreate, mlirBlockDestroy, mlirBlockGetParentRegion,
+    mlirBlockInsertOwnedOperation, MlirBlock,
+};
 use std::{
     marker::PhantomData,
     mem::{forget, ManuallyDrop},
@@ -38,14 +42,24 @@ impl<'c> Block<'c> {
         unsafe { RegionRef::from_raw(mlirBlockGetParentRegion(self.block)) }
     }
 
-    pub(crate) fn from_raw(block: MlirBlock) -> Self {
+    pub fn insert_operation(&self, position: usize, operation: Operation) {
+        unsafe {
+            mlirBlockInsertOwnedOperation(self.block, position as isize, operation.into_raw())
+        }
+    }
+
+    pub fn append_operation(&self, operation: Operation) {
+        unsafe { mlirBlockAppendOwnedOperation(self.block, operation.into_raw()) }
+    }
+
+    pub(crate) unsafe fn from_raw(block: MlirBlock) -> Self {
         Self {
             block,
             _context: Default::default(),
         }
     }
 
-    pub(crate) fn into_raw(self) -> MlirBlock {
+    pub(crate) unsafe fn into_raw(self) -> MlirBlock {
         let block = self.block;
 
         forget(self);
@@ -64,6 +78,15 @@ impl<'c> Drop for Block<'c> {
 pub struct BlockRef<'a> {
     block: ManuallyDrop<Block<'a>>,
     _reference: PhantomData<&'a Block<'a>>,
+}
+
+impl<'a> BlockRef<'a> {
+    pub(crate) unsafe fn from_raw(block: MlirBlock) -> Self {
+        Self {
+            block: ManuallyDrop::new(Block::from_raw(block)),
+            _reference: Default::default(),
+        }
+    }
 }
 
 impl<'a> Deref for BlockRef<'a> {

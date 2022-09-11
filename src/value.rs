@@ -3,6 +3,7 @@ use std::marker::PhantomData;
 
 // Values are always non-owning references to their parents, such as operations and block arguments.
 // See the `Value` class in the MLIR C++ API.
+#[derive(Clone, Copy, Debug)]
 pub struct Value<'a> {
     value: MlirValue,
     _parent: PhantomData<&'a ()>,

@@ -7,10 +7,15 @@ use crate::{
 };
 use mlir_sys::{
     mlirOperationCreate, mlirOperationDestroy, mlirOperationDump, mlirOperationGetContext,
-    mlirOperationGetRegion, mlirOperationGetResult, mlirOperationPrint, MlirOperation,
-    MlirStringRef,
+    mlirOperationGetRegion, mlirOperationGetResult, mlirOperationPrint, mlirOperationVerify,
+    MlirOperation, MlirStringRef,
 };
-use std::{ffi::c_void, marker::PhantomData, mem::ManuallyDrop, ops::Deref};
+use std::{
+    ffi::c_void,
+    marker::PhantomData,
+    mem::{forget, ManuallyDrop},
+    ops::Deref,
+};
 
 pub struct Operation<'c> {
     operation: MlirOperation,
@@ -35,6 +40,10 @@ impl<'c> Operation<'c> {
 
     pub fn region(&self, index: usize) -> RegionRef {
         unsafe { RegionRef::from_raw(mlirOperationGetRegion(self.operation, index as isize)) }
+    }
+
+    pub fn verify(&self) -> bool {
+        unsafe { mlirOperationVerify(self.operation) }
     }
 
     pub fn print(&self) -> StringRef {
@@ -64,6 +73,14 @@ impl<'c> Operation<'c> {
             operation,
             _context: Default::default(),
         }
+    }
+
+    pub(crate) unsafe fn into_raw(self) -> MlirOperation {
+        let operation = self.operation;
+
+        forget(self);
+
+        operation
     }
 }
 
