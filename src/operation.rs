@@ -7,8 +7,9 @@ use crate::{
 };
 use mlir_sys::{
     mlirOperationCreate, mlirOperationDestroy, mlirOperationDump, mlirOperationGetContext,
-    mlirOperationGetNextInBlock, mlirOperationGetRegion, mlirOperationGetResult,
-    mlirOperationPrint, mlirOperationVerify, MlirOperation, MlirStringRef,
+    mlirOperationGetNextInBlock, mlirOperationGetNumRegions, mlirOperationGetNumResults,
+    mlirOperationGetRegion, mlirOperationGetResult, mlirOperationPrint, mlirOperationVerify,
+    MlirOperation, MlirStringRef,
 };
 use std::{
     ffi::c_void,
@@ -34,16 +35,43 @@ impl<'c> Operation<'c> {
         unsafe { ContextRef::from_raw(mlirOperationGetContext(self.operation)) }
     }
 
-    pub fn result(&self, index: usize) -> Value {
-        unsafe { Value::from_raw(mlirOperationGetResult(self.operation, index as isize)) }
+    pub fn result(&self, index: usize) -> Option<Value> {
+        unsafe {
+            if index < mlirOperationGetNumResults(self.operation) as usize {
+                Some(Value::from_raw(mlirOperationGetResult(
+                    self.operation,
+                    index as isize,
+                )))
+            } else {
+                None
+            }
+        }
     }
 
-    pub fn region(&self, index: usize) -> RegionRef {
-        unsafe { RegionRef::from_raw(mlirOperationGetRegion(self.operation, index as isize)) }
+    pub fn region(&self, index: usize) -> Option<RegionRef> {
+        unsafe {
+            if index < mlirOperationGetNumRegions(self.operation) as usize {
+                Some(RegionRef::from_raw(mlirOperationGetRegion(
+                    self.operation,
+                    index as isize,
+                )))
+            } else {
+                None
+            }
+        }
     }
 
-    pub fn region_mut(&mut self, index: usize) -> RegionRefMut {
-        unsafe { RegionRefMut::from_raw(mlirOperationGetRegion(self.operation, index as isize)) }
+    pub fn region_mut(&mut self, index: usize) -> Option<RegionRefMut> {
+        unsafe {
+            if index < mlirOperationGetNumRegions(self.operation) as usize {
+                Some(RegionRefMut::from_raw(mlirOperationGetRegion(
+                    self.operation,
+                    index as isize,
+                )))
+            } else {
+                None
+            }
+        }
     }
 
     pub fn next_in_block(&self) -> Option<OperationRef> {
@@ -172,5 +200,35 @@ mod tests {
             "foo",
             Location::unknown(&Context::new()),
         ));
+    }
+
+    #[test]
+    fn result_none() {
+        assert!(Operation::new(OperationState::new(
+            "foo",
+            Location::unknown(&Context::new()),
+        ))
+        .result(0)
+        .is_none());
+    }
+
+    #[test]
+    fn region_none() {
+        assert!(Operation::new(OperationState::new(
+            "foo",
+            Location::unknown(&Context::new()),
+        ))
+        .region(0)
+        .is_none());
+    }
+
+    #[test]
+    fn region_mut_none() {
+        assert!(Operation::new(OperationState::new(
+            "foo",
+            Location::unknown(&Context::new()),
+        ))
+        .region_mut(0)
+        .is_none());
     }
 }

@@ -81,7 +81,10 @@ mod tests {
                 let mut state = OperationState::new("memref.dim", location);
 
                 state
-                    .add_operands(vec![function_block.argument(0).unwrap(), zero.result(0)])
+                    .add_operands(vec![
+                        function_block.argument(0).unwrap(),
+                        zero.result(0).unwrap(),
+                    ])
                     .add_results(vec![index_type]);
 
                 Operation::new(state)
@@ -131,7 +134,7 @@ mod tests {
                 let add = loop_block.append_operation({
                     let mut state = OperationState::new("arith.addf", location);
 
-                    state.add_operands(vec![lhs.result(0), rhs.result(0)]);
+                    state.add_operands(vec![lhs.result(0).unwrap(), rhs.result(0).unwrap()]);
                     state.add_results(vec![f32_type]);
 
                     Operation::new(state)
@@ -141,7 +144,7 @@ mod tests {
                     let mut state = OperationState::new("memref.store", location);
 
                     state.add_operands(vec![
-                        add.result(0),
+                        add.result(0).unwrap(),
                         function_block.argument(0).unwrap(),
                         loop_block.argument(0).unwrap(),
                     ]);
@@ -156,7 +159,11 @@ mod tests {
             function_block.append_operation(Operation::new({
                 let mut state = OperationState::new("scf.for", location);
 
-                state.add_operands(vec![zero.result(0), dim.result(0), one.result(0)]);
+                state.add_operands(vec![
+                    zero.result(0).unwrap(),
+                    dim.result(0).unwrap(),
+                    one.result(0).unwrap(),
+                ]);
                 let loop_region = Region::new();
                 loop_region.append_block(loop_block);
                 state.add_regions(vec![loop_region]);
