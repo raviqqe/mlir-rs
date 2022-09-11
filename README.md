@@ -10,7 +10,7 @@ This crate is a wrapper of [the MLIR C API](https://mlir.llvm.org/docs/CAPI/).
 
 ## Contribution
 
-Melior is still the alpha stage as well as the MLIR C API. Contribution is welcome! But, note that the API is unstable and can have breaking changes in the future.
+Melior is still in the alpha stage as well as the MLIR C API. Contribution is welcome! But, note that the API is unstable and can have breaking changes in the future.
 
 ### Naming conventions
 
