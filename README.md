@@ -14,9 +14,10 @@ Melior is still in the alpha stage as well as the MLIR C API. Contribution is we
 
 ### Naming conventions
 
+- `mlir<X>Create*` functions are renamed as `<X>::new`.
 - `mlir<X>Get<Y>` functions are renamed as follows:
-  - If the resulting objects refer to `self`, they are named `<X>::as_<Y>()`.
-  - Otherwise, they are named just `<X>::<Y>()` and may have argments, such as position indices.
+  - If the resulting objects refer to `self`, they are named `<X>::as_<Y>`.
+  - Otherwise, they are named just `<X>::<Y>` and may have argments, such as position indices.
 
 ## References
 
