@@ -14,7 +14,7 @@ use mlir_sys::{
 use std::{
     marker::PhantomData,
     mem::{forget, ManuallyDrop},
-    ops::Deref,
+    ops::{Deref, DerefMut},
 };
 
 pub struct Block<'c> {
@@ -63,13 +63,13 @@ impl<'c> Block<'c> {
         }
     }
 
-    pub fn insert_operation(&self, position: usize, operation: Operation) {
+    pub fn insert_operation(&mut self, position: usize, operation: Operation) {
         unsafe {
             mlirBlockInsertOwnedOperation(self.block, position as isize, operation.into_raw())
         }
     }
 
-    pub fn append_operation(&self, operation: Operation) {
+    pub fn append_operation(&mut self, operation: Operation) {
         unsafe { mlirBlockAppendOwnedOperation(self.block, operation.into_raw()) }
     }
 
@@ -115,6 +115,34 @@ impl<'a> Deref for BlockRef<'a> {
 
     fn deref(&self) -> &Self::Target {
         &self.block
+    }
+}
+
+pub struct BlockRefMut<'a> {
+    block: ManuallyDrop<Block<'a>>,
+    _reference: PhantomData<&'a mut Block<'a>>,
+}
+
+impl<'a> BlockRefMut<'a> {
+    pub(crate) unsafe fn from_raw(block: MlirBlock) -> Self {
+        Self {
+            block: ManuallyDrop::new(Block::from_raw(block)),
+            _reference: Default::default(),
+        }
+    }
+}
+
+impl<'a> Deref for BlockRefMut<'a> {
+    type Target = Block<'a>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.block
+    }
+}
+
+impl<'a> DerefMut for BlockRefMut<'a> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.block
     }
 }
 

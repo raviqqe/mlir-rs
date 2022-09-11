@@ -6,7 +6,7 @@ use mlir_sys::{
 use std::{
     marker::PhantomData,
     mem::{forget, ManuallyDrop},
-    ops::Deref,
+    ops::{Deref, DerefMut},
 };
 
 pub struct Region {
@@ -68,6 +68,34 @@ impl<'a> Deref for RegionRef<'a> {
 
     fn deref(&self) -> &Self::Target {
         &self.region
+    }
+}
+
+pub struct RegionRefMut<'a> {
+    region: ManuallyDrop<Region>,
+    _region: PhantomData<&'a mut Region>,
+}
+
+impl<'a> RegionRefMut<'a> {
+    pub(crate) unsafe fn from_raw(region: MlirRegion) -> Self {
+        Self {
+            region: ManuallyDrop::new(Region { region }),
+            _region: Default::default(),
+        }
+    }
+}
+
+impl<'a> Deref for RegionRefMut<'a> {
+    type Target = Region;
+
+    fn deref(&self) -> &Self::Target {
+        &self.region
+    }
+}
+
+impl<'a> DerefMut for RegionRefMut<'a> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.region
     }
 }
 

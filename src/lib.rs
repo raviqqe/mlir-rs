@@ -55,13 +55,13 @@ mod tests {
         context.get_or_load_dialect("scf");
 
         let location = Location::unknown(&context);
-        let module = Module::new(location);
+        let mut module = Module::new(location);
 
         let r#type = Type::parse(&context, "memref<?xf32>");
 
         let function = {
             let region = Region::new();
-            let block = Block::new(vec![(r#type, location), (r#type, location)]);
+            let mut block = Block::new(vec![(r#type, location), (r#type, location)]);
             let index_type = Type::parse(&context, "index");
 
             block.append_operation({
@@ -114,11 +114,7 @@ mod tests {
             Operation::new(state)
         };
 
-        module
-            .as_operation()
-            .region(0)
-            .first_block()
-            .insert_operation(0, function);
+        module.body_mut().insert_operation(0, function);
 
         module.as_operation().dump();
 

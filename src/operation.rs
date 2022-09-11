@@ -1,7 +1,7 @@
 use crate::{
     context::{Context, ContextRef},
     operation_state::OperationState,
-    region::RegionRef,
+    region::{RegionRef, RegionRefMut},
     string_ref::StringRef,
     value::Value,
 };
@@ -14,7 +14,7 @@ use std::{
     ffi::c_void,
     marker::PhantomData,
     mem::{forget, ManuallyDrop},
-    ops::Deref,
+    ops::{Deref, DerefMut},
 };
 
 pub struct Operation<'c> {
@@ -40,6 +40,10 @@ impl<'c> Operation<'c> {
 
     pub fn region(&self, index: usize) -> RegionRef {
         unsafe { RegionRef::from_raw(mlirOperationGetRegion(self.operation, index as isize)) }
+    }
+
+    pub fn region_mut(&mut self, index: usize) -> RegionRefMut {
+        unsafe { RegionRefMut::from_raw(mlirOperationGetRegion(self.operation, index as isize)) }
     }
 
     pub fn next_in_block(&self) -> Option<OperationRef> {
@@ -126,6 +130,34 @@ impl<'a> Deref for OperationRef<'a> {
 
     fn deref(&self) -> &Self::Target {
         &self.operation
+    }
+}
+
+pub struct OperationRefMut<'a> {
+    operation: ManuallyDrop<Operation<'a>>,
+    _reference: PhantomData<&'a mut Operation<'a>>,
+}
+
+impl<'a> OperationRefMut<'a> {
+    pub(crate) unsafe fn from_raw(operation: MlirOperation) -> Self {
+        Self {
+            operation: ManuallyDrop::new(Operation::from_raw(operation)),
+            _reference: Default::default(),
+        }
+    }
+}
+
+impl<'a> Deref for OperationRefMut<'a> {
+    type Target = Operation<'a>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.operation
+    }
+}
+
+impl<'a> DerefMut for OperationRefMut<'a> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.operation
     }
 }
 
