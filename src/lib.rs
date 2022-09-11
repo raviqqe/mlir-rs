@@ -61,14 +61,13 @@ mod tests {
 
         let function = {
             let region = Region::new();
-            let mut block = Block::new(vec![(r#type, location), (r#type, location)]);
+            let block = Block::new(vec![(r#type, location), (r#type, location)]);
             let index_type = Type::parse(&context, "index");
 
-            block.append_operation({
+            let zero = block.append_operation({
                 let mut state = OperationState::new("arith.constant", location);
 
-                state.add_results(vec![index_type]);
-                state.add_attributes(vec![(
+                state.add_results(vec![index_type]).add_attributes(vec![(
                     Identifier::new(&context, "value"),
                     Attribute::parse(&context, "0 : index"),
                 )]);
@@ -79,11 +78,9 @@ mod tests {
             block.append_operation({
                 let mut state = OperationState::new("memref.dim", location);
 
-                state.add_operands(vec![
-                    block.argument(0),
-                    block.first_operation().unwrap().result(0),
-                ]);
-                state.add_results(vec![index_type]);
+                state
+                    .add_operands(vec![block.argument(0), zero.result(0)])
+                    .add_results(vec![index_type]);
 
                 Operation::new(state)
             });
@@ -99,17 +96,18 @@ mod tests {
 
             let mut state = OperationState::new("func.func", Location::unknown(&context));
 
-            state.add_attributes(vec![
-                (
-                    Identifier::new(&context, "function_type"),
-                    Attribute::parse(&context, "(memref<?xf32>, memref<?xf32>) -> ()"),
-                ),
-                (
-                    Identifier::new(&context, "sym_name"),
-                    Attribute::parse(&context, "\"add\""),
-                ),
-            ]);
-            state.add_regions(vec![region]);
+            state
+                .add_attributes(vec![
+                    (
+                        Identifier::new(&context, "function_type"),
+                        Attribute::parse(&context, "(memref<?xf32>, memref<?xf32>) -> ()"),
+                    ),
+                    (
+                        Identifier::new(&context, "sym_name"),
+                        Attribute::parse(&context, "\"add\""),
+                    ),
+                ])
+                .add_regions(vec![region]);
 
             Operation::new(state)
         };

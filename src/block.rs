@@ -63,14 +63,26 @@ impl<'c> Block<'c> {
         }
     }
 
-    pub fn insert_operation(&mut self, position: usize, operation: Operation) {
+    // TODO How can we make those update functions take `&mut self`?
+    // TODO Use cells?
+    pub fn insert_operation(&self, position: usize, operation: Operation) -> OperationRef {
         unsafe {
-            mlirBlockInsertOwnedOperation(self.block, position as isize, operation.into_raw())
+            let operation = operation.into_raw();
+
+            mlirBlockInsertOwnedOperation(self.block, position as isize, operation);
+
+            OperationRef::from_raw(operation)
         }
     }
 
-    pub fn append_operation(&mut self, operation: Operation) {
-        unsafe { mlirBlockAppendOwnedOperation(self.block, operation.into_raw()) }
+    pub fn append_operation(&self, operation: Operation) -> OperationRef {
+        unsafe {
+            let operation = operation.into_raw();
+
+            mlirBlockAppendOwnedOperation(self.block, operation);
+
+            OperationRef::from_raw(operation)
+        }
     }
 
     pub(crate) unsafe fn from_raw(block: MlirBlock) -> Self {
