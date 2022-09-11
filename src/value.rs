@@ -17,7 +17,7 @@ impl<'a> Value<'a> {
         }
     }
 
-    pub(crate) unsafe fn to_raw(&self) -> MlirValue {
+    pub(crate) unsafe fn to_raw(self) -> MlirValue {
         self.value
     }
 }

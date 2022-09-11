@@ -3,7 +3,7 @@ use once_cell::sync::Lazy;
 use std::{collections::HashMap, ffi::CString, marker::PhantomData, slice, str, sync::RwLock};
 
 // We need to pass null-terminated strings to functions in the MLIR API although Rust's strings are not.
-static STRING_CACHE: Lazy<RwLock<HashMap<String, CString>>> = Lazy::new(|| Default::default());
+static STRING_CACHE: Lazy<RwLock<HashMap<String, CString>>> = Lazy::new(Default::default);
 
 // https://mlir.llvm.org/docs/CAPI/#stringref
 //

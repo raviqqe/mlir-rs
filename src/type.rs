@@ -24,7 +24,7 @@ impl<'c> Type<'c> {
         unsafe { ContextRef::from_raw(mlirTypeGetContext(self.r#type)) }
     }
 
-    pub(crate) unsafe fn to_raw(&self) -> MlirType {
+    pub(crate) unsafe fn to_raw(self) -> MlirType {
         self.r#type
     }
 }
