@@ -1,10 +1,15 @@
 use crate::{
-    context::Context, location::Location, operation::Operation, r#type::Type, region::RegionRef,
+    context::Context,
+    location::Location,
+    operation::{Operation, OperationRef},
+    r#type::Type,
+    region::RegionRef,
     utility::into_raw_array,
+    value::Value,
 };
 use mlir_sys::{
-    mlirBlockAppendOwnedOperation, mlirBlockCreate, mlirBlockDestroy, mlirBlockGetParentRegion,
-    mlirBlockInsertOwnedOperation, MlirBlock,
+    mlirBlockAppendOwnedOperation, mlirBlockCreate, mlirBlockDestroy, mlirBlockGetArgument,
+    mlirBlockGetFirstOperation, mlirBlockGetParentRegion, mlirBlockInsertOwnedOperation, MlirBlock,
 };
 use std::{
     marker::PhantomData,
@@ -18,7 +23,7 @@ pub struct Block<'c> {
 }
 
 impl<'c> Block<'c> {
-    pub fn new(arguments: Vec<(Type, Location)>) -> Self {
+    pub fn new(arguments: Vec<(Type<'c>, Location)>) -> Self {
         unsafe {
             Self::from_raw(mlirBlockCreate(
                 arguments.len() as isize,
@@ -38,8 +43,24 @@ impl<'c> Block<'c> {
         }
     }
 
+    pub fn argument(&self, position: usize) -> Value {
+        unsafe { Value::from_raw(mlirBlockGetArgument(self.block, position as isize)) }
+    }
+
     pub fn parent_region(&self) -> RegionRef {
         unsafe { RegionRef::from_raw(mlirBlockGetParentRegion(self.block)) }
+    }
+
+    pub fn first_operation(&self) -> Option<OperationRef> {
+        unsafe {
+            let operation = mlirBlockGetFirstOperation(self.block);
+
+            if operation.ptr.is_null() {
+                None
+            } else {
+                Some(OperationRef::from_raw(operation))
+            }
+        }
     }
 
     pub fn insert_operation(&self, position: usize, operation: Operation) {

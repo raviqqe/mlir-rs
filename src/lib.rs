@@ -54,25 +54,36 @@ mod tests {
         context.get_or_load_dialect("shape");
         context.get_or_load_dialect("scf");
 
-        let module = Module::new(Location::unknown(&context));
+        let location = Location::unknown(&context);
+        let module = Module::new(location);
 
         let r#type = Type::parse(&context, "memref<?xf32>");
 
         let function = {
             let region = Region::new();
-            let block = Block::new(vec![
-                (r#type, Location::unknown(&context)),
-                (r#type, Location::unknown(&context)),
-            ]);
+            let block = Block::new(vec![(r#type, location), (r#type, location)]);
+            let index_type = Type::parse(&context, "index");
 
             block.append_operation({
-                let mut state = OperationState::new("arith.constant", Location::unknown(&context));
+                let mut state = OperationState::new("arith.constant", location);
 
-                state.add_results(vec![Type::parse(&context, "index")]);
+                state.add_results(vec![index_type]);
                 state.add_attributes(vec![(
                     Identifier::new(&context, "value"),
                     Attribute::parse(&context, "0 : index"),
                 )]);
+
+                Operation::new(state)
+            });
+
+            block.append_operation({
+                let mut state = OperationState::new("memref.dim", location);
+
+                state.add_operands(vec![
+                    block.argument(0),
+                    block.first_operation().unwrap().result(0),
+                ]);
+                state.add_results(vec![index_type]);
 
                 Operation::new(state)
             });

@@ -7,6 +7,7 @@ use mlir_sys::{
 };
 use std::marker::PhantomData;
 
+#[derive(Clone, Copy, Debug)]
 pub struct Location<'c> {
     location: MlirLocation,
     _context: PhantomData<&'c Context>,

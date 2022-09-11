@@ -7,8 +7,8 @@ use crate::{
 };
 use mlir_sys::{
     mlirOperationCreate, mlirOperationDestroy, mlirOperationDump, mlirOperationGetContext,
-    mlirOperationGetRegion, mlirOperationGetResult, mlirOperationPrint, mlirOperationVerify,
-    MlirOperation, MlirStringRef,
+    mlirOperationGetNextInBlock, mlirOperationGetRegion, mlirOperationGetResult,
+    mlirOperationPrint, mlirOperationVerify, MlirOperation, MlirStringRef,
 };
 use std::{
     ffi::c_void,
@@ -35,11 +35,23 @@ impl<'c> Operation<'c> {
     }
 
     pub fn result(&self, index: usize) -> Value {
-        Value::from_raw(unsafe { mlirOperationGetResult(self.operation, index as isize) })
+        unsafe { Value::from_raw(mlirOperationGetResult(self.operation, index as isize)) }
     }
 
     pub fn region(&self, index: usize) -> RegionRef {
         unsafe { RegionRef::from_raw(mlirOperationGetRegion(self.operation, index as isize)) }
+    }
+
+    pub fn next_in_block(&self) -> Option<OperationRef> {
+        unsafe {
+            let operation = mlirOperationGetNextInBlock(self.operation);
+
+            if operation.ptr.is_null() {
+                None
+            } else {
+                Some(OperationRef::from_raw(operation))
+            }
+        }
     }
 
     pub fn verify(&self) -> bool {
