@@ -9,14 +9,14 @@ use std::marker::PhantomData;
 #[derive(Clone, Copy, Debug)]
 pub struct Type<'c> {
     r#type: MlirType,
-    _parent: PhantomData<&'c Context>,
+    _context: PhantomData<&'c Context>,
 }
 
 impl<'c> Type<'c> {
     pub fn parse(context: &Context, source: &str) -> Self {
         Self {
             r#type: unsafe { mlirTypeParseGet(context.to_raw(), StringRef::from(source).to_raw()) },
-            _parent: Default::default(),
+            _context: Default::default(),
         }
     }
 
