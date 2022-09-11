@@ -1,3 +1,12 @@
 {
-  "words": ["femtomc", "libdir", "melior", "mlir", "rustc", "stdc"]
+  "words": [
+    "addf",
+    "femtomc",
+    "libdir",
+    "melior",
+    "memref",
+    "mlir",
+    "rustc",
+    "stdc"
+  ]
 }
