@@ -81,7 +81,7 @@ mod tests {
                 let mut state = OperationState::new("memref.dim", location);
 
                 state
-                    .add_operands(vec![function_block.argument(0), zero.result(0)])
+                    .add_operands(vec![function_block.argument(0).unwrap(), zero.result(0)])
                     .add_results(vec![index_type]);
 
                 Operation::new(state)
@@ -107,7 +107,10 @@ mod tests {
                 let lhs = loop_block.append_operation({
                     let mut state = OperationState::new("memref.load", location);
 
-                    state.add_operands(vec![function_block.argument(0), loop_block.argument(0)]);
+                    state.add_operands(vec![
+                        function_block.argument(0).unwrap(),
+                        loop_block.argument(0).unwrap(),
+                    ]);
                     state.add_results(vec![f32_type]);
 
                     Operation::new(state)
@@ -116,7 +119,10 @@ mod tests {
                 let rhs = loop_block.append_operation({
                     let mut state = OperationState::new("memref.load", location);
 
-                    state.add_operands(vec![function_block.argument(1), loop_block.argument(0)]);
+                    state.add_operands(vec![
+                        function_block.argument(1).unwrap(),
+                        loop_block.argument(0).unwrap(),
+                    ]);
                     state.add_results(vec![f32_type]);
 
                     Operation::new(state)
@@ -136,8 +142,8 @@ mod tests {
 
                     state.add_operands(vec![
                         add.result(0),
-                        function_block.argument(0),
-                        loop_block.argument(0),
+                        function_block.argument(0).unwrap(),
+                        loop_block.argument(0).unwrap(),
                     ]);
 
                     Operation::new(state)

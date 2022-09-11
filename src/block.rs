@@ -9,8 +9,8 @@ use crate::{
 };
 use mlir_sys::{
     mlirBlockAddArgument, mlirBlockAppendOwnedOperation, mlirBlockCreate, mlirBlockDestroy,
-    mlirBlockGetArgument, mlirBlockGetFirstOperation, mlirBlockGetParentRegion,
-    mlirBlockInsertOwnedOperation, MlirBlock,
+    mlirBlockGetArgument, mlirBlockGetFirstOperation, mlirBlockGetNumArguments,
+    mlirBlockGetParentRegion, mlirBlockInsertOwnedOperation, MlirBlock,
 };
 use std::{
     marker::PhantomData,
@@ -44,8 +44,17 @@ impl<'c> Block<'c> {
         }
     }
 
-    pub fn argument(&self, position: usize) -> Value {
-        unsafe { Value::from_raw(mlirBlockGetArgument(self.block, position as isize)) }
+    pub fn argument(&self, position: usize) -> Option<Value> {
+        unsafe {
+            if position < mlirBlockGetNumArguments(self.block) as usize {
+                Some(Value::from_raw(mlirBlockGetArgument(
+                    self.block,
+                    position as isize,
+                )))
+            } else {
+                None
+            }
+        }
     }
 
     pub fn parent_region(&self) -> RegionRef {
@@ -176,5 +185,10 @@ mod tests {
     #[test]
     fn new() {
         Block::new(vec![]);
+    }
+
+    #[test]
+    fn get_non_existent_argument() {
+        assert!(Block::new(vec![]).argument(0).is_none());
     }
 }
