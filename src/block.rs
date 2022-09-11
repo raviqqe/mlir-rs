@@ -8,8 +8,9 @@ use crate::{
     value::Value,
 };
 use mlir_sys::{
-    mlirBlockAppendOwnedOperation, mlirBlockCreate, mlirBlockDestroy, mlirBlockGetArgument,
-    mlirBlockGetFirstOperation, mlirBlockGetParentRegion, mlirBlockInsertOwnedOperation, MlirBlock,
+    mlirBlockAddArgument, mlirBlockAppendOwnedOperation, mlirBlockCreate, mlirBlockDestroy,
+    mlirBlockGetArgument, mlirBlockGetFirstOperation, mlirBlockGetParentRegion,
+    mlirBlockInsertOwnedOperation, MlirBlock,
 };
 use std::{
     marker::PhantomData,
@@ -60,6 +61,16 @@ impl<'c> Block<'c> {
             } else {
                 Some(OperationRef::from_raw(operation))
             }
+        }
+    }
+
+    pub fn add_argument(&self, r#type: Type<'c>, location: Location<'c>) -> Value {
+        unsafe {
+            Value::from_raw(mlirBlockAddArgument(
+                self.block,
+                r#type.to_raw(),
+                location.to_raw(),
+            ))
         }
     }
 

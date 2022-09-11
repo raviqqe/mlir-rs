@@ -42,6 +42,8 @@ mod tests {
         assert_eq!(module.as_operation().print(), "module{}");
     }
 
+    // This test is copied directly from a `makeAndDumpAdd` function in:
+    // https://github.com/llvm/llvm-project/blob/llvmorg-15.0.0/mlir/test/CAPI/ir.c
     #[test]
     fn build_add() {
         let registry = DialectRegistry::new();
@@ -60,11 +62,11 @@ mod tests {
         let r#type = Type::parse(&context, "memref<?xf32>");
 
         let function = {
-            let region = Region::new();
-            let block = Block::new(vec![(r#type, location), (r#type, location)]);
+            let function_region = Region::new();
+            let function_block = Block::new(vec![(r#type, location), (r#type, location)]);
             let index_type = Type::parse(&context, "index");
 
-            let zero = block.append_operation({
+            let zero = function_block.append_operation({
                 let mut state = OperationState::new("arith.constant", location);
 
                 state.add_results(vec![index_type]).add_attributes(vec![(
@@ -75,24 +77,93 @@ mod tests {
                 Operation::new(state)
             });
 
-            block.append_operation({
+            let dim = function_block.append_operation({
                 let mut state = OperationState::new("memref.dim", location);
 
                 state
-                    .add_operands(vec![block.argument(0), zero.result(0)])
+                    .add_operands(vec![function_block.argument(0), zero.result(0)])
                     .add_results(vec![index_type]);
 
                 Operation::new(state)
             });
 
-            // TODO
+            let loop_block = Block::new(vec![]);
+            loop_block.add_argument(index_type, location);
 
-            block.append_operation(Operation::new(OperationState::new(
+            let one = function_block.append_operation({
+                let mut state = OperationState::new("arith.constant", location);
+
+                state.add_results(vec![index_type]).add_attributes(vec![(
+                    Identifier::new(&context, "value"),
+                    Attribute::parse(&context, "1 : index"),
+                )]);
+
+                Operation::new(state)
+            });
+
+            {
+                let f32_type = Type::parse(&context, "f32");
+
+                let lhs = loop_block.append_operation({
+                    let mut state = OperationState::new("memref.load", location);
+
+                    state.add_operands(vec![function_block.argument(0), loop_block.argument(0)]);
+                    state.add_results(vec![f32_type]);
+
+                    Operation::new(state)
+                });
+
+                let rhs = loop_block.append_operation({
+                    let mut state = OperationState::new("memref.load", location);
+
+                    state.add_operands(vec![function_block.argument(1), loop_block.argument(0)]);
+                    state.add_results(vec![f32_type]);
+
+                    Operation::new(state)
+                });
+
+                let add = loop_block.append_operation({
+                    let mut state = OperationState::new("arith.addf", location);
+
+                    state.add_operands(vec![lhs.result(0), rhs.result(0)]);
+                    state.add_results(vec![f32_type]);
+
+                    Operation::new(state)
+                });
+
+                loop_block.append_operation({
+                    let mut state = OperationState::new("memref.store", location);
+
+                    state.add_operands(vec![
+                        add.result(0),
+                        function_block.argument(0),
+                        loop_block.argument(0),
+                    ]);
+
+                    Operation::new(state)
+                });
+
+                loop_block
+                    .append_operation(Operation::new(OperationState::new("scf.yield", location)));
+            }
+
+            function_block.append_operation(Operation::new({
+                let mut state = OperationState::new("scf.for", location);
+
+                state.add_operands(vec![zero.result(0), dim.result(0), one.result(0)]);
+                let loop_region = Region::new();
+                loop_region.append_block(loop_block);
+                state.add_regions(vec![loop_region]);
+
+                state
+            }));
+
+            function_block.append_operation(Operation::new(OperationState::new(
                 "func.return",
                 Location::unknown(&context),
             )));
 
-            region.append_block(block);
+            function_region.append_block(function_block);
 
             let mut state = OperationState::new("func.func", Location::unknown(&context));
 
@@ -107,7 +178,7 @@ mod tests {
                         Attribute::parse(&context, "\"add\""),
                     ),
                 ])
-                .add_regions(vec![region]);
+                .add_regions(vec![function_region]);
 
             Operation::new(state)
         };
