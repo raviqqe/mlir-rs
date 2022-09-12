@@ -3,6 +3,7 @@ use mlir_sys::{
     MlirDialectRegistry,
 };
 
+#[derive(Debug)]
 pub struct DialectRegistry {
     registry: MlirDialectRegistry,
 }

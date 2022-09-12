@@ -17,12 +17,11 @@ pub mod value;
 
 #[cfg(test)]
 mod tests {
-    use mlir_sys::mlirGetDialectHandle__func__;
-
     use crate::{
-        attribute::Attribute, block::Block, context::Context, dialect_registry::DialectRegistry,
-        identifier::Identifier, location::Location, module::Module, operation::Operation,
-        operation_state::OperationState, r#type::Type, region::Region,
+        attribute::Attribute, block::Block, context::Context, dialect_handle::DialectHandle,
+        dialect_registry::DialectRegistry, identifier::Identifier, location::Location,
+        module::Module, operation::Operation, operation_state::OperationState, r#type::Type,
+        region::Region,
     };
 
     #[test]
@@ -185,8 +184,7 @@ mod tests {
     fn dialect_registry() {
         let registry = DialectRegistry::new();
 
-        let handle = DialectHandle::func();
-        handle.insert_dialect(registry);
+        DialectHandle::func().insert_dialect(&registry);
 
         let context = Context::new();
         assert_eq!(context.registered_dialect_count(), 0);

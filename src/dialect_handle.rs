@@ -1,4 +1,6 @@
-use mlir_sys::{mlirGetDialectHandle__func__, MlirDialect, MlirDialectHandle};
+use mlir_sys::{mlirDialectHandleInsertDialect, mlirGetDialectHandle__func__, MlirDialectHandle};
+
+use crate::dialect_registry::DialectRegistry;
 
 #[derive(Clone, Copy, Debug)]
 pub struct DialectHandle {
@@ -7,13 +9,14 @@ pub struct DialectHandle {
 
 impl DialectHandle {
     pub fn func(&self) -> Self {
-        Self::from_raw(unsafe { mlirGetDialectHandle__func__() })
+        unsafe { Self::from_raw(mlirGetDialectHandle__func__()) }
     }
 
-    pub(crate) unsafe fn from_raw(dialect: MlirDialect) -> Self {
-        Self {
-            dialect,
-            _context: Default::default(),
-        }
+    pub fn insert_dialect(&self, registry: &DialectRegistry) {
+        unsafe { mlirDialectHandleInsertDialect(self.handle, registry.to_raw()) }
+    }
+
+    pub(crate) unsafe fn from_raw(handle: MlirDialectHandle) -> Self {
+        Self { handle }
     }
 }
