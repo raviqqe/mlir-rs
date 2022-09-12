@@ -181,6 +181,7 @@ mod tests {
         // assert_eq!(module.as_operation().print(), "");
     }
 
+    #[test]
     fn dialect_registry() {
         let registry = DialectRegistry::new();
 

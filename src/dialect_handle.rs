@@ -8,7 +8,7 @@ pub struct DialectHandle {
 }
 
 impl DialectHandle {
-    pub fn func(&self) -> Self {
+    pub fn func() -> Self {
         unsafe { Self::from_raw(mlirGetDialectHandle__func__()) }
     }
 
