@@ -23,3 +23,8 @@ jobs:
       - uses: streetsidesoftware/cspell-action@main
         with:
           files: "**/*.{md,rs}"
+  readme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: npx markdown-link-check README.md
