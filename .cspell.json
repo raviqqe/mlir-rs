@@ -3,6 +3,7 @@
     "addf",
     "femtomc",
     "libdir",
+    "linalg",
     "melior",
     "memref",
     "mlir",
