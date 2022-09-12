@@ -16,6 +16,8 @@ pub mod value;
 
 #[cfg(test)]
 mod tests {
+    use mlir_sys::mlirGetDialectHandle__func__;
+
     use crate::{
         attribute::Attribute, block::Block, context::Context, dialect_registry::DialectRegistry,
         identifier::Identifier, location::Location, module::Module, operation::Operation,
@@ -177,5 +179,19 @@ mod tests {
         assert!(module.as_operation().verify());
         // TODO Fix this. Somehow, MLIR inserts null characters in the middle of string refs.
         // assert_eq!(module.as_operation().print(), "");
+    }
+
+    fn dialect_registry() {
+        let registry = DialectRegistry::new();
+
+        let handle = DialectHandle::func();
+        handle.insert_dialect(registry);
+
+        let context = Context::new();
+        assert_eq!(context.registered_dialect_count(), 0);
+
+        context.append_dialect_registry(&registry);
+
+        assert_eq!(context.registered_dialect_count(), 1);
     }
 }

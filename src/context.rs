@@ -1,8 +1,8 @@
 use crate::{dialect::Dialect, dialect_registry::DialectRegistry, string_ref::StringRef};
 use mlir_sys::{
     mlirContextAppendDialectRegistry, mlirContextCreate, mlirContextDestroy,
-    mlirContextGetOrLoadDialect, mlirContextLoadAllAvailableDialects,
-    mlirRegisterAllLLVMTranslations, MlirContext,
+    mlirContextGetNumRegisteredDialects, mlirContextGetOrLoadDialect,
+    mlirContextLoadAllAvailableDialects, mlirRegisterAllLLVMTranslations, MlirContext,
 };
 use std::{marker::PhantomData, mem::ManuallyDrop, ops::Deref};
 
@@ -17,6 +17,10 @@ impl Context {
         unsafe { mlirRegisterAllLLVMTranslations(context) }
 
         Self { context }
+    }
+
+    pub fn registered_dialect_count(&self) -> usize {
+        unsafe { mlirContextGetNumRegisteredDialects(self.context) as usize }
     }
 
     pub fn get_or_load_dialect(&self, name: &str) -> Dialect {
