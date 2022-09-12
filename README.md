@@ -1,6 +1,6 @@
 # Melior
 
-Rustic MLIR bindings for Rust
+The rustic MLIR bindings for Rust
 
 This crate is a wrapper of [the MLIR C API](https://mlir.llvm.org/docs/CAPI/).
 
