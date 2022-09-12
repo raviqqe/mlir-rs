@@ -72,7 +72,7 @@ impl DialectHandle {
         unsafe { mlirDialectHandleInsertDialect(self.handle, registry.to_raw()) }
     }
 
-    pub fn load_dialect(&self, context: &Context) -> Dialect {
+    pub fn load_dialect<'c>(&self, context: &'c Context) -> Dialect<'c> {
         unsafe { Dialect::from_raw(mlirDialectHandleLoadDialect(self.handle, context.to_raw())) }
     }
 
