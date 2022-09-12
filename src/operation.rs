@@ -9,7 +9,7 @@ use mlir_sys::{
     mlirOperationCreate, mlirOperationDestroy, mlirOperationDump, mlirOperationGetContext,
     mlirOperationGetNextInBlock, mlirOperationGetNumRegions, mlirOperationGetNumResults,
     mlirOperationGetRegion, mlirOperationGetResult, mlirOperationPrint, mlirOperationVerify,
-    MlirOperation, MlirStringRef,
+    MlirOperation, MlirRegion, MlirStringRef,
 };
 use std::{
     ffi::c_void,
@@ -49,28 +49,20 @@ impl<'c> Operation<'c> {
     }
 
     pub fn region(&self, index: usize) -> Option<RegionRef> {
-        unsafe {
-            if index < mlirOperationGetNumRegions(self.operation) as usize {
-                Some(RegionRef::from_raw(mlirOperationGetRegion(
-                    self.operation,
-                    index as isize,
-                )))
-            } else {
-                None
-            }
-        }
+        unsafe { Self::raw_region(self.operation, index).map(|region| RegionRef::from_raw(region)) }
     }
 
     pub fn region_mut(&mut self, index: usize) -> Option<RegionRefMut> {
         unsafe {
-            if index < mlirOperationGetNumRegions(self.operation) as usize {
-                Some(RegionRefMut::from_raw(mlirOperationGetRegion(
-                    self.operation,
-                    index as isize,
-                )))
-            } else {
-                None
-            }
+            Self::raw_region(self.operation, index).map(|region| RegionRefMut::from_raw(region))
+        }
+    }
+
+    unsafe fn raw_region(operation: MlirOperation, index: usize) -> Option<MlirRegion> {
+        if index < mlirOperationGetNumRegions(operation) as usize {
+            Some(mlirOperationGetRegion(operation, index as isize))
+        } else {
+            None
         }
     }
 
