@@ -20,8 +20,16 @@ impl Region {
         }
     }
 
-    pub fn first_block(&self) -> BlockRef {
-        unsafe { BlockRef::from_raw(mlirRegionGetFirstBlock(self.region)) }
+    pub fn first_block(&self) -> Option<BlockRef> {
+        unsafe {
+            let block = mlirRegionGetFirstBlock(self.region);
+
+            if block.ptr.is_null() {
+                None
+            } else {
+                Some(BlockRef::from_raw(block))
+            }
+        }
     }
 
     pub fn append_block(&self, block: Block) {
@@ -106,5 +114,10 @@ mod tests {
     #[test]
     fn new() {
         Region::new();
+    }
+
+    #[test]
+    fn first_block_none() {
+        assert!(Region::new().first_block().is_none());
     }
 }
