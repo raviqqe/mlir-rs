@@ -1,16 +1,13 @@
-use crate::{module::Module, string_ref::StringRef};
+use crate::{logical_result::LogicalResult, module::Module, string_ref::StringRef};
 use mlir_sys::{mlirExecutionEngineCreate, mlirExecutionEngineInvokePacked, MlirExecutionEngine};
+use std::ffi::c_void;
 
 pub struct ExecutionEngine {
     engine: MlirExecutionEngine,
 }
 
 impl ExecutionEngine {
-    pub fn new(
-        module: &Module,
-        optimization_level: usize,
-        shared_library_paths: Vec<&str>,
-    ) -> Self {
+    pub fn new(module: &Module, optimization_level: usize, shared_library_paths: &[&str]) -> Self {
         Self {
             engine: unsafe {
                 mlirExecutionEngineCreate(
@@ -23,13 +20,13 @@ impl ExecutionEngine {
         }
     }
 
-    pub unsafe fn invoke_packed(&self, name: &str, argments: &mut [&mut ()]) -> () {
+    pub unsafe fn invoke_packed(&self, name: &str, arguments: &mut [*mut ()]) -> LogicalResult {
         unsafe {
-            mlirExecutionEngineInvokePacked(
+            LogicalResult::from_raw(mlirExecutionEngineInvokePacked(
                 self.engine,
                 StringRef::from(name).to_raw(),
-                arguments.as_ptr(),
-            )
+                arguments.as_mut_ptr() as *mut *mut c_void,
+            ))
         }
     }
 }
@@ -59,20 +56,21 @@ mod tests {
         // TODO
         // lowerModuleToLLVM(ctx, module);
         context.register_all_llvm_translations();
-        let engine = ExecutionEngine::new(&module, 2, vec![]);
+        let engine = ExecutionEngine::new(&module, 2, &[]);
 
         let input = 42;
         let result = -1;
-        let args = vec![&input, &result];
+        let args = vec![&mut input, &mut result];
 
-        assert!();
-        if (mlirLogicalResultIsFailure(mlirExecutionEngineInvokePacked(
-            jit,
-            mlirStringRefCreateFromCString("add"),
-            args,
-        ))) {
-            fprintf(stderr, "Execution engine creation failed");
-            abort();
+        assert!(unsafe {
+            engine.invoke_packed(
+                "add",
+                &mut [
+                    &mut input as *mut i32 as *mut (),
+                    &mut result as *mut i32 as *mut (),
+                ],
+            )
         }
+        .is_success());
     }
 }
