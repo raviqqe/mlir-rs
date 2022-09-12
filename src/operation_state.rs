@@ -25,7 +25,7 @@ impl<'c> OperationState<'c> {
         }
     }
 
-    pub fn add_results(&mut self, results: Vec<Type<'c>>) -> &mut Self {
+    pub fn add_results(mut self, results: Vec<Type<'c>>) -> Self {
         unsafe {
             mlirOperationStateAddResults(
                 &mut self.state,
@@ -37,7 +37,7 @@ impl<'c> OperationState<'c> {
         self
     }
 
-    pub fn add_operands(&mut self, operands: Vec<Value>) -> &mut Self {
+    pub fn add_operands(mut self, operands: Vec<Value>) -> Self {
         unsafe {
             mlirOperationStateAddOperands(
                 &mut self.state,
@@ -49,7 +49,7 @@ impl<'c> OperationState<'c> {
         self
     }
 
-    pub fn add_regions(&mut self, regions: Vec<Region>) -> &mut Self {
+    pub fn add_regions(mut self, regions: Vec<Region>) -> Self {
         unsafe {
             mlirOperationStateAddOwnedRegions(
                 &mut self.state,
@@ -66,7 +66,7 @@ impl<'c> OperationState<'c> {
         self
     }
 
-    pub fn add_successors(&mut self, successors: Vec<Block>) -> &mut Self {
+    pub fn add_successors(mut self, successors: Vec<Block>) -> Self {
         unsafe {
             mlirOperationStateAddSuccessors(
                 &mut self.state,
@@ -83,7 +83,7 @@ impl<'c> OperationState<'c> {
         self
     }
 
-    pub fn add_attributes(&mut self, attributes: Vec<(Identifier, Attribute<'c>)>) -> &mut Self {
+    pub fn add_attributes(mut self, attributes: Vec<(Identifier, Attribute<'c>)>) -> Self {
         unsafe {
             mlirOperationStateAddAttributes(
                 &mut self.state,
@@ -124,43 +124,42 @@ mod tests {
     #[test]
     fn add_results() {
         let context = Context::new();
-        let mut state = OperationState::new("foo", Location::unknown(&context));
 
-        state.add_results(vec![Type::parse(&context, "i1")]);
-
-        Operation::new(state);
+        Operation::new(
+            OperationState::new("foo", Location::unknown(&context))
+                .add_results(vec![Type::parse(&context, "i1")]),
+        );
     }
 
     #[test]
     fn add_regions() {
         let context = Context::new();
-        let mut state = OperationState::new("foo", Location::unknown(&context));
 
-        state.add_regions(vec![Region::new()]);
-
-        Operation::new(state);
+        Operation::new(
+            OperationState::new("foo", Location::unknown(&context))
+                .add_regions(vec![Region::new()]),
+        );
     }
 
     #[test]
     fn add_successors() {
         let context = Context::new();
-        let mut state = OperationState::new("foo", Location::unknown(&context));
 
-        state.add_successors(vec![Block::new(vec![])]);
-
-        Operation::new(state);
+        Operation::new(
+            OperationState::new("foo", Location::unknown(&context))
+                .add_successors(vec![Block::new(vec![])]),
+        );
     }
 
     #[test]
     fn add_attributes() {
         let context = Context::new();
-        let mut state = OperationState::new("foo", Location::unknown(&context));
 
-        state.add_attributes(vec![(
-            Identifier::new(&context, "foo"),
-            Attribute::parse(&context, "unit"),
-        )]);
-
-        Operation::new(state);
+        Operation::new(
+            OperationState::new("foo", Location::unknown(&context)).add_attributes(vec![(
+                Identifier::new(&context, "foo"),
+                Attribute::parse(&context, "unit"),
+            )]),
+        );
     }
 }
