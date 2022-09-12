@@ -25,6 +25,7 @@ impl<'c> Module<'c> {
     }
 
     pub fn parse(context: &Context, source: &str) -> Self {
+        // TODO Should we allocate StringRef locally because source can be big?
         Self {
             module: unsafe {
                 mlirModuleCreateParse(context.to_raw(), StringRef::from(source).to_raw())

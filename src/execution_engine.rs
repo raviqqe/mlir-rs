@@ -48,7 +48,7 @@ mod tests {
 
         lowerModuleToLLVM(ctx, module);
         context.register_all_llvm_translations();
-        let engine = ExecutionEngine::new(module, 2, vec![]);
+        let engine = ExecutionEngine::new(&module, 2, vec![]);
 
         let input = 42;
         let result = -1;
