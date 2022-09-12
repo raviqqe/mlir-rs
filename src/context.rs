@@ -12,11 +12,9 @@ pub struct Context {
 
 impl Context {
     pub fn new() -> Self {
-        let context = unsafe { mlirContextCreate() };
-
-        unsafe { mlirRegisterAllLLVMTranslations(context) }
-
-        Self { context }
+        Self {
+            context: unsafe { mlirContextCreate() },
+        }
     }
 
     pub fn registered_dialect_count(&self) -> usize {
@@ -30,6 +28,10 @@ impl Context {
                 StringRef::from(name).to_raw(),
             ))
         }
+    }
+
+    pub fn register_all_llvm_translations(&self) {
+        unsafe { mlirRegisterAllLLVMTranslations(self.context) }
     }
 
     pub fn append_dialect_registry(&self, registry: &DialectRegistry) {
