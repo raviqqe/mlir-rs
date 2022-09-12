@@ -184,14 +184,13 @@ mod tests {
     #[test]
     fn dialect_registry() {
         let registry = DialectRegistry::new();
-
         DialectHandle::func().insert_dialect(&registry);
 
         let context = Context::new();
-        assert_eq!(context.registered_dialect_count(), 0);
+        let count = context.registered_dialect_count();
 
         context.append_dialect_registry(&registry);
 
-        assert_eq!(context.registered_dialect_count(), 1);
+        assert_eq!(context.registered_dialect_count() - count, 1);
     }
 }
