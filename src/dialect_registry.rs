@@ -39,6 +39,7 @@ impl Default for DialectRegistry {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::{context::Context, dialect_handle::DialectHandle};
 
     #[test]
     fn new() {
@@ -48,5 +49,18 @@ mod tests {
     #[test]
     fn register_all_dialects() {
         DialectRegistry::new();
+    }
+
+    #[test]
+    fn register_dialect() {
+        let registry = DialectRegistry::new();
+        DialectHandle::func().insert_dialect(&registry);
+
+        let context = Context::new();
+        let count = context.registered_dialect_count();
+
+        context.append_dialect_registry(&registry);
+
+        assert_eq!(context.registered_dialect_count() - count, 1);
     }
 }

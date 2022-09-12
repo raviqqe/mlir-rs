@@ -3,10 +3,11 @@ use crate::{
     context::{Context, ContextRef},
     location::Location,
     operation::{OperationRef, OperationRefMut},
+    string_ref::StringRef,
 };
 use mlir_sys::{
-    mlirModuleCreateEmpty, mlirModuleDestroy, mlirModuleGetBody, mlirModuleGetContext,
-    mlirModuleGetOperation, MlirModule,
+    mlirModuleCreateEmpty, mlirModuleCreateParse, mlirModuleDestroy, mlirModuleGetBody,
+    mlirModuleGetContext, mlirModuleGetOperation, MlirModule,
 };
 use std::marker::PhantomData;
 
@@ -19,6 +20,15 @@ impl<'c> Module<'c> {
     pub fn new(location: Location) -> Self {
         Self {
             module: unsafe { mlirModuleCreateEmpty(location.to_raw()) },
+            _context: Default::default(),
+        }
+    }
+
+    pub fn parse(context: &Context, source: &str) -> Self {
+        Self {
+            module: unsafe {
+                mlirModuleCreateParse(context.to_raw(), StringRef::from(source).to_raw())
+            },
             _context: Default::default(),
         }
     }
@@ -41,6 +51,10 @@ impl<'c> Module<'c> {
 
     pub fn body_mut(&mut self) -> BlockRefMut {
         unsafe { BlockRefMut::from_raw(mlirModuleGetBody(self.module)) }
+    }
+
+    pub(crate) unsafe fn to_raw(&self) -> MlirModule {
+        self.module
     }
 }
 

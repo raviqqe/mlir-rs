@@ -4,6 +4,7 @@ pub mod context;
 pub mod dialect;
 pub mod dialect_handle;
 pub mod dialect_registry;
+pub mod execution_engine;
 pub mod identifier;
 pub mod location;
 pub mod module;
@@ -179,18 +180,5 @@ mod tests {
         assert!(module.as_operation().verify());
         // TODO Fix this. Somehow, MLIR inserts null characters in the middle of string refs.
         // assert_eq!(module.as_operation().print(), "");
-    }
-
-    #[test]
-    fn dialect_registry() {
-        let registry = DialectRegistry::new();
-        DialectHandle::func().insert_dialect(&registry);
-
-        let context = Context::new();
-        let count = context.registered_dialect_count();
-
-        context.append_dialect_registry(&registry);
-
-        assert_eq!(context.registered_dialect_count() - count, 1);
     }
 }
