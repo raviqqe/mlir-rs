@@ -7,6 +7,7 @@ pub mod dialect_registry;
 pub mod execution_engine;
 pub mod identifier;
 pub mod location;
+pub mod logical_result;
 pub mod module;
 pub mod operation;
 pub mod operation_state;
@@ -19,10 +20,9 @@ pub mod value;
 #[cfg(test)]
 mod tests {
     use crate::{
-        attribute::Attribute, block::Block, context::Context, dialect_handle::DialectHandle,
-        dialect_registry::DialectRegistry, identifier::Identifier, location::Location,
-        module::Module, operation::Operation, operation_state::OperationState, r#type::Type,
-        region::Region,
+        attribute::Attribute, block::Block, context::Context, dialect_registry::DialectRegistry,
+        identifier::Identifier, location::Location, module::Module, operation::Operation,
+        operation_state::OperationState, r#type::Type, region::Region,
     };
 
     #[test]

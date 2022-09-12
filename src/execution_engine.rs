@@ -1,5 +1,5 @@
-use crate::module::Module;
-use mlir_sys::{mlirExecutionEngineCreate, MlirExecutionEngine};
+use crate::{module::Module, string_ref::StringRef};
+use mlir_sys::{mlirExecutionEngineCreate, mlirExecutionEngineInvokePacked, MlirExecutionEngine};
 
 pub struct ExecutionEngine {
     engine: MlirExecutionEngine,
@@ -20,6 +20,16 @@ impl ExecutionEngine {
                     sharedLibPaths,
                 )
             },
+        }
+    }
+
+    pub unsafe fn invoke_packed(&self, name: &str, argments: &mut [&mut ()]) -> () {
+        unsafe {
+            mlirExecutionEngineInvokePacked(
+                self.engine,
+                StringRef::from(name).to_raw(),
+                arguments.as_ptr(),
+            )
         }
     }
 }
@@ -46,7 +56,8 @@ mod tests {
       "#,
         );
 
-        lowerModuleToLLVM(ctx, module);
+        // TODO
+        // lowerModuleToLLVM(ctx, module);
         context.register_all_llvm_translations();
         let engine = ExecutionEngine::new(&module, 2, vec![]);
 
