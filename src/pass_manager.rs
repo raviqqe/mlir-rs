@@ -21,10 +21,6 @@ impl<'c> PassManager<'c> {
         }
     }
 
-    pub fn add_pass(&mut self, pass: Pass) {
-        unsafe { mlirPassManagerAddOwnedPass(self.raw, pass.to_raw()) }
-    }
-
     pub fn nested_under(&mut self, name: &str) -> OperationPassManager {
         unsafe {
             OperationPassManager::from_raw(mlirPassManagerGetNestedUnder(
@@ -32,6 +28,10 @@ impl<'c> PassManager<'c> {
                 StringRef::from(name).to_raw(),
             ))
         }
+    }
+
+    pub fn add_pass(&mut self, pass: Pass) {
+        unsafe { mlirPassManagerAddOwnedPass(self.raw, pass.to_raw()) }
     }
 
     pub fn run(&self, module: &mut Module) -> LogicalResult {

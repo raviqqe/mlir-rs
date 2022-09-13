@@ -1,5 +1,5 @@
-use crate::{pass::Pass, pass_manager::PassManager};
-use mlir_sys::{mlirOpPassManagerAddOwnedPass, MlirOpPassManager};
+use crate::{pass::Pass, pass_manager::PassManager, string_ref::StringRef};
+use mlir_sys::{mlirOpPassManagerAddOwnedPass, mlirOpPassManagerGetNestedUnder, MlirOpPassManager};
 use std::marker::PhantomData;
 
 pub struct OperationPassManager<'a> {
@@ -12,6 +12,15 @@ impl<'a> OperationPassManager<'a> {
         Self {
             raw,
             _parent: Default::default(),
+        }
+    }
+
+    pub fn nested_under(&mut self, name: &str) -> OperationPassManager {
+        unsafe {
+            Self::from_raw(mlirOpPassManagerGetNestedUnder(
+                self.raw,
+                StringRef::from(name).to_raw(),
+            ))
         }
     }
 
