@@ -78,14 +78,14 @@ impl<'c> OperationState<'c> {
         self
     }
 
-    pub fn add_attributes(mut self, attributes: Vec<(Identifier, Attribute<'c>)>) -> Self {
+    pub fn add_attributes(mut self, attributes: &[(Identifier, Attribute<'c>)]) -> Self {
         unsafe {
             mlirOperationStateAddAttributes(
                 &mut self.raw,
                 attributes.len() as isize,
                 into_raw_array(
                     attributes
-                        .into_iter()
+                        .iter()
                         .map(|(identifier, attribute)| {
                             mlirNamedAttributeGet(identifier.to_raw(), attribute.to_raw())
                         })
@@ -150,7 +150,7 @@ mod tests {
         let context = Context::new();
 
         Operation::new(
-            OperationState::new("foo", Location::unknown(&context)).add_attributes(vec![(
+            OperationState::new("foo", Location::unknown(&context)).add_attributes(&[(
                 Identifier::new(&context, "foo"),
                 Attribute::parse(&context, "unit"),
             )]),

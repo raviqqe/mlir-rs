@@ -73,7 +73,7 @@ mod tests {
             let zero = function_block.append_operation(Operation::new(
                 OperationState::new("arith.constant", location)
                     .add_results(&[index_type])
-                    .add_attributes(vec![(
+                    .add_attributes(&[(
                         Identifier::new(&context, "value"),
                         Attribute::parse(&context, "0 : index"),
                     )]),
@@ -91,7 +91,7 @@ mod tests {
             let one = function_block.append_operation(Operation::new(
                 OperationState::new("arith.constant", location)
                     .add_results(&[index_type])
-                    .add_attributes(vec![(
+                    .add_attributes(&[(
                         Identifier::new(&context, "value"),
                         Attribute::parse(&context, "1 : index"),
                     )]),
@@ -159,7 +159,7 @@ mod tests {
 
             Operation::new(
                 OperationState::new("func.func", Location::unknown(&context))
-                    .add_attributes(vec![
+                    .add_attributes(&[
                         (
                             Identifier::new(&context, "function_type"),
                             Attribute::parse(&context, "(memref<?xf32>, memref<?xf32>) -> ()"),
