@@ -49,3 +49,32 @@ impl<'c> Drop for PassManager<'c> {
         unsafe { mlirPassManagerDestroy(self.raw) }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::location::Location;
+
+    #[test]
+    fn new() {
+        let context = Context::new();
+
+        PassManager::new(&context);
+    }
+
+    #[test]
+    fn add_pass() {
+        let context = Context::new();
+
+        PassManager::new(&context).add_pass(Pass::convert_func_to_llvm());
+    }
+
+    #[test]
+    fn run() {
+        let context = Context::new();
+        let mut manager = PassManager::new(&context);
+
+        manager.add_pass(Pass::convert_func_to_llvm());
+        manager.run(&mut Module::new(Location::unknown(&context)));
+    }
+}
