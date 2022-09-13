@@ -2,7 +2,7 @@
 
 [![GitHub Action](https://img.shields.io/github/workflow/status/raviqqe/melior/test?style=flat-square)](https://github.com/raviqqe/melior/actions?query=workflow%3Atest)
 [![Crate](https://img.shields.io/crates/v/melior.svg?style=flat-square)](https://crates.io/crates/melior)
-[![License](https://img.shields.io/github/license/raviqqe/melior.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![License](https://img.shields.io/github/license/raviqqe/melior.svg?style=flat-square)](LICENSE)
 
 The rustic MLIR bindings for Rust
 
