@@ -8,7 +8,8 @@ use std::{marker::PhantomData, mem::ManuallyDrop, ops::Deref};
 
 /// A context of IR, dialects, and passes.
 ///
-/// Contexts own various objects, such as types, locations, and dialect instances.
+/// Contexts own various objects, such as types, locations, and dialect
+/// instances.
 pub struct Context {
     raw: MlirContext,
 }

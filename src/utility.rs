@@ -1,6 +1,6 @@
-use std::sync::Once;
 use crate::{context::Context, dialect_registry::DialectRegistry};
 use mlir_sys::{mlirRegisterAllDialects, mlirRegisterAllLLVMTranslations, mlirRegisterAllPasses};
+use std::sync::Once;
 
 /// Registers all dialects to a dialect registry.
 pub fn register_all_dialects(registry: &DialectRegistry) {
