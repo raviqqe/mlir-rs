@@ -9,6 +9,7 @@ use mlir_sys::{
 };
 use std::marker::PhantomData;
 
+/// A pass manager.
 pub struct PassManager<'c> {
     raw: MlirPassManager,
     _context: PhantomData<&'c Context>,
@@ -23,7 +24,7 @@ impl<'c> PassManager<'c> {
         }
     }
 
-    /// Gets an operation pass manager nested under an operation corresponding to a given name.
+    /// Gets an operation pass manager for nested operations corresponding to a given name.
     pub fn nested_under(&mut self, name: &str) -> OperationPassManager {
         unsafe {
             OperationPassManager::from_raw(mlirPassManagerGetNestedUnder(

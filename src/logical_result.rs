@@ -1,5 +1,6 @@
 use mlir_sys::MlirLogicalResult;
 
+/// A logical result of success or failure.
 pub struct LogicalResult {
     result: MlirLogicalResult,
 }
