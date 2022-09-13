@@ -81,25 +81,21 @@ impl<'c> Operation<'c> {
     }
 
     pub fn print(&self) -> String {
-        let mut strings: Vec<StringRef> = vec![];
+        let mut string = vec![];
 
         unsafe extern "C" fn callback(string: MlirStringRef, data: *mut c_void) {
-            (&mut *(data as *mut Vec<StringRef>)).push(StringRef::from_raw(string));
+            (&mut *(data as *mut Vec<u8>)).extend(StringRef::from_raw(string).as_str().as_bytes());
         }
 
         unsafe {
             mlirOperationPrint(
                 self.raw,
                 Some(callback),
-                &mut strings as *mut _ as *mut c_void,
+                &mut string as *mut _ as *mut c_void,
             );
         }
 
-        strings
-            .iter()
-            .map(|string| string.as_str())
-            .collect::<Vec<&str>>()
-            .concat()
+        String::from_utf8(string).unwrap()
     }
 
     pub fn dump(&self) {
