@@ -2,7 +2,7 @@ use crate::{dialect::Dialect, dialect_registry::DialectRegistry, string_ref::Str
 use mlir_sys::{
     mlirContextAppendDialectRegistry, mlirContextCreate, mlirContextDestroy,
     mlirContextGetNumRegisteredDialects, mlirContextGetOrLoadDialect,
-    mlirContextLoadAllAvailableDialects, mlirRegisterAllLLVMTranslations, MlirContext,
+    mlirContextLoadAllAvailableDialects, MlirContext,
 };
 use std::{marker::PhantomData, mem::ManuallyDrop, ops::Deref};
 
