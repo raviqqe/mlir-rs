@@ -2,7 +2,10 @@ use crate::{
     context::{Context, ContextRef},
     string_ref::StringRef,
 };
-use mlir_sys::{mlirTypeGetContext, mlirTypeParseGet, MlirType};
+use mlir_sys::{
+    mlirIntegerTypeGet, mlirIntegerTypeSignedGet, mlirIntegerTypeUnsignedGet,
+    mlirLLVMPointerTypeGet, mlirTypeEqual, mlirTypeGetContext, mlirTypeParseGet, MlirType,
+};
 use std::marker::PhantomData;
 
 // Types are always values but their internal storage is owned by contexts.
@@ -20,6 +23,34 @@ impl<'c> Type<'c> {
         }
     }
 
+    pub fn integer(context: &Context, bits: u32) -> Self {
+        Self {
+            raw: unsafe { mlirIntegerTypeGet(context.to_raw(), bits) },
+            _context: Default::default(),
+        }
+    }
+
+    pub fn signed_integer(context: &Context, bits: u32) -> Self {
+        Self {
+            raw: unsafe { mlirIntegerTypeSignedGet(context.to_raw(), bits) },
+            _context: Default::default(),
+        }
+    }
+
+    pub fn unsigned_integer(context: &Context, bits: u32) -> Self {
+        Self {
+            raw: unsafe { mlirIntegerTypeUnsignedGet(context.to_raw(), bits) },
+            _context: Default::default(),
+        }
+    }
+
+    pub fn llvm_pointer(r#type: Self, address_space: u32) -> Self {
+        Self {
+            raw: unsafe { mlirLLVMPointerTypeGet(r#type.to_raw(), address_space) },
+            _context: Default::default(),
+        }
+    }
+
     pub fn context(&self) -> ContextRef<'c> {
         unsafe { ContextRef::from_raw(mlirTypeGetContext(self.raw)) }
     }
@@ -28,6 +59,14 @@ impl<'c> Type<'c> {
         self.raw
     }
 }
+
+impl<'c> PartialEq for Type<'c> {
+    fn eq(&self, other: &Self) -> bool {
+        unsafe { mlirTypeEqual(self.raw, other.raw) }
+    }
+}
+
+impl<'c> Eq for Type<'c> {}
 
 #[cfg(test)]
 mod tests {
