@@ -5,11 +5,13 @@ use mlir_sys::{
 };
 use std::ffi::c_void;
 
+/// An execution engine.
 pub struct ExecutionEngine {
     raw: MlirExecutionEngine,
 }
 
 impl ExecutionEngine {
+    /// Creates an execution engine.
     pub fn new(module: &Module, optimization_level: usize, shared_library_paths: &[&str]) -> Self {
         Self {
             raw: unsafe {
@@ -27,11 +29,11 @@ impl ExecutionEngine {
         }
     }
 
-    // # Safety
-    //
-    // This function modifies memory locations pointed by the `arguments` argument.
-    // If those pointers are invalid or misaligned, calling this function might result in undefined
-    // behavior.
+    /// # Safety
+    ///
+    /// This function modifies memory locations pointed by the `arguments` argument.
+    /// If those pointers are invalid or misaligned, calling this function might result in undefined
+    /// behavior.
     pub unsafe fn invoke_packed(&self, name: &str, arguments: &mut [*mut ()]) -> LogicalResult {
         LogicalResult::from_raw(mlirExecutionEngineInvokePacked(
             self.raw,

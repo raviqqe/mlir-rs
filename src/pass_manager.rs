@@ -15,6 +15,7 @@ pub struct PassManager<'c> {
 }
 
 impl<'c> PassManager<'c> {
+    /// Creates a pass manager.
     pub fn new(context: &Context) -> Self {
         Self {
             raw: unsafe { mlirPassManagerCreate(context.to_raw()) },
@@ -22,6 +23,7 @@ impl<'c> PassManager<'c> {
         }
     }
 
+    /// Gets an operation pass manager nested under an operation corresponding to a given name.
     pub fn nested_under(&mut self, name: &str) -> OperationPassManager {
         unsafe {
             OperationPassManager::from_raw(mlirPassManagerGetNestedUnder(
@@ -31,14 +33,17 @@ impl<'c> PassManager<'c> {
         }
     }
 
+    /// Adds a pass to a pass manager.
     pub fn add_pass(&mut self, pass: Pass) {
         unsafe { mlirPassManagerAddOwnedPass(self.raw, pass.to_raw()) }
     }
 
+    /// Runs passes added to a pass manager against a module.
     pub fn run(&self, module: &mut Module) -> LogicalResult {
         LogicalResult::from_raw(unsafe { mlirPassManagerRun(self.raw, module.to_raw()) })
     }
 
+    /// Converts a pass manager to an operation pass manager.
     pub fn as_operation_pass_manager(&mut self) -> OperationPassManager {
         unsafe { OperationPassManager::from_raw(mlirPassManagerGetAsOpPassManager(self.raw)) }
     }
