@@ -55,14 +55,14 @@ mod tests {
         register_all_llvm_translations(&context);
     }
 
-    #[test]
-    fn register_passes() {
-        register_all_passes();
-    }
+    // #[test]
+    // fn register_passes() {
+    //     register_all_passes();
+    // }
 
-    #[test]
-    fn register_passes_twice() {
-        register_all_passes();
-        register_all_passes();
-    }
+    // #[test]
+    // fn register_passes_twice() {
+    //     register_all_passes();
+    //     register_all_passes();
+    // }
 }
