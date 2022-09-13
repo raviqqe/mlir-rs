@@ -18,6 +18,8 @@ impl Pass {
         Self::from_raw_fn(mlirCreateConversionConvertFuncToLLVM)
     }
 
+    // TODO Add more passes.
+
     fn from_raw_fn(create_raw: unsafe extern "C" fn() -> MlirPass) -> Self {
         Self {
             raw: unsafe { create_raw() },
