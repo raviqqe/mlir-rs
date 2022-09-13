@@ -29,7 +29,7 @@ impl ExecutionEngine {
 
     // # Safety
     //
-    // This function modify memory locations pointed by the `arguments` argument.
+    // This function modifies memory locations pointed by the `arguments` argument.
     // If those pointers are invalid or misaligned, calling this function might result in undefined
     // behaviour.
     pub unsafe fn invoke_packed(&self, name: &str, arguments: &mut [*mut ()]) -> LogicalResult {
