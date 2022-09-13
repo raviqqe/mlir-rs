@@ -1,3 +1,4 @@
+use std::sync::Once;
 use crate::{context::Context, dialect_registry::DialectRegistry};
 use mlir_sys::{mlirRegisterAllDialects, mlirRegisterAllLLVMTranslations, mlirRegisterAllPasses};
 
@@ -13,7 +14,9 @@ pub fn register_all_llvm_translations(context: &Context) {
 
 /// Register all passes.
 pub fn register_all_passes() {
-    unsafe { mlirRegisterAllPasses() }
+    static ONCE: Once = Once::new();
+
+    ONCE.call_once(|| unsafe { mlirRegisterAllPasses() });
 }
 
 // TODO Use into_raw_parts.
