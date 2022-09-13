@@ -5,6 +5,7 @@ use crate::{
     string_ref::StringRef,
     value::Value,
 };
+use core::fmt;
 use mlir_sys::{
     mlirOperationCreate, mlirOperationDestroy, mlirOperationDump, mlirOperationGetContext,
     mlirOperationGetNextInBlock, mlirOperationGetNumRegions, mlirOperationGetNumResults,
@@ -13,6 +14,7 @@ use mlir_sys::{
 };
 use std::{
     ffi::c_void,
+    fmt::{Display, Formatter},
     marker::PhantomData,
     mem::{forget, ManuallyDrop},
     ops::{Deref, DerefMut},
@@ -80,24 +82,6 @@ impl<'c> Operation<'c> {
         unsafe { mlirOperationVerify(self.raw) }
     }
 
-    pub fn print(&self) -> String {
-        let mut string = vec![];
-
-        unsafe extern "C" fn callback(string: MlirStringRef, data: *mut c_void) {
-            (&mut *(data as *mut Vec<u8>)).extend(StringRef::from_raw(string).as_str().as_bytes());
-        }
-
-        unsafe {
-            mlirOperationPrint(
-                self.raw,
-                Some(callback),
-                &mut string as *mut _ as *mut c_void,
-            );
-        }
-
-        String::from_utf8(string).unwrap()
-    }
-
     pub fn dump(&self) {
         unsafe { mlirOperationDump(self.raw) }
     }
@@ -121,6 +105,27 @@ impl<'c> Operation<'c> {
 impl<'c> Drop for Operation<'c> {
     fn drop(&mut self) {
         unsafe { mlirOperationDestroy(self.raw) };
+    }
+}
+
+impl<'c> Display for &Operation<'c> {
+    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
+        let mut data = (formatter, Ok(()));
+
+        unsafe extern "C" fn callback(string: MlirStringRef, data: *mut c_void) {
+            let data = &mut *(data as *mut (&mut Formatter, fmt::Result));
+            let result = write!(data.0, "{}", StringRef::from_raw(string).as_str());
+
+            if data.1.is_ok() {
+                data.1 = result;
+            }
+        }
+
+        unsafe {
+            mlirOperationPrint(self.raw, Some(callback), &mut data as *mut _ as *mut c_void);
+        }
+
+        data.1
     }
 }
 
