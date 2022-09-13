@@ -9,6 +9,7 @@ use std::{
     ops::{Deref, DerefMut},
 };
 
+/// A region.
 pub struct Region {
     raw: MlirRegion,
 }

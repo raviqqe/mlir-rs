@@ -46,6 +46,7 @@ impl<'c> Block<'c> {
         }
     }
 
+    /// Gets an argument at a position.
     pub fn argument(&self, position: usize) -> Option<Value> {
         unsafe {
             if position < mlirBlockGetNumArguments(self.raw) as usize {
@@ -59,10 +60,12 @@ impl<'c> Block<'c> {
         }
     }
 
+    /// Gets a parent region.
     pub fn parent_region(&self) -> RegionRef {
         unsafe { RegionRef::from_raw(mlirBlockGetParentRegion(self.raw)) }
     }
 
+    /// Gets the first operation.
     pub fn first_operation(&self) -> Option<OperationRef> {
         unsafe {
             let operation = mlirBlockGetFirstOperation(self.raw);
@@ -75,6 +78,7 @@ impl<'c> Block<'c> {
         }
     }
 
+    /// Adds an argument.
     pub fn add_argument(&self, r#type: Type<'c>, location: Location<'c>) -> Value {
         unsafe {
             Value::from_raw(mlirBlockAddArgument(
@@ -85,6 +89,7 @@ impl<'c> Block<'c> {
         }
     }
 
+    /// Inserts an operation.
     // TODO How can we make those update functions take `&mut self`?
     // TODO Use cells?
     pub fn insert_operation(&self, position: usize, operation: Operation) -> OperationRef {
@@ -97,6 +102,7 @@ impl<'c> Block<'c> {
         }
     }
 
+    /// Appends an operation.
     pub fn append_operation(&self, operation: Operation) -> OperationRef {
         unsafe {
             let operation = operation.into_raw();
@@ -120,6 +126,10 @@ impl<'c> Block<'c> {
         forget(self);
 
         block
+    }
+
+    pub(crate) unsafe fn to_raw(&self) -> MlirBlock {
+        self.raw
     }
 }
 

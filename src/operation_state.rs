@@ -25,7 +25,7 @@ impl<'c> OperationState<'c> {
         }
     }
 
-    pub fn add_results(mut self, results: Vec<Type<'c>>) -> Self {
+    pub fn add_results(mut self, results: &[Type<'c>]) -> Self {
         unsafe {
             mlirOperationStateAddResults(
                 &mut self.raw,
@@ -37,7 +37,7 @@ impl<'c> OperationState<'c> {
         self
     }
 
-    pub fn add_operands(mut self, operands: Vec<Value>) -> Self {
+    pub fn add_operands(mut self, operands: &[Value]) -> Self {
         unsafe {
             mlirOperationStateAddOperands(
                 &mut self.raw,
@@ -66,17 +66,12 @@ impl<'c> OperationState<'c> {
         self
     }
 
-    pub fn add_successors(mut self, successors: Vec<Block>) -> Self {
+    pub fn add_successors(mut self, successors: &[&Block]) -> Self {
         unsafe {
             mlirOperationStateAddSuccessors(
                 &mut self.raw,
                 successors.len() as isize,
-                into_raw_array(
-                    successors
-                        .into_iter()
-                        .map(|block| block.into_raw())
-                        .collect(),
-                ),
+                into_raw_array(successors.into_iter().map(|block| block.to_raw()).collect()),
             )
         }
 
@@ -126,7 +121,7 @@ mod tests {
 
         Operation::new(
             OperationState::new("foo", Location::unknown(&context))
-                .add_results(vec![Type::parse(&context, "i1")]),
+                .add_results(&[Type::parse(&context, "i1")]),
         );
     }
 
@@ -146,7 +141,7 @@ mod tests {
 
         Operation::new(
             OperationState::new("foo", Location::unknown(&context))
-                .add_successors(vec![Block::new(&[])]),
+                .add_successors(&[&Block::new(&[])]),
         );
     }
 

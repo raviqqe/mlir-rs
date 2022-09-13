@@ -5,13 +5,16 @@ use crate::{
 use mlir_sys::{mlirAttributeGetContext, mlirAttributeParseGet, MlirAttribute};
 use std::marker::PhantomData;
 
+/// An attribute.
 // Attributes are always values but their internal storage is owned by contexts.
+#[derive(Clone, Copy, Debug)]
 pub struct Attribute<'c> {
     raw: MlirAttribute,
     _context: PhantomData<&'c Context>,
 }
 
 impl<'c> Attribute<'c> {
+    /// Parses an attribute.
     pub fn parse(context: &Context, source: &str) -> Self {
         Self {
             raw: unsafe {
@@ -21,6 +24,7 @@ impl<'c> Attribute<'c> {
         }
     }
 
+    /// Gets a context.
     pub fn context(&self) -> ContextRef<'c> {
         unsafe { ContextRef::from_raw(mlirAttributeGetContext(self.raw)) }
     }

@@ -72,7 +72,7 @@ mod tests {
 
             let zero = function_block.append_operation(Operation::new(
                 OperationState::new("arith.constant", location)
-                    .add_results(vec![index_type])
+                    .add_results(&[index_type])
                     .add_attributes(vec![(
                         Identifier::new(&context, "value"),
                         Attribute::parse(&context, "0 : index"),
@@ -81,11 +81,8 @@ mod tests {
 
             let dim = function_block.append_operation(Operation::new(
                 OperationState::new("memref.dim", location)
-                    .add_operands(vec![
-                        function_block.argument(0).unwrap(),
-                        zero.result(0).unwrap(),
-                    ])
-                    .add_results(vec![index_type]),
+                    .add_operands(&[function_block.argument(0).unwrap(), zero.result(0).unwrap()])
+                    .add_results(&[index_type]),
             ));
 
             let loop_block = Block::new(&[]);
@@ -93,7 +90,7 @@ mod tests {
 
             let one = function_block.append_operation(Operation::new(
                 OperationState::new("arith.constant", location)
-                    .add_results(vec![index_type])
+                    .add_results(&[index_type])
                     .add_attributes(vec![(
                         Identifier::new(&context, "value"),
                         Attribute::parse(&context, "1 : index"),
@@ -105,30 +102,30 @@ mod tests {
 
                 let lhs = loop_block.append_operation(Operation::new(
                     OperationState::new("memref.load", location)
-                        .add_operands(vec![
+                        .add_operands(&[
                             function_block.argument(0).unwrap(),
                             loop_block.argument(0).unwrap(),
                         ])
-                        .add_results(vec![f32_type]),
+                        .add_results(&[f32_type]),
                 ));
 
                 let rhs = loop_block.append_operation(Operation::new(
                     OperationState::new("memref.load", location)
-                        .add_operands(vec![
+                        .add_operands(&[
                             function_block.argument(1).unwrap(),
                             loop_block.argument(0).unwrap(),
                         ])
-                        .add_results(vec![f32_type]),
+                        .add_results(&[f32_type]),
                 ));
 
                 let add = loop_block.append_operation(Operation::new(
                     OperationState::new("arith.addf", location)
-                        .add_operands(vec![lhs.result(0).unwrap(), rhs.result(0).unwrap()])
-                        .add_results(vec![f32_type]),
+                        .add_operands(&[lhs.result(0).unwrap(), rhs.result(0).unwrap()])
+                        .add_results(&[f32_type]),
                 ));
 
                 loop_block.append_operation(Operation::new(
-                    OperationState::new("memref.store", location).add_operands(vec![
+                    OperationState::new("memref.store", location).add_operands(&[
                         add.result(0).unwrap(),
                         function_block.argument(0).unwrap(),
                         loop_block.argument(0).unwrap(),
@@ -145,7 +142,7 @@ mod tests {
                 loop_region.append_block(loop_block);
 
                 OperationState::new("scf.for", location)
-                    .add_operands(vec![
+                    .add_operands(&[
                         zero.result(0).unwrap(),
                         dim.result(0).unwrap(),
                         one.result(0).unwrap(),
