@@ -31,7 +31,7 @@ impl ExecutionEngine {
     //
     // This function modifies memory locations pointed by the `arguments` argument.
     // If those pointers are invalid or misaligned, calling this function might result in undefined
-    // behaviour.
+    // behavior.
     pub unsafe fn invoke_packed(&self, name: &str, arguments: &mut [*mut ()]) -> LogicalResult {
         LogicalResult::from_raw(mlirExecutionEngineInvokePacked(
             self.raw,
