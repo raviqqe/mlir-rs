@@ -1,8 +1,8 @@
 # Melior
 
-[![GitHub Action](https://img.shields.io/github/workflow/status/raviqqe/hamt-rs/test?style=flat-square)](https://github.com/raviqqe/hamt-rs/actions?query=workflow%3Atest)
+[![GitHub Action](https://img.shields.io/github/workflow/status/raviqqe/melior/test?style=flat-square)](https://github.com/raviqqe/melior/actions?query=workflow%3Atest)
 [![Crate](https://img.shields.io/crates/v/melior.svg?style=flat-square)](https://crates.io/crates/melior)
-[![License](https://img.shields.io/github/license/raviqqe/hamt-rs.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![License](https://img.shields.io/github/license/raviqqe/melior.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
 The rustic MLIR bindings for Rust
 
