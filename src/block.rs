@@ -15,7 +15,7 @@ use mlir_sys::{
 use std::{
     marker::PhantomData,
     mem::{forget, ManuallyDrop},
-    ops::{Deref},
+    ops::Deref,
 };
 
 /// A block
