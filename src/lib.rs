@@ -67,7 +67,7 @@ mod tests {
 
         let function = {
             let function_region = Region::new();
-            let function_block = Block::new(vec![(r#type, location), (r#type, location)]);
+            let function_block = Block::new(&[(r#type, location), (r#type, location)]);
             let index_type = Type::parse(&context, "index");
 
             let zero = function_block.append_operation(Operation::new(
@@ -88,7 +88,7 @@ mod tests {
                     .add_results(vec![index_type]),
             ));
 
-            let loop_block = Block::new(vec![]);
+            let loop_block = Block::new(&[]);
             loop_block.add_argument(index_type, location);
 
             let one = function_block.append_operation(Operation::new(

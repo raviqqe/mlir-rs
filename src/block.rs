@@ -18,13 +18,15 @@ use std::{
     ops::{Deref, DerefMut},
 };
 
+/// A block
 pub struct Block<'c> {
     raw: MlirBlock,
     _context: PhantomData<&'c Context>,
 }
 
 impl<'c> Block<'c> {
-    pub fn new(arguments: Vec<(Type<'c>, Location)>) -> Self {
+    /// Creates a block.
+    pub fn new(arguments: &[(Type<'c>, Location<'c>)]) -> Self {
         unsafe {
             Self::from_raw(mlirBlockCreate(
                 arguments.len() as isize,
@@ -185,11 +187,11 @@ mod tests {
 
     #[test]
     fn new() {
-        Block::new(vec![]);
+        Block::new(&[]);
     }
 
     #[test]
     fn get_non_existent_argument() {
-        assert!(Block::new(vec![]).argument(0).is_none());
+        assert!(Block::new(&[]).argument(0).is_none());
     }
 }

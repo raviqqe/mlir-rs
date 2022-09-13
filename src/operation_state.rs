@@ -146,7 +146,7 @@ mod tests {
 
         Operation::new(
             OperationState::new("foo", Location::unknown(&context))
-                .add_successors(vec![Block::new(vec![])]),
+                .add_successors(vec![Block::new(&[])]),
         );
     }
 
