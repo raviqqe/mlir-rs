@@ -179,7 +179,7 @@ mod tests {
         module.body_mut().insert_operation(0, function);
 
         assert!(module.as_operation().verify());
-        // TODO Fix this. Somehow, MLIR inserts null characters in the middle of string refs.
-        // assert_eq!(module.as_operation().print(), "");
+        // TODO Fix this. Somehow, MLIR inserts null characters in the middle of
+        // string refs. assert_eq!(module.as_operation().print(), "");
     }
 }

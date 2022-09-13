@@ -130,7 +130,8 @@ impl<'c> Drop for Operation<'c> {
     }
 }
 
-// TODO Should we split context lifetimes? Or, is it transitively proven that 'c > 'a?
+// TODO Should we split context lifetimes? Or, is it transitively proven that 'c
+// > 'a?
 pub struct OperationRef<'a> {
     operation: ManuallyDrop<Operation<'a>>,
     _reference: PhantomData<&'a Operation<'a>>,

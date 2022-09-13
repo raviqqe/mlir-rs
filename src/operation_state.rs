@@ -110,8 +110,7 @@ impl<'c> OperationState<'c> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::context::Context;
-    use crate::operation::Operation;
+    use crate::{context::Context, operation::Operation};
 
     #[test]
     fn new() {

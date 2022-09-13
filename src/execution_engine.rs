@@ -29,11 +29,14 @@ impl ExecutionEngine {
         }
     }
 
+    /// Invokes a function in a module. The `arguments` argument includes
+    /// pointers to results of the function as well as arguments.
+    ///
     /// # Safety
     ///
-    /// This function modifies memory locations pointed by the `arguments` argument.
-    /// If those pointers are invalid or misaligned, calling this function might result in undefined
-    /// behavior.
+    /// This function modifies memory locations pointed by the `arguments`
+    /// argument. If those pointers are invalid or misaligned, calling this
+    /// function might result in undefined behavior.
     pub unsafe fn invoke_packed(&self, name: &str, arguments: &mut [*mut ()]) -> LogicalResult {
         LogicalResult::from_raw(mlirExecutionEngineInvokePacked(
             self.raw,
@@ -41,6 +44,8 @@ impl ExecutionEngine {
             arguments.as_mut_ptr() as *mut *mut c_void,
         ))
     }
+
+    // TODO Add rest of the API.
 }
 
 impl Drop for ExecutionEngine {
