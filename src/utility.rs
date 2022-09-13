@@ -65,4 +65,11 @@ mod tests {
         register_all_passes();
         register_all_passes();
     }
+
+    #[test]
+    fn register_passes_many_times() {
+        for _ in 0..1000 {
+            register_all_passes();
+        }
+    }
 }
