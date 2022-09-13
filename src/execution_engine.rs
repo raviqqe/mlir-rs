@@ -58,18 +58,22 @@ impl Drop for ExecutionEngine {
 mod tests {
     use super::*;
     use crate::{
-        context::Context, dialect_registry::DialectRegistry, module::Module, pass::Pass,
+        context::Context,
+        dialect_registry::DialectRegistry,
+        module::Module,
+        pass::Pass,
         pass_manager::PassManager,
+        utility::{register_all_dialects, register_all_llvm_translations},
     };
 
     #[test]
     fn invoke_packed() {
         let registry = DialectRegistry::new();
-        registry.register_all_dialects();
+        register_all_dialects(&registry);
 
         let context = Context::new();
         context.append_dialect_registry(&registry);
-        context.register_all_llvm_translations();
+        register_all_llvm_translations(&context);
 
         let module = Module::parse(
             &context,

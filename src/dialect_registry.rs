@@ -1,7 +1,4 @@
-use mlir_sys::{
-    mlirDialectRegistryCreate, mlirDialectRegistryDestroy, mlirRegisterAllDialects,
-    MlirDialectRegistry,
-};
+use mlir_sys::{mlirDialectRegistryCreate, mlirDialectRegistryDestroy, MlirDialectRegistry};
 
 #[derive(Debug)]
 pub struct DialectRegistry {
@@ -13,10 +10,6 @@ impl DialectRegistry {
         Self {
             raw: unsafe { mlirDialectRegistryCreate() },
         }
-    }
-
-    pub fn register_all_dialects(&self) {
-        unsafe { mlirRegisterAllDialects(self.to_raw()) }
     }
 
     pub(crate) unsafe fn to_raw(&self) -> MlirDialectRegistry {

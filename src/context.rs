@@ -30,10 +30,6 @@ impl Context {
         }
     }
 
-    pub fn register_all_llvm_translations(&self) {
-        unsafe { mlirRegisterAllLLVMTranslations(self.raw) }
-    }
-
     pub fn append_dialect_registry(&self, registry: &DialectRegistry) {
         unsafe { mlirContextAppendDialectRegistry(self.raw, registry.to_raw()) }
     }

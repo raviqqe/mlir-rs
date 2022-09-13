@@ -26,6 +26,7 @@ mod tests {
         attribute::Attribute, block::Block, context::Context, dialect_registry::DialectRegistry,
         identifier::Identifier, location::Location, module::Module, operation::Operation,
         operation_state::OperationState, r#type::Type, region::Region,
+        utility::register_all_dialects,
     };
 
     #[test]
@@ -51,7 +52,7 @@ mod tests {
     #[test]
     fn build_add() {
         let registry = DialectRegistry::new();
-        registry.register_all_dialects();
+        register_all_dialects(&registry);
 
         let context = Context::new();
         context.append_dialect_registry(&registry);
