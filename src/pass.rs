@@ -1,5 +1,6 @@
 use mlir_sys::{
-    mlirCreateConversionConvertArithmeticToLLVM, mlirCreateConversionConvertFuncToLLVM, MlirPass,
+    mlirCreateConversionConvertArithmeticToLLVM, mlirCreateConversionConvertFuncToLLVM,
+    mlirCreateConversionConvertMathToLLVM, mlirCreateConversionConvertMathToLibm, MlirPass,
 };
 
 /// A pass.
@@ -16,6 +17,16 @@ impl Pass {
     /// Creates a pass to convert the `func` dialect to the `llvm` dialect.
     pub fn convert_func_to_llvm() -> Self {
         Self::from_raw_fn(mlirCreateConversionConvertFuncToLLVM)
+    }
+
+    /// Creates a pass to convert the `math` dialect to the `llvm` dialect.
+    pub fn convert_math_to_llvm() -> Self {
+        Self::from_raw_fn(mlirCreateConversionConvertMathToLLVM)
+    }
+
+    /// Creates a pass to convert the `math` dialect to the `libm` dialect.
+    pub fn convert_math_to_libm() -> Self {
+        Self::from_raw_fn(mlirCreateConversionConvertMathToLibm)
     }
 
     // TODO Add more passes.
