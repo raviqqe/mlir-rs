@@ -48,8 +48,6 @@ mod tests {
         assert_eq!(module.as_operation().print(), "module{}");
     }
 
-    // This test is copied directly from a `makeAndDumpAdd` function in:
-    // https://github.com/llvm/llvm-project/blob/llvmorg-15.0.0/mlir/test/CAPI/ir.c
     #[test]
     fn build_add() {
         let registry = DialectRegistry::new();

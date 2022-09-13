@@ -56,7 +56,7 @@ mod tests {
     };
 
     #[test]
-    fn simple() {
+    fn invoke_packed() {
         let registry = DialectRegistry::new();
         registry.register_all_dialects();
 
