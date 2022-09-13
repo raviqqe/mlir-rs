@@ -1,5 +1,9 @@
 # Melior
 
+[![GitHub Action](https://img.shields.io/github/workflow/status/raviqqe/hamt-rs/test?style=flat-square)](https://github.com/raviqqe/hamt-rs/actions?query=workflow%3Atest)
+[![Crate](https://img.shields.io/crates/v/melior.svg?style=flat-square)](https://crates.io/crates/melior)
+[![License](https://img.shields.io/github/license/raviqqe/hamt-rs.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+
 The rustic MLIR bindings for Rust
 
 This crate is a wrapper of [the MLIR C API](https://mlir.llvm.org/docs/CAPI/).
