@@ -18,19 +18,15 @@ impl LogicalResult {
     }
 
     pub fn is_success(&self) -> bool {
-        unsafe { self.result.value != 0 }
+        self.result.value != 0
     }
 
     pub fn is_failure(&self) -> bool {
-        unsafe { self.result.value == 0 }
+        self.result.value == 0
     }
 
-    pub(crate) unsafe fn from_raw(result: MlirLogicalResult) -> Self {
+    pub(crate) fn from_raw(result: MlirLogicalResult) -> Self {
         Self { result }
-    }
-
-    pub(crate) unsafe fn to_raw(&self) -> MlirLogicalResult {
-        self.result
     }
 }
 
