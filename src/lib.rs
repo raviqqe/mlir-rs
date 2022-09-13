@@ -23,10 +23,10 @@ pub mod value;
 #[cfg(test)]
 mod tests {
     use crate::{
-        attribute::Attribute, block::Block, context::Context,
-        dialect_registry::DialectRegistry, identifier::Identifier, location::Location,
-        module::Module, operation::Operation, operation_state::OperationState, r#type::Type,
-        region::Region, utility::register_all_dialects,
+        attribute::Attribute, block::Block, context::Context, dialect_registry::DialectRegistry,
+        identifier::Identifier, location::Location, module::Module, operation::Operation,
+        operation_state::OperationState, r#type::Type, region::Region,
+        utility::register_all_dialects,
     };
 
     #[test]

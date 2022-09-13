@@ -115,6 +115,13 @@ impl<'c> Type<'c> {
         unsafe { ContextRef::from_raw(mlirTypeGetContext(self.raw)) }
     }
 
+    pub(crate) unsafe fn from_raw(raw: MlirType) -> Self {
+        Self {
+            raw,
+            _context: Default::default(),
+        }
+    }
+
     pub(crate) unsafe fn to_raw(self) -> MlirType {
         self.raw
     }
