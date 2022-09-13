@@ -79,7 +79,7 @@ mod tests {
     #[test]
     fn run() {
         let context = Context::new();
-        let mut manager = PassManager::new(&context);
+        let manager = PassManager::new(&context);
 
         manager.add_pass(Pass::convert_func_to_llvm());
         manager.run(&mut Module::new(Location::unknown(&context)));
