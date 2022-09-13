@@ -16,7 +16,7 @@ pub fn register_all_llvm_translations(context: &Context) {
 pub fn register_all_passes() {
     static ONCE: Once = Once::new();
 
-    // Multiple `mlirRegisterAllPasses` calls seems to lead to double free.
+    // Multiple calls of `mlirRegisterAllPasses` seems to lead to double free.
     ONCE.call_once(|| unsafe { mlirRegisterAllPasses() });
 }
 
