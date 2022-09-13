@@ -15,12 +15,14 @@ pub struct Region {
 }
 
 impl Region {
+    /// Creates a region.
     pub fn new() -> Self {
         Self {
             raw: unsafe { mlirRegionCreate() },
         }
     }
 
+    /// Gets the first block in a region.
     pub fn first_block(&self) -> Option<BlockRef> {
         unsafe {
             let block = mlirRegionGetFirstBlock(self.raw);
@@ -33,6 +35,7 @@ impl Region {
         }
     }
 
+    /// Appends a block.
     pub fn append_block(&self, block: Block) {
         unsafe { mlirRegionAppendOwnedBlock(self.raw, block.into_raw()) }
     }
@@ -58,6 +61,7 @@ impl Drop for Region {
     }
 }
 
+/// A reference to a region.
 pub struct RegionRef<'a> {
     raw: ManuallyDrop<Region>,
     _region: PhantomData<&'a Region>,

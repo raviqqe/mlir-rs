@@ -10,7 +10,7 @@ use mlir_sys::{
     mlirOperationCreate, mlirOperationDestroy, mlirOperationDump, mlirOperationGetContext,
     mlirOperationGetNextInBlock, mlirOperationGetNumRegions, mlirOperationGetNumResults,
     mlirOperationGetRegion, mlirOperationGetResult, mlirOperationPrint, mlirOperationVerify,
-    MlirOperation, MlirRegion, MlirStringRef,
+    MlirOperation, MlirStringRef,
 };
 use std::{
     ffi::c_void,
@@ -20,12 +20,14 @@ use std::{
     ops::Deref,
 };
 
+/// An operation.
 pub struct Operation<'c> {
     raw: MlirOperation,
     _context: PhantomData<&'c Context>,
 }
 
 impl<'c> Operation<'c> {
+    /// Creates an operation.
     pub fn new(state: OperationState) -> Self {
         Self {
             raw: unsafe { mlirOperationCreate(&mut state.into_raw()) },
@@ -33,10 +35,12 @@ impl<'c> Operation<'c> {
         }
     }
 
+    /// Gets a context.
     pub fn context(&self) -> ContextRef {
         unsafe { ContextRef::from_raw(mlirOperationGetContext(self.raw)) }
     }
 
+    /// Gets a result at an index.
     pub fn result(&self, index: usize) -> Option<Value> {
         unsafe {
             if index < mlirOperationGetNumResults(self.raw) as usize {
@@ -50,18 +54,21 @@ impl<'c> Operation<'c> {
         }
     }
 
+    /// Gets a result at an index.
     pub fn region(&self, index: usize) -> Option<RegionRef> {
-        unsafe { Self::raw_region(self.raw, index).map(|region| RegionRef::from_raw(region)) }
-    }
-
-    unsafe fn raw_region(operation: MlirOperation, index: usize) -> Option<MlirRegion> {
-        if index < mlirOperationGetNumRegions(operation) as usize {
-            Some(mlirOperationGetRegion(operation, index as isize))
-        } else {
-            None
+        unsafe {
+            if index < mlirOperationGetNumRegions(self.raw) as usize {
+                Some(RegionRef::from_raw(mlirOperationGetRegion(
+                    self.raw,
+                    index as isize,
+                )))
+            } else {
+                None
+            }
         }
     }
 
+    /// Gets the next operation in the same block.
     pub fn next_in_block(&self) -> Option<OperationRef> {
         unsafe {
             let operation = mlirOperationGetNextInBlock(self.raw);
@@ -74,10 +81,12 @@ impl<'c> Operation<'c> {
         }
     }
 
+    /// Verifies an operation.
     pub fn verify(&self) -> bool {
         unsafe { mlirOperationVerify(self.raw) }
     }
 
+    /// Dumps an operation.
     pub fn dump(&self) {
         unsafe { mlirOperationDump(self.raw) }
     }
@@ -125,8 +134,9 @@ impl<'c> Display for &Operation<'c> {
     }
 }
 
-// TODO Should we split context lifetimes? Or, is it transitively proven that 'c
-// > 'a?
+/// A reference to an operation.
+// TODO Should we split context lifetimes? Or, is it transitively proven that
+// 'c > 'a?
 pub struct OperationRef<'a> {
     operation: ManuallyDrop<Operation<'a>>,
     _reference: PhantomData<&'a Operation<'a>>,

@@ -18,7 +18,7 @@ Contribution is welcome! But, Melior is still in the alpha stage as well as the 
 
 ### Technical notes
 
-- We use `&T` for MLIR objects all the time instead of `&mut T` to mitigate the intricacy of representing a loose ownership model of the MLIR C API in Rust.
+- We always use `&T` for MLIR objects instead of `&mut T` to mitigate the intricacy of representing a loose ownership model of the MLIR C API in Rust.
 - Only UTF-8 is supported as string encoding.
   - Most string conversion between Rust and C is cached internally.
 

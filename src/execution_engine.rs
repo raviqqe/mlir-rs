@@ -71,7 +71,7 @@ mod tests {
         context.append_dialect_registry(&registry);
         context.register_all_llvm_translations();
 
-        let mut module = Module::parse(
+        let module = Module::parse(
             &context,
             r#"
             module {
@@ -90,7 +90,7 @@ mod tests {
             .nested_under("func.func")
             .add_pass(Pass::convert_arithmetic_to_llvm());
 
-        assert!(pass_manager.run(&mut module).is_success());
+        assert!(pass_manager.run(&module).is_success());
 
         let engine = ExecutionEngine::new(&module, 2, &[]);
 

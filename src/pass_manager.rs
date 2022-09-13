@@ -41,7 +41,7 @@ impl<'c> PassManager<'c> {
     }
 
     /// Runs passes added to a pass manager against a module.
-    pub fn run(&self, module: &mut Module) -> LogicalResult {
+    pub fn run(&self, module: &Module) -> LogicalResult {
         LogicalResult::from_raw(unsafe { mlirPassManagerRun(self.raw, module.to_raw()) })
     }
 
@@ -82,6 +82,6 @@ mod tests {
         let manager = PassManager::new(&context);
 
         manager.add_pass(Pass::convert_func_to_llvm());
-        manager.run(&mut Module::new(Location::unknown(&context)));
+        manager.run(&Module::new(Location::unknown(&context)));
     }
 }
