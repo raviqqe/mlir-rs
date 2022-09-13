@@ -16,7 +16,7 @@ brew install llvm@15
 
 Contribution is welcome! But, Melior is still in the alpha stage as well as the MLIR C API. Note that the API is unstable and can have breaking changes in the future.
 
-### Design decisions
+### Technical notes
 
 - Only UTF-8 is supported as string encoding.
   - Most string conversion between Rust and C is cached internally.
