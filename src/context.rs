@@ -63,6 +63,7 @@ impl Default for Context {
     }
 }
 
+/// A reference to a context.
 pub struct ContextRef<'c> {
     raw: ManuallyDrop<Context>,
     _reference: PhantomData<&'c Context>,
