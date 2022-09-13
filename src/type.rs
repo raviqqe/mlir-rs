@@ -8,24 +8,24 @@ use std::marker::PhantomData;
 // Types are always values but their internal storage is owned by contexts.
 #[derive(Clone, Copy, Debug)]
 pub struct Type<'c> {
-    r#type: MlirType,
+    raw: MlirType,
     _context: PhantomData<&'c Context>,
 }
 
 impl<'c> Type<'c> {
     pub fn parse(context: &Context, source: &str) -> Self {
         Self {
-            r#type: unsafe { mlirTypeParseGet(context.to_raw(), StringRef::from(source).to_raw()) },
+            raw: unsafe { mlirTypeParseGet(context.to_raw(), StringRef::from(source).to_raw()) },
             _context: Default::default(),
         }
     }
 
     pub fn context(&self) -> ContextRef<'c> {
-        unsafe { ContextRef::from_raw(mlirTypeGetContext(self.r#type)) }
+        unsafe { ContextRef::from_raw(mlirTypeGetContext(self.raw)) }
     }
 
     pub(crate) unsafe fn to_raw(self) -> MlirType {
-        self.r#type
+        self.raw
     }
 }
 

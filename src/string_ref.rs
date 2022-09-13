@@ -11,15 +11,14 @@ static STRING_CACHE: Lazy<RwLock<HashMap<String, CString>>> = Lazy::new(Default:
 // TODO The documentation says string refs do not have to be null-terminated.
 // But it looks like some functions do not handle strings not null-terminated?
 pub struct StringRef<'a> {
-    string: MlirStringRef,
+    raw: MlirStringRef,
     _parent: PhantomData<&'a ()>,
 }
 
 impl<'a> StringRef<'a> {
     pub fn as_str(&self) -> &str {
         unsafe {
-            let bytes =
-                slice::from_raw_parts(self.string.data as *mut u8, self.string.length as usize);
+            let bytes = slice::from_raw_parts(self.raw.data as *mut u8, self.raw.length as usize);
 
             str::from_utf8(if bytes[bytes.len() - 1] == 0 {
                 &bytes[..bytes.len() - 1]
@@ -31,12 +30,12 @@ impl<'a> StringRef<'a> {
     }
 
     pub(crate) unsafe fn to_raw(&self) -> MlirStringRef {
-        self.string
+        self.raw
     }
 
     pub(crate) unsafe fn from_raw(string: MlirStringRef) -> Self {
         Self {
-            string,
+            raw: string,
             _parent: Default::default(),
         }
     }

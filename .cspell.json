@@ -3,13 +3,13 @@
     "addf",
     "addi",
     "femtomc",
-    "libdir",
     "libm",
     "linalg",
     "melior",
     "memref",
     "mlir",
     "rustc",
+    "spirv",
     "stdc"
   ]
 }

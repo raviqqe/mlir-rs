@@ -5,24 +5,25 @@ use crate::{
 use mlir_sys::{mlirDialectEqual, mlirDialectGetContext, mlirDialectGetNamespace, MlirDialect};
 use std::marker::PhantomData;
 
+/// A dialect.
 #[derive(Clone, Copy, Debug)]
 pub struct Dialect<'c> {
-    dialect: MlirDialect,
+    raw: MlirDialect,
     _context: PhantomData<&'c Context>,
 }
 
 impl<'c> Dialect<'c> {
     pub fn context(&self) -> ContextRef<'c> {
-        unsafe { ContextRef::from_raw(mlirDialectGetContext(self.dialect)) }
+        unsafe { ContextRef::from_raw(mlirDialectGetContext(self.raw)) }
     }
 
     pub fn namespace(&self) -> StringRef {
-        unsafe { StringRef::from_raw(mlirDialectGetNamespace(self.dialect)) }
+        unsafe { StringRef::from_raw(mlirDialectGetNamespace(self.raw)) }
     }
 
     pub(crate) unsafe fn from_raw(dialect: MlirDialect) -> Self {
         Self {
-            dialect,
+            raw: dialect,
             _context: Default::default(),
         }
     }
@@ -30,7 +31,7 @@ impl<'c> Dialect<'c> {
 
 impl<'c> PartialEq for Dialect<'c> {
     fn eq(&self, other: &Self) -> bool {
-        unsafe { mlirDialectEqual(self.dialect, other.dialect) }
+        unsafe { mlirDialectEqual(self.raw, other.raw) }
     }
 }
 

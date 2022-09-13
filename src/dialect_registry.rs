@@ -5,13 +5,13 @@ use mlir_sys::{
 
 #[derive(Debug)]
 pub struct DialectRegistry {
-    registry: MlirDialectRegistry,
+    raw: MlirDialectRegistry,
 }
 
 impl DialectRegistry {
     pub fn new() -> Self {
         Self {
-            registry: unsafe { mlirDialectRegistryCreate() },
+            raw: unsafe { mlirDialectRegistryCreate() },
         }
     }
 
@@ -20,13 +20,13 @@ impl DialectRegistry {
     }
 
     pub(crate) unsafe fn to_raw(&self) -> MlirDialectRegistry {
-        self.registry
+        self.raw
     }
 }
 
 impl Drop for DialectRegistry {
     fn drop(&mut self) {
-        unsafe { mlirDialectRegistryDestroy(self.registry) };
+        unsafe { mlirDialectRegistryDestroy(self.raw) };
     }
 }
 

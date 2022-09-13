@@ -2,32 +2,32 @@ use mlir_sys::MlirLogicalResult;
 
 /// A logical result of success or failure.
 pub struct LogicalResult {
-    result: MlirLogicalResult,
+    raw: MlirLogicalResult,
 }
 
 impl LogicalResult {
     pub fn success() -> Self {
         Self {
-            result: MlirLogicalResult { value: 1 },
+            raw: MlirLogicalResult { value: 1 },
         }
     }
 
     pub fn failure() -> Self {
         Self {
-            result: MlirLogicalResult { value: 0 },
+            raw: MlirLogicalResult { value: 0 },
         }
     }
 
     pub fn is_success(&self) -> bool {
-        self.result.value != 0
+        self.raw.value != 0
     }
 
     pub fn is_failure(&self) -> bool {
-        self.result.value == 0
+        self.raw.value == 0
     }
 
     pub(crate) fn from_raw(result: MlirLogicalResult) -> Self {
-        Self { result }
+        Self { raw: result }
     }
 }
 

@@ -11,14 +11,14 @@ use mlir_sys::{
 use std::marker::PhantomData;
 
 pub struct OperationState<'c> {
-    state: MlirOperationState,
+    raw: MlirOperationState,
     _context: PhantomData<&'c Context>,
 }
 
 impl<'c> OperationState<'c> {
     pub fn new(name: &str, location: Location<'c>) -> Self {
         Self {
-            state: unsafe {
+            raw: unsafe {
                 mlirOperationStateGet(StringRef::from(name).to_raw(), location.to_raw())
             },
             _context: Default::default(),
@@ -28,7 +28,7 @@ impl<'c> OperationState<'c> {
     pub fn add_results(mut self, results: Vec<Type<'c>>) -> Self {
         unsafe {
             mlirOperationStateAddResults(
-                &mut self.state,
+                &mut self.raw,
                 results.len() as isize,
                 into_raw_array(results.iter().map(|r#type| r#type.to_raw()).collect()),
             )
@@ -40,7 +40,7 @@ impl<'c> OperationState<'c> {
     pub fn add_operands(mut self, operands: Vec<Value>) -> Self {
         unsafe {
             mlirOperationStateAddOperands(
-                &mut self.state,
+                &mut self.raw,
                 operands.len() as isize,
                 into_raw_array(operands.iter().map(|value| value.to_raw()).collect()),
             )
@@ -52,7 +52,7 @@ impl<'c> OperationState<'c> {
     pub fn add_regions(mut self, regions: Vec<Region>) -> Self {
         unsafe {
             mlirOperationStateAddOwnedRegions(
-                &mut self.state,
+                &mut self.raw,
                 regions.len() as isize,
                 into_raw_array(
                     regions
@@ -69,7 +69,7 @@ impl<'c> OperationState<'c> {
     pub fn add_successors(mut self, successors: Vec<Block>) -> Self {
         unsafe {
             mlirOperationStateAddSuccessors(
-                &mut self.state,
+                &mut self.raw,
                 successors.len() as isize,
                 into_raw_array(
                     successors
@@ -86,7 +86,7 @@ impl<'c> OperationState<'c> {
     pub fn add_attributes(mut self, attributes: Vec<(Identifier, Attribute<'c>)>) -> Self {
         unsafe {
             mlirOperationStateAddAttributes(
-                &mut self.state,
+                &mut self.raw,
                 attributes.len() as isize,
                 into_raw_array(
                     attributes
@@ -103,7 +103,7 @@ impl<'c> OperationState<'c> {
     }
 
     pub(crate) unsafe fn into_raw(self) -> MlirOperationState {
-        self.state
+        self.raw
     }
 }
 

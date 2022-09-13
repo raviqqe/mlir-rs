@@ -7,14 +7,14 @@ use std::marker::PhantomData;
 
 // Attributes are always values but their internal storage is owned by contexts.
 pub struct Attribute<'c> {
-    attribute: MlirAttribute,
+    raw: MlirAttribute,
     _context: PhantomData<&'c Context>,
 }
 
 impl<'c> Attribute<'c> {
     pub fn parse(context: &Context, source: &str) -> Self {
         Self {
-            attribute: unsafe {
+            raw: unsafe {
                 mlirAttributeParseGet(context.to_raw(), StringRef::from(source).to_raw())
             },
             _context: Default::default(),
@@ -22,11 +22,11 @@ impl<'c> Attribute<'c> {
     }
 
     pub fn context(&self) -> ContextRef<'c> {
-        unsafe { ContextRef::from_raw(mlirAttributeGetContext(self.attribute)) }
+        unsafe { ContextRef::from_raw(mlirAttributeGetContext(self.raw)) }
     }
 
     pub(crate) unsafe fn to_raw(&self) -> MlirAttribute {
-        self.attribute
+        self.raw
     }
 }
 

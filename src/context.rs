@@ -7,49 +7,49 @@ use mlir_sys::{
 use std::{marker::PhantomData, mem::ManuallyDrop, ops::Deref};
 
 pub struct Context {
-    context: MlirContext,
+    raw: MlirContext,
 }
 
 impl Context {
     pub fn new() -> Self {
         Self {
-            context: unsafe { mlirContextCreate() },
+            raw: unsafe { mlirContextCreate() },
         }
     }
 
     pub fn registered_dialect_count(&self) -> usize {
-        unsafe { mlirContextGetNumRegisteredDialects(self.context) as usize }
+        unsafe { mlirContextGetNumRegisteredDialects(self.raw) as usize }
     }
 
     pub fn get_or_load_dialect(&self, name: &str) -> Dialect {
         unsafe {
             Dialect::from_raw(mlirContextGetOrLoadDialect(
-                self.context,
+                self.raw,
                 StringRef::from(name).to_raw(),
             ))
         }
     }
 
     pub fn register_all_llvm_translations(&self) {
-        unsafe { mlirRegisterAllLLVMTranslations(self.context) }
+        unsafe { mlirRegisterAllLLVMTranslations(self.raw) }
     }
 
     pub fn append_dialect_registry(&self, registry: &DialectRegistry) {
-        unsafe { mlirContextAppendDialectRegistry(self.context, registry.to_raw()) }
+        unsafe { mlirContextAppendDialectRegistry(self.raw, registry.to_raw()) }
     }
 
     pub fn load_all_available_dialects(&self) {
-        unsafe { mlirContextLoadAllAvailableDialects(self.context) }
+        unsafe { mlirContextLoadAllAvailableDialects(self.raw) }
     }
 
     pub(crate) unsafe fn to_raw(&self) -> MlirContext {
-        self.context
+        self.raw
     }
 }
 
 impl Drop for Context {
     fn drop(&mut self) {
-        unsafe { mlirContextDestroy(self.context) };
+        unsafe { mlirContextDestroy(self.raw) };
     }
 }
 
@@ -60,14 +60,14 @@ impl Default for Context {
 }
 
 pub struct ContextRef<'c> {
-    context: ManuallyDrop<Context>,
+    raw: ManuallyDrop<Context>,
     _reference: PhantomData<&'c Context>,
 }
 
 impl<'c> ContextRef<'c> {
     pub(crate) unsafe fn from_raw(context: MlirContext) -> Self {
         Self {
-            context: ManuallyDrop::new(Context { context }),
+            raw: ManuallyDrop::new(Context { raw: context }),
             _reference: Default::default(),
         }
     }
@@ -77,7 +77,7 @@ impl<'c> Deref for ContextRef<'c> {
     type Target = Context;
 
     fn deref(&self) -> &Self::Target {
-        &self.context
+        &self.raw
     }
 }
 

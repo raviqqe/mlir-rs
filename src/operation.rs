@@ -19,27 +19,27 @@ use std::{
 };
 
 pub struct Operation<'c> {
-    operation: MlirOperation,
+    raw: MlirOperation,
     _context: PhantomData<&'c Context>,
 }
 
 impl<'c> Operation<'c> {
     pub fn new(state: OperationState) -> Self {
         Self {
-            operation: unsafe { mlirOperationCreate(&mut state.into_raw()) },
+            raw: unsafe { mlirOperationCreate(&mut state.into_raw()) },
             _context: Default::default(),
         }
     }
 
     pub fn context(&self) -> ContextRef {
-        unsafe { ContextRef::from_raw(mlirOperationGetContext(self.operation)) }
+        unsafe { ContextRef::from_raw(mlirOperationGetContext(self.raw)) }
     }
 
     pub fn result(&self, index: usize) -> Option<Value> {
         unsafe {
-            if index < mlirOperationGetNumResults(self.operation) as usize {
+            if index < mlirOperationGetNumResults(self.raw) as usize {
                 Some(Value::from_raw(mlirOperationGetResult(
-                    self.operation,
+                    self.raw,
                     index as isize,
                 )))
             } else {
@@ -49,13 +49,11 @@ impl<'c> Operation<'c> {
     }
 
     pub fn region(&self, index: usize) -> Option<RegionRef> {
-        unsafe { Self::raw_region(self.operation, index).map(|region| RegionRef::from_raw(region)) }
+        unsafe { Self::raw_region(self.raw, index).map(|region| RegionRef::from_raw(region)) }
     }
 
     pub fn region_mut(&mut self, index: usize) -> Option<RegionRefMut> {
-        unsafe {
-            Self::raw_region(self.operation, index).map(|region| RegionRefMut::from_raw(region))
-        }
+        unsafe { Self::raw_region(self.raw, index).map(|region| RegionRefMut::from_raw(region)) }
     }
 
     unsafe fn raw_region(operation: MlirOperation, index: usize) -> Option<MlirRegion> {
@@ -68,7 +66,7 @@ impl<'c> Operation<'c> {
 
     pub fn next_in_block(&self) -> Option<OperationRef> {
         unsafe {
-            let operation = mlirOperationGetNextInBlock(self.operation);
+            let operation = mlirOperationGetNextInBlock(self.raw);
 
             if operation.ptr.is_null() {
                 None
@@ -79,7 +77,7 @@ impl<'c> Operation<'c> {
     }
 
     pub fn verify(&self) -> bool {
-        unsafe { mlirOperationVerify(self.operation) }
+        unsafe { mlirOperationVerify(self.raw) }
     }
 
     pub fn print(&self) -> String {
@@ -91,7 +89,7 @@ impl<'c> Operation<'c> {
 
         unsafe {
             mlirOperationPrint(
-                self.operation,
+                self.raw,
                 Some(callback),
                 &mut strings as *mut _ as *mut c_void,
             );
@@ -105,18 +103,18 @@ impl<'c> Operation<'c> {
     }
 
     pub fn dump(&self) {
-        unsafe { mlirOperationDump(self.operation) }
+        unsafe { mlirOperationDump(self.raw) }
     }
 
     pub(crate) unsafe fn from_raw(operation: MlirOperation) -> Self {
         Self {
-            operation,
+            raw: operation,
             _context: Default::default(),
         }
     }
 
     pub(crate) unsafe fn into_raw(self) -> MlirOperation {
-        let operation = self.operation;
+        let operation = self.raw;
 
         forget(self);
 
@@ -126,7 +124,7 @@ impl<'c> Operation<'c> {
 
 impl<'c> Drop for Operation<'c> {
     fn drop(&mut self) {
-        unsafe { mlirOperationDestroy(self.operation) };
+        unsafe { mlirOperationDestroy(self.raw) };
     }
 }
 

@@ -10,9 +10,10 @@ use mlir_sys::{
     mlirGetDialectHandle__sparse_tensor__, mlirGetDialectHandle__tensor__, MlirDialectHandle,
 };
 
+/// A dialect handle.
 #[derive(Clone, Copy, Debug)]
 pub struct DialectHandle {
-    handle: MlirDialectHandle,
+    raw: MlirDialectHandle,
 }
 
 impl DialectHandle {
@@ -65,23 +66,23 @@ impl DialectHandle {
     }
 
     pub fn namespace(&self) -> StringRef {
-        unsafe { StringRef::from_raw(mlirDialectHandleGetNamespace(self.handle)) }
+        unsafe { StringRef::from_raw(mlirDialectHandleGetNamespace(self.raw)) }
     }
 
     pub fn insert_dialect(&self, registry: &DialectRegistry) {
-        unsafe { mlirDialectHandleInsertDialect(self.handle, registry.to_raw()) }
+        unsafe { mlirDialectHandleInsertDialect(self.raw, registry.to_raw()) }
     }
 
     pub fn load_dialect<'c>(&self, context: &'c Context) -> Dialect<'c> {
-        unsafe { Dialect::from_raw(mlirDialectHandleLoadDialect(self.handle, context.to_raw())) }
+        unsafe { Dialect::from_raw(mlirDialectHandleLoadDialect(self.raw, context.to_raw())) }
     }
 
     pub fn register_dialect(&self, context: &Context) {
-        unsafe { mlirDialectHandleRegisterDialect(self.handle, context.to_raw()) }
+        unsafe { mlirDialectHandleRegisterDialect(self.raw, context.to_raw()) }
     }
 
     pub(crate) unsafe fn from_raw(handle: MlirDialectHandle) -> Self {
-        Self { handle }
+        Self { raw: handle }
     }
 }
 
