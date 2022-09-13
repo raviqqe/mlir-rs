@@ -24,7 +24,7 @@ jobs:
         with:
           files: "**/*.{md,rs}"
   readme:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
       - run: npx markdown-link-check README.md
