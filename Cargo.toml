@@ -1,6 +1,6 @@
 [package]
 name = "melior"
-description = "MLIR wrapper in Rust"
+description = "The rustic MLIR bindings in Rust"
 version = "0.1.0"
 edition = "2021"
 license-file = "LICENSE"
