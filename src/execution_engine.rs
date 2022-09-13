@@ -1,15 +1,18 @@
 use crate::{logical_result::LogicalResult, module::Module, string_ref::StringRef};
-use mlir_sys::{mlirExecutionEngineCreate, mlirExecutionEngineInvokePacked, MlirExecutionEngine};
+use mlir_sys::{
+    mlirExecutionEngineCreate, mlirExecutionEngineDestroy, mlirExecutionEngineInvokePacked,
+    MlirExecutionEngine,
+};
 use std::ffi::c_void;
 
 pub struct ExecutionEngine {
-    engine: MlirExecutionEngine,
+    raw: MlirExecutionEngine,
 }
 
 impl ExecutionEngine {
     pub fn new(module: &Module, optimization_level: usize, shared_library_paths: &[&str]) -> Self {
         Self {
-            engine: unsafe {
+            raw: unsafe {
                 mlirExecutionEngineCreate(
                     module.to_raw(),
                     optimization_level as i32,
@@ -26,10 +29,16 @@ impl ExecutionEngine {
 
     pub unsafe fn invoke_packed(&self, name: &str, arguments: &mut [*mut ()]) -> LogicalResult {
         LogicalResult::from_raw(mlirExecutionEngineInvokePacked(
-            self.engine,
+            self.raw,
             StringRef::from(name).to_raw(),
             arguments.as_mut_ptr() as *mut *mut c_void,
         ))
+    }
+}
+
+impl Drop for ExecutionEngine {
+    fn drop(&mut self) {
+        unsafe { mlirExecutionEngineDestroy(self.raw) }
     }
 }
 
