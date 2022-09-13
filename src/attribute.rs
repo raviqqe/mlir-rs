@@ -29,7 +29,7 @@ impl<'c> Attribute<'c> {
         unsafe { ContextRef::from_raw(mlirAttributeGetContext(self.raw)) }
     }
 
-    pub(crate) unsafe fn to_raw(&self) -> MlirAttribute {
+    pub(crate) unsafe fn to_raw(self) -> MlirAttribute {
         self.raw
     }
 }
