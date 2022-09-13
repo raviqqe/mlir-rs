@@ -23,10 +23,10 @@ pub mod value;
 #[cfg(test)]
 mod tests {
     use crate::{
-        attribute::Attribute, block::Block, context::Context, dialect_registry::DialectRegistry,
-        identifier::Identifier, location::Location, module::Module, operation::Operation,
-        operation_state::OperationState, r#type::Type, region::Region,
-        utility::register_all_dialects,
+        attribute::Attribute, block::Block, context::Context,
+        dialect_registry::DialectRegistry, identifier::Identifier, location::Location,
+        module::Module, operation::Operation, operation_state::OperationState, r#type::Type,
+        region::Region, utility::register_all_dialects,
     };
 
     #[test]
@@ -178,55 +178,5 @@ mod tests {
 
         assert!(module.as_operation().verify());
         insta::assert_display_snapshot!(&*module.as_operation());
-    }
-
-    #[test]
-    fn create_llvm_types() {
-        let context = Context::new();
-
-        let i8 = Type::integer(&context, 8);
-        let i32 = Type::integer(&context, 32);
-        let i64 = Type::integer(&context, 64);
-
-        let i32_pointer = Type::llvm_pointer(i32, 0);
-
-        assert_eq!(i32_pointer, Type::parse(&context, "!llvm.ptr<i32>"));
-
-        // const char *i32p4_text = "!llvm.ptr<i32, 4>";
-        // MlirType i32p4 = mlirLLVMPointerTypeGet(i32, 4);
-        // MlirType i32p4_ref = mlirTypeParseGet(ctx, mlirStringRefCreateFromCString(i32p4_text));
-        // // CHECK: !llvm.ptr<i32, 4>: 1
-        // fprintf(stderr, "%s: %d\n", i32p4_text, mlirTypeEqual(i32p4, i32p4_ref));
-
-        // const char *voidt_text = "!llvm.void";
-        // MlirType voidt = mlirLLVMVoidTypeGet(ctx);
-        // MlirType voidt_ref =
-        //     mlirTypeParseGet(ctx, mlirStringRefCreateFromCString(voidt_text));
-        // // CHECK: !llvm.void: 1
-        // fprintf(stderr, "%s: %d\n", voidt_text, mlirTypeEqual(voidt, voidt_ref));
-
-        // const char *i32_4_text = "!llvm.array<4xi32>";
-        // MlirType i32_4 = mlirLLVMArrayTypeGet(i32, 4);
-        // MlirType i32_4_ref =
-        //     mlirTypeParseGet(ctx, mlirStringRefCreateFromCString(i32_4_text));
-        // // CHECK: !llvm.array<4xi32>: 1
-        // fprintf(stderr, "%s: %d\n", i32_4_text, mlirTypeEqual(i32_4, i32_4_ref));
-
-        // const char *i8_i32_i64_text = "!llvm.func<i8 (i32, i64)>";
-        // const MlirType i32_i64_arr[] = {i32, i64};
-        // MlirType i8_i32_i64 = mlirLLVMFunctionTypeGet(i8, 2, i32_i64_arr, false);
-        // MlirType i8_i32_i64_ref =
-        //     mlirTypeParseGet(ctx, mlirStringRefCreateFromCString(i8_i32_i64_text));
-        // // CHECK: !llvm.func<i8 (i32, i64)>: 1
-        // fprintf(stderr, "%s: %d\n", i8_i32_i64_text,
-        //         mlirTypeEqual(i8_i32_i64, i8_i32_i64_ref));
-
-        // const char *i32_i64_s_text = "!llvm.struct<(i32, i64)>";
-        // MlirType i32_i64_s = mlirLLVMStructTypeLiteralGet(ctx, 2, i32_i64_arr, false);
-        // MlirType i32_i64_s_ref =
-        //     mlirTypeParseGet(ctx, mlirStringRefCreateFromCString(i32_i64_s_text));
-        // // CHECK: !llvm.struct<(i32, i64)>: 1
-        // fprintf(stderr, "%s: %d\n", i32_i64_s_text,
-        //         mlirTypeEqual(i32_i64_s, i32_i64_s_ref));
     }
 }

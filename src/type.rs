@@ -1,10 +1,12 @@
 use crate::{
     context::{Context, ContextRef},
     string_ref::StringRef,
+    utility::into_raw_array,
 };
 use mlir_sys::{
-    mlirIntegerTypeGet, mlirIntegerTypeSignedGet, mlirIntegerTypeUnsignedGet,
-    mlirLLVMPointerTypeGet, mlirTypeEqual, mlirTypeGetContext, mlirTypeParseGet, MlirType,
+    mlirIntegerTypeGet, mlirIntegerTypeSignedGet, mlirIntegerTypeUnsignedGet, mlirLLVMArrayTypeGet,
+    mlirLLVMFunctionTypeGet, mlirLLVMPointerTypeGet, mlirLLVMStructTypeLiteralGet,
+    mlirLLVMVoidTypeGet, mlirTypeEqual, mlirTypeGetContext, mlirTypeParseGet, MlirType,
 };
 use std::marker::PhantomData;
 
@@ -44,9 +46,56 @@ impl<'c> Type<'c> {
         }
     }
 
+    // TODO Check if the `llvm` dialect is loaded.
+    pub fn llvm_array(r#type: Type<'c>, len: u32) -> Self {
+        Self {
+            raw: unsafe { mlirLLVMArrayTypeGet(r#type.to_raw(), len) },
+            _context: Default::default(),
+        }
+    }
+
+    pub fn llvm_function(
+        result: Type<'c>,
+        arguments: &[Type<'c>],
+        variadic_arguments: bool,
+    ) -> Self {
+        Self {
+            raw: unsafe {
+                mlirLLVMFunctionTypeGet(
+                    result.to_raw(),
+                    arguments.len() as isize,
+                    into_raw_array(arguments.iter().map(|argument| argument.to_raw()).collect()),
+                    variadic_arguments,
+                )
+            },
+            _context: Default::default(),
+        }
+    }
+
     pub fn llvm_pointer(r#type: Self, address_space: u32) -> Self {
         Self {
             raw: unsafe { mlirLLVMPointerTypeGet(r#type.to_raw(), address_space) },
+            _context: Default::default(),
+        }
+    }
+
+    pub fn llvm_struct(context: &Context, fields: &[Type<'c>], packed: bool) -> Self {
+        Self {
+            raw: unsafe {
+                mlirLLVMStructTypeLiteralGet(
+                    context.to_raw(),
+                    fields.len() as isize,
+                    into_raw_array(fields.iter().map(|field| field.to_raw()).collect()),
+                    packed,
+                )
+            },
+            _context: Default::default(),
+        }
+    }
+
+    pub fn llvm_void(context: &Context) -> Self {
+        Self {
+            raw: unsafe { mlirLLVMVoidTypeGet(context.to_raw()) },
             _context: Default::default(),
         }
     }
@@ -70,6 +119,8 @@ impl<'c> Eq for Type<'c> {}
 
 #[cfg(test)]
 mod tests {
+    use crate::dialect_handle::DialectHandle;
+
     use super::*;
 
     #[test]
@@ -80,5 +131,47 @@ mod tests {
     #[test]
     fn context() {
         Type::parse(&Context::new(), "i8").context();
+    }
+
+    #[test]
+    fn create_llvm_types() {
+        let context = Context::new();
+
+        DialectHandle::llvm().register_dialect(&context);
+        context.get_or_load_dialect("llvm");
+
+        let i8 = Type::integer(&context, 8);
+        let i32 = Type::integer(&context, 32);
+        let i64 = Type::integer(&context, 64);
+
+        assert_eq!(
+            Type::llvm_pointer(i32, 0),
+            Type::parse(&context, "!llvm.ptr<i32>")
+        );
+
+        assert_eq!(
+            Type::llvm_pointer(i32, 4),
+            Type::parse(&context, "!llvm.ptr<i32, 4>")
+        );
+
+        assert_eq!(
+            Type::llvm_void(&context),
+            Type::parse(&context, "!llvm.void")
+        );
+
+        assert_eq!(
+            Type::llvm_array(i32, 4),
+            Type::parse(&context, "!llvm.array<4xi32>")
+        );
+
+        assert_eq!(
+            Type::llvm_function(i8, &[i32, i64], false),
+            Type::parse(&context, "!llvm.func<i8 (i32, i64)>")
+        );
+
+        assert_eq!(
+            Type::llvm_struct(&context, &[i32, i64], false),
+            Type::parse(&context, "!llvm.struct<(i32, i64)>")
+        );
     }
 }
