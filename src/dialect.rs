@@ -13,10 +13,13 @@ pub struct Dialect<'c> {
 }
 
 impl<'c> Dialect<'c> {
+    /// Gets a context.
     pub fn context(&self) -> ContextRef<'c> {
         unsafe { ContextRef::from_raw(mlirDialectGetContext(self.raw)) }
     }
 
+    /// Gets a namespace.
+    // TODO Return &str.
     pub fn namespace(&self) -> StringRef {
         unsafe { StringRef::from_raw(mlirDialectGetNamespace(self.raw)) }
     }

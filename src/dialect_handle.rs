@@ -17,66 +17,82 @@ pub struct DialectHandle {
 }
 
 impl DialectHandle {
+    /// Creates a `async` dialect handle.
     pub fn r#async() -> Self {
         unsafe { Self::from_raw(mlirGetDialectHandle__async__()) }
     }
 
+    /// Creates a `cf` dialect handle.
     pub fn cf() -> Self {
         unsafe { Self::from_raw(mlirGetDialectHandle__cf__()) }
     }
 
+    /// Creates a `func` dialect handle.
     pub fn func() -> Self {
         unsafe { Self::from_raw(mlirGetDialectHandle__func__()) }
     }
 
+    /// Creates a `gpu` dialect handle.
     pub fn gpu() -> Self {
         unsafe { Self::from_raw(mlirGetDialectHandle__gpu__()) }
     }
 
+    /// Creates a `linalg` dialect handle.
     pub fn linalg() -> Self {
         unsafe { Self::from_raw(mlirGetDialectHandle__linalg__()) }
     }
 
+    /// Creates a `llvm` dialect handle.
     pub fn llvm() -> Self {
         unsafe { Self::from_raw(mlirGetDialectHandle__llvm__()) }
     }
 
+    /// Creates a `pdl` dialect handle.
     pub fn pdl() -> Self {
         unsafe { Self::from_raw(mlirGetDialectHandle__pdl__()) }
     }
 
+    /// Creates a `quant` dialect handle.
     pub fn quant() -> Self {
         unsafe { Self::from_raw(mlirGetDialectHandle__quant__()) }
     }
 
+    /// Creates a `scf` dialect handle.
     pub fn scf() -> Self {
         unsafe { Self::from_raw(mlirGetDialectHandle__scf__()) }
     }
 
+    /// Creates a `shape` dialect handle.
     pub fn shape() -> Self {
         unsafe { Self::from_raw(mlirGetDialectHandle__shape__()) }
     }
 
+    /// Creates a `sparse_tensor` dialect handle.
     pub fn sparse_tensor() -> Self {
         unsafe { Self::from_raw(mlirGetDialectHandle__sparse_tensor__()) }
     }
 
+    /// Creates a `tensor` dialect handle.
     pub fn tensor() -> Self {
         unsafe { Self::from_raw(mlirGetDialectHandle__tensor__()) }
     }
 
+    /// Gets a namespace.
     pub fn namespace(&self) -> StringRef {
         unsafe { StringRef::from_raw(mlirDialectHandleGetNamespace(self.raw)) }
     }
 
+    /// Inserts a dialect into a dialect registry.
     pub fn insert_dialect(&self, registry: &DialectRegistry) {
         unsafe { mlirDialectHandleInsertDialect(self.raw, registry.to_raw()) }
     }
 
+    /// Loads a dialect into a context.
     pub fn load_dialect<'c>(&self, context: &'c Context) -> Dialect<'c> {
         unsafe { Dialect::from_raw(mlirDialectHandleLoadDialect(self.raw, context.to_raw())) }
     }
 
+    /// Registers a dialect into a context.
     pub fn register_dialect(&self, context: &Context) {
         unsafe { mlirDialectHandleRegisterDialect(self.raw, context.to_raw()) }
     }
