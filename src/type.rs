@@ -119,9 +119,8 @@ impl<'c> Eq for Type<'c> {}
 
 #[cfg(test)]
 mod tests {
-    use crate::dialect_handle::DialectHandle;
-
     use super::*;
+    use crate::dialect_handle::DialectHandle;
 
     #[test]
     fn new() {
@@ -131,6 +130,33 @@ mod tests {
     #[test]
     fn context() {
         Type::parse(&Context::new(), "i8").context();
+    }
+
+    #[test]
+    fn integer() {
+        let context = Context::new();
+
+        assert_eq!(Type::integer(&context, 42), Type::parse(&context, "i42"));
+    }
+
+    #[test]
+    fn signed_integer() {
+        let context = Context::new();
+
+        assert_eq!(
+            Type::signed_integer(&context, 42),
+            Type::parse(&context, "si42")
+        );
+    }
+
+    #[test]
+    fn unsigned_integer() {
+        let context = Context::new();
+
+        assert_eq!(
+            Type::unsigned_integer(&context, 42),
+            Type::parse(&context, "ui42")
+        );
     }
 
     #[test]
