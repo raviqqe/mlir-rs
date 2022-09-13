@@ -4,6 +4,7 @@
     "addi",
     "femtomc",
     "libdir",
+    "libm",
     "linalg",
     "melior",
     "memref",
