@@ -10,6 +10,7 @@ use mlir_sys::{
 };
 use std::marker::PhantomData;
 
+/// A type.
 // Types are always values but their internal storage is owned by contexts.
 #[derive(Clone, Copy, Debug)]
 pub struct Type<'c> {
@@ -18,6 +19,7 @@ pub struct Type<'c> {
 }
 
 impl<'c> Type<'c> {
+    /// Parses a type.
     pub fn parse(context: &Context, source: &str) -> Self {
         Self {
             raw: unsafe { mlirTypeParseGet(context.to_raw(), StringRef::from(source).to_raw()) },
@@ -25,6 +27,7 @@ impl<'c> Type<'c> {
         }
     }
 
+    /// Creates an integer type.
     pub fn integer(context: &Context, bits: u32) -> Self {
         Self {
             raw: unsafe { mlirIntegerTypeGet(context.to_raw(), bits) },
@@ -32,6 +35,7 @@ impl<'c> Type<'c> {
         }
     }
 
+    /// Creates a signed integer type.
     pub fn signed_integer(context: &Context, bits: u32) -> Self {
         Self {
             raw: unsafe { mlirIntegerTypeSignedGet(context.to_raw(), bits) },
@@ -39,6 +43,7 @@ impl<'c> Type<'c> {
         }
     }
 
+    /// Creates an unsigned integer type.
     pub fn unsigned_integer(context: &Context, bits: u32) -> Self {
         Self {
             raw: unsafe { mlirIntegerTypeUnsignedGet(context.to_raw(), bits) },
@@ -46,6 +51,7 @@ impl<'c> Type<'c> {
         }
     }
 
+    /// Creates an LLVM array type.
     // TODO Check if the `llvm` dialect is loaded.
     pub fn llvm_array(r#type: Type<'c>, len: u32) -> Self {
         Self {
@@ -54,6 +60,7 @@ impl<'c> Type<'c> {
         }
     }
 
+    /// Creates an LLVM function type.
     pub fn llvm_function(
         result: Type<'c>,
         arguments: &[Type<'c>],
@@ -72,6 +79,7 @@ impl<'c> Type<'c> {
         }
     }
 
+    /// Creates an LLVM pointer type.
     pub fn llvm_pointer(r#type: Self, address_space: u32) -> Self {
         Self {
             raw: unsafe { mlirLLVMPointerTypeGet(r#type.to_raw(), address_space) },
@@ -79,6 +87,7 @@ impl<'c> Type<'c> {
         }
     }
 
+    /// Creates an LLVM struct type.
     pub fn llvm_struct(context: &Context, fields: &[Type<'c>], packed: bool) -> Self {
         Self {
             raw: unsafe {
@@ -93,6 +102,7 @@ impl<'c> Type<'c> {
         }
     }
 
+    /// Creates an LLVM void type.
     pub fn llvm_void(context: &Context) -> Self {
         Self {
             raw: unsafe { mlirLLVMVoidTypeGet(context.to_raw()) },
@@ -100,6 +110,7 @@ impl<'c> Type<'c> {
         }
     }
 
+    /// Gets a context.
     pub fn context(&self) -> ContextRef<'c> {
         unsafe { ContextRef::from_raw(mlirTypeGetContext(self.raw)) }
     }
