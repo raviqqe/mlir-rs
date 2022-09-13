@@ -19,7 +19,7 @@ Contribution is welcome! But, Melior is still in the alpha stage as well as the 
 ### Design decisions
 
 - Only UTF-8 is supported as string encoding.
-  - All string conversion between Rust and C is cached internally.
+  - Most string conversion between Rust and C is cached internally.
 
 ### Naming conventions
 
