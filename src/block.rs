@@ -163,34 +163,6 @@ impl<'a> Deref for BlockRef<'a> {
     }
 }
 
-pub struct BlockRefMut<'a> {
-    raw: ManuallyDrop<Block<'a>>,
-    _reference: PhantomData<&'a mut Block<'a>>,
-}
-
-impl<'a> BlockRefMut<'a> {
-    pub(crate) unsafe fn from_raw(block: MlirBlock) -> Self {
-        Self {
-            raw: ManuallyDrop::new(Block::from_raw(block)),
-            _reference: Default::default(),
-        }
-    }
-}
-
-impl<'a> Deref for BlockRefMut<'a> {
-    type Target = Block<'a>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.raw
-    }
-}
-
-impl<'a> DerefMut for BlockRefMut<'a> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.raw
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

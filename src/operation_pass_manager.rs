@@ -11,7 +11,7 @@ pub struct OperationPassManager<'a> {
 impl<'a> OperationPassManager<'a> {
     /// Gets an operation pass manager for nested operations corresponding to a
     /// given name.
-    pub fn nested_under(&mut self, name: &str) -> OperationPassManager {
+    pub fn nested_under(&self, name: &str) -> OperationPassManager {
         unsafe {
             Self::from_raw(mlirOpPassManagerGetNestedUnder(
                 self.raw,
@@ -21,7 +21,7 @@ impl<'a> OperationPassManager<'a> {
     }
 
     /// Adds a pass.
-    pub fn add_pass(&mut self, pass: Pass) {
+    pub fn add_pass(&self, pass: Pass) {
         unsafe { mlirOpPassManagerAddOwnedPass(self.raw, pass.to_raw()) }
     }
 

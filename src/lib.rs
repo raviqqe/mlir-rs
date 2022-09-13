@@ -61,7 +61,7 @@ mod tests {
         context.get_or_load_dialect("scf");
 
         let location = Location::unknown(&context);
-        let mut module = Module::new(location);
+        let module = Module::new(location);
 
         let r#type = Type::parse(&context, "memref<?xf32>");
 
@@ -173,7 +173,7 @@ mod tests {
             )
         };
 
-        module.body_mut().insert_operation(0, function);
+        module.body().insert_operation(0, function);
 
         assert!(module.as_operation().verify());
         insta::assert_display_snapshot!(&*module.as_operation());

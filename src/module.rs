@@ -1,8 +1,8 @@
 use crate::{
-    block::{BlockRef, BlockRefMut},
+    block::BlockRef,
     context::{Context, ContextRef},
     location::Location,
-    operation::{OperationRef, OperationRefMut},
+    operation::OperationRef,
     string_ref::StringRef,
 };
 use mlir_sys::{
@@ -38,20 +38,12 @@ impl<'c> Module<'c> {
         unsafe { OperationRef::from_raw(mlirModuleGetOperation(self.raw)) }
     }
 
-    pub fn as_operation_mut(&mut self) -> OperationRefMut {
-        unsafe { OperationRefMut::from_raw(mlirModuleGetOperation(self.raw)) }
-    }
-
     pub fn context(&self) -> ContextRef<'c> {
         unsafe { ContextRef::from_raw(mlirModuleGetContext(self.raw)) }
     }
 
     pub fn body(&self) -> BlockRef {
         unsafe { BlockRef::from_raw(mlirModuleGetBody(self.raw)) }
-    }
-
-    pub fn body_mut(&mut self) -> BlockRefMut {
-        unsafe { BlockRefMut::from_raw(mlirModuleGetBody(self.raw)) }
     }
 
     pub(crate) unsafe fn to_raw(&self) -> MlirModule {

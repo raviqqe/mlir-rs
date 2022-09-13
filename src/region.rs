@@ -80,34 +80,6 @@ impl<'a> Deref for RegionRef<'a> {
     }
 }
 
-pub struct RegionRefMut<'a> {
-    raw: ManuallyDrop<Region>,
-    _region: PhantomData<&'a mut Region>,
-}
-
-impl<'a> RegionRefMut<'a> {
-    pub(crate) unsafe fn from_raw(region: MlirRegion) -> Self {
-        Self {
-            raw: ManuallyDrop::new(Region { raw: region }),
-            _region: Default::default(),
-        }
-    }
-}
-
-impl<'a> Deref for RegionRefMut<'a> {
-    type Target = Region;
-
-    fn deref(&self) -> &Self::Target {
-        &self.raw
-    }
-}
-
-impl<'a> DerefMut for RegionRefMut<'a> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.raw
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

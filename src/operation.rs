@@ -1,7 +1,7 @@
 use crate::{
     context::{Context, ContextRef},
     operation_state::OperationState,
-    region::{RegionRef, RegionRefMut},
+    region::RegionRef,
     string_ref::StringRef,
     value::Value,
 };
@@ -17,7 +17,7 @@ use std::{
     fmt::{Display, Formatter},
     marker::PhantomData,
     mem::{forget, ManuallyDrop},
-    ops::{Deref, DerefMut},
+    ops::Deref,
 };
 
 pub struct Operation<'c> {
@@ -52,10 +52,6 @@ impl<'c> Operation<'c> {
 
     pub fn region(&self, index: usize) -> Option<RegionRef> {
         unsafe { Self::raw_region(self.raw, index).map(|region| RegionRef::from_raw(region)) }
-    }
-
-    pub fn region_mut(&mut self, index: usize) -> Option<RegionRefMut> {
-        unsafe { Self::raw_region(self.raw, index).map(|region| RegionRefMut::from_raw(region)) }
     }
 
     unsafe fn raw_region(operation: MlirOperation, index: usize) -> Option<MlirRegion> {
@@ -153,34 +149,6 @@ impl<'a> Deref for OperationRef<'a> {
     }
 }
 
-pub struct OperationRefMut<'a> {
-    operation: ManuallyDrop<Operation<'a>>,
-    _reference: PhantomData<&'a mut Operation<'a>>,
-}
-
-impl<'a> OperationRefMut<'a> {
-    pub(crate) unsafe fn from_raw(operation: MlirOperation) -> Self {
-        Self {
-            operation: ManuallyDrop::new(Operation::from_raw(operation)),
-            _reference: Default::default(),
-        }
-    }
-}
-
-impl<'a> Deref for OperationRefMut<'a> {
-    type Target = Operation<'a>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.operation
-    }
-}
-
-impl<'a> DerefMut for OperationRefMut<'a> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.operation
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -211,16 +179,6 @@ mod tests {
             Location::unknown(&Context::new()),
         ))
         .region(0)
-        .is_none());
-    }
-
-    #[test]
-    fn region_mut_none() {
-        assert!(Operation::new(OperationState::new(
-            "foo",
-            Location::unknown(&Context::new()),
-        ))
-        .region_mut(0)
         .is_none());
     }
 }
