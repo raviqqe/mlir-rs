@@ -8,13 +8,6 @@ pub struct OperationPassManager<'a> {
 }
 
 impl<'a> OperationPassManager<'a> {
-    pub(crate) unsafe fn from_raw(raw: MlirOpPassManager) -> Self {
-        Self {
-            raw,
-            _parent: Default::default(),
-        }
-    }
-
     pub fn nested_under(&mut self, name: &str) -> OperationPassManager {
         unsafe {
             Self::from_raw(mlirOpPassManagerGetNestedUnder(
@@ -26,5 +19,12 @@ impl<'a> OperationPassManager<'a> {
 
     pub fn add_pass(&mut self, pass: Pass) {
         unsafe { mlirOpPassManagerAddOwnedPass(self.raw, pass.to_raw()) }
+    }
+
+    pub(crate) unsafe fn from_raw(raw: MlirOpPassManager) -> Self {
+        Self {
+            raw,
+            _parent: Default::default(),
+        }
     }
 }
