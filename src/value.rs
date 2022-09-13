@@ -90,6 +90,11 @@ mod tests {
     }
 
     #[test]
+    fn is_block_argument() {
+        todo!()
+    }
+
+    #[test]
     fn dump() {
         let context = Context::new();
         let location = Location::unknown(&context);
