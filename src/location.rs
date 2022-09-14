@@ -1,10 +1,12 @@
 use crate::{
+    attribute::Attribute,
     context::{Context, ContextRef},
     string_ref::StringRef,
+    utility::into_raw_array,
 };
 use mlir_sys::{
-    mlirLocationEqual, mlirLocationFileLineColGet, mlirLocationGetContext, mlirLocationPrint,
-    mlirLocationUnknownGet, MlirLocation, MlirStringRef,
+    mlirLocationEqual, mlirLocationFileLineColGet, mlirLocationFusedGet, mlirLocationGetContext,
+    mlirLocationNameGet, mlirLocationPrint, mlirLocationUnknownGet, MlirLocation, MlirStringRef,
 };
 use std::{
     ffi::c_void,
@@ -12,6 +14,7 @@ use std::{
     marker::PhantomData,
 };
 
+/// A location
 #[derive(Clone, Copy, Debug)]
 pub struct Location<'c> {
     raw: MlirLocation,
@@ -19,6 +22,7 @@ pub struct Location<'c> {
 }
 
 impl<'c> Location<'c> {
+    /// Creates a location with a filename and line and column numbers.
     pub fn new(context: &'c Context, filename: &str, line: usize, column: usize) -> Self {
         unsafe {
             Self::from_raw(mlirLocationFileLineColGet(
@@ -26,6 +30,29 @@ impl<'c> Location<'c> {
                 StringRef::from(filename).to_raw(),
                 line as u32,
                 column as u32,
+            ))
+        }
+    }
+
+    /// Creates a fused location.
+    pub fn fused(context: &Context, locations: &[Self], attribute: Attribute) -> Self {
+        unsafe {
+            Self::from_raw(mlirLocationFusedGet(
+                context.to_raw(),
+                locations.len() as isize,
+                into_raw_array(locations.iter().map(|location| location.to_raw()).collect()),
+                attribute.to_raw(),
+            ))
+        }
+    }
+
+    /// Creates a name location.
+    pub fn name(context: &Context, name: &str, child: Location) -> Self {
+        unsafe {
+            Self::from_raw(mlirLocationNameGet(
+                context.to_raw(),
+                StringRef::from(name).to_raw(),
+                child.to_raw(),
             ))
         }
     }
@@ -85,6 +112,27 @@ mod tests {
     #[test]
     fn new() {
         Location::new(&Context::new(), "foo", 42, 42);
+    }
+
+    #[test]
+    fn fused() {
+        let context = Context::new();
+
+        Location::fused(
+            &context,
+            &[
+                Location::new(&Context::new(), "foo", 1, 1),
+                Location::new(&Context::new(), "foo", 2, 2),
+            ],
+            Attribute::parse(&context, "42"),
+        );
+    }
+
+    #[test]
+    fn name() {
+        let context = Context::new();
+
+        Location::name(&context, "foo", Location::unknown(&context));
     }
 
     #[test]
