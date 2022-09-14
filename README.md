@@ -8,7 +8,17 @@ The rustic MLIR bindings for Rust
 
 This crate is a wrapper of [the MLIR C API](https://mlir.llvm.org/docs/CAPI/).
 
-## Dependencies
+## Goals
+
+Melior aims to provide a simple, safe, and complete API for MLIR with a reasonably sane ownership model represented by the type system in Rust.
+
+## Install
+
+```sh
+cargo add melior
+```
+
+### Dependencies
 
 [LLVM/MLIR 15](https://llvm.org/) needs to be installed on your system. On Linux and macOS, you can install it via [Homebrew](https://brew.sh).
 
@@ -28,7 +38,7 @@ Contribution is welcome! But, Melior is still in the alpha stage as well as the 
 
 ### Naming conventions
 
-- `mlir<X>Create*` functions are renamed as `<X>::new`.
+- `mlir<X>Create` functions are renamed as `<X>::new`.
 - `mlir<X>Get<Y>` functions are renamed as follows:
   - If the resulting objects refer to `&self`, they are named `<X>::as_<Y>`.
   - Otherwise, they are named just `<X>::<Y>` and may have arguments, such as position indices.
