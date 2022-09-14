@@ -14,7 +14,7 @@ pub struct Location<'c> {
 }
 
 impl<'c> Location<'c> {
-    pub fn new(context: &Context, filename: &str, line: usize, column: usize) -> Self {
+    pub fn new(context: &'c Context, filename: &str, line: usize, column: usize) -> Self {
         Self {
             raw: unsafe {
                 mlirLocationFileLineColGet(

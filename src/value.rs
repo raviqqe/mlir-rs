@@ -95,7 +95,7 @@ mod tests {
         let r#type = Type::parse(&context, "index");
         let block = Block::new(&[(r#type, Location::unknown(&context))]);
 
-        assert_eq!(block.argument(0).unwrap().r#type(), r#type);
+        assert!(block.argument(0).unwrap().is_block_argument());
     }
 
     #[test]

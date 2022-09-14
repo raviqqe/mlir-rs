@@ -20,7 +20,7 @@ pub struct Type<'c> {
 
 impl<'c> Type<'c> {
     /// Parses a type.
-    pub fn parse(context: &Context, source: &str) -> Self {
+    pub fn parse(context: &'c Context, source: &str) -> Self {
         Self {
             raw: unsafe { mlirTypeParseGet(context.to_raw(), StringRef::from(source).to_raw()) },
             _context: Default::default(),
@@ -28,7 +28,7 @@ impl<'c> Type<'c> {
     }
 
     /// Creates an integer type.
-    pub fn integer(context: &Context, bits: u32) -> Self {
+    pub fn integer(context: &'c Context, bits: u32) -> Self {
         Self {
             raw: unsafe { mlirIntegerTypeGet(context.to_raw(), bits) },
             _context: Default::default(),
@@ -36,7 +36,7 @@ impl<'c> Type<'c> {
     }
 
     /// Creates a signed integer type.
-    pub fn signed_integer(context: &Context, bits: u32) -> Self {
+    pub fn signed_integer(context: &'c Context, bits: u32) -> Self {
         Self {
             raw: unsafe { mlirIntegerTypeSignedGet(context.to_raw(), bits) },
             _context: Default::default(),
@@ -44,7 +44,7 @@ impl<'c> Type<'c> {
     }
 
     /// Creates an unsigned integer type.
-    pub fn unsigned_integer(context: &Context, bits: u32) -> Self {
+    pub fn unsigned_integer(context: &'c Context, bits: u32) -> Self {
         Self {
             raw: unsafe { mlirIntegerTypeUnsignedGet(context.to_raw(), bits) },
             _context: Default::default(),
@@ -88,7 +88,7 @@ impl<'c> Type<'c> {
     }
 
     /// Creates an LLVM struct type.
-    pub fn llvm_struct(context: &Context, fields: &[Type<'c>], packed: bool) -> Self {
+    pub fn llvm_struct(context: &'c Context, fields: &[Type<'c>], packed: bool) -> Self {
         Self {
             raw: unsafe {
                 mlirLLVMStructTypeLiteralGet(
@@ -103,7 +103,7 @@ impl<'c> Type<'c> {
     }
 
     /// Creates an LLVM void type.
-    pub fn llvm_void(context: &Context) -> Self {
+    pub fn llvm_void(context: &'c Context) -> Self {
         Self {
             raw: unsafe { mlirLLVMVoidTypeGet(context.to_raw()) },
             _context: Default::default(),
