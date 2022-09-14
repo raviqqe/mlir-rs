@@ -9,8 +9,8 @@ use mlir_sys::{
     mlirFunctionTypeGetNumResults, mlirFunctionTypeGetResult, mlirIntegerTypeGet,
     mlirIntegerTypeSignedGet, mlirIntegerTypeUnsignedGet, mlirLLVMArrayTypeGet,
     mlirLLVMFunctionTypeGet, mlirLLVMPointerTypeGet, mlirLLVMStructTypeLiteralGet,
-    mlirLLVMVoidTypeGet, mlirTypeEqual, mlirTypeGetContext, mlirTypeIsAFunction, mlirTypeParseGet,
-    mlirTypePrint, MlirStringRef, MlirType,
+    mlirLLVMVoidTypeGet, mlirTypeDump, mlirTypeEqual, mlirTypeGetContext, mlirTypeIsAFunction,
+    mlirTypeParseGet, mlirTypePrint, MlirStringRef, MlirType,
 };
 use std::{
     ffi::c_void,
@@ -162,6 +162,11 @@ impl<'c> Type<'c> {
 
             Ok(mlirFunctionTypeGetNumResults(self.raw) as usize)
         }
+    }
+
+    /// Dumps a type.
+    pub fn dump(&self) {
+        unsafe { mlirTypeDump(self.raw) }
     }
 
     pub(crate) unsafe fn from_raw(raw: MlirType) -> Self {
