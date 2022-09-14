@@ -46,7 +46,7 @@ impl<'c> PassManager<'c> {
     }
 
     /// Converts a pass manager to an operation pass manager.
-    pub fn as_operation_pass_manager(&mut self) -> OperationPassManager {
+    pub fn as_operation_pass_manager(&self) -> OperationPassManager {
         unsafe { OperationPassManager::from_raw(mlirPassManagerGetAsOpPassManager(self.raw)) }
     }
 }
@@ -117,105 +117,65 @@ mod tests {
         assert!(manager.run(&module).is_success());
     }
 
-    // void testRunPassOnNestedModule() {
-    //   MlirContext ctx = mlirContextCreate();
-    //   registerAllUpstreamDialects(ctx);
+    #[test]
+    fn run_on_function_in_nested_module() {
+        let context = Context::new();
+        register_all_upstream_dialects(&context);
 
-    //   MlirModule module = mlirModuleCreateParse(
-    //       ctx,
-    //       // clang-format off
-    //                             mlirStringRefCreateFromCString(
-    // "func.func @foo(%arg0 : i32) -> i32 {                                   \n"
-    // "  %res = arith.addi %arg0, %arg0 : i32                                     \n"
-    // "  return %res : i32                                                        \n"
-    // "}                                                                          \n"
-    // "module {                                                                   \n"
-    // "  func.func @bar(%arg0 : f32) -> f32 {                                     \n"
-    // "    %res = arith.addf %arg0, %arg0 : f32                                   \n"
-    // "    return %res : f32                                                      \n"
-    // "  }                                                                        \n"
-    // "}"));
-    //   // clang-format on
-    //   if (mlirModuleIsNull(module))
-    //     exit(1);
+        let module = Module::parse(
+            &context,
+            indoc!(
+                "
+                func.func @foo(%arg0 : i32) -> i32 {
+                    %res = arith.addi %arg0, %arg0 : i32
+                    return %res : i32
+                }
 
-    //   // Run the print-op-stats pass on functions under the top-level module:
-    //   // CHECK-LABEL: Operations encountered:
-    //   // CHECK: arith.addi        , 1
-    //   // CHECK: func.func      , 1
-    //   // CHECK: func.return        , 1
-    //   {
-    //     MlirPassManager pm = mlirPassManagerCreate(ctx);
-    //     MlirOpPassManager nestedFuncPm = mlirPassManagerGetNestedUnder(
-    //         pm, mlirStringRefCreateFromCString("func.func"));
-    //     MlirPass printOpStatPass = mlirCreateTransformsPrintOpStats();
-    //     mlirOpPassManagerAddOwnedPass(nestedFuncPm, printOpStatPass);
-    //     MlirLogicalResult success = mlirPassManagerRun(pm, module);
-    //     if (mlirLogicalResultIsFailure(success))
-    //       exit(2);
-    //     mlirPassManagerDestroy(pm);
-    //   }
-    //   // Run the print-op-stats pass on functions under the nested module:
-    //   // CHECK-LABEL: Operations encountered:
-    //   // CHECK: arith.addf        , 1
-    //   // CHECK: func.func      , 1
-    //   // CHECK: func.return        , 1
-    //   {
-    //     MlirPassManager pm = mlirPassManagerCreate(ctx);
-    //     MlirOpPassManager nestedModulePm = mlirPassManagerGetNestedUnder(
-    //         pm, mlirStringRefCreateFromCString("builtin.module"));
-    //     MlirOpPassManager nestedFuncPm = mlirOpPassManagerGetNestedUnder(
-    //         nestedModulePm, mlirStringRefCreateFromCString("func.func"));
-    //     MlirPass printOpStatPass = mlirCreateTransformsPrintOpStats();
-    //     mlirOpPassManagerAddOwnedPass(nestedFuncPm, printOpStatPass);
-    //     MlirLogicalResult success = mlirPassManagerRun(pm, module);
-    //     if (mlirLogicalResultIsFailure(success))
-    //       exit(2);
-    //     mlirPassManagerDestroy(pm);
-    //   }
+                module {
+                    func.func @bar(%arg0 : f32) -> f32 {
+                        %res = arith.addf %arg0, %arg0 : f32
+                        return %res : f32
+                    }
+                }
+                "
+            ),
+        );
 
-    //   mlirModuleDestroy(module);
-    //   mlirContextDestroy(ctx);
-    // }
+        let manager = PassManager::new(&context);
+        manager
+            .nested_under("func.func")
+            .add_pass(Pass::print_operation_stats());
 
-    // static void printToStderr(MlirStringRef str, void *userData) {
-    //   (void)userData;
-    //   fwrite(str.data, 1, str.length, stderr);
-    // }
+        assert!(manager.run(&module).is_success());
 
-    // void testPrintPassPipeline() {
-    //   MlirContext ctx = mlirContextCreate();
-    //   MlirPassManager pm = mlirPassManagerCreate(ctx);
-    //   // Populate the pass-manager
-    //   MlirOpPassManager nestedModulePm = mlirPassManagerGetNestedUnder(
-    //       pm, mlirStringRefCreateFromCString("builtin.module"));
-    //   MlirOpPassManager nestedFuncPm = mlirOpPassManagerGetNestedUnder(
-    //       nestedModulePm, mlirStringRefCreateFromCString("func.func"));
-    //   MlirPass printOpStatPass = mlirCreateTransformsPrintOpStats();
-    //   mlirOpPassManagerAddOwnedPass(nestedFuncPm, printOpStatPass);
+        let manager = PassManager::new(&context);
+        manager
+            .nested_under("builtin.module")
+            .nested_under("func.func")
+            .add_pass(Pass::print_operation_stats());
 
-    //   // Print the top level pass manager
-    //   // CHECK: Top-level: builtin.module(func.func(print-op-stats{json=false}))
-    //   fprintf(stderr, "Top-level: ");
-    //   mlirPrintPassPipeline(mlirPassManagerGetAsOpPassManager(pm), printToStderr,
-    //                         NULL);
-    //   fprintf(stderr, "\n");
+        assert!(manager.run(&module).is_success());
+    }
 
-    //   // Print the pipeline nested one level down
-    //   // CHECK: Nested Module: func.func(print-op-stats{json=false})
-    //   fprintf(stderr, "Nested Module: ");
-    //   mlirPrintPassPipeline(nestedModulePm, printToStderr, NULL);
-    //   fprintf(stderr, "\n");
+    #[test]
+    fn print_pass_pipeline() {
+        let context = Context::new();
+        let manager = PassManager::new(&context);
+        let module_manager = manager.nested_under("builtin.module");
+        let function_manager = module_manager.nested_under("func.func");
 
-    //   // Print the pipeline nested two levels down
-    //   // CHECK: Nested Module>Func: print-op-stats
-    //   fprintf(stderr, "Nested Module>Func: ");
-    //   mlirPrintPassPipeline(nestedFuncPm, printToStderr, NULL);
-    //   fprintf(stderr, "\n");
+        function_manager.add_pass(Pass::print_operation_stats());
 
-    //   mlirPassManagerDestroy(pm);
-    //   mlirContextDestroy(ctx);
-    // }
+        assert_eq!(
+            manager.as_operation_pass_manager().to_string(),
+            "builtin.module(func.func(print-op-stats{json=false}))"
+        );
+        assert_eq!(
+            module_manager.to_string(),
+            "func.func(print-op-stats{json=false})"
+        );
+        assert_eq!(function_manager.to_string(), "print-op-stats{json=false}");
+    }
 
     // void testParsePassPipeline() {
     //   MlirContext ctx = mlirContextCreate();

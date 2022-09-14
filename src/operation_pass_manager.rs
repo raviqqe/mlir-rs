@@ -1,8 +1,16 @@
 use crate::{pass::Pass, pass_manager::PassManager, string_ref::StringRef};
-use mlir_sys::{mlirOpPassManagerAddOwnedPass, mlirOpPassManagerGetNestedUnder, MlirOpPassManager};
-use std::marker::PhantomData;
+use mlir_sys::{
+    mlirOpPassManagerAddOwnedPass, mlirOpPassManagerGetNestedUnder, mlirPrintPassPipeline,
+    MlirOpPassManager, MlirStringRef,
+};
+use std::{
+    ffi::c_void,
+    fmt::{self, Display, Formatter},
+    marker::PhantomData,
+};
 
 /// An operation pass manager.
+#[derive(Debug)]
 pub struct OperationPassManager<'a> {
     raw: MlirOpPassManager,
     _parent: PhantomData<&'a PassManager<'a>>,
@@ -30,5 +38,26 @@ impl<'a> OperationPassManager<'a> {
             raw,
             _parent: Default::default(),
         }
+    }
+}
+
+impl<'a> Display for OperationPassManager<'a> {
+    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
+        let mut data = (formatter, Ok(()));
+
+        unsafe extern "C" fn callback(string: MlirStringRef, data: *mut c_void) {
+            let data = &mut *(data as *mut (&mut Formatter, fmt::Result));
+            let result = write!(data.0, "{}", StringRef::from_raw(string).as_str());
+
+            if data.1.is_ok() {
+                data.1 = result;
+            }
+        }
+
+        unsafe {
+            mlirPrintPassPipeline(self.raw, Some(callback), &mut data as *mut _ as *mut c_void);
+        }
+
+        data.1
     }
 }
