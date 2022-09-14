@@ -4,6 +4,7 @@ use crate::{
 };
 use mlir_sys::{
     mlirPassManagerAddOwnedPass, mlirPassManagerCreate, mlirPassManagerDestroy,
+    mlirPassManagerEnableIRPrinting, mlirPassManagerEnableVerifier,
     mlirPassManagerGetAsOpPassManager, mlirPassManagerGetNestedUnder, mlirPassManagerRun,
     MlirPassManager,
 };
@@ -40,6 +41,16 @@ impl<'c> PassManager<'c> {
         unsafe { mlirPassManagerAddOwnedPass(self.raw, pass.to_raw()) }
     }
 
+    /// Enables a verifier.
+    pub fn enable_verifier(&self, enabled: bool) {
+        unsafe { mlirPassManagerEnableVerifier(self.raw, enabled) }
+    }
+
+    /// Enables IR printing.
+    pub fn enable_ir_printing(&self) {
+        unsafe { mlirPassManagerEnableIRPrinting(self.raw) }
+    }
+
     /// Runs passes added to a pass manager against a module.
     pub fn run(&self, module: &Module) -> LogicalResult {
         LogicalResult::from_raw(unsafe { mlirPassManagerRun(self.raw, module.to_raw()) })
@@ -68,6 +79,12 @@ mod tests {
     use indoc::indoc;
     use pretty_assertions::assert_eq;
 
+    fn register_all_upstream_dialects(context: &Context) {
+        let registry = DialectRegistry::new();
+        register_all_dialects(&registry);
+        context.append_dialect_registry(&registry);
+    }
+
     #[test]
     fn new() {
         let context = Context::new();
@@ -83,18 +100,27 @@ mod tests {
     }
 
     #[test]
+    fn enable_verifier() {
+        let context = Context::new();
+
+        PassManager::new(&context).enable_verifier(true);
+    }
+
+    // TODO Enable this test.
+    // #[test]
+    // fn enable_ir_printing() {
+    //     let context = Context::new();
+
+    //     PassManager::new(&context).enable_ir_printing();
+    // }
+
+    #[test]
     fn run() {
         let context = Context::new();
         let manager = PassManager::new(&context);
 
         manager.add_pass(Pass::convert_func_to_llvm());
         manager.run(&Module::new(Location::unknown(&context)));
-    }
-
-    fn register_all_upstream_dialects(context: &Context) {
-        let registry = DialectRegistry::new();
-        register_all_dialects(&registry);
-        context.append_dialect_registry(&registry);
     }
 
     #[test]
