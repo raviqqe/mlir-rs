@@ -3,7 +3,8 @@ use crate::{
     string_ref::StringRef,
 };
 use mlir_sys::{
-    mlirLocationFileLineColGet, mlirLocationGetContext, mlirLocationUnknownGet, MlirLocation,
+    mlirLocationEqual, mlirLocationFileLineColGet, mlirLocationGetContext, mlirLocationUnknownGet,
+    MlirLocation,
 };
 use std::marker::PhantomData;
 
@@ -44,6 +45,12 @@ impl<'c> Location<'c> {
     }
 }
 
+impl<'c> PartialEq for Location<'c> {
+    fn eq(&self, other: &Self) -> bool {
+        unsafe { mlirLocationEqual(self.raw, other.raw) }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -61,5 +68,26 @@ mod tests {
     #[test]
     fn context() {
         Location::new(&Context::new(), "foo", 42, 42).context();
+    }
+
+    #[test]
+    fn equal() {
+        let context = Context::new();
+
+        assert_eq!(Location::unknown(&context), Location::unknown(&context));
+        assert_eq!(
+            Location::new(&context, "foo", 42, 42),
+            Location::new(&context, "foo", 42, 42),
+        );
+    }
+
+    #[test]
+    fn not_equal() {
+        let context = Context::new();
+
+        assert_ne!(
+            Location::new(&context, "foo", 42, 42),
+            Location::unknown(&context)
+        );
     }
 }
