@@ -8,6 +8,7 @@ use mlir_sys::{
 };
 use std::marker::PhantomData;
 
+#[derive(Clone, Copy, Debug)]
 pub struct Identifier<'c> {
     raw: MlirIdentifier,
     _context: PhantomData<&'c Context>,
@@ -54,5 +55,25 @@ mod tests {
     #[test]
     fn context() {
         Identifier::new(&Context::new(), "foo").context();
+    }
+
+    #[test]
+    fn equal() {
+        let context = Context::new();
+
+        assert_eq!(
+            Identifier::new(&context, "foo"),
+            Identifier::new(&context, "foo")
+        );
+    }
+
+    #[test]
+    fn not_equal() {
+        let context = Context::new();
+
+        assert_ne!(
+            Identifier::new(&context, "foo"),
+            Identifier::new(&context, "bar")
+        );
     }
 }
