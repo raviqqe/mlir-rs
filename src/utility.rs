@@ -1,5 +1,11 @@
-use crate::{context::Context, dialect_registry::DialectRegistry};
-use mlir_sys::{mlirRegisterAllDialects, mlirRegisterAllLLVMTranslations, mlirRegisterAllPasses};
+use crate::{
+    context::Context, dialect_registry::DialectRegistry, logical_result::LogicalResult,
+    operation_pass_manager::OperationPassManager, string_ref::StringRef,
+};
+use mlir_sys::{
+    mlirParsePassPipeline, mlirRegisterAllDialects, mlirRegisterAllLLVMTranslations,
+    mlirRegisterAllPasses, mlirRegisterTransformsCSE, mlirRegisterTransformsPrintOpStats,
+};
 use std::sync::Once;
 
 /// Registers all dialects to a dialect registry.
@@ -18,6 +24,23 @@ pub fn register_all_passes() {
 
     // Multiple calls of `mlirRegisterAllPasses` seems to cause double free.
     ONCE.call_once(|| unsafe { mlirRegisterAllPasses() });
+}
+
+/// Parses a pass pipeline.
+pub fn parse_pass_pipeline(manager: OperationPassManager, source: &str) -> LogicalResult {
+    LogicalResult::from_raw(unsafe {
+        mlirParsePassPipeline(manager.to_raw(), StringRef::from(source).to_raw())
+    })
+}
+
+/// Registers a pass to print operation stats.
+pub fn register_print_operation_stats() {
+    unsafe { mlirRegisterTransformsPrintOpStats() }
+}
+
+/// Registers a pass to print operation stats.
+pub fn register_cse() {
+    unsafe { mlirRegisterTransformsCSE() }
 }
 
 // TODO Use into_raw_parts.

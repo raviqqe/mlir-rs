@@ -10,7 +10,7 @@ use std::{
 };
 
 /// An operation pass manager.
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct OperationPassManager<'a> {
     raw: MlirOpPassManager,
     _parent: PhantomData<&'a PassManager<'a>>,
@@ -31,6 +31,10 @@ impl<'a> OperationPassManager<'a> {
     /// Adds a pass.
     pub fn add_pass(&self, pass: Pass) {
         unsafe { mlirOpPassManagerAddOwnedPass(self.raw, pass.to_raw()) }
+    }
+
+    pub(crate) unsafe fn to_raw(&self) -> MlirOpPassManager {
+        self.raw
     }
 
     pub(crate) unsafe fn from_raw(raw: MlirOpPassManager) -> Self {
