@@ -3,6 +3,7 @@
     "addf",
     "addi",
     "femtomc",
+    "indoc",
     "insta",
     "libm",
     "linalg",
