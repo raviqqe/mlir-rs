@@ -2,7 +2,7 @@ use mlir_sys::{
     mlirCreateConversionConvertArithmeticToLLVM, mlirCreateConversionConvertControlFlowToLLVM,
     mlirCreateConversionConvertControlFlowToSPIRV, mlirCreateConversionConvertFuncToLLVM,
     mlirCreateConversionConvertMathToLLVM, mlirCreateConversionConvertMathToLibm,
-    mlirCreateConversionConvertMathToSPIRV, MlirPass,
+    mlirCreateConversionConvertMathToSPIRV, mlirCreateTransformsPrintOpStats, MlirPass,
 };
 
 /// A pass.
@@ -44,6 +44,11 @@ impl Pass {
     /// Creates a pass to convert the `math` dialect to the `libm` dialect.
     pub fn convert_math_to_libm() -> Self {
         Self::from_raw_fn(mlirCreateConversionConvertMathToLibm)
+    }
+
+    /// Creates a pass to print operation statistics.
+    pub fn print_operation_stats() -> Self {
+        Self::from_raw_fn(mlirCreateTransformsPrintOpStats)
     }
 
     // TODO Add more passes.

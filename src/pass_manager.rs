@@ -114,7 +114,7 @@ mod tests {
         let manager = PassManager::new(&context);
         manager.add_pass(Pass::print_operation_stats());
 
-        assert_eq!(manager.run(&module));
+        assert!(manager.run(&module).is_success());
     }
 
     // void testRunPassOnNestedModule() {
