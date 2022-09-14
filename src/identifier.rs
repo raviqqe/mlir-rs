@@ -2,7 +2,10 @@ use crate::{
     context::{Context, ContextRef},
     string_ref::StringRef,
 };
-use mlir_sys::{mlirIdentifierGet, mlirIdentifierGetContext, MlirIdentifier};
+use mlir_sys::{
+    mlirIdentifierEqual, mlirIdentifierGet, mlirIdentifierGetContext, mlirIdentifierStr,
+    MlirIdentifier,
+};
 use std::marker::PhantomData;
 
 pub struct Identifier<'c> {
@@ -22,10 +25,22 @@ impl<'c> Identifier<'c> {
         unsafe { ContextRef::from_raw(mlirIdentifierGetContext(self.raw)) }
     }
 
+    pub fn as_string_ref(&self) -> StringRef {
+        unsafe { StringRef::from_raw(mlirIdentifierStr(self.raw)) }
+    }
+
     pub(crate) unsafe fn to_raw(&self) -> MlirIdentifier {
         self.raw
     }
 }
+
+impl<'c> PartialEq for Identifier<'c> {
+    fn eq(&self, other: &Self) -> bool {
+        unsafe { mlirIdentifierEqual(self.raw, other.raw) }
+    }
+}
+
+impl<'c> Eq for Identifier<'c> {}
 
 #[cfg(test)]
 mod tests {
