@@ -49,8 +49,8 @@ impl<'a> Value<'a> {
 #[cfg(test)]
 mod tests {
     use crate::{
-        attribute::Attribute, context::Context, identifier::Identifier, location::Location,
-        operation::Operation, operation_state::OperationState, r#type::Type,
+        attribute::Attribute, block::Block, context::Context, identifier::Identifier,
+        location::Location, operation::Operation, operation_state::OperationState, r#type::Type,
     };
 
     #[test]
@@ -91,7 +91,11 @@ mod tests {
 
     #[test]
     fn is_block_argument() {
-        todo!()
+        let context = Context::new();
+        let r#type = Type::parse(&context, "index");
+        let block = Block::new(&[(r#type, Location::unknown(&context))]);
+
+        assert_eq!(block.argument(0).unwrap().r#type(), r#type);
     }
 
     #[test]
