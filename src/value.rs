@@ -83,8 +83,9 @@ impl<'c> Display for Value<'c> {
 #[cfg(test)]
 mod tests {
     use crate::{
-        attribute::Attribute, block::Block, context::Context, identifier::Identifier,
-        location::Location, operation::Operation, operation_state::OperationState, r#type::Type,
+        attribute::Attribute, block::Block, context::Context, dialect_registry::DialectRegistry,
+        identifier::Identifier, location::Location, operation::Operation,
+        operation_state::OperationState, r#type::Type, utility::register_all_dialects,
     };
 
     #[test]
@@ -191,6 +192,7 @@ mod tests {
     #[test]
     fn display() {
         let context = Context::new();
+        context.load_all_available_dialects();
         let location = Location::unknown(&context);
         let index_type = Type::parse(&context, "index");
 
@@ -206,6 +208,33 @@ mod tests {
         assert_eq!(
             operation.result(0).unwrap().to_string(),
             "%0 = \"arith.constant\"() {value = 0 : index} : () -> index\n"
+        );
+    }
+
+    #[test]
+    fn display_with_dialect_loaded() {
+        let registry = DialectRegistry::new();
+        register_all_dialects(&registry);
+
+        let context = Context::new();
+        context.append_dialect_registry(&registry);
+        context.load_all_available_dialects();
+
+        let location = Location::unknown(&context);
+        let index_type = Type::parse(&context, "index");
+
+        let operation = Operation::new(
+            OperationState::new("arith.constant", location)
+                .add_results(&[index_type])
+                .add_attributes(&[(
+                    Identifier::new(&context, "value"),
+                    Attribute::parse(&context, "0 : index"),
+                )]),
+        );
+
+        assert_eq!(
+            operation.result(0).unwrap().to_string(),
+            "%c0 = arith.constant 0 : index\n"
         );
     }
 }
