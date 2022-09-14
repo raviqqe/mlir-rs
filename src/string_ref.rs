@@ -1,4 +1,4 @@
-use mlir_sys::{mlirStringRefCreateFromCString, MlirStringRef};
+use mlir_sys::{mlirStringRefCreateFromCString, mlirStringRefEqual, MlirStringRef};
 use once_cell::sync::Lazy;
 use std::{collections::HashMap, ffi::CString, marker::PhantomData, slice, str, sync::RwLock};
 
@@ -10,6 +10,7 @@ static STRING_CACHE: Lazy<RwLock<HashMap<String, CString>>> = Lazy::new(Default:
 //
 // TODO The documentation says string refs do not have to be null-terminated.
 // But it looks like some functions do not handle strings not null-terminated?
+#[derive(Clone, Copy, Debug)]
 pub struct StringRef<'a> {
     raw: MlirStringRef,
     _parent: PhantomData<&'a ()>,
@@ -41,6 +42,14 @@ impl<'a> StringRef<'a> {
     }
 }
 
+impl<'a> PartialEq for StringRef<'a> {
+    fn eq(&self, other: &Self) -> bool {
+        unsafe { mlirStringRefEqual(self.raw, other.raw) }
+    }
+}
+
+impl<'a> Eq for StringRef<'a> {}
+
 impl From<&str> for StringRef<'static> {
     fn from(string: &str) -> Self {
         if !STRING_CACHE.read().unwrap().contains_key(string) {
@@ -54,5 +63,20 @@ impl From<&str> for StringRef<'static> {
         let string = lock.get(string).unwrap();
 
         unsafe { Self::from_raw(mlirStringRefCreateFromCString(string.as_ptr())) }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn equal() {
+        assert_eq!(StringRef::from("foo"), StringRef::from("foo"));
+    }
+
+    #[test]
+    fn not_equal() {
+        assert_ne!(StringRef::from("foo"), StringRef::from("bar"));
     }
 }
