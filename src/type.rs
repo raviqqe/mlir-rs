@@ -4,9 +4,10 @@ use crate::{
     utility::into_raw_array,
 };
 use mlir_sys::{
-    mlirIntegerTypeGet, mlirIntegerTypeSignedGet, mlirIntegerTypeUnsignedGet, mlirLLVMArrayTypeGet,
-    mlirLLVMFunctionTypeGet, mlirLLVMPointerTypeGet, mlirLLVMStructTypeLiteralGet,
-    mlirLLVMVoidTypeGet, mlirTypeEqual, mlirTypeGetContext, mlirTypeParseGet, MlirType,
+    mlirFunctionTypeGet, mlirIntegerTypeGet, mlirIntegerTypeSignedGet, mlirIntegerTypeUnsignedGet,
+    mlirLLVMArrayTypeGet, mlirLLVMFunctionTypeGet, mlirLLVMPointerTypeGet,
+    mlirLLVMStructTypeLiteralGet, mlirLLVMVoidTypeGet, mlirTypeEqual, mlirTypeGetContext,
+    mlirTypeParseGet, MlirType,
 };
 use std::marker::PhantomData;
 
@@ -21,43 +22,46 @@ pub struct Type<'c> {
 impl<'c> Type<'c> {
     /// Parses a type.
     pub fn parse(context: &'c Context, source: &str) -> Self {
-        Self {
-            raw: unsafe { mlirTypeParseGet(context.to_raw(), StringRef::from(source).to_raw()) },
-            _context: Default::default(),
+        unsafe {
+            Self::from_raw(mlirTypeParseGet(
+                context.to_raw(),
+                StringRef::from(source).to_raw(),
+            ))
+        }
+    }
+
+    /// Creates an integer type.
+    pub fn function(context: &'c Context, inputs: &[Type<'c>], results: &[Type<'c>]) -> Self {
+        unsafe {
+            Self::from_raw(mlirFunctionTypeGet(
+                context.to_raw(),
+                inputs.len() as isize,
+                into_raw_array(inputs.iter().map(|r#type| r#type.to_raw()).collect()),
+                results.len() as isize,
+                into_raw_array(results.iter().map(|r#type| r#type.to_raw()).collect()),
+            ))
         }
     }
 
     /// Creates an integer type.
     pub fn integer(context: &'c Context, bits: u32) -> Self {
-        Self {
-            raw: unsafe { mlirIntegerTypeGet(context.to_raw(), bits) },
-            _context: Default::default(),
-        }
+        unsafe { Self::from_raw(mlirIntegerTypeGet(context.to_raw(), bits)) }
     }
 
     /// Creates a signed integer type.
     pub fn signed_integer(context: &'c Context, bits: u32) -> Self {
-        Self {
-            raw: unsafe { mlirIntegerTypeSignedGet(context.to_raw(), bits) },
-            _context: Default::default(),
-        }
+        unsafe { Self::from_raw(mlirIntegerTypeSignedGet(context.to_raw(), bits)) }
     }
 
     /// Creates an unsigned integer type.
     pub fn unsigned_integer(context: &'c Context, bits: u32) -> Self {
-        Self {
-            raw: unsafe { mlirIntegerTypeUnsignedGet(context.to_raw(), bits) },
-            _context: Default::default(),
-        }
+        unsafe { Self::from_raw(mlirIntegerTypeUnsignedGet(context.to_raw(), bits)) }
     }
 
     /// Creates an LLVM array type.
     // TODO Check if the `llvm` dialect is loaded.
     pub fn llvm_array(r#type: Type<'c>, len: u32) -> Self {
-        Self {
-            raw: unsafe { mlirLLVMArrayTypeGet(r#type.to_raw(), len) },
-            _context: Default::default(),
-        }
+        unsafe { Self::from_raw(mlirLLVMArrayTypeGet(r#type.to_raw(), len)) }
     }
 
     /// Creates an LLVM function type.
@@ -66,48 +70,36 @@ impl<'c> Type<'c> {
         arguments: &[Type<'c>],
         variadic_arguments: bool,
     ) -> Self {
-        Self {
-            raw: unsafe {
-                mlirLLVMFunctionTypeGet(
-                    result.to_raw(),
-                    arguments.len() as isize,
-                    into_raw_array(arguments.iter().map(|argument| argument.to_raw()).collect()),
-                    variadic_arguments,
-                )
-            },
-            _context: Default::default(),
+        unsafe {
+            Self::from_raw(mlirLLVMFunctionTypeGet(
+                result.to_raw(),
+                arguments.len() as isize,
+                into_raw_array(arguments.iter().map(|argument| argument.to_raw()).collect()),
+                variadic_arguments,
+            ))
         }
     }
 
     /// Creates an LLVM pointer type.
     pub fn llvm_pointer(r#type: Self, address_space: u32) -> Self {
-        Self {
-            raw: unsafe { mlirLLVMPointerTypeGet(r#type.to_raw(), address_space) },
-            _context: Default::default(),
-        }
+        unsafe { Self::from_raw(mlirLLVMPointerTypeGet(r#type.to_raw(), address_space)) }
     }
 
     /// Creates an LLVM struct type.
     pub fn llvm_struct(context: &'c Context, fields: &[Type<'c>], packed: bool) -> Self {
-        Self {
-            raw: unsafe {
-                mlirLLVMStructTypeLiteralGet(
-                    context.to_raw(),
-                    fields.len() as isize,
-                    into_raw_array(fields.iter().map(|field| field.to_raw()).collect()),
-                    packed,
-                )
-            },
-            _context: Default::default(),
+        unsafe {
+            Self::from_raw(mlirLLVMStructTypeLiteralGet(
+                context.to_raw(),
+                fields.len() as isize,
+                into_raw_array(fields.iter().map(|field| field.to_raw()).collect()),
+                packed,
+            ))
         }
     }
 
     /// Creates an LLVM void type.
     pub fn llvm_void(context: &'c Context) -> Self {
-        Self {
-            raw: unsafe { mlirLLVMVoidTypeGet(context.to_raw()) },
-            _context: Default::default(),
-        }
+        unsafe { Self::from_raw(mlirLLVMVoidTypeGet(context.to_raw())) }
     }
 
     /// Gets a context.
