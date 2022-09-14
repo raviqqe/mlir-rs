@@ -4,6 +4,7 @@ pub mod context;
 pub mod dialect;
 pub mod dialect_handle;
 pub mod dialect_registry;
+pub mod error;
 pub mod execution_engine;
 pub mod identifier;
 pub mod location;
