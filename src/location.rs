@@ -16,28 +16,29 @@ pub struct Location<'c> {
 
 impl<'c> Location<'c> {
     pub fn new(context: &'c Context, filename: &str, line: usize, column: usize) -> Self {
-        Self {
-            raw: unsafe {
-                mlirLocationFileLineColGet(
-                    context.to_raw(),
-                    StringRef::from(filename).to_raw(),
-                    line as u32,
-                    column as u32,
-                )
-            },
-            _context: Default::default(),
+        unsafe {
+            Self::from_raw(mlirLocationFileLineColGet(
+                context.to_raw(),
+                StringRef::from(filename).to_raw(),
+                line as u32,
+                column as u32,
+            ))
         }
     }
 
     pub fn unknown(context: &Context) -> Self {
-        Self {
-            raw: unsafe { mlirLocationUnknownGet(context.to_raw()) },
-            _context: Default::default(),
-        }
+        unsafe { Self::from_raw(mlirLocationUnknownGet(context.to_raw())) }
     }
 
     pub fn context(&self) -> ContextRef<'c> {
         unsafe { ContextRef::from_raw(mlirLocationGetContext(self.raw)) }
+    }
+
+    pub(crate) unsafe fn from_raw(raw: MlirLocation) -> Self {
+        Self {
+            raw,
+            _context: Default::default(),
+        }
     }
 
     pub(crate) unsafe fn to_raw(self) -> MlirLocation {
