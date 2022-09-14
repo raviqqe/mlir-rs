@@ -192,7 +192,7 @@ impl<'c> PartialEq for Type<'c> {
 
 impl<'c> Eq for Type<'c> {}
 
-impl<'c> Display for &Type<'c> {
+impl<'c> Display for Type<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         let mut data = (formatter, Ok(()));
 
@@ -226,6 +226,40 @@ mod tests {
     #[test]
     fn context() {
         Type::parse(&Context::new(), "i8").context();
+    }
+
+    #[test]
+    fn integer() {
+        let context = Context::new();
+
+        assert_eq!(Type::integer(&context, 42), Type::parse(&context, "i42"));
+    }
+
+    #[test]
+    fn signed_integer() {
+        let context = Context::new();
+
+        assert_eq!(
+            Type::signed_integer(&context, 42),
+            Type::parse(&context, "si42")
+        );
+    }
+
+    #[test]
+    fn unsigned_integer() {
+        let context = Context::new();
+
+        assert_eq!(
+            Type::unsigned_integer(&context, 42),
+            Type::parse(&context, "ui42")
+        );
+    }
+
+    #[test]
+    fn display() {
+        let context = Context::new();
+
+        assert_eq!(Type::integer(&context, 42).to_string(), "i42");
     }
 
     mod function {
@@ -330,72 +364,96 @@ mod tests {
         }
     }
 
-    #[test]
-    fn integer() {
-        let context = Context::new();
+    mod llvm {
+        use super::*;
 
-        assert_eq!(Type::integer(&context, 42), Type::parse(&context, "i42"));
-    }
+        fn create_context() -> Context {
+            let context = Context::new();
 
-    #[test]
-    fn signed_integer() {
-        let context = Context::new();
+            DialectHandle::llvm().register_dialect(&context);
+            context.get_or_load_dialect("llvm");
 
-        assert_eq!(
-            Type::signed_integer(&context, 42),
-            Type::parse(&context, "si42")
-        );
-    }
+            context
+        }
 
-    #[test]
-    fn unsigned_integer() {
-        let context = Context::new();
+        #[test]
+        fn pointer() {
+            let context = create_context();
+            let i32 = Type::integer(&context, 32);
 
-        assert_eq!(
-            Type::unsigned_integer(&context, 42),
-            Type::parse(&context, "ui42")
-        );
-    }
+            assert_eq!(
+                Type::llvm_pointer(i32, 0),
+                Type::parse(&context, "!llvm.ptr<i32>")
+            );
+        }
 
-    #[test]
-    fn create_llvm_types() {
-        let context = Context::new();
+        #[test]
+        fn pointer_with_address_space() {
+            let context = create_context();
+            let i32 = Type::integer(&context, 32);
 
-        DialectHandle::llvm().register_dialect(&context);
-        context.get_or_load_dialect("llvm");
+            assert_eq!(
+                Type::llvm_pointer(i32, 4),
+                Type::parse(&context, "!llvm.ptr<i32, 4>")
+            );
+        }
 
-        let i8 = Type::integer(&context, 8);
-        let i32 = Type::integer(&context, 32);
-        let i64 = Type::integer(&context, 64);
+        #[test]
+        fn void() {
+            let context = create_context();
 
-        assert_eq!(
-            Type::llvm_pointer(i32, 0),
-            Type::parse(&context, "!llvm.ptr<i32>")
-        );
+            assert_eq!(
+                Type::llvm_void(&context),
+                Type::parse(&context, "!llvm.void")
+            );
+        }
 
-        assert_eq!(
-            Type::llvm_pointer(i32, 4),
-            Type::parse(&context, "!llvm.ptr<i32, 4>")
-        );
+        #[test]
+        fn array() {
+            let context = create_context();
+            let i32 = Type::integer(&context, 32);
 
-        assert_eq!(
-            Type::llvm_void(&context),
-            Type::parse(&context, "!llvm.void")
-        );
+            assert_eq!(
+                Type::llvm_array(i32, 4),
+                Type::parse(&context, "!llvm.array<4xi32>")
+            );
+        }
 
-        assert_eq!(
-            Type::llvm_array(i32, 4),
-            Type::parse(&context, "!llvm.array<4xi32>")
-        );
+        #[test]
+        fn function() {
+            let context = create_context();
+            let i8 = Type::integer(&context, 8);
+            let i32 = Type::integer(&context, 32);
+            let i64 = Type::integer(&context, 64);
 
-        assert_eq!(
-            Type::llvm_function(i8, &[i32, i64], false),
-            Type::parse(&context, "!llvm.func<i8 (i32, i64)>")
-        );
+            assert_eq!(
+                Type::llvm_function(i8, &[i32, i64], false),
+                Type::parse(&context, "!llvm.func<i8 (i32, i64)>")
+            );
+        }
 
-        assert_eq!(
-            Type::llvm_struct(&context, &[i32, i64], false),
-            Type::parse(&context, "!llvm.struct<(i32, i64)>")
-        );
+        #[test]
+        fn r#struct() {
+            let context = create_context();
+            let i32 = Type::integer(&context, 32);
+            let i64 = Type::integer(&context, 64);
+
+            assert_eq!(
+                Type::llvm_struct(&context, &[i32, i64], false),
+                Type::parse(&context, "!llvm.struct<(i32, i64)>")
+            );
+        }
+
+        #[test]
+        fn packed_struct() {
+            let context = create_context();
+            let i32 = Type::integer(&context, 32);
+            let i64 = Type::integer(&context, 64);
+
+            assert_eq!(
+                Type::llvm_struct(&context, &[i32, i64], true),
+                Type::parse(&context, "!llvm.struct<packed (i32, i64)>")
+            );
+        }
     }
 }
