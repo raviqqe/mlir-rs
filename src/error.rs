@@ -1,7 +1,8 @@
 use crate::r#type::Type;
-use std::error;
-use std::fmt::Display;
-use std::fmt::{self, Formatter};
+use std::{
+    error,
+    fmt::{self, Display, Formatter},
+};
 
 #[derive(Debug, Eq, PartialEq)]
 pub enum Error<'c> {
