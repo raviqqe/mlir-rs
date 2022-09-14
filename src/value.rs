@@ -75,11 +75,11 @@ mod tests {
     fn is_operation_result() {
         let context = Context::new();
         let location = Location::unknown(&context);
-        let index_type = Type::parse(&context, "index");
+        let r#type = Type::parse(&context, "index");
 
         let value = Operation::new(
             OperationState::new("arith.constant", location)
-                .add_results(&[index_type])
+                .add_results(&[r#type])
                 .add_attributes(&[(
                     Identifier::new(&context, "value"),
                     Attribute::parse(&context, "0 : index"),
