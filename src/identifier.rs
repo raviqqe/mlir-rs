@@ -30,7 +30,7 @@ impl<'c> Identifier<'c> {
         unsafe { StringRef::from_raw(mlirIdentifierStr(self.raw)) }
     }
 
-    pub(crate) unsafe fn to_raw(&self) -> MlirIdentifier {
+    pub(crate) unsafe fn to_raw(self) -> MlirIdentifier {
         self.raw
     }
 }
