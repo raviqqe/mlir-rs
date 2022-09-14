@@ -3,10 +3,14 @@ use crate::{
     string_ref::StringRef,
 };
 use mlir_sys::{
-    mlirLocationEqual, mlirLocationFileLineColGet, mlirLocationGetContext, mlirLocationUnknownGet,
-    MlirLocation,
+    mlirLocationEqual, mlirLocationFileLineColGet, mlirLocationGetContext, mlirLocationPrint,
+    mlirLocationUnknownGet, MlirLocation, MlirStringRef,
 };
-use std::marker::PhantomData;
+use std::{
+    ffi::c_void,
+    fmt::{self, Display, Formatter},
+    marker::PhantomData,
+};
 
 #[derive(Clone, Copy, Debug)]
 pub struct Location<'c> {
@@ -52,9 +56,31 @@ impl<'c> PartialEq for Location<'c> {
     }
 }
 
+impl<'c> Display for Location<'c> {
+    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
+        let mut data = (formatter, Ok(()));
+
+        unsafe extern "C" fn callback(string: MlirStringRef, data: *mut c_void) {
+            let data = &mut *(data as *mut (&mut Formatter, fmt::Result));
+            let result = write!(data.0, "{}", StringRef::from_raw(string).as_str());
+
+            if data.1.is_ok() {
+                data.1 = result;
+            }
+        }
+
+        unsafe {
+            mlirLocationPrint(self.raw, Some(callback), &mut data as *mut _ as *mut c_void);
+        }
+
+        data.1
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use pretty_assertions::{assert_eq, assert_ne};
 
     #[test]
     fn new() {
@@ -89,6 +115,17 @@ mod tests {
         assert_ne!(
             Location::new(&context, "foo", 42, 42),
             Location::unknown(&context)
+        );
+    }
+
+    #[test]
+    fn display() {
+        let context = Context::new();
+
+        assert_eq!(Location::unknown(&context).to_string(), "loc(unknown)");
+        assert_eq!(
+            Location::new(&context, "foo", 42, 42).to_string(),
+            "loc(\"foo\":42:42)"
         );
     }
 }
