@@ -38,6 +38,7 @@ Contribution is welcome! But, Melior is still in the alpha stage as well as the 
 
 ### Naming conventions
 
+- `Mlir<X>` objects are named `<X>` if they have no destructor. Otherwise, they are named `<X>` for owned objects and `<X>Ref` for borrowed references.
 - `mlir<X>Create` functions are renamed as `<X>::new`.
 - `mlir<X>Get<Y>` functions are renamed as follows:
   - If the resulting objects refer to `&self`, they are named `<X>::as_<Y>`.
