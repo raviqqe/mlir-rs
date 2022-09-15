@@ -61,7 +61,7 @@ impl<'c> Block<'c> {
 
 impl<'c> Drop for Block<'c> {
     fn drop(&mut self) {
-        unsafe { mlirBlockDestroy(self.to_raw()) };
+        unsafe { mlirBlockDestroy(self.raw) };
     }
 }
 
