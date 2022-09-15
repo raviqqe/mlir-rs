@@ -77,6 +77,7 @@ impl<'c> Deref for Block<'c> {
     }
 }
 
+/// A reference of a block.
 // TODO Should we split context lifetimes? Or, is it transitively proven that 'c
 // > 'a?
 #[derive(Clone, Copy, Debug)]
