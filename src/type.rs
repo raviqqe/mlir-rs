@@ -306,8 +306,8 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            Type::vector(&[42], Type::index(&context)),
-            Type::parse(&context, "vector<42xindex>")
+            Type::vector(&[42], Type::integer(&context, 32)),
+            Type::parse(&context, "vector<42xi32>")
         );
     }
 
@@ -316,8 +316,8 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            Type::vector(&[0], Type::index(&context)).to_string(),
-            "vector<0xindex>"
+            Type::vector(&[0], Type::integer(&context, 32)).to_string(),
+            "vector<0xi32>"
         );
     }
 
@@ -326,8 +326,12 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            Type::vector_checked(Location::unknown(&context), &[42], Type::index(&context)),
-            Some(Type::parse(&context, "vector<42xindex>"))
+            Type::vector_checked(
+                Location::unknown(&context),
+                &[42],
+                Type::integer(&context, 32)
+            ),
+            Some(Type::parse(&context, "vector<42xi32>"))
         );
     }
 
