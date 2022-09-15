@@ -189,6 +189,7 @@ impl<'a> Eq for BlockRef<'a> {}
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::operation_state::OperationState;
 
     #[test]
     fn new() {
@@ -196,7 +197,43 @@ mod tests {
     }
 
     #[test]
-    fn get_non_existent_argument() {
+    fn argument() {
+        let context = Context::new();
+        let r#type = Type::integer(&context, 64);
+
+        assert_eq!(
+            Block::new(&[(r#type, Location::unknown(&context))])
+                .argument(0)
+                .unwrap()
+                .r#type(),
+            r#type
+        );
+    }
+
+    #[test]
+    fn argument_none() {
         assert!(Block::new(&[]).argument(0).is_none());
+    }
+
+    #[test]
+    fn append_operation() {
+        let context = Context::new();
+        let block = Block::new(&[]);
+
+        block.append_operation(Operation::new(OperationState::new(
+            "foo",
+            Location::unknown(&context),
+        )));
+    }
+
+    #[test]
+    fn insert_operation() {
+        let context = Context::new();
+        let block = Block::new(&[]);
+
+        block.insert_operation(
+            0,
+            Operation::new(OperationState::new("foo", Location::unknown(&context))),
+        );
     }
 }
