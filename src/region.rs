@@ -1,6 +1,7 @@
 use crate::block::{Block, BlockRef};
 use mlir_sys::{
-    mlirRegionAppendOwnedBlock, mlirRegionCreate, mlirRegionDestroy, mlirRegionGetFirstBlock,
+    mlirRegionAppendOwnedBlock, mlirRegionCreate, mlirRegionDestroy, mlirRegionEqual,
+    mlirRegionGetFirstBlock, mlirRegionInsertOwnedBlockAfter, mlirRegionInsertOwnedBlockBefore,
     MlirRegion,
 };
 use std::{
@@ -10,6 +11,7 @@ use std::{
 };
 
 /// A region.
+#[derive(Debug)]
 pub struct Region {
     raw: MlirRegion,
 }
@@ -35,9 +37,37 @@ impl Region {
         }
     }
 
+    /// Inserts a block after another block.
+    pub fn insert_block_after(&self, one: BlockRef, other: Block) -> BlockRef {
+        unsafe {
+            let r#ref = BlockRef::from_raw(other.to_raw());
+
+            mlirRegionInsertOwnedBlockAfter(self.raw, one.to_raw(), other.into_raw());
+
+            r#ref
+        }
+    }
+
+    /// Inserts a block before another block.
+    pub fn insert_block_before(&self, one: BlockRef, other: Block) -> BlockRef {
+        unsafe {
+            let r#ref = BlockRef::from_raw(other.to_raw());
+
+            mlirRegionInsertOwnedBlockBefore(self.raw, one.to_raw(), other.into_raw());
+
+            r#ref
+        }
+    }
+
     /// Appends a block.
-    pub fn append_block(&self, block: Block) {
-        unsafe { mlirRegionAppendOwnedBlock(self.raw, block.into_raw()) }
+    pub fn append_block(&self, block: Block) -> BlockRef {
+        unsafe {
+            let r#ref = BlockRef::from_raw(block.to_raw());
+
+            mlirRegionAppendOwnedBlock(self.raw, block.into_raw());
+
+            r#ref
+        }
     }
 
     pub(crate) unsafe fn into_raw(self) -> mlir_sys::MlirRegion {
@@ -60,6 +90,14 @@ impl Drop for Region {
         unsafe { mlirRegionDestroy(self.raw) }
     }
 }
+
+impl PartialEq for Region {
+    fn eq(&self, other: &Self) -> bool {
+        unsafe { mlirRegionEqual(self.raw, other.raw) }
+    }
+}
+
+impl Eq for Region {}
 
 /// A reference to a region.
 pub struct RegionRef<'a> {
@@ -94,7 +132,49 @@ mod tests {
     }
 
     #[test]
-    fn first_block_none() {
+    fn first_block() {
         assert!(Region::new().first_block().is_none());
+    }
+
+    #[test]
+    fn append_block() {
+        let region = Region::new();
+        let block = Block::new(&[]);
+
+        region.append_block(block);
+
+        assert!(region.first_block().is_some());
+    }
+
+    #[test]
+    fn insert_block_after() {
+        let region = Region::new();
+
+        let block = region.append_block(Block::new(&[]));
+        region.insert_block_after(block, Block::new(&[]));
+
+        assert_eq!(region.first_block(), Some(block));
+    }
+
+    #[test]
+    fn insert_block_before() {
+        let region = Region::new();
+
+        let block = region.append_block(Block::new(&[]));
+        let block = region.insert_block_before(block, Block::new(&[]));
+
+        assert_eq!(region.first_block(), Some(block));
+    }
+
+    #[test]
+    fn equal() {
+        let region = Region::new();
+
+        assert_eq!(region, region);
+    }
+
+    #[test]
+    fn not_equal() {
+        assert_ne!(Region::new(), Region::new());
     }
 }

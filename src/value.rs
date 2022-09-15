@@ -59,7 +59,7 @@ impl<'a> PartialEq for Value<'a> {
 
 impl<'a> Eq for Value<'a> {}
 
-impl<'c> Display for Value<'c> {
+impl<'a> Display for Value<'a> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         let mut data = (formatter, Ok(()));
 

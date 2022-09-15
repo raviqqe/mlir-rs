@@ -9,18 +9,15 @@ use crate::{
 };
 use mlir_sys::{
     mlirBlockAddArgument, mlirBlockAppendOwnedOperation, mlirBlockCreate, mlirBlockDestroy,
-    mlirBlockGetArgument, mlirBlockGetFirstOperation, mlirBlockGetNumArguments,
+    mlirBlockEqual, mlirBlockGetArgument, mlirBlockGetFirstOperation, mlirBlockGetNumArguments,
     mlirBlockGetParentRegion, mlirBlockInsertOwnedOperation, MlirBlock,
 };
-use std::{
-    marker::PhantomData,
-    mem::{forget, ManuallyDrop},
-    ops::Deref,
-};
+use std::{marker::PhantomData, mem::forget, ops::Deref};
 
 /// A block
+#[derive(Debug)]
 pub struct Block<'c> {
-    raw: MlirBlock,
+    r#ref: BlockRef<'static>,
     _context: PhantomData<&'c Context>,
 }
 
@@ -46,6 +43,53 @@ impl<'c> Block<'c> {
         }
     }
 
+    pub(crate) unsafe fn from_raw(block: MlirBlock) -> Self {
+        Self {
+            r#ref: BlockRef::from_raw(block),
+            _context: Default::default(),
+        }
+    }
+
+    pub(crate) unsafe fn into_raw(self) -> MlirBlock {
+        let block = self.raw;
+
+        forget(self);
+
+        block
+    }
+}
+
+impl<'c> Drop for Block<'c> {
+    fn drop(&mut self) {
+        unsafe { mlirBlockDestroy(self.to_raw()) };
+    }
+}
+
+impl<'c> PartialEq for Block<'c> {
+    fn eq(&self, other: &Self) -> bool {
+        self.r#ref == other.r#ref
+    }
+}
+
+impl<'c> Eq for Block<'c> {}
+
+impl<'a> Deref for Block<'a> {
+    type Target = BlockRef<'a>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.r#ref
+    }
+}
+
+// TODO Should we split context lifetimes? Or, is it transitively proven that 'c
+// > 'a?
+#[derive(Clone, Copy, Debug)]
+pub struct BlockRef<'a> {
+    raw: MlirBlock,
+    _reference: PhantomData<&'a Block<'a>>,
+}
+
+impl<'c> BlockRef<'c> {
     /// Gets an argument at a position.
     pub fn argument(&self, position: usize) -> Option<Value> {
         unsafe {
@@ -113,19 +157,11 @@ impl<'c> Block<'c> {
         }
     }
 
-    pub(crate) unsafe fn from_raw(block: MlirBlock) -> Self {
+    pub(crate) unsafe fn from_raw(raw: MlirBlock) -> Self {
         Self {
-            raw: block,
-            _context: Default::default(),
+            raw,
+            _reference: Default::default(),
         }
-    }
-
-    pub(crate) unsafe fn into_raw(self) -> MlirBlock {
-        let block = self.raw;
-
-        forget(self);
-
-        block
     }
 
     pub(crate) unsafe fn to_raw(&self) -> MlirBlock {
@@ -133,35 +169,13 @@ impl<'c> Block<'c> {
     }
 }
 
-impl<'c> Drop for Block<'c> {
-    fn drop(&mut self) {
-        unsafe { mlirBlockDestroy(self.raw) };
+impl<'a> PartialEq for BlockRef<'a> {
+    fn eq(&self, other: &Self) -> bool {
+        unsafe { mlirBlockEqual(self.raw, other.raw) }
     }
 }
 
-// TODO Should we split context lifetimes? Or, is it transitively proven that 'c
-// > 'a?
-pub struct BlockRef<'a> {
-    raw: ManuallyDrop<Block<'a>>,
-    _reference: PhantomData<&'a Block<'a>>,
-}
-
-impl<'a> BlockRef<'a> {
-    pub(crate) unsafe fn from_raw(block: MlirBlock) -> Self {
-        Self {
-            raw: ManuallyDrop::new(Block::from_raw(block)),
-            _reference: Default::default(),
-        }
-    }
-}
-
-impl<'a> Deref for BlockRef<'a> {
-    type Target = Block<'a>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.raw
-    }
-}
+impl<'a> Eq for BlockRef<'a> {}
 
 #[cfg(test)]
 mod tests {
