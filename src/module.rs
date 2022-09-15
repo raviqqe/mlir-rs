@@ -18,19 +18,16 @@ pub struct Module<'c> {
 
 impl<'c> Module<'c> {
     pub fn new(location: Location) -> Self {
-        Self {
-            raw: unsafe { mlirModuleCreateEmpty(location.to_raw()) },
-            _context: Default::default(),
-        }
+        unsafe { Self::from_raw(mlirModuleCreateEmpty(location.to_raw())) }
     }
 
-    pub fn parse(context: &Context, source: &str) -> Self {
+    pub fn parse(context: &Context, source: &str) -> Option<Self> {
         // TODO Should we allocate StringRef locally because sources can be big?
-        Self {
-            raw: unsafe {
-                mlirModuleCreateParse(context.to_raw(), StringRef::from(source).to_raw())
-            },
-            _context: Default::default(),
+        unsafe {
+            Self::from_option_raw(mlirModuleCreateParse(
+                context.to_raw(),
+                StringRef::from(source).to_raw(),
+            ))
         }
     }
 
@@ -44,6 +41,21 @@ impl<'c> Module<'c> {
 
     pub fn body(&self) -> BlockRef {
         unsafe { BlockRef::from_raw(mlirModuleGetBody(self.raw)) }
+    }
+
+    unsafe fn from_raw(raw: MlirModule) -> Self {
+        Self {
+            raw,
+            _context: Default::default(),
+        }
+    }
+
+    unsafe fn from_option_raw(raw: MlirModule) -> Option<Self> {
+        if raw.ptr.is_null() {
+            None
+        } else {
+            Some(Self::from_raw(raw))
+        }
     }
 
     pub(crate) unsafe fn to_raw(&self) -> MlirModule {

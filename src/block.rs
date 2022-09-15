@@ -89,7 +89,7 @@ impl<'c> BlockRef<'c> {
     /// Gets an argument at a position.
     pub fn argument(&self, position: usize) -> Option<Value> {
         unsafe {
-            if position < mlirBlockGetNumArguments(self.raw) as usize {
+            if position < self.argument_count() as usize {
                 Some(Value::from_raw(mlirBlockGetArgument(
                     self.raw,
                     position as isize,
@@ -98,6 +98,11 @@ impl<'c> BlockRef<'c> {
                 None
             }
         }
+    }
+
+    /// Gets a number of arguments.
+    pub fn argument_count(&self) -> usize {
+        unsafe { mlirBlockGetNumArguments(self.raw) as usize }
     }
 
     /// Gets a parent region.
