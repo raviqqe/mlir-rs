@@ -82,8 +82,8 @@ impl<'a> OperationRef<'a> {
     }
 
     /// Gets a block.
-    pub fn block(&self) -> BlockRef {
-        unsafe { BlockRef::from_raw(mlirOperationGetBlock(self.raw)) }
+    pub fn block(&self) -> Option<BlockRef> {
+        unsafe { BlockRef::from_option_raw(mlirOperationGetBlock(self.raw)) }
     }
 
     /// Gets a result at an index.
@@ -179,7 +179,7 @@ impl<'a> Display for OperationRef<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{context::Context, location::Location};
+    use crate::{block::Block, context::Context, location::Location};
 
     #[test]
     fn new() {
@@ -187,6 +187,39 @@ mod tests {
             "foo",
             Location::unknown(&Context::new()),
         ));
+    }
+
+    #[test]
+    fn name() {
+        let context = Context::new();
+
+        assert_eq!(
+            Operation::new(OperationState::new("foo", Location::unknown(&context),)).name(),
+            Identifier::new(&context, "foo")
+        );
+    }
+
+    #[test]
+    fn block() {
+        let block = Block::new(&[]);
+        let operation = block.append_operation(Operation::new(OperationState::new(
+            "foo",
+            Location::unknown(&Context::new()),
+        )));
+
+        assert_eq!(operation.block(), Some(*block));
+    }
+
+    #[test]
+    fn block_none() {
+        assert_eq!(
+            Operation::new(OperationState::new(
+                "foo",
+                Location::unknown(&Context::new())
+            ))
+            .block(),
+            None
+        );
     }
 
     #[test]
