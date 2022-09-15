@@ -15,18 +15,33 @@ pub struct Attribute<'c> {
 
 impl<'c> Attribute<'c> {
     /// Parses an attribute.
-    pub fn parse(context: &Context, source: &str) -> Self {
-        Self {
-            raw: unsafe {
-                mlirAttributeParseGet(context.to_raw(), StringRef::from(source).to_raw())
-            },
-            _context: Default::default(),
+    pub fn parse(context: &Context, source: &str) -> Option<Self> {
+        unsafe {
+            Self::from_option_raw(mlirAttributeParseGet(
+                context.to_raw(),
+                StringRef::from(source).to_raw(),
+            ))
         }
     }
 
     /// Gets a context.
     pub fn context(&self) -> ContextRef<'c> {
         unsafe { ContextRef::from_raw(mlirAttributeGetContext(self.raw)) }
+    }
+
+    unsafe fn from_raw(raw: MlirAttribute) -> Self {
+        Self {
+            raw,
+            _context: Default::default(),
+        }
+    }
+
+    unsafe fn from_option_raw(raw: MlirAttribute) -> Option<Self> {
+        if raw.ptr.is_null() {
+            None
+        } else {
+            Some(Self::from_raw(raw))
+        }
     }
 
     pub(crate) unsafe fn to_raw(self) -> MlirAttribute {
@@ -41,12 +56,17 @@ mod tests {
     #[test]
     fn parse() {
         for attribute in ["unit", "i32", r#""foo""#] {
-            Attribute::parse(&Context::new(), attribute);
+            assert!(Attribute::parse(&Context::new(), attribute).is_some());
         }
     }
 
     #[test]
+    fn parse_none() {
+        assert!(Attribute::parse(&Context::new(), "z").is_none());
+    }
+
+    #[test]
     fn context() {
-        Attribute::parse(&Context::new(), "unit").context();
+        Attribute::parse(&Context::new(), "unit").unwrap().context();
     }
 }

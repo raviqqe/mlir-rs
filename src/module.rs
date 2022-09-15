@@ -82,4 +82,14 @@ mod tests {
     fn context() {
         Module::new(Location::new(&Context::new(), "foo", 42, 42)).context();
     }
+
+    #[test]
+    fn parse() {
+        assert!(Module::parse(&Context::new(), "module{}").is_some());
+    }
+
+    #[test]
+    fn parse_none() {
+        assert!(Module::parse(&Context::new(), "module{").is_none());
+    }
 }
