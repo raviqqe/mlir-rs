@@ -312,12 +312,32 @@ mod tests {
     }
 
     #[test]
+    fn vector_with_invalid_dimension() {
+        let context = Context::new();
+
+        assert_eq!(
+            Type::vector(&[0], Type::index(&context)).to_string(),
+            "vector<0xindex>"
+        );
+    }
+
+    #[test]
     fn vector_checked() {
         let context = Context::new();
 
         assert_eq!(
             Type::vector_checked(Location::unknown(&context), &[42], Type::index(&context)),
             Some(Type::parse(&context, "vector<42xindex>"))
+        );
+    }
+
+    #[test]
+    fn vector_checked_fail() {
+        let context = Context::new();
+
+        assert_eq!(
+            Type::vector_checked(Location::unknown(&context), &[0], Type::index(&context)),
+            None
         );
     }
 
