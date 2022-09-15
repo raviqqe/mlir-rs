@@ -77,10 +77,7 @@ impl<'c> Drop for Module<'c> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        block::Block, operation_state::OperationState,
-        region::Region,
-    };
+    use crate::{block::Block, operation_state::OperationState, region::Region};
 
     #[test]
     fn new() {
