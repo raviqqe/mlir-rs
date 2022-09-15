@@ -16,13 +16,13 @@ use std::{
     ffi::c_void,
     fmt::{Display, Formatter},
     marker::PhantomData,
-    mem::{forget, ManuallyDrop},
+    mem::forget,
     ops::Deref,
 };
 
 /// An operation.
 pub struct Operation<'c> {
-    raw: MlirOperation,
+    r#ref: OperationRef<'static>,
     _context: PhantomData<&'c Context>,
 }
 
@@ -30,11 +30,44 @@ impl<'c> Operation<'c> {
     /// Creates an operation.
     pub fn new(state: OperationState) -> Self {
         Self {
-            raw: unsafe { mlirOperationCreate(&mut state.into_raw()) },
+            r#ref: unsafe { OperationRef::from_raw(mlirOperationCreate(&mut state.into_raw())) },
             _context: Default::default(),
         }
     }
 
+    pub(crate) unsafe fn into_raw(self) -> MlirOperation {
+        let operation = self.raw;
+
+        forget(self);
+
+        operation
+    }
+}
+
+impl<'c> Drop for Operation<'c> {
+    fn drop(&mut self) {
+        unsafe { mlirOperationDestroy(self.raw) };
+    }
+}
+
+impl<'c> Deref for Operation<'c> {
+    type Target = OperationRef<'static>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.r#ref
+    }
+}
+
+/// A reference to an operation.
+// TODO Should we split context lifetimes? Or, is it transitively proven that
+// 'c > 'a?
+#[derive(Clone, Copy, Debug)]
+pub struct OperationRef<'a> {
+    raw: MlirOperation,
+    _reference: PhantomData<&'a Operation<'a>>,
+}
+
+impl<'a> OperationRef<'a> {
     /// Gets a context.
     pub fn context(&self) -> ContextRef {
         unsafe { ContextRef::from_raw(mlirOperationGetContext(self.raw)) }
@@ -91,29 +124,15 @@ impl<'c> Operation<'c> {
         unsafe { mlirOperationDump(self.raw) }
     }
 
-    pub(crate) unsafe fn from_raw(operation: MlirOperation) -> Self {
+    pub(crate) unsafe fn from_raw(raw: MlirOperation) -> Self {
         Self {
-            raw: operation,
-            _context: Default::default(),
+            raw,
+            _reference: Default::default(),
         }
     }
-
-    pub(crate) unsafe fn into_raw(self) -> MlirOperation {
-        let operation = self.raw;
-
-        forget(self);
-
-        operation
-    }
 }
 
-impl<'c> Drop for Operation<'c> {
-    fn drop(&mut self) {
-        unsafe { mlirOperationDestroy(self.raw) };
-    }
-}
-
-impl<'c> Display for &Operation<'c> {
+impl<'a> Display for OperationRef<'a> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         let mut data = (formatter, Ok(()));
 
@@ -131,31 +150,6 @@ impl<'c> Display for &Operation<'c> {
         }
 
         data.1
-    }
-}
-
-/// A reference to an operation.
-// TODO Should we split context lifetimes? Or, is it transitively proven that
-// 'c > 'a?
-pub struct OperationRef<'a> {
-    operation: ManuallyDrop<Operation<'a>>,
-    _reference: PhantomData<&'a Operation<'a>>,
-}
-
-impl<'a> OperationRef<'a> {
-    pub(crate) unsafe fn from_raw(operation: MlirOperation) -> Self {
-        Self {
-            operation: ManuallyDrop::new(Operation::from_raw(operation)),
-            _reference: Default::default(),
-        }
-    }
-}
-
-impl<'a> Deref for OperationRef<'a> {
-    type Target = Operation<'a>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.operation
     }
 }
 

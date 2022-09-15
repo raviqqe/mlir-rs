@@ -25,28 +25,24 @@ impl<'c> Block<'c> {
     /// Creates a block.
     pub fn new(arguments: &[(Type<'c>, Location<'c>)]) -> Self {
         unsafe {
-            Self::from_raw(mlirBlockCreate(
-                arguments.len() as isize,
-                into_raw_array(
-                    arguments
-                        .iter()
-                        .map(|(argument, _)| argument.to_raw())
-                        .collect(),
-                ),
-                into_raw_array(
-                    arguments
-                        .iter()
-                        .map(|(_, location)| location.to_raw())
-                        .collect(),
-                ),
-            ))
-        }
-    }
-
-    unsafe fn from_raw(block: MlirBlock) -> Self {
-        Self {
-            r#ref: BlockRef::from_raw(block),
-            _context: Default::default(),
+            Self {
+                r#ref: BlockRef::from_raw(mlirBlockCreate(
+                    arguments.len() as isize,
+                    into_raw_array(
+                        arguments
+                            .iter()
+                            .map(|(argument, _)| argument.to_raw())
+                            .collect(),
+                    ),
+                    into_raw_array(
+                        arguments
+                            .iter()
+                            .map(|(_, location)| location.to_raw())
+                            .collect(),
+                    ),
+                )),
+                _context: Default::default(),
+            }
         }
     }
 
