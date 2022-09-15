@@ -16,9 +16,11 @@ pub struct Identifier<'c> {
 
 impl<'c> Identifier<'c> {
     pub fn new(context: &Context, name: &str) -> Self {
-        Self {
-            raw: unsafe { mlirIdentifierGet(context.to_raw(), StringRef::from(name).to_raw()) },
-            _context: Default::default(),
+        unsafe {
+            Self::from_raw(mlirIdentifierGet(
+                context.to_raw(),
+                StringRef::from(name).to_raw(),
+            ))
         }
     }
 
@@ -28,6 +30,13 @@ impl<'c> Identifier<'c> {
 
     pub fn as_string_ref(&self) -> StringRef {
         unsafe { StringRef::from_raw(mlirIdentifierStr(self.raw)) }
+    }
+
+    pub(crate) unsafe fn from_raw(raw: MlirIdentifier) -> Self {
+        Self {
+            raw,
+            _context: Default::default(),
+        }
     }
 
     pub(crate) unsafe fn to_raw(self) -> MlirIdentifier {

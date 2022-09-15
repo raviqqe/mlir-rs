@@ -1,5 +1,6 @@
 use crate::{
     context::{Context, ContextRef},
+    identifier::Identifier,
     operation_state::OperationState,
     region::RegionRef,
     string_ref::StringRef,
@@ -8,9 +9,9 @@ use crate::{
 use core::fmt;
 use mlir_sys::{
     mlirOperationCreate, mlirOperationDestroy, mlirOperationDump, mlirOperationGetContext,
-    mlirOperationGetNextInBlock, mlirOperationGetNumRegions, mlirOperationGetNumResults,
-    mlirOperationGetRegion, mlirOperationGetResult, mlirOperationPrint, mlirOperationVerify,
-    MlirOperation, MlirStringRef,
+    mlirOperationGetName, mlirOperationGetNextInBlock, mlirOperationGetNumRegions,
+    mlirOperationGetNumResults, mlirOperationGetRegion, mlirOperationGetResult, mlirOperationPrint,
+    mlirOperationVerify, MlirOperation, MlirStringRef,
 };
 use std::{
     ffi::c_void,
@@ -74,10 +75,15 @@ impl<'a> OperationRef<'a> {
         unsafe { ContextRef::from_raw(mlirOperationGetContext(self.raw)) }
     }
 
+    /// Gets a name.
+    pub fn name(&self) -> Identifier {
+        unsafe { Identifier::from_raw(mlirOperationGetName(self.raw)) }
+    }
+
     /// Gets a result at an index.
     pub fn result(&self, index: usize) -> Option<Value> {
         unsafe {
-            if index < mlirOperationGetNumResults(self.raw) as usize {
+            if index < self.result_count() as usize {
                 Some(Value::from_raw(mlirOperationGetResult(
                     self.raw,
                     index as isize,
@@ -88,10 +94,15 @@ impl<'a> OperationRef<'a> {
         }
     }
 
+    /// Gets a number of results.
+    pub fn result_count(&self) -> usize {
+        unsafe { mlirOperationGetNumResults(self.raw) as usize }
+    }
+
     /// Gets a result at an index.
     pub fn region(&self, index: usize) -> Option<RegionRef> {
         unsafe {
-            if index < mlirOperationGetNumRegions(self.raw) as usize {
+            if index < self.region_count() as usize {
                 Some(RegionRef::from_raw(mlirOperationGetRegion(
                     self.raw,
                     index as isize,
@@ -100,6 +111,11 @@ impl<'a> OperationRef<'a> {
                 None
             }
         }
+    }
+
+    /// Gets a number of regions.
+    pub fn region_count(&self) -> usize {
+        unsafe { mlirOperationGetNumRegions(self.raw) as usize }
     }
 
     /// Gets the next operation in the same block.
