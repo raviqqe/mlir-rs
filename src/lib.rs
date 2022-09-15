@@ -174,7 +174,7 @@ mod tests {
             )
         };
 
-        module.body().insert_operation(0, function);
+        module.body().append_operation(function);
 
         assert!(module.as_operation().verify());
         insta::assert_display_snapshot!(module.as_operation());
