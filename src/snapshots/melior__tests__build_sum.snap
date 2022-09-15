@@ -1,6 +1,6 @@
 ---
 source: src/lib.rs
-expression: "&*module.as_operation()"
+expression: module.as_operation()
 ---
 module {
   func.func @add(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
