@@ -9,8 +9,9 @@ use crate::{
 };
 use mlir_sys::{
     mlirBlockAddArgument, mlirBlockAppendOwnedOperation, mlirBlockCreate, mlirBlockDestroy,
-    mlirBlockEqual, mlirBlockGetArgument, mlirBlockGetFirstOperation, mlirBlockGetNumArguments,
-    mlirBlockGetParentRegion, mlirBlockInsertOwnedOperation, MlirBlock,
+    mlirBlockEqual, mlirBlockGetArgument, mlirBlockGetFirstOperation, mlirBlockGetNextInRegion,
+    mlirBlockGetNumArguments, mlirBlockGetParentRegion, mlirBlockInsertOwnedOperation,
+    mlirBlockInsertOwnedOperationAfter, mlirBlockInsertOwnedOperationBefore, MlirBlock,
 };
 use std::{marker::PhantomData, mem::forget, ops::Deref};
 
@@ -135,6 +136,17 @@ impl<'c> BlockRef<'c> {
         }
     }
 
+    /// Appends an operation.
+    pub fn append_operation(&self, operation: Operation) -> OperationRef {
+        unsafe {
+            let operation = operation.into_raw();
+
+            mlirBlockAppendOwnedOperation(self.raw, operation);
+
+            OperationRef::from_raw(operation)
+        }
+    }
+
     /// Inserts an operation.
     // TODO How can we make those update functions take `&mut self`?
     // TODO Use cells?
@@ -148,15 +160,31 @@ impl<'c> BlockRef<'c> {
         }
     }
 
-    /// Appends an operation.
-    pub fn append_operation(&self, operation: Operation) -> OperationRef {
+    /// Inserts an operation after another.
+    pub fn insert_operation_after(&self, one: OperationRef, other: Operation) -> OperationRef {
         unsafe {
-            let operation = operation.into_raw();
+            let other = other.into_raw();
 
-            mlirBlockAppendOwnedOperation(self.raw, operation);
+            mlirBlockInsertOwnedOperationAfter(self.raw, one.to_raw(), other);
 
-            OperationRef::from_raw(operation)
+            OperationRef::from_raw(other)
         }
+    }
+
+    /// Inserts an operation before another.
+    pub fn insert_operation_before(&self, one: OperationRef, other: Operation) -> OperationRef {
+        unsafe {
+            let other = other.into_raw();
+
+            mlirBlockInsertOwnedOperationBefore(self.raw, one.to_raw(), other);
+
+            OperationRef::from_raw(other)
+        }
+    }
+
+    /// Gets a next block in a region.
+    pub fn next_in_region(&self) -> Option<BlockRef> {
+        unsafe { BlockRef::from_option_raw(mlirBlockGetNextInRegion(self.raw)) }
     }
 
     pub(crate) unsafe fn from_raw(raw: MlirBlock) -> Self {
@@ -276,5 +304,57 @@ mod tests {
             0,
             Operation::new(OperationState::new("foo", Location::unknown(&context))),
         );
+    }
+
+    #[test]
+    fn insert_operation_after() {
+        let context = Context::new();
+        let block = Block::new(&[]);
+
+        let first_operation = block.append_operation(Operation::new(OperationState::new(
+            "foo",
+            Location::unknown(&context),
+        )));
+        let second_operation = block.insert_operation_after(
+            first_operation,
+            Operation::new(OperationState::new("foo", Location::unknown(&context))),
+        );
+
+        assert_eq!(block.first_operation(), Some(first_operation));
+        assert_eq!(
+            block.first_operation().unwrap().next_in_block(),
+            Some(second_operation)
+        );
+    }
+
+    #[test]
+    fn insert_operation_before() {
+        let context = Context::new();
+        let block = Block::new(&[]);
+
+        let second_operation = block.append_operation(Operation::new(OperationState::new(
+            "foo",
+            Location::unknown(&context),
+        )));
+        let first_operation = block.insert_operation_before(
+            second_operation,
+            Operation::new(OperationState::new("foo", Location::unknown(&context))),
+        );
+
+        assert_eq!(block.first_operation(), Some(first_operation));
+        assert_eq!(
+            block.first_operation().unwrap().next_in_block(),
+            Some(second_operation)
+        );
+    }
+
+    #[test]
+    fn next_in_region() {
+        let region = Region::new();
+
+        let first_block = region.append_block(Block::new(&[]));
+        let second_block = region.append_block(Block::new(&[]));
+
+        assert_eq!(first_block.next_in_region(), Some(second_block));
     }
 }

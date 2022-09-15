@@ -156,6 +156,10 @@ impl<'a> OperationRef<'a> {
         unsafe { mlirOperationDump(self.raw) }
     }
 
+    pub(crate) unsafe fn to_raw(self) -> MlirOperation {
+        self.raw
+    }
+
     pub(crate) unsafe fn from_raw(raw: MlirOperation) -> Self {
         Self {
             raw,
