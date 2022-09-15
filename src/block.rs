@@ -10,8 +10,9 @@ use crate::{
 use mlir_sys::{
     mlirBlockAddArgument, mlirBlockAppendOwnedOperation, mlirBlockCreate, mlirBlockDestroy,
     mlirBlockEqual, mlirBlockGetArgument, mlirBlockGetFirstOperation, mlirBlockGetNextInRegion,
-    mlirBlockGetNumArguments, mlirBlockGetParentRegion, mlirBlockInsertOwnedOperation,
-    mlirBlockInsertOwnedOperationAfter, mlirBlockInsertOwnedOperationBefore, MlirBlock,
+    mlirBlockGetNumArguments, mlirBlockGetParentOperation, mlirBlockGetParentRegion,
+    mlirBlockInsertOwnedOperation, mlirBlockInsertOwnedOperationAfter,
+    mlirBlockInsertOwnedOperationBefore, MlirBlock,
 };
 use std::{marker::PhantomData, mem::forget, ops::Deref};
 
@@ -110,6 +111,11 @@ impl<'c> BlockRef<'c> {
     /// Gets a parent region.
     pub fn parent_region(&self) -> Option<RegionRef> {
         unsafe { RegionRef::from_option_raw(mlirBlockGetParentRegion(self.raw)) }
+    }
+
+    /// Gets a parent operation.
+    pub fn parent_operation(&self) -> Option<OperationRef> {
+        unsafe { OperationRef::from_option_raw(mlirBlockGetParentOperation(self.raw)) }
     }
 
     /// Gets the first operation.
@@ -218,7 +224,7 @@ impl<'a> Eq for BlockRef<'a> {}
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{operation_state::OperationState, region::Region};
+    use crate::{module::Module, operation_state::OperationState, region::Region};
 
     #[test]
     fn new() {
@@ -262,6 +268,24 @@ mod tests {
         let block = Block::new(&[]);
 
         assert_eq!(block.parent_region(), None);
+    }
+
+    #[test]
+    fn parent_operation() {
+        let context = Context::new();
+        let module = Module::new(Location::unknown(&context));
+
+        assert_eq!(
+            module.body().parent_operation(),
+            Some(module.as_operation())
+        );
+    }
+
+    #[test]
+    fn parent_operation_none() {
+        let block = Block::new(&[]);
+
+        assert_eq!(block.parent_operation(), None);
     }
 
     #[test]

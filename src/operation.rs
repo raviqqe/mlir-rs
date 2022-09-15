@@ -166,6 +166,14 @@ impl<'a> OperationRef<'a> {
             _reference: Default::default(),
         }
     }
+
+    pub(crate) unsafe fn from_option_raw(raw: MlirOperation) -> Option<Self> {
+        if raw.ptr.is_null() {
+            None
+        } else {
+            Some(Self::from_raw(raw))
+        }
+    }
 }
 
 impl<'a> PartialEq for OperationRef<'a> {
