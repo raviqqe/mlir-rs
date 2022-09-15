@@ -59,7 +59,6 @@ mod tests {
         context.append_dialect_registry(&registry);
         context.get_or_load_dialect("func");
         context.get_or_load_dialect("memref");
-        context.get_or_load_dialect("shape");
         context.get_or_load_dialect("scf");
 
         let location = Location::unknown(&context);
