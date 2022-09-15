@@ -126,7 +126,7 @@ mod tests {
                 Location::new(&Context::new(), "foo", 1, 1),
                 Location::new(&Context::new(), "foo", 2, 2),
             ],
-            Attribute::parse(&context, "42"),
+            Attribute::parse(&context, "42").unwrap(),
         );
     }
 

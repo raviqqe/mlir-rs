@@ -152,7 +152,7 @@ mod tests {
         Operation::new(
             OperationState::new("foo", Location::unknown(&context)).add_attributes(&[(
                 Identifier::new(&context, "foo"),
-                Attribute::parse(&context, "unit"),
+                Attribute::parse(&context, "unit").unwrap(),
             )]),
         );
     }

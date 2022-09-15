@@ -99,7 +99,7 @@ mod tests {
                 .add_results(&[index_type])
                 .add_attributes(&[(
                     Identifier::new(&context, "value"),
-                    Attribute::parse(&context, "0 : index"),
+                    Attribute::parse(&context, "0 : index").unwrap(),
                 )]),
         );
 
@@ -117,7 +117,7 @@ mod tests {
                 .add_results(&[r#type])
                 .add_attributes(&[(
                     Identifier::new(&context, "value"),
-                    Attribute::parse(&context, "0 : index"),
+                    Attribute::parse(&context, "0 : index").unwrap(),
                 )]),
         );
 
@@ -144,7 +144,7 @@ mod tests {
                 .add_results(&[index_type])
                 .add_attributes(&[(
                     Identifier::new(&context, "value"),
-                    Attribute::parse(&context, "0 : index"),
+                    Attribute::parse(&context, "0 : index").unwrap(),
                 )]),
         );
 
@@ -162,7 +162,7 @@ mod tests {
                 .add_results(&[index_type])
                 .add_attributes(&[(
                     Identifier::new(&context, "value"),
-                    Attribute::parse(&context, "0 : index"),
+                    Attribute::parse(&context, "0 : index").unwrap(),
                 )]),
         );
 
@@ -181,7 +181,7 @@ mod tests {
                     .add_results(&[index_type])
                     .add_attributes(&[(
                         Identifier::new(&context, "value"),
-                        Attribute::parse(&context, "0 : index"),
+                        Attribute::parse(&context, "0 : index").unwrap(),
                     )]),
             )
         };
@@ -201,7 +201,7 @@ mod tests {
                 .add_results(&[index_type])
                 .add_attributes(&[(
                     Identifier::new(&context, "value"),
-                    Attribute::parse(&context, "0 : index"),
+                    Attribute::parse(&context, "0 : index").unwrap(),
                 )]),
         );
 
@@ -228,7 +228,7 @@ mod tests {
                 .add_results(&[index_type])
                 .add_attributes(&[(
                     Identifier::new(&context, "value"),
-                    Attribute::parse(&context, "0 : index"),
+                    Attribute::parse(&context, "0 : index").unwrap(),
                 )]),
         );
 

@@ -86,11 +86,11 @@ mod tests {
                     .add_attributes(&[
                         (
                             Identifier::new(&context, "function_type"),
-                            Attribute::parse(&context, "(i64, i64) -> i64"),
+                            Attribute::parse(&context, "(i64, i64) -> i64").unwrap(),
                         ),
                         (
                             Identifier::new(&context, "sym_name"),
-                            Attribute::parse(&context, "\"add\""),
+                            Attribute::parse(&context, "\"add\"").unwrap(),
                         ),
                     ])
                     .add_regions(vec![region]),
@@ -129,7 +129,7 @@ mod tests {
                     .add_results(&[index_type])
                     .add_attributes(&[(
                         Identifier::new(&context, "value"),
-                        Attribute::parse(&context, "0 : index"),
+                        Attribute::parse(&context, "0 : index").unwrap(),
                     )]),
             ));
 
@@ -147,7 +147,7 @@ mod tests {
                     .add_results(&[index_type])
                     .add_attributes(&[(
                         Identifier::new(&context, "value"),
-                        Attribute::parse(&context, "1 : index"),
+                        Attribute::parse(&context, "1 : index").unwrap(),
                     )]),
             ));
 
@@ -216,11 +216,12 @@ mod tests {
                     .add_attributes(&[
                         (
                             Identifier::new(&context, "function_type"),
-                            Attribute::parse(&context, "(memref<?xf32>, memref<?xf32>) -> ()"),
+                            Attribute::parse(&context, "(memref<?xf32>, memref<?xf32>) -> ()")
+                                .unwrap(),
                         ),
                         (
                             Identifier::new(&context, "sym_name"),
-                            Attribute::parse(&context, "\"sum\""),
+                            Attribute::parse(&context, "\"sum\"").unwrap(),
                         ),
                     ])
                     .add_regions(vec![function_region]),
