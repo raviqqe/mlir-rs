@@ -21,6 +21,7 @@ use std::{
 };
 
 /// An operation.
+#[derive(Debug)]
 pub struct Operation<'c> {
     r#ref: OperationRef<'static>,
     _context: PhantomData<&'c Context>,
