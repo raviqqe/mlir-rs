@@ -138,7 +138,8 @@ mod tests {
                 }
                 "
             ),
-        );
+        )
+        .unwrap();
 
         let manager = PassManager::new(&context);
         manager.add_pass(Pass::print_operation_stats());
@@ -168,7 +169,8 @@ mod tests {
                 }
                 "
             ),
-        );
+        )
+        .unwrap();
 
         let manager = PassManager::new(&context);
         manager
