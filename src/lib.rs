@@ -65,12 +65,12 @@ mod tests {
         let location = Location::unknown(&context);
         let module = Module::new(location);
 
-        let r#type = Type::parse(&context, "memref<?xf32>");
+        let r#type = Type::parse(&context, "memref<?xf32>").unwrap();
 
         let function = {
             let function_region = Region::new();
             let function_block = Block::new(&[(r#type, location), (r#type, location)]);
-            let index_type = Type::parse(&context, "index");
+            let index_type = Type::parse(&context, "index").unwrap();
 
             let zero = function_block.append_operation(Operation::new(
                 OperationState::new("arith.constant", location)
@@ -100,7 +100,7 @@ mod tests {
             ));
 
             {
-                let f32_type = Type::parse(&context, "f32");
+                let f32_type = Type::parse(&context, "f32").unwrap();
 
                 let lhs = loop_block.append_operation(Operation::new(
                     OperationState::new("memref.load", location)

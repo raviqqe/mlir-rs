@@ -92,7 +92,7 @@ mod tests {
     fn r#type() {
         let context = Context::new();
         let location = Location::unknown(&context);
-        let index_type = Type::parse(&context, "index");
+        let index_type = Type::parse(&context, "index").unwrap();
 
         let operation = Operation::new(
             OperationState::new("arith.constant", location)
@@ -110,7 +110,7 @@ mod tests {
     fn is_operation_result() {
         let context = Context::new();
         let location = Location::unknown(&context);
-        let r#type = Type::parse(&context, "index");
+        let r#type = Type::parse(&context, "index").unwrap();
 
         let operation = Operation::new(
             OperationState::new("arith.constant", location)
@@ -127,7 +127,7 @@ mod tests {
     #[test]
     fn is_block_argument() {
         let context = Context::new();
-        let r#type = Type::parse(&context, "index");
+        let r#type = Type::parse(&context, "index").unwrap();
         let block = Block::new(&[(r#type, Location::unknown(&context))]);
 
         assert!(block.argument(0).unwrap().is_block_argument());
@@ -137,7 +137,7 @@ mod tests {
     fn dump() {
         let context = Context::new();
         let location = Location::unknown(&context);
-        let index_type = Type::parse(&context, "index");
+        let index_type = Type::parse(&context, "index").unwrap();
 
         let value = Operation::new(
             OperationState::new("arith.constant", location)
@@ -155,7 +155,7 @@ mod tests {
     fn equal() {
         let context = Context::new();
         let location = Location::unknown(&context);
-        let index_type = Type::parse(&context, "index");
+        let index_type = Type::parse(&context, "index").unwrap();
 
         let operation = Operation::new(
             OperationState::new("arith.constant", location)
@@ -173,7 +173,7 @@ mod tests {
     fn not_equal() {
         let context = Context::new();
         let location = Location::unknown(&context);
-        let index_type = Type::parse(&context, "index");
+        let index_type = Type::parse(&context, "index").unwrap();
 
         let operation = || {
             Operation::new(
@@ -194,7 +194,7 @@ mod tests {
         let context = Context::new();
         context.load_all_available_dialects();
         let location = Location::unknown(&context);
-        let index_type = Type::parse(&context, "index");
+        let index_type = Type::parse(&context, "index").unwrap();
 
         let operation = Operation::new(
             OperationState::new("arith.constant", location)
@@ -221,7 +221,7 @@ mod tests {
         context.load_all_available_dialects();
 
         let location = Location::unknown(&context);
-        let index_type = Type::parse(&context, "index");
+        let index_type = Type::parse(&context, "index").unwrap();
 
         let operation = Operation::new(
             OperationState::new("arith.constant", location)

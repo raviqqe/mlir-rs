@@ -30,9 +30,9 @@ pub struct Type<'c> {
 
 impl<'c> Type<'c> {
     /// Parses a type.
-    pub fn parse(context: &'c Context, source: &str) -> Self {
+    pub fn parse(context: &'c Context, source: &str) -> Option<Self> {
         unsafe {
-            Self::from_raw(mlirTypeParseGet(
+            Self::from_option_raw(mlirTypeParseGet(
                 context.to_raw(),
                 StringRef::from(source).to_raw(),
             ))
@@ -264,14 +264,17 @@ mod tests {
 
     #[test]
     fn context() {
-        Type::parse(&Context::new(), "i8").context();
+        Type::parse(&Context::new(), "i8").unwrap().context();
     }
 
     #[test]
     fn integer() {
         let context = Context::new();
 
-        assert_eq!(Type::integer(&context, 42), Type::parse(&context, "i42"));
+        assert_eq!(
+            Type::integer(&context, 42),
+            Type::parse(&context, "i42").unwrap()
+        );
     }
 
     #[test]
@@ -280,7 +283,7 @@ mod tests {
 
         assert_eq!(
             Type::signed_integer(&context, 42),
-            Type::parse(&context, "si42")
+            Type::parse(&context, "si42").unwrap()
         );
     }
 
@@ -290,7 +293,7 @@ mod tests {
 
         assert_eq!(
             Type::unsigned_integer(&context, 42),
-            Type::parse(&context, "ui42")
+            Type::parse(&context, "ui42").unwrap()
         );
     }
 
@@ -298,7 +301,10 @@ mod tests {
     fn index() {
         let context = Context::new();
 
-        assert_eq!(Type::index(&context), Type::parse(&context, "index"));
+        assert_eq!(
+            Type::index(&context),
+            Type::parse(&context, "index").unwrap()
+        );
     }
 
     #[test]
@@ -307,7 +313,7 @@ mod tests {
 
         assert_eq!(
             Type::vector(&[42], Type::integer(&context, 32)),
-            Type::parse(&context, "vector<42xi32>")
+            Type::parse(&context, "vector<42xi32>").unwrap()
         );
     }
 
@@ -331,7 +337,7 @@ mod tests {
                 &[42],
                 Type::integer(&context, 32)
             ),
-            Some(Type::parse(&context, "vector<42xi32>"))
+            Type::parse(&context, "vector<42xi32>")
         );
     }
 
@@ -362,7 +368,7 @@ mod tests {
 
             assert_eq!(
                 Type::function(&context, &[integer, integer], &[integer]),
-                Type::parse(&context, "(i42, i42) -> i42")
+                Type::parse(&context, "(i42, i42) -> i42").unwrap()
             );
         }
 
@@ -373,7 +379,7 @@ mod tests {
 
             assert_eq!(
                 Type::function(&context, &[], &[integer, integer]),
-                Type::parse(&context, "() -> (i42, i42)")
+                Type::parse(&context, "() -> (i42, i42)").unwrap()
             );
         }
 
@@ -473,7 +479,7 @@ mod tests {
 
             assert_eq!(
                 Type::llvm_pointer(i32, 0),
-                Type::parse(&context, "!llvm.ptr<i32>")
+                Type::parse(&context, "!llvm.ptr<i32>").unwrap()
             );
         }
 
@@ -484,7 +490,7 @@ mod tests {
 
             assert_eq!(
                 Type::llvm_pointer(i32, 4),
-                Type::parse(&context, "!llvm.ptr<i32, 4>")
+                Type::parse(&context, "!llvm.ptr<i32, 4>").unwrap()
             );
         }
 
@@ -494,7 +500,7 @@ mod tests {
 
             assert_eq!(
                 Type::llvm_void(&context),
-                Type::parse(&context, "!llvm.void")
+                Type::parse(&context, "!llvm.void").unwrap()
             );
         }
 
@@ -505,7 +511,7 @@ mod tests {
 
             assert_eq!(
                 Type::llvm_array(i32, 4),
-                Type::parse(&context, "!llvm.array<4xi32>")
+                Type::parse(&context, "!llvm.array<4xi32>").unwrap()
             );
         }
 
@@ -518,7 +524,7 @@ mod tests {
 
             assert_eq!(
                 Type::llvm_function(i8, &[i32, i64], false),
-                Type::parse(&context, "!llvm.func<i8 (i32, i64)>")
+                Type::parse(&context, "!llvm.func<i8 (i32, i64)>").unwrap()
             );
         }
 
@@ -530,7 +536,7 @@ mod tests {
 
             assert_eq!(
                 Type::llvm_struct(&context, &[i32, i64], false),
-                Type::parse(&context, "!llvm.struct<(i32, i64)>")
+                Type::parse(&context, "!llvm.struct<(i32, i64)>").unwrap()
             );
         }
 
@@ -542,7 +548,7 @@ mod tests {
 
             assert_eq!(
                 Type::llvm_struct(&context, &[i32, i64], true),
-                Type::parse(&context, "!llvm.struct<packed (i32, i64)>")
+                Type::parse(&context, "!llvm.struct<packed (i32, i64)>").unwrap()
             );
         }
     }

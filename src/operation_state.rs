@@ -121,7 +121,7 @@ mod tests {
 
         Operation::new(
             OperationState::new("foo", Location::unknown(&context))
-                .add_results(&[Type::parse(&context, "i1")]),
+                .add_results(&[Type::parse(&context, "i1").unwrap()]),
         );
     }
 
