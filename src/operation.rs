@@ -1,4 +1,5 @@
 use crate::{
+    block::BlockRef,
     context::{Context, ContextRef},
     identifier::Identifier,
     operation_state::OperationState,
@@ -8,10 +9,10 @@ use crate::{
 };
 use core::fmt;
 use mlir_sys::{
-    mlirOperationCreate, mlirOperationDestroy, mlirOperationDump, mlirOperationGetContext,
-    mlirOperationGetName, mlirOperationGetNextInBlock, mlirOperationGetNumRegions,
-    mlirOperationGetNumResults, mlirOperationGetRegion, mlirOperationGetResult, mlirOperationPrint,
-    mlirOperationVerify, MlirOperation, MlirStringRef,
+    mlirOperationCreate, mlirOperationDestroy, mlirOperationDump, mlirOperationGetBlock,
+    mlirOperationGetContext, mlirOperationGetName, mlirOperationGetNextInBlock,
+    mlirOperationGetNumRegions, mlirOperationGetNumResults, mlirOperationGetRegion,
+    mlirOperationGetResult, mlirOperationPrint, mlirOperationVerify, MlirOperation, MlirStringRef,
 };
 use std::{
     ffi::c_void,
@@ -78,6 +79,11 @@ impl<'a> OperationRef<'a> {
     /// Gets a name.
     pub fn name(&self) -> Identifier {
         unsafe { Identifier::from_raw(mlirOperationGetName(self.raw)) }
+    }
+
+    /// Gets a block.
+    pub fn block(&self) -> BlockRef {
+        unsafe { BlockRef::from_raw(mlirOperationGetBlock(self.raw)) }
     }
 
     /// Gets a result at an index.
