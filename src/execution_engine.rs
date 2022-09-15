@@ -85,7 +85,8 @@ mod tests {
                 }
             }
             "#,
-        );
+        )
+        .unwrap();
 
         let pass_manager = PassManager::new(&context);
         pass_manager.add_pass(Pass::convert_func_to_llvm());
