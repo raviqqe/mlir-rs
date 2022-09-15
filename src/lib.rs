@@ -220,7 +220,7 @@ mod tests {
                         ),
                         (
                             Identifier::new(&context, "sym_name"),
-                            Attribute::parse(&context, "\"add\""),
+                            Attribute::parse(&context, "\"sum\""),
                         ),
                     ])
                     .add_regions(vec![function_region]),
