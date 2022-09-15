@@ -2,15 +2,16 @@ use crate::{
     block::BlockRef,
     context::{Context, ContextRef},
     location::Location,
-    operation::OperationRef,
+    operation::{Operation, OperationRef},
     string_ref::StringRef,
 };
 use mlir_sys::{
-    mlirModuleCreateEmpty, mlirModuleCreateParse, mlirModuleDestroy, mlirModuleGetBody,
-    mlirModuleGetContext, mlirModuleGetOperation, MlirModule,
+    mlirModuleCreateEmpty, mlirModuleCreateParse, mlirModuleDestroy, mlirModuleFromOperation,
+    mlirModuleGetBody, mlirModuleGetContext, mlirModuleGetOperation, MlirModule,
 };
 use std::marker::PhantomData;
 
+#[derive(Debug)]
 pub struct Module<'c> {
     raw: MlirModule,
     _context: PhantomData<&'c Context>,
@@ -43,6 +44,10 @@ impl<'c> Module<'c> {
         unsafe { BlockRef::from_raw(mlirModuleGetBody(self.raw)) }
     }
 
+    pub fn from_operation(operation: Operation) -> Option<Self> {
+        unsafe { Self::from_option_raw(mlirModuleFromOperation(operation.into_raw())) }
+    }
+
     unsafe fn from_raw(raw: MlirModule) -> Self {
         Self {
             raw,
@@ -72,6 +77,10 @@ impl<'c> Drop for Module<'c> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::{
+        block::Block, operation_state::OperationState,
+        region::Region,
+    };
 
     #[test]
     fn new() {
@@ -91,5 +100,33 @@ mod tests {
     #[test]
     fn parse_none() {
         assert!(Module::parse(&Context::new(), "module{").is_none());
+    }
+
+    #[test]
+    fn from_operation() {
+        let context = Context::new();
+
+        let region = Region::new();
+        region.append_block(Block::new(&[]));
+
+        let module = Module::from_operation(Operation::new(
+            OperationState::new("builtin.module", Location::unknown(&context))
+                .add_regions(vec![region]),
+        ))
+        .unwrap();
+
+        assert!(module.as_operation().verify());
+        assert_eq!(module.as_operation().to_string(), "module {\n}\n")
+    }
+
+    #[test]
+    fn from_operation_fail() {
+        let context = Context::new();
+
+        assert!(Module::from_operation(Operation::new(OperationState::new(
+            "func.func",
+            Location::unknown(&context),
+        )))
+        .is_none());
     }
 }
