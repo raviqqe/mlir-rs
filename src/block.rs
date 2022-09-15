@@ -164,7 +164,7 @@ impl<'c> BlockRef<'c> {
         }
     }
 
-    pub(crate) unsafe fn to_raw(&self) -> MlirBlock {
+    pub(crate) unsafe fn to_raw(self) -> MlirBlock {
         self.raw
     }
 }
