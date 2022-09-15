@@ -117,6 +117,14 @@ impl<'a> RegionRef<'a> {
             _region: Default::default(),
         }
     }
+
+    pub(crate) unsafe fn from_option_raw(raw: MlirRegion) -> Option<Self> {
+        if raw.ptr.is_null() {
+            None
+        } else {
+            Some(Self::from_raw(raw))
+        }
+    }
 }
 
 impl<'a> PartialEq for RegionRef<'a> {

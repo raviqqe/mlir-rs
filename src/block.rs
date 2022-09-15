@@ -107,8 +107,8 @@ impl<'c> BlockRef<'c> {
     }
 
     /// Gets a parent region.
-    pub fn parent_region(&self) -> RegionRef {
-        unsafe { RegionRef::from_raw(mlirBlockGetParentRegion(self.raw)) }
+    pub fn parent_region(&self) -> Option<RegionRef> {
+        unsafe { RegionRef::from_option_raw(mlirBlockGetParentRegion(self.raw)) }
     }
 
     /// Gets the first operation.
@@ -190,7 +190,7 @@ impl<'a> Eq for BlockRef<'a> {}
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::operation_state::OperationState;
+    use crate::{operation_state::OperationState, region::Region};
 
     #[test]
     fn new() {
@@ -219,6 +219,21 @@ mod tests {
     #[test]
     fn argument_count() {
         assert_eq!(Block::new(&[]).argument_count(), 0);
+    }
+
+    #[test]
+    fn parent_region() {
+        let region = Region::new();
+        let block = region.append_block(Block::new(&[]));
+
+        assert_eq!(block.parent_region(), Some(*region));
+    }
+
+    #[test]
+    fn parent_region_none() {
+        let block = Block::new(&[]);
+
+        assert_eq!(block.parent_region(), None);
     }
 
     #[test]
