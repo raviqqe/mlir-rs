@@ -9,10 +9,11 @@ use crate::{
 };
 use core::fmt;
 use mlir_sys::{
-    mlirOperationCreate, mlirOperationDestroy, mlirOperationDump, mlirOperationGetBlock,
-    mlirOperationGetContext, mlirOperationGetName, mlirOperationGetNextInBlock,
-    mlirOperationGetNumRegions, mlirOperationGetNumResults, mlirOperationGetRegion,
-    mlirOperationGetResult, mlirOperationPrint, mlirOperationVerify, MlirOperation, MlirStringRef,
+    mlirOperationCreate, mlirOperationDestroy, mlirOperationDump, mlirOperationEqual,
+    mlirOperationGetBlock, mlirOperationGetContext, mlirOperationGetName,
+    mlirOperationGetNextInBlock, mlirOperationGetNumRegions, mlirOperationGetNumResults,
+    mlirOperationGetRegion, mlirOperationGetResult, mlirOperationPrint, mlirOperationVerify,
+    MlirOperation, MlirStringRef,
 };
 use std::{
     ffi::c_void,
@@ -52,6 +53,14 @@ impl<'c> Drop for Operation<'c> {
         unsafe { mlirOperationDestroy(self.raw) };
     }
 }
+
+impl<'c> PartialEq for Operation<'c> {
+    fn eq(&self, other: &Self) -> bool {
+        self.r#ref == other.r#ref
+    }
+}
+
+impl<'c> Eq for Operation<'c> {}
 
 impl<'c> Deref for Operation<'c> {
     type Target = OperationRef<'static>;
@@ -154,6 +163,14 @@ impl<'a> OperationRef<'a> {
         }
     }
 }
+
+impl<'a> PartialEq for OperationRef<'a> {
+    fn eq(&self, other: &Self) -> bool {
+        unsafe { mlirOperationEqual(self.raw, other.raw) }
+    }
+}
+
+impl<'a> Eq for OperationRef<'a> {}
 
 impl<'a> Display for OperationRef<'a> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {

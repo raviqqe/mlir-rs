@@ -216,6 +216,24 @@ mod tests {
     }
 
     #[test]
+    fn argument_count() {
+        assert_eq!(Block::new(&[]).argument_count(), 0);
+    }
+
+    #[test]
+    fn first_operation() {
+        let context = Context::new();
+        let block = Block::new(&[]);
+
+        let operation = block.append_operation(Operation::new(OperationState::new(
+            "foo",
+            Location::unknown(&context),
+        )));
+
+        assert_eq!(block.first_operation(), Some(operation));
+    }
+
+    #[test]
     fn append_operation() {
         let context = Context::new();
         let block = Block::new(&[]);
