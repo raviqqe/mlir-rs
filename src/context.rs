@@ -4,24 +4,54 @@ use mlir_sys::{
     mlirContextGetNumRegisteredDialects, mlirContextGetOrLoadDialect,
     mlirContextLoadAllAvailableDialects, MlirContext,
 };
-use std::{marker::PhantomData, mem::ManuallyDrop, ops::Deref};
+use std::{marker::PhantomData, ops::Deref};
 
 /// A context of IR, dialects, and passes.
 ///
 /// Contexts own various objects, such as types, locations, and dialect
 /// instances.
+#[derive(Debug)]
 pub struct Context {
-    raw: MlirContext,
+    r#ref: ContextRef<'static>,
 }
 
 impl Context {
     /// Creates a context.
     pub fn new() -> Self {
         Self {
-            raw: unsafe { mlirContextCreate() },
+            r#ref: unsafe { ContextRef::from_raw(mlirContextCreate()) },
         }
     }
+}
 
+impl Drop for Context {
+    fn drop(&mut self) {
+        unsafe { mlirContextDestroy(self.raw) };
+    }
+}
+
+impl Default for Context {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Deref for Context {
+    type Target = ContextRef<'static>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.r#ref
+    }
+}
+
+/// A reference to a context.
+#[derive(Clone, Copy, Debug)]
+pub struct ContextRef<'a> {
+    raw: MlirContext,
+    _reference: PhantomData<&'a Context>,
+}
+
+impl<'a> ContextRef<'a> {
     /// Gets a number of registered dialects.
     pub fn registered_dialect_count(&self) -> usize {
         unsafe { mlirContextGetNumRegisteredDialects(self.raw) as usize }
@@ -47,43 +77,15 @@ impl Context {
         unsafe { mlirContextLoadAllAvailableDialects(self.raw) }
     }
 
-    pub(crate) unsafe fn to_raw(&self) -> MlirContext {
+    pub(crate) unsafe fn to_raw(self) -> MlirContext {
         self.raw
     }
-}
 
-impl Drop for Context {
-    fn drop(&mut self) {
-        unsafe { mlirContextDestroy(self.raw) };
-    }
-}
-
-impl Default for Context {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// A reference to a context.
-pub struct ContextRef<'c> {
-    raw: ManuallyDrop<Context>,
-    _reference: PhantomData<&'c Context>,
-}
-
-impl<'c> ContextRef<'c> {
-    pub(crate) unsafe fn from_raw(context: MlirContext) -> Self {
+    pub(crate) unsafe fn from_raw(raw: MlirContext) -> Self {
         Self {
-            raw: ManuallyDrop::new(Context { raw: context }),
+            raw,
             _reference: Default::default(),
         }
-    }
-}
-
-impl<'c> Deref for ContextRef<'c> {
-    type Target = Context;
-
-    fn deref(&self) -> &Self::Target {
-        &self.raw
     }
 }
 

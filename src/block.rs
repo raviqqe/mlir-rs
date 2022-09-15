@@ -43,7 +43,7 @@ impl<'c> Block<'c> {
         }
     }
 
-    pub(crate) unsafe fn from_raw(block: MlirBlock) -> Self {
+    unsafe fn from_raw(block: MlirBlock) -> Self {
         Self {
             r#ref: BlockRef::from_raw(block),
             _context: Default::default(),
