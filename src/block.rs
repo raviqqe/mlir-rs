@@ -234,6 +234,13 @@ mod tests {
     }
 
     #[test]
+    fn first_operation_none() {
+        let block = Block::new(&[]);
+
+        assert_eq!(block.first_operation(), None);
+    }
+
+    #[test]
     fn append_operation() {
         let context = Context::new();
         let block = Block::new(&[]);
