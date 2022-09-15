@@ -3,7 +3,7 @@ source: src/lib.rs
 expression: module.as_operation()
 ---
 module {
-  func.func @add(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
+  func.func @sum(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
     %c0 = arith.constant 0 : index
     %0 = memref.dim %arg0, %c0 : memref<?xf32>
     %c1 = arith.constant 1 : index
