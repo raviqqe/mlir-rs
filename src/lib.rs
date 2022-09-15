@@ -51,6 +51,59 @@ mod tests {
     }
 
     #[test]
+    fn build_add() {
+        let registry = DialectRegistry::new();
+        register_all_dialects(&registry);
+
+        let context = Context::new();
+        context.append_dialect_registry(&registry);
+        context.get_or_load_dialect("func");
+
+        let location = Location::unknown(&context);
+        let module = Module::new(location);
+
+        let integer_type = Type::integer(&context, 64);
+
+        let function = {
+            let region = Region::new();
+            let block = Block::new(&[(integer_type, location), (integer_type, location)]);
+
+            let sum = block.append_operation(Operation::new(
+                OperationState::new("arith.addi", location)
+                    .add_operands(&[block.argument(0).unwrap(), block.argument(1).unwrap()])
+                    .add_results(&[integer_type]),
+            ));
+
+            block.append_operation(Operation::new(
+                OperationState::new("func.return", Location::unknown(&context))
+                    .add_operands(&[sum.result(0).unwrap()]),
+            ));
+
+            region.append_block(block);
+
+            Operation::new(
+                OperationState::new("func.func", Location::unknown(&context))
+                    .add_attributes(&[
+                        (
+                            Identifier::new(&context, "function_type"),
+                            Attribute::parse(&context, "(i64, i64) -> i64"),
+                        ),
+                        (
+                            Identifier::new(&context, "sym_name"),
+                            Attribute::parse(&context, "\"add\""),
+                        ),
+                    ])
+                    .add_regions(vec![region]),
+            )
+        };
+
+        module.body().append_operation(function);
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
     fn build_sum() {
         let registry = DialectRegistry::new();
         register_all_dialects(&registry);
@@ -64,11 +117,11 @@ mod tests {
         let location = Location::unknown(&context);
         let module = Module::new(location);
 
-        let r#type = Type::parse(&context, "memref<?xf32>").unwrap();
+        let memref_type = Type::parse(&context, "memref<?xf32>").unwrap();
 
         let function = {
             let function_region = Region::new();
-            let function_block = Block::new(&[(r#type, location), (r#type, location)]);
+            let function_block = Block::new(&[(memref_type, location), (memref_type, location)]);
             let index_type = Type::parse(&context, "index").unwrap();
 
             let zero = function_block.append_operation(Operation::new(
