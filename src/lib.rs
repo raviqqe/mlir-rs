@@ -51,7 +51,7 @@ mod tests {
     }
 
     #[test]
-    fn build_add() {
+    fn build_sum() {
         let registry = DialectRegistry::new();
         register_all_dialects(&registry);
 
