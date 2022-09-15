@@ -73,8 +73,8 @@ impl<'c> PartialEq for Block<'c> {
 
 impl<'c> Eq for Block<'c> {}
 
-impl<'a> Deref for Block<'a> {
-    type Target = BlockRef<'a>;
+impl<'c> Deref for Block<'c> {
+    type Target = BlockRef<'static>;
 
     fn deref(&self) -> &Self::Target {
         &self.r#ref

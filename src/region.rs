@@ -4,26 +4,67 @@ use mlir_sys::{
     mlirRegionGetFirstBlock, mlirRegionInsertOwnedBlockAfter, mlirRegionInsertOwnedBlockBefore,
     MlirRegion,
 };
-use std::{
-    marker::PhantomData,
-    mem::{forget, ManuallyDrop},
-    ops::Deref,
-};
+use std::{marker::PhantomData, mem::forget, ops::Deref};
 
 /// A region.
 #[derive(Debug)]
 pub struct Region {
-    raw: MlirRegion,
+    r#ref: RegionRef<'static>,
 }
 
 impl Region {
     /// Creates a region.
     pub fn new() -> Self {
         Self {
-            raw: unsafe { mlirRegionCreate() },
+            r#ref: unsafe { RegionRef::from_raw(mlirRegionCreate()) },
         }
     }
 
+    pub(crate) unsafe fn into_raw(self) -> mlir_sys::MlirRegion {
+        let region = self.raw;
+
+        forget(self);
+
+        region
+    }
+}
+
+impl Default for Region {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Drop for Region {
+    fn drop(&mut self) {
+        unsafe { mlirRegionDestroy(self.raw) }
+    }
+}
+
+impl PartialEq for Region {
+    fn eq(&self, other: &Self) -> bool {
+        self.r#ref == other.r#ref
+    }
+}
+
+impl Eq for Region {}
+
+impl Deref for Region {
+    type Target = RegionRef<'static>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.r#ref
+    }
+}
+
+/// A reference to a region.
+#[derive(Clone, Copy, Debug)]
+pub struct RegionRef<'a> {
+    raw: MlirRegion,
+    _region: PhantomData<&'a Region>,
+}
+
+impl<'a> RegionRef<'a> {
     /// Gets the first block in a region.
     pub fn first_block(&self) -> Option<BlockRef> {
         unsafe {
@@ -70,57 +111,21 @@ impl Region {
         }
     }
 
-    pub(crate) unsafe fn into_raw(self) -> mlir_sys::MlirRegion {
-        let region = self.raw;
-
-        forget(self);
-
-        region
-    }
-}
-
-impl Default for Region {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl Drop for Region {
-    fn drop(&mut self) {
-        unsafe { mlirRegionDestroy(self.raw) }
-    }
-}
-
-impl PartialEq for Region {
-    fn eq(&self, other: &Self) -> bool {
-        unsafe { mlirRegionEqual(self.raw, other.raw) }
-    }
-}
-
-impl Eq for Region {}
-
-/// A reference to a region.
-pub struct RegionRef<'a> {
-    raw: ManuallyDrop<Region>,
-    _region: PhantomData<&'a Region>,
-}
-
-impl<'a> RegionRef<'a> {
-    pub(crate) unsafe fn from_raw(region: MlirRegion) -> Self {
+    pub(crate) unsafe fn from_raw(raw: MlirRegion) -> Self {
         Self {
-            raw: ManuallyDrop::new(Region { raw: region }),
+            raw,
             _region: Default::default(),
         }
     }
 }
 
-impl<'a> Deref for RegionRef<'a> {
-    type Target = Region;
-
-    fn deref(&self) -> &Self::Target {
-        &self.raw
+impl<'a> PartialEq for RegionRef<'a> {
+    fn eq(&self, other: &Self) -> bool {
+        unsafe { mlirRegionEqual(self.raw, other.raw) }
     }
 }
+
+impl<'a> Eq for RegionRef<'a> {}
 
 #[cfg(test)]
 mod tests {
