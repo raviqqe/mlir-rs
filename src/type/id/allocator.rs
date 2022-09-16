@@ -1,0 +1,44 @@
+use super::Id;
+use mlir_sys::{
+    mlirTypeIDAllocatorAllocateTypeID, mlirTypeIDAllocatorCreate, mlirTypeIDAllocatorDestroy,
+    MlirTypeIDAllocator,
+};
+
+/// A type ID allocator.
+#[derive(Debug)]
+pub struct Allocator {
+    raw: MlirTypeIDAllocator,
+}
+
+impl Allocator {
+    pub fn new() -> Self {
+        Self {
+            raw: unsafe { mlirTypeIDAllocatorCreate() },
+        }
+    }
+
+    pub fn allocate_type_id(&mut self) -> Id {
+        unsafe { Id::from_raw(mlirTypeIDAllocatorAllocateTypeID(self.raw)) }
+    }
+}
+
+impl Drop for Allocator {
+    fn drop(&mut self) {
+        unsafe { mlirTypeIDAllocatorDestroy(self.raw) }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new() {
+        Allocator::new();
+    }
+
+    #[test]
+    fn allocate_type_id() {
+        Allocator::new().allocate_type_id();
+    }
+}

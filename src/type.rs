@@ -1,3 +1,6 @@
+pub mod id;
+
+pub use self::id::Id;
 use crate::{
     context::{Context, ContextRef},
     error::Error,
