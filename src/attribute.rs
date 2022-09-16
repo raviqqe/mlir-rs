@@ -1,12 +1,12 @@
 use crate::{
     context::{Context, ContextRef},
-    r#type::Type,
+    r#type::{self, Type},
     string_ref::StringRef,
 };
 use mlir_sys::{
     mlirAttributeDump, mlirAttributeEqual, mlirAttributeGetContext, mlirAttributeGetNull,
-    mlirAttributeGetType, mlirAttributeIsAAffineMap, mlirAttributeIsAArray, mlirAttributeIsABool,
-    mlirAttributeIsADenseElements, mlirAttributeIsADenseFPElements,
+    mlirAttributeGetType, mlirAttributeGetTypeID, mlirAttributeIsAAffineMap, mlirAttributeIsAArray,
+    mlirAttributeIsABool, mlirAttributeIsADenseElements, mlirAttributeIsADenseFPElements,
     mlirAttributeIsADenseIntElements, mlirAttributeIsADictionary, mlirAttributeIsAElements,
     mlirAttributeIsAFloat, mlirAttributeIsAInteger, mlirAttributeIsAIntegerSet,
     mlirAttributeIsAOpaque, mlirAttributeIsAOpaqueElements, mlirAttributeIsASparseElements,
@@ -49,6 +49,15 @@ impl<'c> Attribute<'c> {
             None
         } else {
             unsafe { Some(Type::from_raw(mlirAttributeGetType(self.raw))) }
+        }
+    }
+
+    /// Gets a type ID.
+    pub fn type_id(&self) -> Option<r#type::Id> {
+        if self.is_null() {
+            None
+        } else {
+            unsafe { Some(r#type::Id::from_raw(mlirAttributeGetTypeID(self.raw))) }
         }
     }
 
@@ -234,6 +243,16 @@ mod tests {
 
     #[test]
     fn r#type() {
+        let context = Context::new();
+
+        assert_eq!(
+            Attribute::parse(&context, "unit").unwrap().r#type(),
+            Some(Type::none(&context))
+        );
+    }
+
+    #[test]
+    fn type_none() {
         assert_eq!(Attribute::null().r#type(), None);
     }
 

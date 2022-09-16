@@ -13,8 +13,8 @@ use mlir_sys::{
     mlirFunctionTypeGetNumResults, mlirFunctionTypeGetResult, mlirIndexTypeGet, mlirIntegerTypeGet,
     mlirIntegerTypeSignedGet, mlirIntegerTypeUnsignedGet, mlirLLVMArrayTypeGet,
     mlirLLVMFunctionTypeGet, mlirLLVMPointerTypeGet, mlirLLVMStructTypeLiteralGet,
-    mlirLLVMVoidTypeGet, mlirTypeDump, mlirTypeEqual, mlirTypeGetContext, mlirTypeGetTypeID,
-    mlirTypeIsAFunction, mlirTypeParseGet, mlirTypePrint, mlirVectorTypeGet,
+    mlirLLVMVoidTypeGet, mlirNoneTypeGet, mlirTypeDump, mlirTypeEqual, mlirTypeGetContext,
+    mlirTypeGetTypeID, mlirTypeIsAFunction, mlirTypeParseGet, mlirTypePrint, mlirVectorTypeGet,
     mlirVectorTypeGetChecked, MlirStringRef, MlirType,
 };
 use std::{
@@ -73,6 +73,11 @@ impl<'c> Type<'c> {
     /// Creates an unsigned integer type.
     pub fn unsigned_integer(context: &'c Context, bits: u32) -> Self {
         unsafe { Self::from_raw(mlirIntegerTypeUnsignedGet(context.to_raw(), bits)) }
+    }
+
+    /// Creates a none type.
+    pub fn none(context: &'c Context) -> Self {
+        unsafe { Self::from_raw(mlirNoneTypeGet(context.to_raw())) }
     }
 
     /// Creates a vector type.
