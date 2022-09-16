@@ -1,8 +1,11 @@
 mod allocator;
 
 pub use allocator::Allocator;
-use mlir_sys::{mlirTypeIDCreate, mlirTypeIDEqual, MlirTypeID};
-use std::ffi::c_void;
+use mlir_sys::{mlirTypeIDCreate, mlirTypeIDEqual, mlirTypeIDHashValue, MlirTypeID};
+use std::{
+    ffi::c_void,
+    hash::{Hash, Hasher},
+};
 
 /// A type ID.
 #[derive(Clone, Copy, Debug)]
@@ -27,3 +30,11 @@ impl PartialEq for Id {
 }
 
 impl Eq for Id {}
+
+impl Hash for Id {
+    fn hash<H: Hasher>(&self, hasher: &mut H) {
+        unsafe {
+            mlirTypeIDHashValue(self.raw).hash(hasher);
+        }
+    }
+}
