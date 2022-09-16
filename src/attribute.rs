@@ -3,8 +3,8 @@ use crate::{
     string_ref::StringRef,
 };
 use mlir_sys::{
-    mlirAttributeDump, mlirAttributeEqual, mlirAttributeGetContext, mlirAttributeParseGet,
-    mlirAttributePrint, MlirAttribute, MlirStringRef,
+    mlirAttributeDump, mlirAttributeEqual, mlirAttributeGetContext, mlirAttributeGetNull,
+    mlirAttributeParseGet, mlirAttributePrint, MlirAttribute, MlirStringRef,
 };
 use std::{
     ffi::c_void,
@@ -29,6 +29,11 @@ impl<'c> Attribute<'c> {
                 StringRef::from(source).to_raw(),
             ))
         }
+    }
+
+    /// Creates a null attribute.
+    pub fn null() -> Self {
+        unsafe { Self::from_raw(mlirAttributeGetNull()) }
     }
 
     /// Gets a context.
@@ -104,6 +109,11 @@ mod tests {
     #[test]
     fn parse_none() {
         assert!(Attribute::parse(&Context::new(), "z").is_none());
+    }
+
+    #[test]
+    fn null() {
+        assert_eq!(Attribute::null().to_string(), "null");
     }
 
     #[test]
