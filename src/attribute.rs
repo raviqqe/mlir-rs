@@ -1,10 +1,12 @@
 use crate::{
     context::{Context, ContextRef},
+    r#type::Type,
     string_ref::StringRef,
 };
 use mlir_sys::{
     mlirAttributeDump, mlirAttributeEqual, mlirAttributeGetContext, mlirAttributeGetNull,
-    mlirAttributeParseGet, mlirAttributePrint, MlirAttribute, MlirStringRef,
+    mlirAttributeGetType, mlirAttributeIsABool, mlirAttributeIsAUnit, mlirAttributeParseGet,
+    mlirAttributePrint, MlirAttribute, MlirStringRef,
 };
 use std::{
     ffi::c_void,
@@ -34,6 +36,30 @@ impl<'c> Attribute<'c> {
     /// Creates a null attribute.
     pub fn null() -> Self {
         unsafe { Self::from_raw(mlirAttributeGetNull()) }
+    }
+
+    /// Gets a type.
+    pub fn r#type(&self) -> Option<Type<'c>> {
+        if self.is_null() {
+            None
+        } else {
+            unsafe { Some(Type::from_raw(mlirAttributeGetType(self.raw))) }
+        }
+    }
+
+    /// Returns `true` if an attribute is null.
+    pub fn is_null(&self) -> bool {
+        self.raw.ptr.is_null()
+    }
+
+    /// Returns `true` if an attribute is bool.
+    pub fn is_bool(&self) -> bool {
+        !self.is_null() && unsafe { mlirAttributeIsABool(self.raw) }
+    }
+
+    /// Returns `true` if an attribute is unit.
+    pub fn is_unit(&self) -> bool {
+        !self.is_null() && unsafe { mlirAttributeIsAUnit(self.raw) }
     }
 
     /// Gets a context.
@@ -119,6 +145,26 @@ mod tests {
     #[test]
     fn context() {
         Attribute::parse(&Context::new(), "unit").unwrap().context();
+    }
+
+    #[test]
+    fn r#type() {
+        assert_eq!(Attribute::null().r#type(), None);
+    }
+
+    #[test]
+    fn is_null() {
+        assert!(Attribute::null().is_null());
+    }
+
+    #[test]
+    fn is_unit() {
+        assert!(Attribute::parse(&Context::new(), "unit").unwrap().is_unit());
+    }
+
+    #[test]
+    fn is_not_unit() {
+        assert!(!Attribute::null().is_unit());
     }
 
     #[test]
