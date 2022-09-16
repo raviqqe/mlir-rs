@@ -12,8 +12,9 @@ use mlir_sys::{
     mlirBlockAddArgument, mlirBlockAppendOwnedOperation, mlirBlockCreate, mlirBlockDestroy,
     mlirBlockDetach, mlirBlockEqual, mlirBlockGetArgument, mlirBlockGetFirstOperation,
     mlirBlockGetNextInRegion, mlirBlockGetNumArguments, mlirBlockGetParentOperation,
-    mlirBlockGetParentRegion, mlirBlockInsertOwnedOperation, mlirBlockInsertOwnedOperationAfter,
-    mlirBlockInsertOwnedOperationBefore, mlirBlockPrint, MlirBlock, MlirStringRef,
+    mlirBlockGetParentRegion, mlirBlockGetTerminator, mlirBlockInsertOwnedOperation,
+    mlirBlockInsertOwnedOperationAfter, mlirBlockInsertOwnedOperationBefore, mlirBlockPrint,
+    MlirBlock, MlirStringRef,
 };
 use std::{
     ffi::c_void,
@@ -117,16 +118,6 @@ impl<'c> BlockRef<'c> {
         unsafe { mlirBlockGetNumArguments(self.raw) as usize }
     }
 
-    /// Gets a parent region.
-    pub fn parent_region(&self) -> Option<RegionRef> {
-        unsafe { RegionRef::from_option_raw(mlirBlockGetParentRegion(self.raw)) }
-    }
-
-    /// Gets a parent operation.
-    pub fn parent_operation(&self) -> Option<OperationRef> {
-        unsafe { OperationRef::from_option_raw(mlirBlockGetParentOperation(self.raw)) }
-    }
-
     /// Gets the first operation.
     pub fn first_operation(&self) -> Option<OperationRef> {
         unsafe {
@@ -138,6 +129,21 @@ impl<'c> BlockRef<'c> {
                 Some(OperationRef::from_raw(operation))
             }
         }
+    }
+
+    /// Gets a terminator operation.
+    pub fn terminator(&self) -> Option<OperationRef> {
+        unsafe { OperationRef::from_option_raw(mlirBlockGetTerminator(self.raw)) }
+    }
+
+    /// Gets a parent region.
+    pub fn parent_region(&self) -> Option<RegionRef> {
+        unsafe { RegionRef::from_option_raw(mlirBlockGetParentRegion(self.raw)) }
+    }
+
+    /// Gets a parent operation.
+    pub fn parent_operation(&self) -> Option<OperationRef> {
+        unsafe { OperationRef::from_option_raw(mlirBlockGetParentOperation(self.raw)) }
     }
 
     /// Adds an argument.
@@ -263,7 +269,10 @@ impl<'a> Display for BlockRef<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{module::Module, operation_state::OperationState, region::Region};
+    use crate::{
+        dialect_registry::DialectRegistry, module::Module, operation_state::OperationState,
+        region::Region, utility::register_all_dialects,
+    };
 
     #[test]
     fn new() {
@@ -325,6 +334,30 @@ mod tests {
         let block = Block::new(&[]);
 
         assert_eq!(block.parent_operation(), None);
+    }
+
+    #[test]
+    fn terminator() {
+        let registry = DialectRegistry::new();
+        register_all_dialects(&registry);
+
+        let context = Context::new();
+        context.append_dialect_registry(&registry);
+        context.load_all_available_dialects();
+
+        let block = Block::new(&[]);
+
+        let operation = block.append_operation(Operation::new(OperationState::new(
+            "func.return",
+            Location::unknown(&context),
+        )));
+
+        assert_eq!(block.terminator(), Some(operation));
+    }
+
+    #[test]
+    fn terminator_none() {
+        assert_eq!(Block::new(&[]).terminator(), None);
     }
 
     #[test]
