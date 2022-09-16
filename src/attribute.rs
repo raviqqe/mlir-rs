@@ -5,8 +5,9 @@ use crate::{
 };
 use mlir_sys::{
     mlirAttributeDump, mlirAttributeEqual, mlirAttributeGetContext, mlirAttributeGetNull,
-    mlirAttributeGetType, mlirAttributeIsABool, mlirAttributeIsAUnit, mlirAttributeParseGet,
-    mlirAttributePrint, MlirAttribute, MlirStringRef,
+    mlirAttributeGetType, mlirAttributeIsABool, mlirAttributeIsAInteger,
+    mlirAttributeIsAIntegerSet, mlirAttributeIsAUnit, mlirAttributeParseGet, mlirAttributePrint,
+    MlirAttribute, MlirStringRef,
 };
 use std::{
     ffi::c_void,
@@ -52,12 +53,22 @@ impl<'c> Attribute<'c> {
         self.raw.ptr.is_null()
     }
 
-    /// Returns `true` if an attribute is bool.
+    /// Returns `true` if an attribute is a bool.
     pub fn is_bool(&self) -> bool {
         !self.is_null() && unsafe { mlirAttributeIsABool(self.raw) }
     }
 
-    /// Returns `true` if an attribute is unit.
+    /// Returns `true` if an attribute is an integer.
+    pub fn is_integer(&self) -> bool {
+        !self.is_null() && unsafe { mlirAttributeIsAInteger(self.raw) }
+    }
+
+    /// Returns `true` if an attribute is an integer set.
+    pub fn is_integer_set(&self) -> bool {
+        !self.is_null() && unsafe { mlirAttributeIsAIntegerSet(self.raw) }
+    }
+
+    /// Returns `true` if an attribute is a unit.
     pub fn is_unit(&self) -> bool {
         !self.is_null() && unsafe { mlirAttributeIsAUnit(self.raw) }
     }
@@ -155,6 +166,29 @@ mod tests {
     #[test]
     fn is_null() {
         assert!(Attribute::null().is_null());
+    }
+
+    #[test]
+    fn is_bool() {
+        assert!(Attribute::parse(&Context::new(), "false")
+            .unwrap()
+            .is_bool());
+    }
+
+    #[test]
+    fn is_integer() {
+        assert!(Attribute::parse(&Context::new(), "42")
+            .unwrap()
+            .is_integer());
+    }
+
+    #[test]
+    fn is_integer_set() {
+        assert!(
+            Attribute::parse(&Context::new(), "affine_set<(d0) : (d0 - 2 >= 0)>")
+                .unwrap()
+                .is_integer_set()
+        );
     }
 
     #[test]
