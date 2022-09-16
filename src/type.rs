@@ -377,7 +377,7 @@ mod tests {
     fn not_equal() {
         let context = Context::new();
 
-        assert_eq!(Type::index(&context), Type::integer(&context, 1));
+        assert_ne!(Type::index(&context), Type::integer(&context, 1));
     }
 
     #[test]
