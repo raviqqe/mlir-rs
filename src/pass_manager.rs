@@ -37,17 +37,17 @@ impl<'c> PassManager<'c> {
     }
 
     /// Adds a pass.
-    pub fn add_pass(&mut self, pass: Pass) {
+    pub fn add_pass(&self, pass: Pass) {
         unsafe { mlirPassManagerAddOwnedPass(self.raw, pass.to_raw()) }
     }
 
     /// Enables a verifier.
-    pub fn enable_verifier(&mut self, enabled: bool) {
+    pub fn enable_verifier(&self, enabled: bool) {
         unsafe { mlirPassManagerEnableVerifier(self.raw, enabled) }
     }
 
     /// Enables IR printing.
-    pub fn enable_ir_printing(&mut self) {
+    pub fn enable_ir_printing(&self) {
         unsafe { mlirPassManagerEnableIRPrinting(self.raw) }
     }
 
@@ -117,7 +117,7 @@ mod tests {
     #[test]
     fn run() {
         let context = Context::new();
-        let mut manager = PassManager::new(&context);
+        let manager = PassManager::new(&context);
 
         manager.add_pass(Pass::convert_func_to_llvm());
         manager.run(&mut Module::new(Location::unknown(&context)));
@@ -141,7 +141,7 @@ mod tests {
         )
         .unwrap();
 
-        let mut manager = PassManager::new(&context);
+        let manager = PassManager::new(&context);
         manager.add_pass(Pass::print_operation_stats());
 
         assert!(manager.run(&mut module).is_success());

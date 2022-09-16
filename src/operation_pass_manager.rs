@@ -29,7 +29,7 @@ impl<'a> OperationPassManager<'a> {
     }
 
     /// Adds a pass.
-    pub fn add_pass(&mut self, pass: Pass) {
+    pub fn add_pass(&self, pass: Pass) {
         unsafe { mlirOpPassManagerAddOwnedPass(self.raw, pass.to_raw()) }
     }
 
