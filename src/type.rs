@@ -13,9 +13,9 @@ use mlir_sys::{
     mlirFunctionTypeGetNumResults, mlirFunctionTypeGetResult, mlirIndexTypeGet, mlirIntegerTypeGet,
     mlirIntegerTypeSignedGet, mlirIntegerTypeUnsignedGet, mlirLLVMArrayTypeGet,
     mlirLLVMFunctionTypeGet, mlirLLVMPointerTypeGet, mlirLLVMStructTypeLiteralGet,
-    mlirLLVMVoidTypeGet, mlirTypeDump, mlirTypeEqual, mlirTypeGetContext, mlirTypeIsAFunction,
-    mlirTypeParseGet, mlirTypePrint, mlirVectorTypeGet, mlirVectorTypeGetChecked, MlirStringRef,
-    MlirType,
+    mlirLLVMVoidTypeGet, mlirTypeDump, mlirTypeEqual, mlirTypeGetContext, mlirTypeGetTypeID,
+    mlirTypeIsAFunction, mlirTypeParseGet, mlirTypePrint, mlirVectorTypeGet,
+    mlirVectorTypeGetChecked, MlirStringRef, MlirType,
 };
 use std::{
     ffi::c_void,
@@ -151,6 +151,11 @@ impl<'c> Type<'c> {
         unsafe { ContextRef::from_raw(mlirTypeGetContext(self.raw)) }
     }
 
+    /// Gets an ID.
+    pub fn id(&self) -> Id {
+        unsafe { Id::from_raw(mlirTypeGetTypeID(self.raw)) }
+    }
+
     /// Gets an input of a function type.
     pub fn input(&self, position: usize) -> Result<Option<Self>, Error> {
         unsafe {
@@ -266,11 +271,6 @@ mod tests {
     }
 
     #[test]
-    fn context() {
-        Type::parse(&Context::new(), "i8").unwrap().context();
-    }
-
-    #[test]
     fn integer() {
         let context = Context::new();
 
@@ -352,6 +352,32 @@ mod tests {
             Type::vector_checked(Location::unknown(&context), &[0], Type::index(&context)),
             None
         );
+    }
+
+    #[test]
+    fn context() {
+        Type::parse(&Context::new(), "i8").unwrap().context();
+    }
+
+    #[test]
+    fn id() {
+        let context = Context::new();
+
+        assert_eq!(Type::index(&context).id(), Type::index(&context).id());
+    }
+
+    #[test]
+    fn equal() {
+        let context = Context::new();
+
+        assert_eq!(Type::index(&context), Type::index(&context));
+    }
+
+    #[test]
+    fn not_equal() {
+        let context = Context::new();
+
+        assert_eq!(Type::index(&context), Type::integer(&context, 1));
     }
 
     #[test]

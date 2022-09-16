@@ -1,11 +1,8 @@
 mod allocator;
 
 pub use allocator::Allocator;
-use mlir_sys::{mlirTypeIDCreate, mlirTypeIDEqual, mlirTypeIDHashValue, MlirTypeID};
-use std::{
-    ffi::c_void,
-    hash::{Hash, Hasher},
-};
+use mlir_sys::{mlirTypeIDEqual, mlirTypeIDHashValue, MlirTypeID};
+use std::hash::{Hash, Hasher};
 
 /// A type ID.
 #[derive(Clone, Copy, Debug)]
@@ -14,10 +11,6 @@ pub struct Id {
 }
 
 impl Id {
-    pub unsafe fn new(ptr: *const ()) -> Self {
-        Self::from_raw(mlirTypeIDCreate(ptr as *const c_void))
-    }
-
     pub(crate) unsafe fn from_raw(raw: MlirTypeID) -> Self {
         Self { raw }
     }
