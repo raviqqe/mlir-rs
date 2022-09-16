@@ -6,9 +6,10 @@ use crate::{
 use mlir_sys::{
     mlirAttributeDump, mlirAttributeEqual, mlirAttributeGetContext, mlirAttributeGetNull,
     mlirAttributeGetType, mlirAttributeIsAAffineMap, mlirAttributeIsAArray, mlirAttributeIsABool,
-    mlirAttributeIsADictionary, mlirAttributeIsAFloat, mlirAttributeIsAInteger,
-    mlirAttributeIsAIntegerSet, mlirAttributeIsAString, mlirAttributeIsAUnit,
-    mlirAttributeParseGet, mlirAttributePrint, MlirAttribute, MlirStringRef,
+    mlirAttributeIsADenseElements, mlirAttributeIsADenseFPElements,
+    mlirAttributeIsADenseIntElements, mlirAttributeIsADictionary, mlirAttributeIsAFloat,
+    mlirAttributeIsAInteger, mlirAttributeIsAIntegerSet, mlirAttributeIsAString,
+    mlirAttributeIsAUnit, mlirAttributeParseGet, mlirAttributePrint, MlirAttribute, MlirStringRef,
 };
 use std::{
     ffi::c_void,
@@ -67,6 +68,21 @@ impl<'c> Attribute<'c> {
     /// Returns `true` if an attribute is a bool.
     pub fn is_bool(&self) -> bool {
         !self.is_null() && unsafe { mlirAttributeIsABool(self.raw) }
+    }
+
+    /// Returns `true` if an attribute is dense elements.
+    pub fn is_dense_elements(&self) -> bool {
+        !self.is_null() && unsafe { mlirAttributeIsADenseElements(self.raw) }
+    }
+
+    /// Returns `true` if an attribute is dense integer elements.
+    pub fn is_dense_integer_elements(&self) -> bool {
+        !self.is_null() && unsafe { mlirAttributeIsADenseIntElements(self.raw) }
+    }
+
+    /// Returns `true` if an attribute is dense float elements.
+    pub fn is_dense_float_elements(&self) -> bool {
+        !self.is_null() && unsafe { mlirAttributeIsADenseFPElements(self.raw) }
     }
 
     /// Returns `true` if an attribute is a dictionary.
@@ -199,6 +215,33 @@ mod tests {
         assert!(Attribute::parse(&Context::new(), "false")
             .unwrap()
             .is_bool());
+    }
+
+    #[test]
+    fn is_dense_elements() {
+        assert!(
+            Attribute::parse(&Context::new(), "dense<10> : tensor<2xi8>")
+                .unwrap()
+                .is_dense_elements()
+        );
+    }
+
+    #[test]
+    fn is_integer_dense_elements() {
+        assert!(
+            Attribute::parse(&Context::new(), "dense<42> : tensor<42xi8>")
+                .unwrap()
+                .is_dense_integer_elements()
+        );
+    }
+
+    #[test]
+    fn is_float_dense_elements() {
+        assert!(
+            Attribute::parse(&Context::new(), "dense<42.0> : tensor<42xf32>")
+                .unwrap()
+                .is_dense_float_elements()
+        );
     }
 
     #[test]
