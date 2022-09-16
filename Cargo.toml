@@ -3,7 +3,7 @@ name = "melior"
 description = "The rustic MLIR bindings in Rust"
 version = "0.1.0"
 edition = "2021"
-license-file = "LICENSE"
+license = "Apache-2.0"
 repository = "https://github.com/raviqqe/melior"
 
 [dependencies]
