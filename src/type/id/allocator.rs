@@ -28,6 +28,12 @@ impl Drop for Allocator {
     }
 }
 
+impl Default for Allocator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
