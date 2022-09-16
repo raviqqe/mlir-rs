@@ -14,6 +14,8 @@
 //!
 //! # Examples
 //!
+//! ## Building a function to add integers
+//!
 //! ```rust
 //! use melior::{
 //!     attribute::Attribute,
