@@ -2,7 +2,7 @@ use crate::{
     context::{Context, ContextRef},
     string_ref::StringRef,
 };
-use mlir_sys::{mlirAttributeGetContext, mlirAttributeParseGet, MlirAttribute};
+use mlir_sys::{mlirAttributeDump, mlirAttributeGetContext, mlirAttributeParseGet, MlirAttribute};
 use std::marker::PhantomData;
 
 /// An attribute.
@@ -27,6 +27,11 @@ impl<'c> Attribute<'c> {
     /// Gets a context.
     pub fn context(&self) -> ContextRef<'c> {
         unsafe { ContextRef::from_raw(mlirAttributeGetContext(self.raw)) }
+    }
+
+    /// Dumps an attribute.
+    pub fn dump(&self) {
+        unsafe { mlirAttributeDump(self.raw) }
     }
 
     unsafe fn from_raw(raw: MlirAttribute) -> Self {
