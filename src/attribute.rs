@@ -257,6 +257,16 @@ mod tests {
     }
 
     #[test]
+    fn type_id() {
+        let context = Context::new();
+
+        assert_eq!(
+            Attribute::parse(&context, "unit").unwrap().type_id(),
+            Some(Type::none(&context).id())
+        );
+    }
+
+    #[test]
     fn is_null() {
         assert!(Attribute::null().is_null());
     }
