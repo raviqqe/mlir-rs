@@ -5,7 +5,8 @@ use crate::{
 };
 use mlir_sys::{
     mlirAttributeDump, mlirAttributeEqual, mlirAttributeGetContext, mlirAttributeGetNull,
-    mlirAttributeGetType, mlirAttributeIsABool, mlirAttributeIsAInteger,
+    mlirAttributeGetType, mlirAttributeIsAAffineMap, mlirAttributeIsAArray, mlirAttributeIsABool,
+    mlirAttributeIsADictionary, mlirAttributeIsAFloat, mlirAttributeIsAInteger,
     mlirAttributeIsAIntegerSet, mlirAttributeIsAString, mlirAttributeIsAUnit,
     mlirAttributeParseGet, mlirAttributePrint, MlirAttribute, MlirStringRef,
 };
@@ -53,9 +54,29 @@ impl<'c> Attribute<'c> {
         self.raw.ptr.is_null()
     }
 
+    /// Returns `true` if an attribute is a affine map.
+    pub fn is_affine_map(&self) -> bool {
+        !self.is_null() && unsafe { mlirAttributeIsAAffineMap(self.raw) }
+    }
+
+    /// Returns `true` if an attribute is a array.
+    pub fn is_array(&self) -> bool {
+        !self.is_null() && unsafe { mlirAttributeIsAArray(self.raw) }
+    }
+
     /// Returns `true` if an attribute is a bool.
     pub fn is_bool(&self) -> bool {
         !self.is_null() && unsafe { mlirAttributeIsABool(self.raw) }
+    }
+
+    /// Returns `true` if an attribute is a dictionary.
+    pub fn is_dictionary(&self) -> bool {
+        !self.is_null() && unsafe { mlirAttributeIsADictionary(self.raw) }
+    }
+
+    /// Returns `true` if an attribute is a float.
+    pub fn is_float(&self) -> bool {
+        !self.is_null() && unsafe { mlirAttributeIsAFloat(self.raw) }
     }
 
     /// Returns `true` if an attribute is an integer.
