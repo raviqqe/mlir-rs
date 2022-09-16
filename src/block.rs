@@ -10,9 +10,9 @@ use crate::{
 };
 use mlir_sys::{
     mlirBlockAddArgument, mlirBlockAppendOwnedOperation, mlirBlockCreate, mlirBlockDestroy,
-    mlirBlockEqual, mlirBlockGetArgument, mlirBlockGetFirstOperation, mlirBlockGetNextInRegion,
-    mlirBlockGetNumArguments, mlirBlockGetParentOperation, mlirBlockGetParentRegion,
-    mlirBlockInsertOwnedOperation, mlirBlockInsertOwnedOperationAfter,
+    mlirBlockDetach, mlirBlockEqual, mlirBlockGetArgument, mlirBlockGetFirstOperation,
+    mlirBlockGetNextInRegion, mlirBlockGetNumArguments, mlirBlockGetParentOperation,
+    mlirBlockGetParentRegion, mlirBlockInsertOwnedOperation, mlirBlockInsertOwnedOperationAfter,
     mlirBlockInsertOwnedOperationBefore, mlirBlockPrint, MlirBlock, MlirStringRef,
 };
 use std::{
@@ -34,24 +34,28 @@ impl<'c> Block<'c> {
     /// Creates a block.
     pub fn new(arguments: &[(Type<'c>, Location<'c>)]) -> Self {
         unsafe {
-            Self {
-                r#ref: BlockRef::from_raw(mlirBlockCreate(
-                    arguments.len() as isize,
-                    into_raw_array(
-                        arguments
-                            .iter()
-                            .map(|(argument, _)| argument.to_raw())
-                            .collect(),
-                    ),
-                    into_raw_array(
-                        arguments
-                            .iter()
-                            .map(|(_, location)| location.to_raw())
-                            .collect(),
-                    ),
-                )),
-                _context: Default::default(),
-            }
+            Self::from_raw(mlirBlockCreate(
+                arguments.len() as isize,
+                into_raw_array(
+                    arguments
+                        .iter()
+                        .map(|(argument, _)| argument.to_raw())
+                        .collect(),
+                ),
+                into_raw_array(
+                    arguments
+                        .iter()
+                        .map(|(_, location)| location.to_raw())
+                        .collect(),
+                ),
+            ))
+        }
+    }
+
+    pub(crate) unsafe fn from_raw(raw: MlirBlock) -> Self {
+        Self {
+            r#ref: BlockRef::from_raw(raw),
+            _context: Default::default(),
         }
     }
 
@@ -190,6 +194,15 @@ impl<'c> BlockRef<'c> {
             mlirBlockInsertOwnedOperationBefore(self.raw, one.to_raw(), other);
 
             OperationRef::from_raw(other)
+        }
+    }
+
+    /// Detaches a block from a region and assumes its ownership.
+    pub fn detach(&self) -> Block {
+        unsafe {
+            mlirBlockDetach(self.raw);
+
+            Block::from_raw(self.raw)
         }
     }
 
