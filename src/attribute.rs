@@ -9,8 +9,9 @@ use mlir_sys::{
     mlirAttributeIsADenseElements, mlirAttributeIsADenseFPElements,
     mlirAttributeIsADenseIntElements, mlirAttributeIsADictionary, mlirAttributeIsAElements,
     mlirAttributeIsAFloat, mlirAttributeIsAInteger, mlirAttributeIsAIntegerSet,
-    mlirAttributeIsASparseElements, mlirAttributeIsAString, mlirAttributeIsAUnit,
-    mlirAttributeParseGet, mlirAttributePrint, MlirAttribute, MlirStringRef,
+    mlirAttributeIsASparseElements, mlirAttributeIsAString, mlirAttributeIsASymbolRef,
+    mlirAttributeIsAType, mlirAttributeIsAUnit, mlirAttributeParseGet, mlirAttributePrint,
+    MlirAttribute, MlirStringRef,
 };
 use std::{
     ffi::c_void,
@@ -119,6 +120,16 @@ impl<'c> Attribute<'c> {
     /// Returns `true` if an attribute is a string.
     pub fn is_string(&self) -> bool {
         !self.is_null() && unsafe { mlirAttributeIsAString(self.raw) }
+    }
+
+    /// Returns `true` if an attribute is a symbol.
+    pub fn is_symbol(&self) -> bool {
+        !self.is_null() && unsafe { mlirAttributeIsASymbolRef(self.raw) }
+    }
+
+    /// Returns `true` if an attribute is a type.
+    pub fn is_type(&self) -> bool {
+        !self.is_null() && unsafe { mlirAttributeIsAType(self.raw) }
     }
 
     /// Returns `true` if an attribute is a unit.
@@ -304,6 +315,13 @@ mod tests {
     }
 
     #[test]
+    fn is_type() {
+        assert!(Attribute::parse(&Context::new(), "index")
+            .unwrap()
+            .is_type());
+    }
+
+    #[test]
     fn is_unit() {
         assert!(Attribute::parse(&Context::new(), "unit").unwrap().is_unit());
     }
@@ -311,6 +329,13 @@ mod tests {
     #[test]
     fn is_not_unit() {
         assert!(!Attribute::null().is_unit());
+    }
+
+    #[test]
+    fn is_symbol() {
+        assert!(Attribute::parse(&Context::new(), "@foo")
+            .unwrap()
+            .is_symbol());
     }
 
     #[test]
