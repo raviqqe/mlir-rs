@@ -6,8 +6,8 @@ use crate::{
 use mlir_sys::{
     mlirAttributeDump, mlirAttributeEqual, mlirAttributeGetContext, mlirAttributeGetNull,
     mlirAttributeGetType, mlirAttributeIsABool, mlirAttributeIsAInteger,
-    mlirAttributeIsAIntegerSet, mlirAttributeIsAUnit, mlirAttributeParseGet, mlirAttributePrint,
-    MlirAttribute, MlirStringRef,
+    mlirAttributeIsAIntegerSet, mlirAttributeIsAString, mlirAttributeIsAUnit,
+    mlirAttributeParseGet, mlirAttributePrint, MlirAttribute, MlirStringRef,
 };
 use std::{
     ffi::c_void,
@@ -66,6 +66,11 @@ impl<'c> Attribute<'c> {
     /// Returns `true` if an attribute is an integer set.
     pub fn is_integer_set(&self) -> bool {
         !self.is_null() && unsafe { mlirAttributeIsAIntegerSet(self.raw) }
+    }
+
+    /// Returns `true` if an attribute is a string.
+    pub fn is_string(&self) -> bool {
+        !self.is_null() && unsafe { mlirAttributeIsAString(self.raw) }
     }
 
     /// Returns `true` if an attribute is a unit.
@@ -189,6 +194,13 @@ mod tests {
                 .unwrap()
                 .is_integer_set()
         );
+    }
+
+    #[test]
+    fn is_string() {
+        assert!(Attribute::parse(&Context::new(), "\"foo\"")
+            .unwrap()
+            .is_string());
     }
 
     #[test]
