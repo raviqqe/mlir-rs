@@ -3,6 +3,7 @@
     "addf",
     "addi",
     "femtomc",
+    "hasher",
     "indoc",
     "insta",
     "libm",
