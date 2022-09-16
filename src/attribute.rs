@@ -113,7 +113,7 @@ mod tests {
 
     #[test]
     fn null() {
-        assert_eq!(Attribute::null().to_string(), "null");
+        assert_eq!(Attribute::null().to_string(), "<<NULL ATTRIBUTE>>");
     }
 
     #[test]
