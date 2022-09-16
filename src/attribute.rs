@@ -7,9 +7,10 @@ use mlir_sys::{
     mlirAttributeDump, mlirAttributeEqual, mlirAttributeGetContext, mlirAttributeGetNull,
     mlirAttributeGetType, mlirAttributeIsAAffineMap, mlirAttributeIsAArray, mlirAttributeIsABool,
     mlirAttributeIsADenseElements, mlirAttributeIsADenseFPElements,
-    mlirAttributeIsADenseIntElements, mlirAttributeIsADictionary, mlirAttributeIsAFloat,
-    mlirAttributeIsAInteger, mlirAttributeIsAIntegerSet, mlirAttributeIsAString,
-    mlirAttributeIsAUnit, mlirAttributeParseGet, mlirAttributePrint, MlirAttribute, MlirStringRef,
+    mlirAttributeIsADenseIntElements, mlirAttributeIsADictionary, mlirAttributeIsAElements,
+    mlirAttributeIsAFloat, mlirAttributeIsAInteger, mlirAttributeIsAIntegerSet,
+    mlirAttributeIsASparseElements, mlirAttributeIsAString, mlirAttributeIsAUnit,
+    mlirAttributeParseGet, mlirAttributePrint, MlirAttribute, MlirStringRef,
 };
 use std::{
     ffi::c_void,
@@ -90,6 +91,11 @@ impl<'c> Attribute<'c> {
         !self.is_null() && unsafe { mlirAttributeIsADictionary(self.raw) }
     }
 
+    /// Returns `true` if an attribute is elements.
+    pub fn is_elements(&self) -> bool {
+        !self.is_null() && unsafe { mlirAttributeIsAElements(self.raw) }
+    }
+
     /// Returns `true` if an attribute is a float.
     pub fn is_float(&self) -> bool {
         !self.is_null() && unsafe { mlirAttributeIsAFloat(self.raw) }
@@ -103,6 +109,11 @@ impl<'c> Attribute<'c> {
     /// Returns `true` if an attribute is an integer set.
     pub fn is_integer_set(&self) -> bool {
         !self.is_null() && unsafe { mlirAttributeIsAIntegerSet(self.raw) }
+    }
+
+    /// Returns `true` if an attribute is sparse elements.
+    pub fn is_sparse_elements(&self) -> bool {
+        !self.is_null() && unsafe { mlirAttributeIsASparseElements(self.raw) }
     }
 
     /// Returns `true` if an attribute is a string.
@@ -211,6 +222,11 @@ mod tests {
     }
 
     #[test]
+    fn is_array() {
+        assert!(Attribute::parse(&Context::new(), "[]").unwrap().is_array());
+    }
+
+    #[test]
     fn is_bool() {
         assert!(Attribute::parse(&Context::new(), "false")
             .unwrap()
@@ -227,7 +243,7 @@ mod tests {
     }
 
     #[test]
-    fn is_integer_dense_elements() {
+    fn is_dense_integer_elements() {
         assert!(
             Attribute::parse(&Context::new(), "dense<42> : tensor<42xi8>")
                 .unwrap()
@@ -236,12 +252,22 @@ mod tests {
     }
 
     #[test]
-    fn is_float_dense_elements() {
+    fn is_dense_float_elements() {
         assert!(
             Attribute::parse(&Context::new(), "dense<42.0> : tensor<42xf32>")
                 .unwrap()
                 .is_dense_float_elements()
         );
+    }
+
+    #[test]
+    fn is_elements() {
+        assert!(Attribute::parse(
+            &Context::new(),
+            "sparse<[[0, 0], [1, 2]], [1, 5]> : tensor<3x4xi32>"
+        )
+        .unwrap()
+        .is_elements());
     }
 
     #[test]
@@ -258,6 +284,16 @@ mod tests {
                 .unwrap()
                 .is_integer_set()
         );
+    }
+
+    #[test]
+    fn is_sparse_elements() {
+        assert!(Attribute::parse(
+            &Context::new(),
+            "sparse<[[0, 0], [1, 2]], [1, 5]> : tensor<3x4xi32>"
+        )
+        .unwrap()
+        .is_sparse_elements());
     }
 
     #[test]
