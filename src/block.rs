@@ -4,6 +4,7 @@ use crate::{
     operation::{Operation, OperationRef},
     r#type::Type,
     region::RegionRef,
+    string_ref::StringRef,
     utility::into_raw_array,
     value::Value,
 };
@@ -12,9 +13,15 @@ use mlir_sys::{
     mlirBlockEqual, mlirBlockGetArgument, mlirBlockGetFirstOperation, mlirBlockGetNextInRegion,
     mlirBlockGetNumArguments, mlirBlockGetParentOperation, mlirBlockGetParentRegion,
     mlirBlockInsertOwnedOperation, mlirBlockInsertOwnedOperationAfter,
-    mlirBlockInsertOwnedOperationBefore, MlirBlock,
+    mlirBlockInsertOwnedOperationBefore, mlirBlockPrint, MlirBlock, MlirStringRef,
 };
-use std::{marker::PhantomData, mem::forget, ops::Deref};
+use std::{
+    ffi::c_void,
+    fmt::{self, Display, Formatter},
+    marker::PhantomData,
+    mem::forget,
+    ops::Deref,
+};
 
 /// A block
 #[derive(Debug)]
@@ -219,6 +226,27 @@ impl<'a> PartialEq for BlockRef<'a> {
 
 impl<'a> Eq for BlockRef<'a> {}
 
+impl<'a> Display for BlockRef<'a> {
+    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
+        let mut data = (formatter, Ok(()));
+
+        unsafe extern "C" fn callback(string: MlirStringRef, data: *mut c_void) {
+            let data = &mut *(data as *mut (&mut Formatter, fmt::Result));
+            let result = write!(data.0, "{}", StringRef::from_raw(string).as_str());
+
+            if data.1.is_ok() {
+                data.1 = result;
+            }
+        }
+
+        unsafe {
+            mlirBlockPrint(self.raw, Some(callback), &mut data as *mut _ as *mut c_void);
+        }
+
+        data.1
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -378,5 +406,10 @@ mod tests {
         let second_block = region.append_block(Block::new(&[]));
 
         assert_eq!(first_block.next_in_region(), Some(second_block));
+    }
+
+    #[test]
+    fn display() {
+        assert_eq!(Block::new(&[]).to_string(), "<<UNLINKED BLOCK>>\n");
     }
 }
