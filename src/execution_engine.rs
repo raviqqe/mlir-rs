@@ -75,7 +75,7 @@ mod tests {
         context.append_dialect_registry(&registry);
         register_all_llvm_translations(&context);
 
-        let module = Module::parse(
+        let mut module = Module::parse(
             &context,
             r#"
             module {
@@ -88,14 +88,14 @@ mod tests {
         )
         .unwrap();
 
-        let pass_manager = PassManager::new(&context);
+        let mut pass_manager = PassManager::new(&context);
         pass_manager.add_pass(Pass::convert_func_to_llvm());
 
         pass_manager
             .nested_under("func.func")
             .add_pass(Pass::convert_arithmetic_to_llvm());
 
-        assert!(pass_manager.run(&module).is_success());
+        assert!(pass_manager.run(&mut module).is_success());
 
         let engine = ExecutionEngine::new(&module, 2, &[]);
 
