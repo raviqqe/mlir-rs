@@ -9,9 +9,9 @@ use mlir_sys::{
     mlirAttributeIsADenseElements, mlirAttributeIsADenseFPElements,
     mlirAttributeIsADenseIntElements, mlirAttributeIsADictionary, mlirAttributeIsAElements,
     mlirAttributeIsAFloat, mlirAttributeIsAInteger, mlirAttributeIsAIntegerSet,
-    mlirAttributeIsASparseElements, mlirAttributeIsAString, mlirAttributeIsASymbolRef,
-    mlirAttributeIsAType, mlirAttributeIsAUnit, mlirAttributeParseGet, mlirAttributePrint,
-    MlirAttribute, MlirStringRef,
+    mlirAttributeIsAOpaque, mlirAttributeIsASparseElements, mlirAttributeIsAString,
+    mlirAttributeIsASymbolRef, mlirAttributeIsAType, mlirAttributeIsAUnit, mlirAttributeParseGet,
+    mlirAttributePrint, MlirAttribute, MlirStringRef,
 };
 use std::{
     ffi::c_void,
@@ -110,6 +110,11 @@ impl<'c> Attribute<'c> {
     /// Returns `true` if an attribute is an integer set.
     pub fn is_integer_set(&self) -> bool {
         !self.is_null() && unsafe { mlirAttributeIsAIntegerSet(self.raw) }
+    }
+
+    /// Returns `true` if an attribute is opaque.
+    pub fn is_opaque(&self) -> bool {
+        !self.is_null() && unsafe { mlirAttributeIsAOpaque(self.raw) }
     }
 
     /// Returns `true` if an attribute is sparse elements.
@@ -295,6 +300,13 @@ mod tests {
                 .unwrap()
                 .is_integer_set()
         );
+    }
+
+    #[test]
+    fn is_opaque() {
+        assert!(Attribute::parse(&Context::new(), "#foo<\"bar\">")
+            .unwrap()
+            .is_opaque());
     }
 
     #[test]
