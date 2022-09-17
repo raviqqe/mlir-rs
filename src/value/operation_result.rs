@@ -3,7 +3,7 @@ use crate::operation::OperationRef;
 use mlir_sys::{mlirOpResultGetOwner, mlirOpResultGetResultNumber};
 use std::ops::Deref;
 
-/// An opreation result.
+/// An operation result.
 #[derive(Clone, Copy, Debug)]
 pub struct OperationResult<'a> {
     value: Value<'a>,
