@@ -123,7 +123,9 @@ impl<'c> Builder<'c> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::context::Context;
+    use crate::{
+        context::Context, dialect_registry::DialectRegistry, utility::register_all_dialects,
+    };
 
     #[test]
     fn new() {
@@ -171,7 +173,11 @@ mod tests {
 
     #[test]
     fn enable_result_type_infrence() {
+        let registry = DialectRegistry::new();
+        register_all_dialects(&registry);
+
         let context = Context::new();
+        context.append_dialect_registry(&registry);
         context.load_all_available_dialects();
 
         let location = Location::unknown(&context);
