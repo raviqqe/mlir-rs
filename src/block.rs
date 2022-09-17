@@ -203,6 +203,11 @@ impl<'c> BlockRef<'c> {
     }
 
     /// Detaches a block from a region and assumes its ownership.
+    ///
+    /// # Safety
+    ///
+    /// This function might invalidate existing references to the block if you drop it too early.
+    // TODO Implement this for BlockRefMut instead and mark it safe.
     pub unsafe fn detach(&self) -> Option<Block> {
         if self.parent_region().is_some() {
             mlirBlockDetach(self.raw);
