@@ -108,7 +108,7 @@ impl<'c> Builder<'c> {
     }
 
     /// Enables result type inference.
-    pub fn enable_result_type_infrence(mut self) -> Self {
+    pub fn enable_result_type_inference(mut self) -> Self {
         unsafe { mlirOperationStateEnableResultTypeInference(&mut self.raw) }
 
         self
@@ -172,7 +172,7 @@ mod tests {
     }
 
     #[test]
-    fn enable_result_type_infrence() {
+    fn enable_result_type_inference() {
         let registry = DialectRegistry::new();
         register_all_dialects(&registry);
 
@@ -188,7 +188,7 @@ mod tests {
         assert_eq!(
             Builder::new("arith.addi", location)
                 .add_operands(&[argument, argument])
-                .enable_result_type_infrence()
+                .enable_result_type_inference()
                 .build()
                 .result(0)
                 .unwrap()
