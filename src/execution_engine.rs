@@ -61,7 +61,7 @@ mod tests {
         context::Context,
         dialect,
         module::Module,
-        pass::{self, PassManager},
+        pass,
         utility::{register_all_dialects, register_all_llvm_translations},
     };
 
@@ -87,7 +87,7 @@ mod tests {
         )
         .unwrap();
 
-        let pass_manager = PassManager::new(&context);
+        let pass_manager = pass::Manager::new(&context);
         pass_manager.add_pass(pass::conversion::convert_func_to_llvm());
 
         pass_manager

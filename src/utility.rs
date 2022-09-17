@@ -1,6 +1,5 @@
 use crate::{
-    context::Context, dialect, logical_result::LogicalResult, pass::OperationPassManager,
-    string_ref::StringRef,
+    context::Context, dialect, logical_result::LogicalResult, pass, string_ref::StringRef,
 };
 use mlir_sys::{
     mlirParsePassPipeline, mlirRegisterAllDialects, mlirRegisterAllLLVMTranslations,
@@ -27,7 +26,7 @@ pub fn register_all_passes() {
 }
 
 /// Parses a pass pipeline.
-pub fn parse_pass_pipeline(manager: OperationPassManager, source: &str) -> LogicalResult {
+pub fn parse_pass_pipeline(manager: pass::OperationManager, source: &str) -> LogicalResult {
     LogicalResult::from_raw(unsafe {
         mlirParsePassPipeline(manager.to_raw(), StringRef::from(source).to_raw())
     })

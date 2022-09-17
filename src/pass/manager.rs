@@ -1,4 +1,4 @@
-use super::OperationPassManager;
+use super::OperationManager;
 use crate::{
     context::Context, logical_result::LogicalResult, module::Module, pass::Pass,
     string_ref::StringRef,
@@ -12,12 +12,12 @@ use mlir_sys::{
 use std::marker::PhantomData;
 
 /// A pass manager.
-pub struct PassManager<'c> {
+pub struct Manager<'c> {
     raw: MlirPassManager,
     _context: PhantomData<&'c Context>,
 }
 
-impl<'c> PassManager<'c> {
+impl<'c> Manager<'c> {
     /// Creates a pass manager.
     pub fn new(context: &Context) -> Self {
         Self {
@@ -28,9 +28,9 @@ impl<'c> PassManager<'c> {
 
     /// Gets an operation pass manager for nested operations corresponding to a
     /// given name.
-    pub fn nested_under(&self, name: &str) -> OperationPassManager {
+    pub fn nested_under(&self, name: &str) -> OperationManager {
         unsafe {
-            OperationPassManager::from_raw(mlirPassManagerGetNestedUnder(
+            OperationManager::from_raw(mlirPassManagerGetNestedUnder(
                 self.raw,
                 StringRef::from(name).to_raw(),
             ))
@@ -58,12 +58,12 @@ impl<'c> PassManager<'c> {
     }
 
     /// Converts a pass manager to an operation pass manager.
-    pub fn as_operation_pass_manager(&self) -> OperationPassManager {
-        unsafe { OperationPassManager::from_raw(mlirPassManagerGetAsOpPassManager(self.raw)) }
+    pub fn as_operation_pass_manager(&self) -> OperationManager {
+        unsafe { OperationManager::from_raw(mlirPassManagerGetAsOpPassManager(self.raw)) }
     }
 }
 
-impl<'c> Drop for PassManager<'c> {
+impl<'c> Drop for Manager<'c> {
     fn drop(&mut self) {
         unsafe { mlirPassManagerDestroy(self.raw) }
     }
@@ -91,21 +91,21 @@ mod tests {
     fn new() {
         let context = Context::new();
 
-        PassManager::new(&context);
+        Manager::new(&context);
     }
 
     #[test]
     fn add_pass() {
         let context = Context::new();
 
-        PassManager::new(&context).add_pass(pass::conversion::convert_func_to_llvm());
+        Manager::new(&context).add_pass(pass::conversion::convert_func_to_llvm());
     }
 
     #[test]
     fn enable_verifier() {
         let context = Context::new();
 
-        PassManager::new(&context).enable_verifier(true);
+        Manager::new(&context).enable_verifier(true);
     }
 
     // TODO Enable this test.
@@ -119,7 +119,7 @@ mod tests {
     #[test]
     fn run() {
         let context = Context::new();
-        let manager = PassManager::new(&context);
+        let manager = Manager::new(&context);
 
         manager.add_pass(pass::conversion::convert_func_to_llvm());
         manager.run(&mut Module::new(Location::unknown(&context)));
@@ -143,7 +143,7 @@ mod tests {
         )
         .unwrap();
 
-        let manager = PassManager::new(&context);
+        let manager = Manager::new(&context);
         manager.add_pass(pass::transform::print_operation_stats());
 
         assert!(manager.run(&mut module).is_success());
@@ -174,14 +174,14 @@ mod tests {
         )
         .unwrap();
 
-        let manager = PassManager::new(&context);
+        let manager = Manager::new(&context);
         manager
             .nested_under("func.func")
             .add_pass(pass::transform::print_operation_stats());
 
         assert!(manager.run(&mut module).is_success());
 
-        let manager = PassManager::new(&context);
+        let manager = Manager::new(&context);
         manager
             .nested_under("builtin.module")
             .nested_under("func.func")
@@ -193,7 +193,7 @@ mod tests {
     #[test]
     fn print_pass_pipeline() {
         let context = Context::new();
-        let manager = PassManager::new(&context);
+        let manager = Manager::new(&context);
         let module_manager = manager.nested_under("builtin.module");
         let function_manager = module_manager.nested_under("func.func");
 
@@ -213,7 +213,7 @@ mod tests {
     #[test]
     fn parse_pass_pipeline_() {
         let context = Context::new();
-        let manager = PassManager::new(&context);
+        let manager = Manager::new(&context);
 
         assert!(parse_pass_pipeline(
             manager.as_operation_pass_manager(),
