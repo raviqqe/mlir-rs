@@ -1,4 +1,4 @@
-use super::{block, Type};
+use super::{block, operation, Type};
 use crate::utility::print_callback;
 use mlir_sys::{
     mlirValueDump, mlirValueEqual, mlirValueGetType, mlirValueIsABlockArgument,
@@ -79,6 +79,12 @@ impl<'a> Display for Value<'a> {
 impl<'a> From<block::Argument<'a>> for Value<'a> {
     fn from(argument: block::Argument<'a>) -> Self {
         unsafe { Self::from_raw(argument.to_raw()) }
+    }
+}
+
+impl<'a> From<operation::ResultValue<'a>> for Value<'a> {
+    fn from(result: operation::ResultValue<'a>) -> Self {
+        unsafe { Self::from_raw(result.to_raw()) }
     }
 }
 

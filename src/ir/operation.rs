@@ -3,7 +3,7 @@
 mod builder;
 mod result;
 
-pub use self::builder::Builder;
+pub use self::{builder::Builder, result::ResultValue};
 use super::{BlockRef, Identifier, RegionRef, Value};
 use crate::{
     context::{Context, ContextRef},
