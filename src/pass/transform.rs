@@ -1,3 +1,5 @@
+//! General transformation passes.
+
 use super::Pass;
 use mlir_sys::{
     mlirCreateTransformsCSE, mlirCreateTransformsCanonicalizer, mlirCreateTransformsInliner,

@@ -1,3 +1,5 @@
+//! Dialect conversion passes.
+
 use super::Pass;
 use mlir_sys::{
     mlirCreateConversionConvertArithmeticToLLVM, mlirCreateConversionConvertControlFlowToLLVM,
