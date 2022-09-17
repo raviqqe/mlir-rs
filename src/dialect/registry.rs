@@ -2,11 +2,11 @@ use mlir_sys::{mlirDialectRegistryCreate, mlirDialectRegistryDestroy, MlirDialec
 
 /// A dialect registry.
 #[derive(Debug)]
-pub struct DialectRegistry {
+pub struct Registry {
     raw: MlirDialectRegistry,
 }
 
-impl DialectRegistry {
+impl Registry {
     /// Creates a dialect registry.
     pub fn new() -> Self {
         Self {
@@ -19,13 +19,13 @@ impl DialectRegistry {
     }
 }
 
-impl Drop for DialectRegistry {
+impl Drop for Registry {
     fn drop(&mut self) {
         unsafe { mlirDialectRegistryDestroy(self.raw) };
     }
 }
 
-impl Default for DialectRegistry {
+impl Default for Registry {
     fn default() -> Self {
         Self::new()
     }
@@ -34,22 +34,22 @@ impl Default for DialectRegistry {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{context::Context, dialect_handle::DialectHandle};
+    use crate::context::Context;
 
     #[test]
     fn new() {
-        DialectRegistry::new();
+        Registry::new();
     }
 
     #[test]
     fn register_all_dialects() {
-        DialectRegistry::new();
+        Registry::new();
     }
 
     #[test]
     fn register_dialect() {
-        let registry = DialectRegistry::new();
-        DialectHandle::func().insert_dialect(&registry);
+        let registry = Registry::new();
+        Handle::func().insert_dialect(&registry);
 
         let context = Context::new();
         let count = context.registered_dialect_count();

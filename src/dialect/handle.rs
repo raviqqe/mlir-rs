@@ -1,6 +1,4 @@
-use crate::{
-    context::Context, dialect::Dialect, dialect_registry::DialectRegistry, string_ref::StringRef,
-};
+use crate::{context::Context, dialect::Dialect, string_ref::StringRef};
 use mlir_sys::{
     mlirDialectHandleGetNamespace, mlirDialectHandleInsertDialect, mlirDialectHandleLoadDialect,
     mlirDialectHandleRegisterDialect, mlirGetDialectHandle__async__, mlirGetDialectHandle__cf__,
@@ -12,11 +10,11 @@ use mlir_sys::{
 
 /// A dialect handle.
 #[derive(Clone, Copy, Debug)]
-pub struct DialectHandle {
+pub struct Handle {
     raw: MlirDialectHandle,
 }
 
-impl DialectHandle {
+impl Handle {
     /// Creates a `async` dialect handle.
     pub fn r#async() -> Self {
         unsafe { Self::from_raw(mlirGetDialectHandle__async__()) }
@@ -108,37 +106,37 @@ mod tests {
 
     #[test]
     fn func() {
-        DialectHandle::func();
+        Handle::func();
     }
 
     #[test]
     fn llvm() {
-        DialectHandle::llvm();
+        Handle::llvm();
     }
 
     #[test]
     fn namespace() {
-        DialectHandle::func().namespace();
+        Handle::func().namespace();
     }
 
     #[test]
     fn insert_dialect() {
         let registry = DialectRegistry::new();
 
-        DialectHandle::func().insert_dialect(&registry);
+        Handle::func().insert_dialect(&registry);
     }
 
     #[test]
     fn load_dialect() {
         let context = Context::new();
 
-        DialectHandle::func().load_dialect(&context);
+        Handle::func().load_dialect(&context);
     }
 
     #[test]
     fn register_dialect() {
         let context = Context::new();
 
-        DialectHandle::func().register_dialect(&context);
+        Handle::func().register_dialect(&context);
     }
 }

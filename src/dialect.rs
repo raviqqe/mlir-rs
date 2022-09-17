@@ -1,5 +1,8 @@
+mod handle;
 pub mod llvm;
+mod registry;
 
+pub use self::{handle::Handle, registry::Registry};
 use crate::{
     context::{Context, ContextRef},
     string_ref::StringRef,
