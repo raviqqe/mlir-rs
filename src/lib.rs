@@ -18,16 +18,10 @@
 //!
 //! ```rust
 //! use melior::{
-//!     attribute::Attribute,
-//!     block::Block,
 //!     context::Context,
 //!     dialect,
-//!     identifier::Identifier,
+//!     ir::*,
 //!     location::Location,
-//!     module::Module,
-//!     operation::{self, Operation},
-//!     region::Region,
-//!     r#type::Type,
 //!     utility::register_all_dialects,
 //! };
 //!
