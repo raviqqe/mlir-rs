@@ -47,21 +47,16 @@
 //!     let region = Region::new();
 //!     let block = Block::new(&[(integer_type, location), (integer_type, location)]);
 //!
-//!     let sum = block.append_operation(Operation::new(
-//!         operation::Builder::new("arith.addi", location)
+//!     let sum = block.append_operation(operation::Builder::new("arith.addi", location)
 //!             .add_operands(&[*block.argument(0).unwrap(), *block.argument(1).unwrap()])
-//!             .add_results(&[integer_type]),
-//!     ));
+//!             .add_results(&[integer_type]).build());
 //!
-//!     block.append_operation(Operation::new(
-//!         operation::Builder::new("func.return", Location::unknown(&context))
-//!             .add_operands(&[*sum.result(0).unwrap()]),
-//!     ));
+//!     block.append_operation(operation::Builder::new("func.return", Location::unknown(&context))
+//!             .add_operands(&[*sum.result(0).unwrap()]).build());
 //!
 //!     region.append_block(block);
 //!
-//!     Operation::new(
-//!         operation::Builder::new("func.func", Location::unknown(&context))
+//!     operation::Builder::new("func.func", Location::unknown(&context))
 //!             .add_attributes(&[
 //!                 (
 //!                     Identifier::new(&context, "function_type"),
@@ -72,8 +67,7 @@
 //!                     Attribute::parse(&context, "\"add\"").unwrap(),
 //!                 ),
 //!             ])
-//!             .add_regions(vec![region]),
-//!     )
+//!             .add_regions(vec![region]).build()
 //! };
 //!
 //! module.body().append_operation(function);
@@ -157,27 +151,34 @@ mod tests {
             let region = Region::new();
             let block = Block::new(&[(integer_type, location), (integer_type, location)]);
 
-            let sum = block.append_operation(operation::Builder::new("arith.addi", location)
+            let sum = block.append_operation(
+                operation::Builder::new("arith.addi", location)
                     .add_operands(&[*block.argument(0).unwrap(), *block.argument(1).unwrap()])
-                    .add_results(&[integer_type]).build());
+                    .add_results(&[integer_type])
+                    .build(),
+            );
 
-            block.append_operation(operation::Builder::new("func.return", Location::unknown(&context))
-                    .add_operands(&[*sum.result(0).unwrap()]).build());
+            block.append_operation(
+                operation::Builder::new("func.return", Location::unknown(&context))
+                    .add_operands(&[*sum.result(0).unwrap()])
+                    .build(),
+            );
 
             region.append_block(block);
 
             operation::Builder::new("func.func", Location::unknown(&context))
-                    .add_attributes(&[
-                        (
-                            Identifier::new(&context, "function_type"),
-                            Attribute::parse(&context, "(i64, i64) -> i64").unwrap(),
-                        ),
-                        (
-                            Identifier::new(&context, "sym_name"),
-                            Attribute::parse(&context, "\"add\"").unwrap(),
-                        ),
-                    ])
-                    .add_regions(vec![region]).build()
+                .add_attributes(&[
+                    (
+                        Identifier::new(&context, "function_type"),
+                        Attribute::parse(&context, "(i64, i64) -> i64").unwrap(),
+                    ),
+                    (
+                        Identifier::new(&context, "sym_name"),
+                        Attribute::parse(&context, "\"add\"").unwrap(),
+                    ),
+                ])
+                .add_regions(vec![region])
+                .build()
         };
 
         module.body().append_operation(function);
@@ -207,76 +208,98 @@ mod tests {
             let function_block = Block::new(&[(memref_type, location), (memref_type, location)]);
             let index_type = Type::parse(&context, "index").unwrap();
 
-            let zero = function_block.append_operation(operation::Builder::new("arith.constant", location)
+            let zero = function_block.append_operation(
+                operation::Builder::new("arith.constant", location)
                     .add_results(&[index_type])
                     .add_attributes(&[(
                         Identifier::new(&context, "value"),
                         Attribute::parse(&context, "0 : index").unwrap(),
-                    )]).build());
+                    )])
+                    .build(),
+            );
 
-            let dim = function_block.append_operation(operation::Builder::new("memref.dim", location)
+            let dim = function_block.append_operation(
+                operation::Builder::new("memref.dim", location)
                     .add_operands(&[
                         *function_block.argument(0).unwrap(),
                         *zero.result(0).unwrap(),
                     ])
-                    .add_results(&[index_type]).build());
+                    .add_results(&[index_type])
+                    .build(),
+            );
 
             let loop_block = Block::new(&[]);
             loop_block.add_argument(index_type, location);
 
-            let one = function_block.append_operation(operation::Builder::new("arith.constant", location)
+            let one = function_block.append_operation(
+                operation::Builder::new("arith.constant", location)
                     .add_results(&[index_type])
                     .add_attributes(&[(
                         Identifier::new(&context, "value"),
                         Attribute::parse(&context, "1 : index").unwrap(),
-                    )]).build());
+                    )])
+                    .build(),
+            );
 
             {
                 let f32_type = Type::parse(&context, "f32").unwrap();
 
-                let lhs = loop_block.append_operation(operation::Builder::new("memref.load", location)
+                let lhs = loop_block.append_operation(
+                    operation::Builder::new("memref.load", location)
                         .add_operands(&[
                             *function_block.argument(0).unwrap(),
                             *loop_block.argument(0).unwrap(),
                         ])
-                        .add_results(&[f32_type]).build());
+                        .add_results(&[f32_type])
+                        .build(),
+                );
 
-                let rhs = loop_block.append_operation(operation::Builder::new("memref.load", location)
+                let rhs = loop_block.append_operation(
+                    operation::Builder::new("memref.load", location)
                         .add_operands(&[
                             *function_block.argument(1).unwrap(),
                             *loop_block.argument(0).unwrap(),
                         ])
-                        .add_results(&[f32_type]).build());
+                        .add_results(&[f32_type])
+                        .build(),
+                );
 
-                let add = loop_block.append_operation(operation::Builder::new("arith.addf", location)
+                let add = loop_block.append_operation(
+                    operation::Builder::new("arith.addf", location)
                         .add_operands(&[*lhs.result(0).unwrap(), *rhs.result(0).unwrap()])
-                        .add_results(&[f32_type]).build());
+                        .add_results(&[f32_type])
+                        .build(),
+                );
 
-                loop_block.append_operation(operation::Builder::new("memref.store", location).add_operands(&[
-                        *add.result(0).unwrap(),
-                        *function_block.argument(0).unwrap(),
-                        *loop_block.argument(0).unwrap(),
-                    ]).build());
+                loop_block.append_operation(
+                    operation::Builder::new("memref.store", location)
+                        .add_operands(&[
+                            *add.result(0).unwrap(),
+                            *function_block.argument(0).unwrap(),
+                            *loop_block.argument(0).unwrap(),
+                        ])
+                        .build(),
+                );
 
-                loop_block.append_operation(operation::Builder::new(
-                    "scf.yield",
-                    location,
-                ).build());
+                loop_block.append_operation(operation::Builder::new("scf.yield", location).build());
             }
 
-            function_block.append_operation({
-                let loop_region = Region::new();
+            function_block.append_operation(
+                {
+                    let loop_region = Region::new();
 
-                loop_region.append_block(loop_block);
+                    loop_region.append_block(loop_block);
 
-                operation::Builder::new("scf.for", location)
-                    .add_operands(&[
-                        *zero.result(0).unwrap(),
-                        *dim.result(0).unwrap(),
-                        *one.result(0).unwrap(),
-                    ])
-                    .add_regions(vec![loop_region])
-            }.build());
+                    operation::Builder::new("scf.for", location)
+                        .add_operands(&[
+                            *zero.result(0).unwrap(),
+                            *dim.result(0).unwrap(),
+                            *one.result(0).unwrap(),
+                        ])
+                        .add_regions(vec![loop_region])
+                }
+                .build(),
+            );
 
             function_block.append_operation(
                 operation::Builder::new("func.return", Location::unknown(&context)).build(),
@@ -285,18 +308,18 @@ mod tests {
             function_region.append_block(function_block);
 
             operation::Builder::new("func.func", Location::unknown(&context))
-                    .add_attributes(&[
-                        (
-                            Identifier::new(&context, "function_type"),
-                            Attribute::parse(&context, "(memref<?xf32>, memref<?xf32>) -> ()")
-                                .unwrap(),
-                        ),
-                        (
-                            Identifier::new(&context, "sym_name"),
-                            Attribute::parse(&context, "\"sum\"").unwrap(),
-                        ),
-                    ])
-                    .add_regions(vec![function_region]).build()
+                .add_attributes(&[
+                    (
+                        Identifier::new(&context, "function_type"),
+                        Attribute::parse(&context, "(memref<?xf32>, memref<?xf32>) -> ()").unwrap(),
+                    ),
+                    (
+                        Identifier::new(&context, "sym_name"),
+                        Attribute::parse(&context, "\"sum\"").unwrap(),
+                    ),
+                ])
+                .add_regions(vec![function_region])
+                .build()
         };
 
         module.body().append_operation(function);
