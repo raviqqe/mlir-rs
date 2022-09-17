@@ -1,7 +1,6 @@
-use super::{BlockRef, Operation, OperationRef};
+use super::{BlockRef, Location, Operation, OperationRef};
 use crate::{
     context::{Context, ContextRef},
-    location::Location,
     string_ref::StringRef,
 };
 use mlir_sys::{

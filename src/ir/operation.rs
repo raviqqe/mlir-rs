@@ -212,7 +212,10 @@ impl<'a> Display for OperationRef<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{context::Context, ir::Block, location::Location};
+    use crate::{
+        context::Context,
+        ir::{Block, Location},
+    };
 
     #[test]
     fn new() {

@@ -73,8 +73,7 @@ mod tests {
     use super::*;
     use crate::{
         dialect,
-        ir::Module,
-        location::Location,
+        ir::{Location, Module},
         pass,
         utility::{parse_pass_pipeline, register_all_dialects, register_print_operation_stats},
     };

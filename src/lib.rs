@@ -21,7 +21,6 @@
 //!     context::Context,
 //!     dialect,
 //!     ir::*,
-//!     location::Location,
 //!     utility::register_all_dialects,
 //! };
 //!
@@ -81,7 +80,6 @@ pub mod dialect;
 pub mod error;
 pub mod execution_engine;
 pub mod ir;
-pub mod location;
 pub mod logical_result;
 pub mod pass;
 pub mod string_ref;
@@ -92,8 +90,7 @@ mod tests {
     use crate::{
         context::Context,
         dialect,
-        ir::{operation, Attribute, Block, Identifier, Module, Region, Type},
-        location::Location,
+        ir::{operation, Attribute, Block, Identifier, Location, Module, Region, Type},
         utility::register_all_dialects,
     };
 

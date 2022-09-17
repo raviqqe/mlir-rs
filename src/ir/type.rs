@@ -6,7 +6,6 @@ pub use self::id::Id;
 use crate::{
     context::{Context, ContextRef},
     error::Error,
-    location::Location,
     string_ref::StringRef,
     utility::into_raw_array,
 };
@@ -22,6 +21,8 @@ use std::{
     fmt::{self, Display, Formatter},
     marker::PhantomData,
 };
+
+use super::Location;
 
 /// A type.
 // Types are always values but their internal storage is owned by contexts.

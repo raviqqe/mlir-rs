@@ -35,8 +35,7 @@ impl<'a> Deref for OperationResult<'a> {
 mod tests {
     use crate::{
         context::Context,
-        ir::{operation, Block, Type},
-        location::Location,
+        ir::{operation, Block, Location, Type},
     };
 
     #[test]

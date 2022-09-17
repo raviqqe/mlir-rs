@@ -40,7 +40,10 @@ impl<'a> Deref for BlockArgument<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{context::Context, ir::Block, location::Location};
+    use crate::{
+        context::Context,
+        ir::{Block, Location},
+    };
 
     #[test]
     fn argument_number() {

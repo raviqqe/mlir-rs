@@ -90,8 +90,7 @@ mod tests {
     use crate::{
         context::Context,
         dialect,
-        ir::{operation, Attribute, Block, Identifier, Type},
-        location::Location,
+        ir::{operation, Attribute, Block, Identifier, Location, Type},
         utility::register_all_dialects,
     };
 

@@ -1,5 +1,5 @@
-use super::{BlockArgument, Operation, OperationRef, RegionRef, Type, Value};
-use crate::{context::Context, location::Location, string_ref::StringRef, utility::into_raw_array};
+use super::{BlockArgument, Location, Operation, OperationRef, RegionRef, Type, Value};
+use crate::{context::Context, string_ref::StringRef, utility::into_raw_array};
 use mlir_sys::{
     mlirBlockAddArgument, mlirBlockAppendOwnedOperation, mlirBlockCreate, mlirBlockDestroy,
     mlirBlockDetach, mlirBlockEqual, mlirBlockGetArgument, mlirBlockGetFirstOperation,
