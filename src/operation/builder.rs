@@ -172,15 +172,22 @@ mod tests {
     #[test]
     fn enable_result_type_infrence() {
         let context = Context::new();
-        let location = Location::unknown(&context);
+        context.load_all_available_dialects();
 
-        // context.load_all_available_dialects();
-        let block = Block::new(&[(Type::index(&context), location)]);
+        let location = Location::unknown(&context);
+        let r#type = Type::index(&context);
+        let block = Block::new(&[(r#type, location)]);
         let argument = *block.argument(0).unwrap();
 
-        Builder::new("arith.addi", location)
-            .add_operands(&[argument, argument])
-            .enable_result_type_infrence()
-            .build();
+        assert_eq!(
+            Builder::new("arith.addi", location)
+                .add_operands(&[argument, argument])
+                .enable_result_type_infrence()
+                .build()
+                .result(0)
+                .unwrap()
+                .r#type(),
+            r#type,
+        );
     }
 }
