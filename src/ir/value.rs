@@ -3,7 +3,7 @@ mod operation_result;
 
 pub use self::{block_argument::BlockArgument, operation_result::OperationResult};
 use super::Type;
-use crate::{utility::print_callback};
+use crate::utility::print_callback;
 use mlir_sys::{
     mlirValueDump, mlirValueEqual, mlirValueGetType, mlirValueIsABlockArgument,
     mlirValueIsAOpResult, mlirValuePrint, MlirValue,
