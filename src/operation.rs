@@ -5,7 +5,7 @@ use crate::{
     operation_state::OperationState,
     region::RegionRef,
     string_ref::StringRef,
-    value::Value,
+    value::{OperationResult, Value},
 };
 use core::fmt;
 use mlir_sys::{
@@ -96,12 +96,11 @@ impl<'a> OperationRef<'a> {
     }
 
     /// Gets a result at an index.
-    pub fn result(&self, index: usize) -> Option<Value> {
+    pub fn result(&self, index: usize) -> Option<OperationResult> {
         unsafe {
             if index < self.result_count() as usize {
-                Some(Value::from_raw(mlirOperationGetResult(
-                    self.raw,
-                    index as isize,
+                Some(OperationResult::from_value(Value::from_raw(
+                    mlirOperationGetResult(self.raw, index as isize),
                 )))
             } else {
                 None

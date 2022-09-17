@@ -56,7 +56,7 @@
 //!
 //!     block.append_operation(Operation::new(
 //!         OperationState::new("func.return", Location::unknown(&context))
-//!             .add_operands(&[sum.result(0).unwrap()]),
+//!             .add_operands(&[*sum.result(0).unwrap()]),
 //!     ));
 //!
 //!     region.append_block(block);
@@ -160,7 +160,7 @@ mod tests {
 
             block.append_operation(Operation::new(
                 OperationState::new("func.return", Location::unknown(&context))
-                    .add_operands(&[sum.result(0).unwrap()]),
+                    .add_operands(&[*sum.result(0).unwrap()]),
             ));
 
             region.append_block(block);
@@ -221,7 +221,7 @@ mod tests {
                 OperationState::new("memref.dim", location)
                     .add_operands(&[
                         *function_block.argument(0).unwrap(),
-                        zero.result(0).unwrap(),
+                        *zero.result(0).unwrap(),
                     ])
                     .add_results(&[index_type]),
             ));
@@ -261,13 +261,13 @@ mod tests {
 
                 let add = loop_block.append_operation(Operation::new(
                     OperationState::new("arith.addf", location)
-                        .add_operands(&[lhs.result(0).unwrap(), rhs.result(0).unwrap()])
+                        .add_operands(&[*lhs.result(0).unwrap(), *rhs.result(0).unwrap()])
                         .add_results(&[f32_type]),
                 ));
 
                 loop_block.append_operation(Operation::new(
                     OperationState::new("memref.store", location).add_operands(&[
-                        add.result(0).unwrap(),
+                        *add.result(0).unwrap(),
                         *function_block.argument(0).unwrap(),
                         *loop_block.argument(0).unwrap(),
                     ]),
@@ -284,9 +284,9 @@ mod tests {
 
                 OperationState::new("scf.for", location)
                     .add_operands(&[
-                        zero.result(0).unwrap(),
-                        dim.result(0).unwrap(),
-                        one.result(0).unwrap(),
+                        *zero.result(0).unwrap(),
+                        *dim.result(0).unwrap(),
+                        *one.result(0).unwrap(),
                     ])
                     .add_regions(vec![loop_region])
             }));

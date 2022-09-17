@@ -1,6 +1,8 @@
 mod block_argument;
+mod operation_result;
 
 pub use self::block_argument::BlockArgument;
+pub use self::operation_result::OperationResult;
 use crate::{r#type::Type, string_ref::StringRef};
 use mlir_sys::{
     mlirValueDump, mlirValueEqual, mlirValueGetType, mlirValueIsABlockArgument,
@@ -168,8 +170,9 @@ mod tests {
                     Attribute::parse(&context, "0 : index").unwrap(),
                 )]),
         );
+        let result = *operation.result(0).unwrap();
 
-        assert_eq!(operation.result(0), operation.result(0));
+        assert_eq!(result, result);
     }
 
     #[test]
@@ -189,7 +192,10 @@ mod tests {
             )
         };
 
-        assert_ne!(operation().result(0), operation().result(0));
+        assert_ne!(
+            *operation().result(0).unwrap(),
+            *operation().result(0).unwrap()
+        );
     }
 
     #[test]
