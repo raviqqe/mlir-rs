@@ -4,6 +4,7 @@ use std::{
     fmt::{self, Display, Formatter},
 };
 
+/// A Melior error.
 #[derive(Debug, Eq, PartialEq)]
 pub enum Error<'c> {
     FunctionExpected(Type<'c>),

@@ -1,3 +1,5 @@
+//! IR objects and builders.
+
 mod attribute;
 mod block;
 mod identifier;
