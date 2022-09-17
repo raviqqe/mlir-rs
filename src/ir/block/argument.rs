@@ -1,12 +1,17 @@
 use super::Value;
 use crate::{
-    ir::{BlockRef, Type},
+    ir::{BlockRef, Type, ValueLike},
+    utility::print_callback,
     Error,
 };
 use mlir_sys::{
     mlirBlockArgumentGetArgNumber, mlirBlockArgumentGetOwner, mlirBlockArgumentSetType,
+    mlirValuePrint, MlirValue,
 };
-use std::ops::Deref;
+use std::{
+    ffi::c_void,
+    fmt::{self, Display, Formatter},
+};
 
 /// A block argument.
 #[derive(Clone, Copy, Debug)]
@@ -26,17 +31,33 @@ impl<'a> Argument<'a> {
     pub fn set_type(&self, r#type: Type) {
         unsafe { mlirBlockArgumentSetType(self.value.to_raw(), r#type.to_raw()) }
     }
+}
 
-    pub(crate) unsafe fn from_value(value: Value<'a>) -> Self {
-        Self { value }
+impl<'a> ValueLike for Argument<'a> {
+    unsafe fn from_raw(value: MlirValue) -> Self {
+        Self {
+            value: Value::from_raw(value),
+        }
+    }
+
+    unsafe fn to_raw(&self) -> MlirValue {
+        self.value.to_raw()
     }
 }
 
-impl<'a> Deref for Argument<'a> {
-    type Target = Value<'a>;
+impl<'a> Display for Argument<'a> {
+    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
+        let mut data = (formatter, Ok(()));
 
-    fn deref(&self) -> &Self::Target {
-        &self.value
+        unsafe {
+            mlirValuePrint(
+                self.value.to_raw(),
+                Some(print_callback),
+                &mut data as *mut _ as *mut c_void,
+            );
+        }
+
+        data.1
     }
 }
 
@@ -45,7 +66,7 @@ impl<'a> TryFrom<Value<'a>> for Argument<'a> {
 
     fn try_from(value: Value<'a>) -> Result<Self, Self::Error> {
         if value.is_block_argument() {
-            Ok(unsafe { Self::from_value(value) })
+            Ok(Self { value })
         } else {
             Err(Error::BlockArgumentExpected(value.to_string()))
         }

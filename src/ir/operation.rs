@@ -4,7 +4,7 @@ mod builder;
 mod result;
 
 pub use self::{builder::Builder, result::ResultValue};
-use super::{BlockRef, Identifier, RegionRef, Value};
+use super::{BlockRef, Identifier, RegionRef, Value, ValueLike};
 use crate::{
     context::{Context, ContextRef},
     utility::print_callback,
@@ -101,8 +101,9 @@ impl<'a> OperationRef<'a> {
     pub fn result(&self, position: usize) -> Result<result::ResultValue, Error> {
         unsafe {
             if position < self.result_count() as usize {
-                Ok(result::ResultValue::from_value(Value::from_raw(
-                    mlirOperationGetResult(self.raw, position as isize),
+                Ok(result::ResultValue::from_raw(mlirOperationGetResult(
+                    self.raw,
+                    position as isize,
                 )))
             } else {
                 Err(Error::OperationResultPosition(self.to_string(), position))

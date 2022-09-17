@@ -1,7 +1,7 @@
 mod argument;
 
 pub use self::argument::Argument;
-use super::{Location, Operation, OperationRef, RegionRef, Type, Value};
+use super::{Location, Operation, OperationRef, RegionRef, Type, Value, ValueLike};
 use crate::{
     context::Context,
     utility::{into_raw_array, print_callback},
@@ -102,10 +102,10 @@ impl<'c> BlockRef<'c> {
     pub fn argument(&self, position: usize) -> Result<Argument, Error> {
         unsafe {
             if position < self.argument_count() as usize {
-                Ok(Argument::from_value(Value::from_raw(mlirBlockGetArgument(
+                Ok(Argument::from_raw(mlirBlockGetArgument(
                     self.raw,
                     position as isize,
-                ))))
+                )))
             } else {
                 Err(Error::BlockArgumentPosition(self.to_string(), position))
             }

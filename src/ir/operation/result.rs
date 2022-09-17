@@ -1,7 +1,14 @@
 use super::Value;
-use crate::{ir::OperationRef, Error};
-use mlir_sys::{mlirOpResultGetOwner, mlirOpResultGetResultNumber};
-use std::ops::Deref;
+use crate::{
+    ir::{OperationRef, ValueLike},
+    utility::print_callback,
+    Error,
+};
+use mlir_sys::{mlirOpResultGetOwner, mlirOpResultGetResultNumber, mlirValuePrint, MlirValue};
+use std::{
+    ffi::c_void,
+    fmt::{self, Display, Formatter},
+};
 
 /// An operation result.
 #[derive(Clone, Copy, Debug)]
@@ -17,17 +24,33 @@ impl<'a> ResultValue<'a> {
     pub fn owner(&self) -> OperationRef {
         unsafe { OperationRef::from_raw(mlirOpResultGetOwner(self.value.to_raw())) }
     }
+}
 
-    pub(crate) unsafe fn from_value(value: Value<'a>) -> Self {
-        Self { value }
+impl<'a> ValueLike for ResultValue<'a> {
+    unsafe fn from_raw(value: MlirValue) -> Self {
+        Self {
+            value: Value::from_raw(value),
+        }
+    }
+
+    unsafe fn to_raw(&self) -> MlirValue {
+        self.value.to_raw()
     }
 }
 
-impl<'a> Deref for ResultValue<'a> {
-    type Target = Value<'a>;
+impl<'a> Display for ResultValue<'a> {
+    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
+        let mut data = (formatter, Ok(()));
 
-    fn deref(&self) -> &Self::Target {
-        &self.value
+        unsafe {
+            mlirValuePrint(
+                self.value.to_raw(),
+                Some(print_callback),
+                &mut data as *mut _ as *mut c_void,
+            );
+        }
+
+        data.1
     }
 }
 
@@ -36,7 +59,7 @@ impl<'a> TryFrom<Value<'a>> for ResultValue<'a> {
 
     fn try_from(value: Value<'a>) -> Result<Self, Self::Error> {
         if value.is_operation_result() {
-            Ok(unsafe { Self::from_value(value) })
+            Ok(Self { value })
         } else {
             Err(Error::OperationResultExpected(value.to_string()))
         }

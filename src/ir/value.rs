@@ -1,9 +1,9 @@
+mod value_like;
+
+pub use self::value_like::ValueLike;
 use super::{block, operation, Type};
 use crate::utility::print_callback;
-use mlir_sys::{
-    mlirValueDump, mlirValueEqual, mlirValueGetType, mlirValueIsABlockArgument,
-    mlirValueIsAOpResult, mlirValuePrint, MlirValue,
-};
+use mlir_sys::{mlirValueEqual, mlirValuePrint, MlirValue};
 use std::{
     ffi::c_void,
     fmt::{self, Display, Formatter},
@@ -19,35 +19,15 @@ pub struct Value<'a> {
     _parent: PhantomData<&'a ()>,
 }
 
-impl<'a> Value<'a> {
-    /// Gets a type.
-    pub fn r#type(&self) -> Type {
-        unsafe { Type::from_raw(mlirValueGetType(self.raw)) }
-    }
-
-    /// Returns `true` if a value is a block argument.
-    pub fn is_block_argument(&self) -> bool {
-        unsafe { mlirValueIsABlockArgument(self.raw) }
-    }
-
-    /// Returns `true` if a value is an operation result.
-    pub fn is_operation_result(&self) -> bool {
-        unsafe { mlirValueIsAOpResult(self.raw) }
-    }
-
-    /// Dumps a value.
-    pub fn dump(&self) {
-        unsafe { mlirValueDump(self.raw) }
-    }
-
-    pub(crate) unsafe fn from_raw(value: MlirValue) -> Self {
+impl<'a> ValueLike for Value<'a> {
+    unsafe fn from_raw(value: MlirValue) -> Self {
         Self {
             raw: value,
             _parent: Default::default(),
         }
     }
 
-    pub(crate) unsafe fn to_raw(self) -> MlirValue {
+    unsafe fn to_raw(&self) -> MlirValue {
         self.raw
     }
 }
@@ -90,10 +70,11 @@ impl<'a> From<operation::ResultValue<'a>> for Value<'a> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::{
         context::Context,
         dialect,
-        ir::{operation, Attribute, Block, Identifier, Location, Type},
+        ir::{operation, Attribute, Block, Identifier, Location},
         utility::register_all_dialects,
     };
 
@@ -170,7 +151,7 @@ mod tests {
                 Attribute::parse(&context, "0 : index").unwrap(),
             )])
             .build();
-        let result = *operation.result(0).unwrap();
+        let result = Value::from(operation.result(0).unwrap());
 
         assert_eq!(result, result);
     }
@@ -192,8 +173,8 @@ mod tests {
         };
 
         assert_ne!(
-            *operation().result(0).unwrap(),
-            *operation().result(0).unwrap()
+            Value::from(operation().result(0).unwrap()),
+            operation().result(0).unwrap().into()
         );
     }
 

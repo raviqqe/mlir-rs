@@ -1,6 +1,6 @@
 use crate::{
     context::Context,
-    ir::{Attribute, BlockRef, Identifier, Location, Region, Type, Value},
+    ir::{Attribute, BlockRef, Identifier, Location, Region, Type, Value, ValueLike},
     string_ref::StringRef,
     utility::into_raw_array,
 };
@@ -184,7 +184,7 @@ mod tests {
         let location = Location::unknown(&context);
         let r#type = Type::index(&context);
         let block = Block::new(&[(r#type, location)]);
-        let argument = *block.argument(0).unwrap();
+        let argument = block.argument(0).unwrap().into();
 
         assert_eq!(
             Builder::new("arith.addi", location)
