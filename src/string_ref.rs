@@ -6,6 +6,7 @@ use std::{collections::HashMap, ffi::CString, marker::PhantomData, slice, str, s
 // Rust's strings are not.
 static STRING_CACHE: Lazy<RwLock<HashMap<String, CString>>> = Lazy::new(Default::default);
 
+/// A string reference.
 // https://mlir.llvm.org/docs/CAPI/#stringref
 //
 // TODO The documentation says string refs do not have to be null-terminated.
@@ -17,6 +18,7 @@ pub struct StringRef<'a> {
 }
 
 impl<'a> StringRef<'a> {
+    /// Converts a string reference into a `str`.
     pub fn as_str(&self) -> &str {
         unsafe {
             let bytes = slice::from_raw_parts(self.raw.data as *mut u8, self.raw.length as usize);
