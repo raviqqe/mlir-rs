@@ -5,7 +5,7 @@ use crate::{
 };
 use mlir_sys::{
     mlirParsePassPipeline, mlirRegisterAllDialects, mlirRegisterAllLLVMTranslations,
-    mlirRegisterAllPasses, mlirRegisterTransformsCSE, mlirRegisterTransformsPrintOpStats,
+    mlirRegisterAllPasses,
 };
 use std::sync::Once;
 

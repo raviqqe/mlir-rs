@@ -74,8 +74,8 @@ mod tests {
     use crate::{
         dialect,
         ir::{Location, Module},
-        pass,
-        utility::{parse_pass_pipeline, register_all_dialects, register_print_operation_stats},
+        pass::{self, transform::register_print_operation_stats},
+        utility::{parse_pass_pipeline, register_all_dialects},
     };
     use indoc::indoc;
     use pretty_assertions::assert_eq;
