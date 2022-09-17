@@ -31,7 +31,7 @@ impl<'c> Identifier<'c> {
         unsafe { ContextRef::from_raw(mlirIdentifierGetContext(self.raw)) }
     }
 
-    /// Converts an identifier into a string ref.
+    /// Converts an identifier into a string reference.
     pub fn as_string_ref(&self) -> StringRef {
         unsafe { StringRef::from_raw(mlirIdentifierStr(self.raw)) }
     }
