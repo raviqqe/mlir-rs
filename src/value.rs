@@ -89,8 +89,8 @@ impl<'a> Display for Value<'a> {
 mod tests {
     use crate::{
         attribute::Attribute, block::Block, context::Context, dialect_registry::DialectRegistry,
-        identifier::Identifier, location::Location, operation::Operation,
-        operation_state::OperationState, r#type::Type, utility::register_all_dialects,
+        identifier::Identifier, location::Location, operation, r#type::Type,
+        utility::register_all_dialects,
     };
 
     #[test]
@@ -99,14 +99,13 @@ mod tests {
         let location = Location::unknown(&context);
         let index_type = Type::parse(&context, "index").unwrap();
 
-        let operation = Operation::new(
-            OperationState::new("arith.constant", location)
-                .add_results(&[index_type])
-                .add_attributes(&[(
-                    Identifier::new(&context, "value"),
-                    Attribute::parse(&context, "0 : index").unwrap(),
-                )]),
-        );
+        let operation = operation::Builder::new("arith.constant", location)
+            .add_results(&[index_type])
+            .add_attributes(&[(
+                Identifier::new(&context, "value"),
+                Attribute::parse(&context, "0 : index").unwrap(),
+            )])
+            .build();
 
         assert_eq!(operation.result(0).unwrap().r#type(), index_type);
     }
@@ -117,14 +116,13 @@ mod tests {
         let location = Location::unknown(&context);
         let r#type = Type::parse(&context, "index").unwrap();
 
-        let operation = Operation::new(
-            OperationState::new("arith.constant", location)
-                .add_results(&[r#type])
-                .add_attributes(&[(
-                    Identifier::new(&context, "value"),
-                    Attribute::parse(&context, "0 : index").unwrap(),
-                )]),
-        );
+        let operation = operation::Builder::new("arith.constant", location)
+            .add_results(&[r#type])
+            .add_attributes(&[(
+                Identifier::new(&context, "value"),
+                Attribute::parse(&context, "0 : index").unwrap(),
+            )])
+            .build();
 
         assert!(operation.result(0).unwrap().is_operation_result());
     }
@@ -144,14 +142,13 @@ mod tests {
         let location = Location::unknown(&context);
         let index_type = Type::parse(&context, "index").unwrap();
 
-        let value = Operation::new(
-            OperationState::new("arith.constant", location)
-                .add_results(&[index_type])
-                .add_attributes(&[(
-                    Identifier::new(&context, "value"),
-                    Attribute::parse(&context, "0 : index").unwrap(),
-                )]),
-        );
+        let value = operation::Builder::new("arith.constant", location)
+            .add_results(&[index_type])
+            .add_attributes(&[(
+                Identifier::new(&context, "value"),
+                Attribute::parse(&context, "0 : index").unwrap(),
+            )])
+            .build();
 
         value.result(0).unwrap().dump();
     }
@@ -162,14 +159,13 @@ mod tests {
         let location = Location::unknown(&context);
         let index_type = Type::parse(&context, "index").unwrap();
 
-        let operation = Operation::new(
-            OperationState::new("arith.constant", location)
-                .add_results(&[index_type])
-                .add_attributes(&[(
-                    Identifier::new(&context, "value"),
-                    Attribute::parse(&context, "0 : index").unwrap(),
-                )]),
-        );
+        let operation = operation::Builder::new("arith.constant", location)
+            .add_results(&[index_type])
+            .add_attributes(&[(
+                Identifier::new(&context, "value"),
+                Attribute::parse(&context, "0 : index").unwrap(),
+            )])
+            .build();
         let result = *operation.result(0).unwrap();
 
         assert_eq!(result, result);
@@ -182,14 +178,13 @@ mod tests {
         let index_type = Type::parse(&context, "index").unwrap();
 
         let operation = || {
-            Operation::new(
-                OperationState::new("arith.constant", location)
-                    .add_results(&[index_type])
-                    .add_attributes(&[(
-                        Identifier::new(&context, "value"),
-                        Attribute::parse(&context, "0 : index").unwrap(),
-                    )]),
-            )
+            operation::Builder::new("arith.constant", location)
+                .add_results(&[index_type])
+                .add_attributes(&[(
+                    Identifier::new(&context, "value"),
+                    Attribute::parse(&context, "0 : index").unwrap(),
+                )])
+                .build()
         };
 
         assert_ne!(
@@ -205,14 +200,13 @@ mod tests {
         let location = Location::unknown(&context);
         let index_type = Type::parse(&context, "index").unwrap();
 
-        let operation = Operation::new(
-            OperationState::new("arith.constant", location)
-                .add_results(&[index_type])
-                .add_attributes(&[(
-                    Identifier::new(&context, "value"),
-                    Attribute::parse(&context, "0 : index").unwrap(),
-                )]),
-        );
+        let operation = operation::Builder::new("arith.constant", location)
+            .add_results(&[index_type])
+            .add_attributes(&[(
+                Identifier::new(&context, "value"),
+                Attribute::parse(&context, "0 : index").unwrap(),
+            )])
+            .build();
 
         assert_eq!(
             operation.result(0).unwrap().to_string(),
@@ -232,14 +226,13 @@ mod tests {
         let location = Location::unknown(&context);
         let index_type = Type::parse(&context, "index").unwrap();
 
-        let operation = Operation::new(
-            OperationState::new("arith.constant", location)
-                .add_results(&[index_type])
-                .add_attributes(&[(
-                    Identifier::new(&context, "value"),
-                    Attribute::parse(&context, "0 : index").unwrap(),
-                )]),
-        );
+        let operation = operation::Builder::new("arith.constant", location)
+            .add_results(&[index_type])
+            .add_attributes(&[(
+                Identifier::new(&context, "value"),
+                Attribute::parse(&context, "0 : index").unwrap(),
+            )])
+            .build();
 
         assert_eq!(
             operation.result(0).unwrap().to_string(),

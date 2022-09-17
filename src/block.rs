@@ -276,8 +276,8 @@ impl<'a> Display for BlockRef<'a> {
 mod tests {
     use super::*;
     use crate::{
-        dialect_registry::DialectRegistry, module::Module, operation_state::OperationState,
-        region::Region, utility::register_all_dialects,
+        dialect_registry::DialectRegistry, module::Module, operation, region::Region,
+        utility::register_all_dialects,
     };
 
     #[test]
@@ -353,10 +353,9 @@ mod tests {
 
         let block = Block::new(&[]);
 
-        let operation = block.append_operation(Operation::new(OperationState::new(
-            "func.return",
-            Location::unknown(&context),
-        )));
+        let operation = block.append_operation(
+            operation::Builder::new("func.return", Location::unknown(&context)).build(),
+        );
 
         assert_eq!(block.terminator(), Some(operation));
     }
@@ -371,10 +370,8 @@ mod tests {
         let context = Context::new();
         let block = Block::new(&[]);
 
-        let operation = block.append_operation(Operation::new(OperationState::new(
-            "foo",
-            Location::unknown(&context),
-        )));
+        let operation = block
+            .append_operation(operation::Builder::new("foo", Location::unknown(&context)).build());
 
         assert_eq!(block.first_operation(), Some(operation));
     }
@@ -391,10 +388,7 @@ mod tests {
         let context = Context::new();
         let block = Block::new(&[]);
 
-        block.append_operation(Operation::new(OperationState::new(
-            "foo",
-            Location::unknown(&context),
-        )));
+        block.append_operation(operation::Builder::new("foo", Location::unknown(&context)).build());
     }
 
     #[test]
@@ -404,7 +398,7 @@ mod tests {
 
         block.insert_operation(
             0,
-            Operation::new(OperationState::new("foo", Location::unknown(&context))),
+            operation::Builder::new("foo", Location::unknown(&context)).build(),
         );
     }
 
@@ -413,13 +407,11 @@ mod tests {
         let context = Context::new();
         let block = Block::new(&[]);
 
-        let first_operation = block.append_operation(Operation::new(OperationState::new(
-            "foo",
-            Location::unknown(&context),
-        )));
+        let first_operation = block
+            .append_operation(operation::Builder::new("foo", Location::unknown(&context)).build());
         let second_operation = block.insert_operation_after(
             first_operation,
-            Operation::new(OperationState::new("foo", Location::unknown(&context))),
+            operation::Builder::new("foo", Location::unknown(&context)).build(),
         );
 
         assert_eq!(block.first_operation(), Some(first_operation));
@@ -434,13 +426,11 @@ mod tests {
         let context = Context::new();
         let block = Block::new(&[]);
 
-        let second_operation = block.append_operation(Operation::new(OperationState::new(
-            "foo",
-            Location::unknown(&context),
-        )));
+        let second_operation = block
+            .append_operation(operation::Builder::new("foo", Location::unknown(&context)).build());
         let first_operation = block.insert_operation_before(
             second_operation,
-            Operation::new(OperationState::new("foo", Location::unknown(&context))),
+            operation::Builder::new("foo", Location::unknown(&context)).build(),
         );
 
         assert_eq!(block.first_operation(), Some(first_operation));

@@ -77,7 +77,7 @@ impl<'c> Drop for Module<'c> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{block::Block, operation_state::OperationState, region::Region};
+    use crate::{block::Block, operation, region::Region};
 
     #[test]
     fn new() {
@@ -106,10 +106,11 @@ mod tests {
         let region = Region::new();
         region.append_block(Block::new(&[]));
 
-        let module = Module::from_operation(Operation::new(
-            OperationState::new("builtin.module", Location::unknown(&context))
-                .add_regions(vec![region]),
-        ))
+        let module = Module::from_operation(
+            operation::Builder::new("builtin.module", Location::unknown(&context))
+                .add_regions(vec![region])
+                .build(),
+        )
         .unwrap();
 
         assert!(module.as_operation().verify());
@@ -120,10 +121,9 @@ mod tests {
     fn from_operation_fail() {
         let context = Context::new();
 
-        assert!(Module::from_operation(Operation::new(OperationState::new(
-            "func.func",
-            Location::unknown(&context),
-        )))
+        assert!(Module::from_operation(
+            operation::Builder::new("func.func", Location::unknown(&context),).build()
+        )
         .is_none());
     }
 }

@@ -33,18 +33,15 @@ impl<'a> Deref for OperationResult<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        block::Block, context::Context, location::Location, operation::Operation,
-        operation_state::OperationState, r#type::Type,
-    };
+    use crate::{block::Block, context::Context, location::Location, operation, r#type::Type};
 
     #[test]
     fn result_number() {
         let context = Context::new();
         let r#type = Type::parse(&context, "index").unwrap();
-        let operation = Operation::new(
-            OperationState::new("foo", Location::unknown(&context)).add_results(&[r#type]),
-        );
+        let operation = operation::Builder::new("foo", Location::unknown(&context))
+            .add_results(&[r#type])
+            .build();
 
         assert_eq!(operation.result(0).unwrap().result_number(), 0);
     }
