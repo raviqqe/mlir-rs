@@ -44,8 +44,6 @@ impl ExecutionEngine {
             arguments.as_mut_ptr() as *mut *mut c_void,
         ))
     }
-
-    // TODO Add rest of the API.
 }
 
 impl Drop for ExecutionEngine {
