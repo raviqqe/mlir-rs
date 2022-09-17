@@ -77,6 +77,7 @@ impl<'c> Builder<'c> {
     }
 
     /// Adds successor blocks.
+    // TODO Fix this to ensure blocks are alive while they are referencedd by the operation.
     pub fn add_successors(mut self, successors: &[BlockRef]) -> Self {
         unsafe {
             mlirOperationStateAddSuccessors(
@@ -125,7 +126,7 @@ impl<'c> Builder<'c> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{context::Context, dialect, utility::register_all_dialects};
+    use crate::{context::Context, dialect, ir::Block, utility::register_all_dialects};
 
     #[test]
     fn new() {
