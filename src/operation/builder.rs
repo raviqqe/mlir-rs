@@ -12,12 +12,14 @@ use std::marker::PhantomData;
 
 use super::Operation;
 
+/// An operation builder.
 pub struct Builder<'c> {
     raw: MlirOperationState,
     _context: PhantomData<&'c Context>,
 }
 
 impl<'c> Builder<'c> {
+    /// Creates an operation builder.
     pub fn new(name: &str, location: Location<'c>) -> Self {
         Self {
             raw: unsafe {
@@ -27,6 +29,7 @@ impl<'c> Builder<'c> {
         }
     }
 
+    /// Adds results.
     pub fn add_results(mut self, results: &[Type<'c>]) -> Self {
         unsafe {
             mlirOperationStateAddResults(
@@ -39,6 +42,7 @@ impl<'c> Builder<'c> {
         self
     }
 
+    /// Adds operands.
     pub fn add_operands(mut self, operands: &[Value]) -> Self {
         unsafe {
             mlirOperationStateAddOperands(
@@ -51,6 +55,7 @@ impl<'c> Builder<'c> {
         self
     }
 
+    /// Adds regions.
     pub fn add_regions(mut self, regions: Vec<Region>) -> Self {
         unsafe {
             mlirOperationStateAddOwnedRegions(
@@ -68,6 +73,7 @@ impl<'c> Builder<'c> {
         self
     }
 
+    /// Adds successor blocks.
     pub fn add_successors(mut self, successors: &[&Block]) -> Self {
         unsafe {
             mlirOperationStateAddSuccessors(
@@ -80,6 +86,7 @@ impl<'c> Builder<'c> {
         self
     }
 
+    /// Adds attributes.
     pub fn add_attributes(mut self, attributes: &[(Identifier, Attribute<'c>)]) -> Self {
         unsafe {
             mlirOperationStateAddAttributes(
@@ -99,6 +106,7 @@ impl<'c> Builder<'c> {
         self
     }
 
+    /// Builds an operation.
     pub fn build(mut self) -> Operation<'c> {
         unsafe { Operation::from_raw(mlirOperationCreate(&mut self.raw)) }
     }

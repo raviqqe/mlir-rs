@@ -1,8 +1,7 @@
 mod block_argument;
 mod operation_result;
 
-pub use self::block_argument::BlockArgument;
-pub use self::operation_result::OperationResult;
+pub use self::{block_argument::BlockArgument, operation_result::OperationResult};
 use crate::{r#type::Type, string_ref::StringRef};
 use mlir_sys::{
     mlirValueDump, mlirValueEqual, mlirValueGetType, mlirValueIsABlockArgument,

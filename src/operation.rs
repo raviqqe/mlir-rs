@@ -11,10 +11,11 @@ use crate::{
 };
 use core::fmt;
 use mlir_sys::{
-    mlirOperationDestroy, mlirOperationDump, mlirOperationEqual, mlirOperationGetBlock,
-    mlirOperationGetContext, mlirOperationGetName, mlirOperationGetNextInBlock,
-    mlirOperationGetNumRegions, mlirOperationGetNumResults, mlirOperationGetRegion,
-    mlirOperationGetResult, mlirOperationPrint, mlirOperationVerify, MlirOperation, MlirStringRef,
+    mlirOperationClone, mlirOperationDestroy, mlirOperationDump, mlirOperationEqual,
+    mlirOperationGetBlock, mlirOperationGetContext, mlirOperationGetName,
+    mlirOperationGetNextInBlock, mlirOperationGetNumRegions, mlirOperationGetNumResults,
+    mlirOperationGetRegion, mlirOperationGetResult, mlirOperationPrint, mlirOperationVerify,
+    MlirOperation, MlirStringRef,
 };
 use std::{
     ffi::c_void,
@@ -155,6 +156,11 @@ impl<'a> OperationRef<'a> {
         unsafe { mlirOperationDump(self.raw) }
     }
 
+    /// Clones an operation.
+    pub fn to_owned(&self) -> Operation {
+        unsafe { Operation::from_raw(mlirOperationClone(self.raw)) }
+    }
+
     pub(crate) unsafe fn to_raw(self) -> MlirOperation {
         self.raw
     }
@@ -211,10 +217,7 @@ mod tests {
 
     #[test]
     fn new() {
-        operation::Builder::new(
-            "foo",
-            Location::unknown(&Context::new()),
-        ).build();
+        operation::Builder::new("foo", Location::unknown(&Context::new())).build();
     }
 
     #[test]
@@ -222,7 +225,9 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            operation::Builder::new("foo", Location::unknown(&context),).build().name(),
+            operation::Builder::new("foo", Location::unknown(&context),)
+                .build()
+                .name(),
             Identifier::new(&context, "foo")
         );
     }
@@ -230,10 +235,9 @@ mod tests {
     #[test]
     fn block() {
         let block = Block::new(&[]);
-        let operation = block.append_operation(operation::Builder::new(
-            "foo",
-            Location::unknown(&Context::new()),
-        ).build());
+        let operation = block.append_operation(
+            operation::Builder::new("foo", Location::unknown(&Context::new())).build(),
+        );
 
         assert_eq!(operation.block(), Some(*block));
     }
@@ -241,23 +245,21 @@ mod tests {
     #[test]
     fn block_none() {
         assert_eq!(
-            operation::Builder::new(
-                "foo",
-                Location::unknown(&Context::new())
-            ).build()
-            .block(),
+            operation::Builder::new("foo", Location::unknown(&Context::new()))
+                .build()
+                .block(),
             None
         );
     }
 
     #[test]
     fn result_none() {
-        assert!(operation::Builder::new(
-            "foo",
-            Location::unknown(&Context::new()),
-        ).build()
-        .result(0)
-        .is_none());
+        assert!(
+            operation::Builder::new("foo", Location::unknown(&Context::new()),)
+                .build()
+                .result(0)
+                .is_none()
+        );
     }
 
     #[test]
@@ -268,5 +270,13 @@ mod tests {
                 .region(0)
                 .is_none()
         );
+    }
+
+    #[test]
+    fn to_owned() {
+        let context = Context::new();
+        let operation = operation::Builder::new("foo", Location::unknown(&context)).build();
+
+        operation.to_owned();
     }
 }
