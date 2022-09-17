@@ -5,6 +5,8 @@ pub(crate) struct LogicalResult {
     raw: MlirLogicalResult,
 }
 
+// TODO Delete this and replace it with `bool`?
+#[allow(unused)]
 impl LogicalResult {
     /// Creates a success result.
     pub fn success() -> Self {

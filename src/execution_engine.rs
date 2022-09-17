@@ -96,7 +96,7 @@ mod tests {
             .nested_under("func.func")
             .add_pass(pass::conversion::convert_arithmetic_to_llvm());
 
-        assert!(pass_manager.run(&mut module).is_success());
+        assert_eq!(pass_manager.run(&mut module), Ok(()));
 
         let engine = ExecutionEngine::new(&module, 2, &[]);
 

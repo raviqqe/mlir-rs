@@ -130,7 +130,9 @@ mod tests {
         let manager = Manager::new(&context);
 
         manager.add_pass(pass::conversion::convert_func_to_llvm());
-        manager.run(&mut Module::new(Location::unknown(&context)));
+        manager
+            .run(&mut Module::new(Location::unknown(&context)))
+            .unwrap();
     }
 
     #[test]
@@ -154,7 +156,7 @@ mod tests {
         let manager = Manager::new(&context);
         manager.add_pass(pass::transform::print_operation_stats());
 
-        assert!(manager.run(&mut module).is_success());
+        assert_eq!(manager.run(&mut module), Ok(()));
     }
 
     #[test]
@@ -187,7 +189,7 @@ mod tests {
             .nested_under("func.func")
             .add_pass(pass::transform::print_operation_stats());
 
-        assert!(manager.run(&mut module).is_success());
+        assert_eq!(manager.run(&mut module), Ok(()));
 
         let manager = Manager::new(&context);
         manager
@@ -195,7 +197,7 @@ mod tests {
             .nested_under("func.func")
             .add_pass(pass::transform::print_operation_stats());
 
-        assert!(manager.run(&mut module).is_success());
+        assert_eq!(manager.run(&mut module), Ok(()));
     }
 
     #[test]
