@@ -1,13 +1,12 @@
+//! Operations and operation builders.
+
 mod builder;
 
 pub use self::builder::Builder;
+use super::{BlockRef, Identifier, OperationResult, RegionRef, Value};
 use crate::{
-    block::BlockRef,
     context::{Context, ContextRef},
-    identifier::Identifier,
-    region::RegionRef,
     string_ref::StringRef,
-    value::{OperationResult, Value},
 };
 use core::fmt;
 use mlir_sys::{
@@ -213,11 +212,11 @@ impl<'a> Display for OperationRef<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{block::Block, context::Context, location::Location, operation};
+    use crate::{context::Context, ir::Block, location::Location};
 
     #[test]
     fn new() {
-        operation::Builder::new("foo", Location::unknown(&Context::new())).build();
+        Builder::new("foo", Location::unknown(&Context::new())).build();
     }
 
     #[test]
@@ -225,7 +224,7 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            operation::Builder::new("foo", Location::unknown(&context),)
+            Builder::new("foo", Location::unknown(&context),)
                 .build()
                 .name(),
             Identifier::new(&context, "foo")
@@ -235,9 +234,8 @@ mod tests {
     #[test]
     fn block() {
         let block = Block::new(&[]);
-        let operation = block.append_operation(
-            operation::Builder::new("foo", Location::unknown(&Context::new())).build(),
-        );
+        let operation =
+            block.append_operation(Builder::new("foo", Location::unknown(&Context::new())).build());
 
         assert_eq!(operation.block(), Some(*block));
     }
@@ -245,7 +243,7 @@ mod tests {
     #[test]
     fn block_none() {
         assert_eq!(
-            operation::Builder::new("foo", Location::unknown(&Context::new()))
+            Builder::new("foo", Location::unknown(&Context::new()))
                 .build()
                 .block(),
             None
@@ -254,28 +252,24 @@ mod tests {
 
     #[test]
     fn result_none() {
-        assert!(
-            operation::Builder::new("foo", Location::unknown(&Context::new()),)
-                .build()
-                .result(0)
-                .is_none()
-        );
+        assert!(Builder::new("foo", Location::unknown(&Context::new()),)
+            .build()
+            .result(0)
+            .is_none());
     }
 
     #[test]
     fn region_none() {
-        assert!(
-            operation::Builder::new("foo", Location::unknown(&Context::new()),)
-                .build()
-                .region(0)
-                .is_none()
-        );
+        assert!(Builder::new("foo", Location::unknown(&Context::new()),)
+            .build()
+            .region(0)
+            .is_none());
     }
 
     #[test]
     fn to_owned() {
         let context = Context::new();
-        let operation = operation::Builder::new("foo", Location::unknown(&context)).build();
+        let operation = Builder::new("foo", Location::unknown(&context)).build();
 
         operation.to_owned();
     }

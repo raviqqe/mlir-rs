@@ -1,4 +1,4 @@
-use crate::block::{Block, BlockRef};
+use super::{Block, BlockRef};
 use mlir_sys::{
     mlirRegionAppendOwnedBlock, mlirRegionCreate, mlirRegionDestroy, mlirRegionEqual,
     mlirRegionGetFirstBlock, mlirRegionInsertOwnedBlockAfter, mlirRegionInsertOwnedBlockBefore,

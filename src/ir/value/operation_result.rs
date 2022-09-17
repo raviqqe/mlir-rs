@@ -1,5 +1,5 @@
 use super::Value;
-use crate::operation::OperationRef;
+use crate::ir::OperationRef;
 use mlir_sys::{mlirOpResultGetOwner, mlirOpResultGetResultNumber};
 use std::ops::Deref;
 
@@ -33,7 +33,11 @@ impl<'a> Deref for OperationResult<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{block::Block, context::Context, location::Location, operation, r#type::Type};
+    use crate::{
+        context::Context,
+        ir::{operation, Block, Type},
+        location::Location,
+    };
 
     #[test]
     fn result_number() {

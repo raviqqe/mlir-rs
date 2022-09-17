@@ -1,6 +1,6 @@
 use crate::{
-    attribute::Attribute,
     context::{Context, ContextRef},
+    ir::Attribute,
     string_ref::StringRef,
     utility::into_raw_array,
 };

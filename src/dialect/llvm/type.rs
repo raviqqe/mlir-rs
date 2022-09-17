@@ -1,4 +1,4 @@
-use crate::{context::Context, r#type::Type, utility::into_raw_array};
+use crate::{context::Context, ir::Type, utility::into_raw_array};
 use mlir_sys::{
     mlirLLVMArrayTypeGet, mlirLLVMFunctionTypeGet, mlirLLVMPointerTypeGet,
     mlirLLVMStructTypeLiteralGet, mlirLLVMVoidTypeGet,

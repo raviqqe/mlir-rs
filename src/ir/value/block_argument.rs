@@ -1,5 +1,5 @@
 use super::Value;
-use crate::{block::BlockRef, r#type::Type};
+use crate::ir::{BlockRef, Type};
 use mlir_sys::{
     mlirBlockArgumentGetArgNumber, mlirBlockArgumentGetOwner, mlirBlockArgumentSetType,
 };
@@ -40,7 +40,7 @@ impl<'a> Deref for BlockArgument<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{block::Block, context::Context, location::Location};
+    use crate::{context::Context, ir::Block, location::Location};
 
     #[test]
     fn argument_number() {

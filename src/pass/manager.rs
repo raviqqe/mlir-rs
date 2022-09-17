@@ -1,7 +1,6 @@
 use super::OperationManager;
 use crate::{
-    context::Context, logical_result::LogicalResult, module::Module, pass::Pass,
-    string_ref::StringRef,
+    context::Context, ir::Module, logical_result::LogicalResult, pass::Pass, string_ref::StringRef,
 };
 use mlir_sys::{
     mlirPassManagerAddOwnedPass, mlirPassManagerCreate, mlirPassManagerDestroy,
@@ -74,6 +73,7 @@ mod tests {
     use super::*;
     use crate::{
         dialect,
+        ir::Module,
         location::Location,
         pass,
         utility::{parse_pass_pipeline, register_all_dialects, register_print_operation_stats},

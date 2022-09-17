@@ -1,7 +1,9 @@
 use crate::{
-    attribute::Attribute, block::Block, context::Context, identifier::Identifier,
-    location::Location, r#type::Type, region::Region, string_ref::StringRef,
-    utility::into_raw_array, value::Value,
+    context::Context,
+    ir::{Attribute, BlockRef, Identifier, Region, Type, Value},
+    location::Location,
+    string_ref::StringRef,
+    utility::into_raw_array,
 };
 use mlir_sys::{
     mlirNamedAttributeGet, mlirOperationCreate, mlirOperationStateAddAttributes,
@@ -75,7 +77,7 @@ impl<'c> Builder<'c> {
     }
 
     /// Adds successor blocks.
-    pub fn add_successors(mut self, successors: &[&Block]) -> Self {
+    pub fn add_successors(mut self, successors: &[BlockRef]) -> Self {
         unsafe {
             mlirOperationStateAddSuccessors(
                 &mut self.raw,
@@ -153,7 +155,7 @@ mod tests {
         let context = Context::new();
 
         Builder::new("foo", Location::unknown(&context))
-            .add_successors(&[&Block::new(&[])])
+            .add_successors(&[*Block::new(&[])])
             .build();
     }
 

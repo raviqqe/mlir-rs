@@ -1,4 +1,4 @@
-use crate::r#type::Type;
+use crate::ir::Type;
 use std::{
     error,
     fmt::{self, Display, Formatter},

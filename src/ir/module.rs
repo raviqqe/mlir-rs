@@ -1,8 +1,7 @@
+use super::{BlockRef, Operation, OperationRef};
 use crate::{
-    block::BlockRef,
     context::{Context, ContextRef},
     location::Location,
-    operation::{Operation, OperationRef},
     string_ref::StringRef,
 };
 use mlir_sys::{
@@ -77,7 +76,7 @@ impl<'c> Drop for Module<'c> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{block::Block, operation, region::Region};
+    use crate::ir::{operation, Block, Region};
 
     #[test]
     fn new() {

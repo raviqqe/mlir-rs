@@ -1,3 +1,5 @@
+//! Types and type IDs.
+
 pub mod id;
 
 pub use self::id::Id;

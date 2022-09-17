@@ -1,13 +1,5 @@
-use crate::{
-    context::Context,
-    location::Location,
-    operation::{Operation, OperationRef},
-    r#type::Type,
-    region::RegionRef,
-    string_ref::StringRef,
-    utility::into_raw_array,
-    value::{BlockArgument, Value},
-};
+use super::{BlockArgument, Operation, OperationRef, RegionRef, Type, Value};
+use crate::{context::Context, location::Location, string_ref::StringRef, utility::into_raw_array};
 use mlir_sys::{
     mlirBlockAddArgument, mlirBlockAppendOwnedOperation, mlirBlockCreate, mlirBlockDestroy,
     mlirBlockDetach, mlirBlockEqual, mlirBlockGetArgument, mlirBlockGetFirstOperation,
@@ -277,7 +269,9 @@ impl<'a> Display for BlockRef<'a> {
 mod tests {
     use super::*;
     use crate::{
-        dialect, module::Module, operation, region::Region, utility::register_all_dialects,
+        dialect,
+        ir::{operation, Module, Region},
+        utility::register_all_dialects,
     };
 
     #[test]

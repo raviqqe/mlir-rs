@@ -1,6 +1,6 @@
+use super::{r#type, Type};
 use crate::{
     context::{Context, ContextRef},
-    r#type::{self, Type},
     string_ref::StringRef,
 };
 use mlir_sys::{
