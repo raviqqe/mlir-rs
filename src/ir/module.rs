@@ -9,6 +9,7 @@ use mlir_sys::{
 };
 use std::marker::PhantomData;
 
+/// A module.
 #[derive(Debug)]
 pub struct Module<'c> {
     raw: MlirModule,
@@ -16,10 +17,12 @@ pub struct Module<'c> {
 }
 
 impl<'c> Module<'c> {
+    /// Creates a module.
     pub fn new(location: Location) -> Self {
         unsafe { Self::from_raw(mlirModuleCreateEmpty(location.to_raw())) }
     }
 
+    /// Parses a module.
     pub fn parse(context: &Context, source: &str) -> Option<Self> {
         // TODO Should we allocate StringRef locally because sources can be big?
         unsafe {
@@ -30,18 +33,22 @@ impl<'c> Module<'c> {
         }
     }
 
+    /// Converts a module into an operation.
     pub fn as_operation(&self) -> OperationRef {
         unsafe { OperationRef::from_raw(mlirModuleGetOperation(self.raw)) }
     }
 
+    /// Gets a context.
     pub fn context(&self) -> ContextRef<'c> {
         unsafe { ContextRef::from_raw(mlirModuleGetContext(self.raw)) }
     }
 
+    /// Gets a block of a module body.
     pub fn body(&self) -> BlockRef {
         unsafe { BlockRef::from_raw(mlirModuleGetBody(self.raw)) }
     }
 
+    /// Converts an operation into a module.
     pub fn from_operation(operation: Operation) -> Option<Self> {
         unsafe { Self::from_option_raw(mlirModuleFromOperation(operation.into_raw())) }
     }

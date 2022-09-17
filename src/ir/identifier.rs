@@ -8,6 +8,7 @@ use mlir_sys::{
 };
 use std::marker::PhantomData;
 
+/// An identifier.
 #[derive(Clone, Copy, Debug)]
 pub struct Identifier<'c> {
     raw: MlirIdentifier,
@@ -15,6 +16,7 @@ pub struct Identifier<'c> {
 }
 
 impl<'c> Identifier<'c> {
+    /// Creates an identifier.
     pub fn new(context: &Context, name: &str) -> Self {
         unsafe {
             Self::from_raw(mlirIdentifierGet(
@@ -24,10 +26,12 @@ impl<'c> Identifier<'c> {
         }
     }
 
+    /// Gets a context.
     pub fn context(&self) -> ContextRef<'c> {
         unsafe { ContextRef::from_raw(mlirIdentifierGetContext(self.raw)) }
     }
 
+    /// Converts an identifier into a string ref.
     pub fn as_string_ref(&self) -> StringRef {
         unsafe { StringRef::from_raw(mlirIdentifierStr(self.raw)) }
     }
