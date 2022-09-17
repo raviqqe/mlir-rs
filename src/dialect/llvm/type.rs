@@ -1,3 +1,5 @@
+//! LLVM types
+
 use crate::{context::Context, ir::Type, utility::into_raw_array};
 use mlir_sys::{
     mlirLLVMArrayTypeGet, mlirLLVMFunctionTypeGet, mlirLLVMPointerTypeGet,
