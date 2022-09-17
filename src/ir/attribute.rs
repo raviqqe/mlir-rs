@@ -2,6 +2,7 @@ use super::{r#type, Type};
 use crate::{
     context::{Context, ContextRef},
     string_ref::StringRef,
+    utility::print_callback,
 };
 use mlir_sys::{
     mlirAttributeDump, mlirAttributeEqual, mlirAttributeGetContext, mlirAttributeGetNull,
@@ -11,7 +12,7 @@ use mlir_sys::{
     mlirAttributeIsAFloat, mlirAttributeIsAInteger, mlirAttributeIsAIntegerSet,
     mlirAttributeIsAOpaque, mlirAttributeIsAOpaqueElements, mlirAttributeIsASparseElements,
     mlirAttributeIsAString, mlirAttributeIsASymbolRef, mlirAttributeIsAType, mlirAttributeIsAUnit,
-    mlirAttributeParseGet, mlirAttributePrint, MlirAttribute, MlirStringRef,
+    mlirAttributeParseGet, mlirAttributePrint, MlirAttribute,
 };
 use std::{
     ffi::c_void,
@@ -198,17 +199,12 @@ impl<'c> Display for Attribute<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         let mut data = (formatter, Ok(()));
 
-        unsafe extern "C" fn callback(string: MlirStringRef, data: *mut c_void) {
-            let data = &mut *(data as *mut (&mut Formatter, fmt::Result));
-            let result = write!(data.0, "{}", StringRef::from_raw(string).as_str());
-
-            if data.1.is_ok() {
-                data.1 = result;
-            }
-        }
-
         unsafe {
-            mlirAttributePrint(self.raw, Some(callback), &mut data as *mut _ as *mut c_void);
+            mlirAttributePrint(
+                self.raw,
+                Some(print_callback),
+                &mut data as *mut _ as *mut c_void,
+            );
         }
 
         data.1

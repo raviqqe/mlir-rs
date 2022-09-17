@@ -1,6 +1,13 @@
 use mlir_sys::{mlirStringRefCreateFromCString, mlirStringRefEqual, MlirStringRef};
 use once_cell::sync::Lazy;
-use std::{collections::HashMap, ffi::CString, marker::PhantomData, slice, str, sync::RwLock};
+use std::{
+    collections::HashMap,
+    ffi::CString,
+    marker::PhantomData,
+    slice,
+    str::{self, Utf8Error},
+    sync::RwLock,
+};
 
 // We need to pass null-terminated strings to functions in the MLIR API although
 // Rust's strings are not.
@@ -19,7 +26,7 @@ pub struct StringRef<'a> {
 
 impl<'a> StringRef<'a> {
     /// Converts a string reference into a `str`.
-    pub fn as_str(&self) -> &str {
+    pub fn as_str(&self) -> Result<&str, Utf8Error> {
         unsafe {
             let bytes = slice::from_raw_parts(self.raw.data as *mut u8, self.raw.length as usize);
 
@@ -28,7 +35,6 @@ impl<'a> StringRef<'a> {
             } else {
                 bytes
             })
-            .unwrap()
         }
     }
 

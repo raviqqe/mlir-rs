@@ -52,7 +52,15 @@ impl<'a> Display for OperationManager<'a> {
 
         unsafe extern "C" fn callback(string: MlirStringRef, data: *mut c_void) {
             let data = &mut *(data as *mut (&mut Formatter, fmt::Result));
-            let result = write!(data.0, "{}", StringRef::from_raw(string).as_str());
+            let result = (|| -> fmt::Result {
+                write!(
+                    data.0,
+                    "{}",
+                    StringRef::from_raw(string)
+                        .as_str()
+                        .map_err(|_| fmt::Error)?
+                )
+            })();
 
             if data.1.is_ok() {
                 data.1 = result;

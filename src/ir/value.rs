@@ -3,10 +3,10 @@ mod operation_result;
 
 pub use self::{block_argument::BlockArgument, operation_result::OperationResult};
 use super::Type;
-use crate::string_ref::StringRef;
+use crate::{utility::print_callback};
 use mlir_sys::{
     mlirValueDump, mlirValueEqual, mlirValueGetType, mlirValueIsABlockArgument,
-    mlirValueIsAOpResult, mlirValuePrint, MlirStringRef, MlirValue,
+    mlirValueIsAOpResult, mlirValuePrint, MlirValue,
 };
 use std::{
     ffi::c_void,
@@ -68,17 +68,12 @@ impl<'a> Display for Value<'a> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         let mut data = (formatter, Ok(()));
 
-        unsafe extern "C" fn callback(string: MlirStringRef, data: *mut c_void) {
-            let data = &mut *(data as *mut (&mut Formatter, fmt::Result));
-            let result = write!(data.0, "{}", StringRef::from_raw(string).as_str());
-
-            if data.1.is_ok() {
-                data.1 = result;
-            }
-        }
-
         unsafe {
-            mlirValuePrint(self.raw, Some(callback), &mut data as *mut _ as *mut c_void);
+            mlirValuePrint(
+                self.raw,
+                Some(print_callback),
+                &mut data as *mut _ as *mut c_void,
+            );
         }
 
         data.1

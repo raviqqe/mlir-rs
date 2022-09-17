@@ -2,11 +2,11 @@ use crate::{
     context::{Context, ContextRef},
     ir::Attribute,
     string_ref::StringRef,
-    utility::into_raw_array,
+    utility::{into_raw_array, print_callback},
 };
 use mlir_sys::{
     mlirLocationEqual, mlirLocationFileLineColGet, mlirLocationFusedGet, mlirLocationGetContext,
-    mlirLocationNameGet, mlirLocationPrint, mlirLocationUnknownGet, MlirLocation, MlirStringRef,
+    mlirLocationNameGet, mlirLocationPrint, mlirLocationUnknownGet, MlirLocation,
 };
 use std::{
     ffi::c_void,
@@ -89,17 +89,12 @@ impl<'c> Display for Location<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         let mut data = (formatter, Ok(()));
 
-        unsafe extern "C" fn callback(string: MlirStringRef, data: *mut c_void) {
-            let data = &mut *(data as *mut (&mut Formatter, fmt::Result));
-            let result = write!(data.0, "{}", StringRef::from_raw(string).as_str());
-
-            if data.1.is_ok() {
-                data.1 = result;
-            }
-        }
-
         unsafe {
-            mlirLocationPrint(self.raw, Some(callback), &mut data as *mut _ as *mut c_void);
+            mlirLocationPrint(
+                self.raw,
+                Some(print_callback),
+                &mut data as *mut _ as *mut c_void,
+            );
         }
 
         data.1

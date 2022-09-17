@@ -5,9 +5,13 @@ use crate::{
 };
 use mlir_sys::{
     mlirParsePassPipeline, mlirRegisterAllDialects, mlirRegisterAllLLVMTranslations,
-    mlirRegisterAllPasses,
+    mlirRegisterAllPasses, MlirStringRef,
 };
-use std::sync::Once;
+use std::{
+    ffi::c_void,
+    fmt::{self, Formatter},
+    sync::Once,
+};
 
 /// Registers all dialects to a dialect registry.
 pub fn register_all_dialects(registry: &dialect::Registry) {
@@ -43,6 +47,24 @@ pub fn parse_pass_pipeline(manager: pass::OperationManager, source: &str) -> Res
 // TODO Use into_raw_parts.
 pub(crate) unsafe fn into_raw_array<T>(xs: Vec<T>) -> *mut T {
     xs.leak().as_mut_ptr()
+}
+
+pub(crate) unsafe extern "C" fn print_callback(string: MlirStringRef, data: *mut c_void) {
+    let (formatter, result) = &mut *(data as *mut (&mut Formatter, fmt::Result));
+
+    if result.is_err() {
+        return;
+    }
+
+    *result = (|| -> fmt::Result {
+        write!(
+            formatter,
+            "{}",
+            StringRef::from_raw(string)
+                .as_str()
+                .map_err(|_| fmt::Error)?
+        )
+    })();
 }
 
 #[cfg(test)]

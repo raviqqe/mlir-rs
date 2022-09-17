@@ -6,7 +6,7 @@ pub use self::builder::Builder;
 use super::{BlockRef, Identifier, OperationResult, RegionRef, Value};
 use crate::{
     context::{Context, ContextRef},
-    string_ref::StringRef,
+    utility::print_callback,
     Error,
 };
 use core::fmt;
@@ -15,7 +15,7 @@ use mlir_sys::{
     mlirOperationGetBlock, mlirOperationGetContext, mlirOperationGetName,
     mlirOperationGetNextInBlock, mlirOperationGetNumRegions, mlirOperationGetNumResults,
     mlirOperationGetRegion, mlirOperationGetResult, mlirOperationPrint, mlirOperationVerify,
-    MlirOperation, MlirStringRef,
+    MlirOperation,
 };
 use std::{
     ffi::c_void,
@@ -193,17 +193,12 @@ impl<'a> Display for OperationRef<'a> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         let mut data = (formatter, Ok(()));
 
-        unsafe extern "C" fn callback(string: MlirStringRef, data: *mut c_void) {
-            let data = &mut *(data as *mut (&mut Formatter, fmt::Result));
-            let result = write!(data.0, "{}", StringRef::from_raw(string).as_str());
-
-            if data.1.is_ok() {
-                data.1 = result;
-            }
-        }
-
         unsafe {
-            mlirOperationPrint(self.raw, Some(callback), &mut data as *mut _ as *mut c_void);
+            mlirOperationPrint(
+                self.raw,
+                Some(print_callback),
+                &mut data as *mut _ as *mut c_void,
+            );
         }
 
         data.1
