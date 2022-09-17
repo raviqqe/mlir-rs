@@ -77,7 +77,8 @@ impl<'c> Builder<'c> {
     }
 
     /// Adds successor blocks.
-    // TODO Fix this to ensure blocks are alive while they are referencedd by the operation.
+    // TODO Fix this to ensure blocks are alive while they are referencedd by the
+    // operation.
     pub fn add_successors(mut self, successors: &[BlockRef]) -> Self {
         unsafe {
             mlirOperationStateAddSuccessors(
