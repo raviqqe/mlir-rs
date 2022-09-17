@@ -121,7 +121,7 @@ mod tests {
 
     #[test]
     fn insert_dialect() {
-        let registry = DialectRegistry::new();
+        let registry = dialect::Registry::new();
 
         Handle::func().insert_dialect(&registry);
     }

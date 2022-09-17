@@ -57,7 +57,7 @@ mod tests {
     fn create_context() -> Context {
         let context = Context::new();
 
-        DialectHandle::llvm().register_dialect(&context);
+        dialect::Handle::llvm().register_dialect(&context);
         context.get_or_load_dialect("llvm");
 
         context
