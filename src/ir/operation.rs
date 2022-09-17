@@ -256,13 +256,13 @@ mod tests {
     }
 
     #[test]
-    fn result_none() {
+    fn result_error() {
         assert_eq!(
             Builder::new("foo", Location::unknown(&Context::new()))
                 .build()
                 .result(0)
                 .unwrap_err(),
-            Error::OperationResultPosition("\"foo\"".into(), 0)
+            Error::OperationResultPosition("\"foo\"() : () -> ()\n".into(), 0)
         );
     }
 
