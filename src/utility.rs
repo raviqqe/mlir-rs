@@ -1,3 +1,5 @@
+//! Utility functions.
+
 use crate::{
     context::Context, dialect, logical_result::LogicalResult, pass, string_ref::StringRef,
 };
