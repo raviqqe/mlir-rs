@@ -6,7 +6,8 @@ use crate::{
 use mlir_sys::{
     mlirNamedAttributeGet, mlirOperationCreate, mlirOperationStateAddAttributes,
     mlirOperationStateAddOperands, mlirOperationStateAddOwnedRegions, mlirOperationStateAddResults,
-    mlirOperationStateAddSuccessors, mlirOperationStateGet, MlirOperationState,
+    mlirOperationStateAddSuccessors, mlirOperationStateEnableResultTypeInference,
+    mlirOperationStateGet, MlirOperationState,
 };
 use std::marker::PhantomData;
 
@@ -106,6 +107,13 @@ impl<'c> Builder<'c> {
         self
     }
 
+    /// Enables result type inference.
+    pub fn enable_result_type_infrence(mut self) -> Self {
+        unsafe { mlirOperationStateEnableResultTypeInference(&mut self.raw) }
+
+        self
+    }
+
     /// Builds an operation.
     pub fn build(mut self) -> Operation<'c> {
         unsafe { Operation::from_raw(mlirOperationCreate(&mut self.raw)) }
@@ -158,6 +166,15 @@ mod tests {
                 Identifier::new(&context, "foo"),
                 Attribute::parse(&context, "unit").unwrap(),
             )])
+            .build();
+    }
+
+    #[test]
+    fn enable_result_type_infrence() {
+        let context = Context::new();
+
+        Builder::new("foo", Location::unknown(&context))
+            .enable_result_type_infrence()
             .build();
     }
 }
