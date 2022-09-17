@@ -203,13 +203,11 @@ impl<'c> BlockRef<'c> {
     }
 
     /// Detaches a block from a region and assumes its ownership.
-    pub fn detach(&self) -> Option<Block> {
+    pub unsafe fn detach(&self) -> Option<Block> {
         if self.parent_region().is_some() {
-            unsafe {
-                mlirBlockDetach(self.raw);
+            mlirBlockDetach(self.raw);
 
-                Some(Block::from_raw(self.raw))
-            }
+            Some(Block::from_raw(self.raw))
         } else {
             None
         }
@@ -462,14 +460,17 @@ mod tests {
         let region = Region::new();
         let block = region.append_block(Block::new(&[]));
 
-        assert_eq!(block.detach().unwrap().to_string(), "<<UNLINKED BLOCK>>\n");
+        assert_eq!(
+            unsafe { block.detach() }.unwrap().to_string(),
+            "<<UNLINKED BLOCK>>\n"
+        );
     }
 
     #[test]
     fn detach_detached() {
         let block = Block::new(&[]);
 
-        assert!(block.detach().is_none());
+        assert!(unsafe { block.detach() }.is_none());
     }
 
     #[test]
