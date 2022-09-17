@@ -1,3 +1,5 @@
+//! Passes and pass managers.
+
 pub mod conversion;
 mod manager;
 mod operation_manager;

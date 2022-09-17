@@ -1,3 +1,5 @@
+//! Dialect handles, instances, and registry.
+
 mod handle;
 pub mod llvm;
 mod registry;
