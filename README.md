@@ -9,6 +9,20 @@ The rustic MLIR bindings for Rust
 This crate is a wrapper of [the MLIR C API](https://mlir.llvm.org/docs/CAPI/).
 
 ```rust
+use melior::{
+    attribute::Attribute,
+    block::Block,
+    context::Context,
+    dialect_registry::DialectRegistry,
+    identifier::Identifier,
+    location::Location,
+    module::Module,
+    operation::{self, Operation},
+    region::Region,
+    r#type::Type,
+    utility::register_all_dialects,
+};
+
 let registry = DialectRegistry::new();
 register_all_dialects(&registry);
 
@@ -25,33 +39,27 @@ let function = {
     let region = Region::new();
     let block = Block::new(&[(integer_type, location), (integer_type, location)]);
 
-    let sum = block.append_operation(Operation::new(
-        OperationState::new("arith.addi", location)
-            .add_operands(&[block.argument(0).unwrap(), block.argument(1).unwrap()])
-            .add_results(&[integer_type]),
-    ));
+    let sum = block.append_operation(operation::Builder::new("arith.addi", location)
+            .add_operands(&[*block.argument(0).unwrap(), *block.argument(1).unwrap()])
+            .add_results(&[integer_type]).build());
 
-    block.append_operation(Operation::new(
-        OperationState::new("func.return", Location::unknown(&context))
-            .add_operands(&[sum.result(0).unwrap()]),
-    ));
+    block.append_operation(operation::Builder::new("func.return", Location::unknown(&context))
+            .add_operands(&[*sum.result(0).unwrap()]).build());
 
     region.append_block(block);
 
-    Operation::new(
-        OperationState::new("func.func", Location::unknown(&context))
+    operation::Builder::new("func.func", Location::unknown(&context))
             .add_attributes(&[
                 (
                     Identifier::new(&context, "function_type"),
-                    Attribute::parse(&context, "(i64, i64) -> i64"),
+                    Attribute::parse(&context, "(i64, i64) -> i64").unwrap(),
                 ),
                 (
                     Identifier::new(&context, "sym_name"),
-                    Attribute::parse(&context, "\"add\""),
+                    Attribute::parse(&context, "\"add\"").unwrap(),
                 ),
             ])
-            .add_regions(vec![region]),
-    )
+            .add_regions(vec![region]).build()
 };
 
 module.body().append_operation(function);
