@@ -1,4 +1,4 @@
-use crate::{ir::Module, logical_result::LogicalResult, string_ref::StringRef};
+use crate::{ir::Module, logical_result::LogicalResult, string_ref::StringRef, Error};
 use mlir_sys::{
     mlirExecutionEngineCreate, mlirExecutionEngineDestroy, mlirExecutionEngineInvokePacked,
     MlirExecutionEngine,
@@ -37,12 +37,18 @@ impl ExecutionEngine {
     /// This function modifies memory locations pointed by the `arguments`
     /// argument. If those pointers are invalid or misaligned, calling this
     /// function might result in undefined behavior.
-    pub unsafe fn invoke_packed(&self, name: &str, arguments: &mut [*mut ()]) -> LogicalResult {
-        LogicalResult::from_raw(mlirExecutionEngineInvokePacked(
+    pub unsafe fn invoke_packed(&self, name: &str, arguments: &mut [*mut ()]) -> Result<(), Error> {
+        let result = LogicalResult::from_raw(mlirExecutionEngineInvokePacked(
             self.raw,
             StringRef::from(name).to_raw(),
             arguments.as_mut_ptr() as *mut *mut c_void,
-        ))
+        ));
+
+        if result.is_success() {
+            Ok(())
+        } else {
+            Err(Error::InvokeFunction)
+        }
     }
 }
 

@@ -8,7 +8,9 @@ use std::{
 pub enum Error {
     BlockArgumentPosition(String, usize),
     FunctionExpected(String),
+    InvokeFunction,
     OperationResultPosition(String, usize),
+    ParsePassPipeline,
 }
 
 impl Display for Error {
@@ -22,6 +24,7 @@ impl Display for Error {
                 )
             }
             Self::FunctionExpected(r#type) => write!(formatter, "function expected: {}", r#type),
+            Self::InvokeFunction => write!(formatter, "failed to invoke JIT-compiled function"),
             Self::OperationResultPosition(operation, position) => {
                 write!(
                     formatter,
@@ -29,6 +32,7 @@ impl Display for Error {
                     position, operation
                 )
             }
+            Self::ParsePassPipeline => write!(formatter, "parse pass pipeline"),
         }
     }
 }

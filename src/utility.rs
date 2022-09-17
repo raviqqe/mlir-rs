@@ -1,7 +1,7 @@
 //! Utility functions.
 
 use crate::{
-    context::Context, dialect, logical_result::LogicalResult, pass, string_ref::StringRef,
+    context::Context, dialect, logical_result::LogicalResult, pass, string_ref::StringRef, Error,
 };
 use mlir_sys::{
     mlirParsePassPipeline, mlirRegisterAllDialects, mlirRegisterAllLLVMTranslations,
@@ -28,10 +28,16 @@ pub fn register_all_passes() {
 }
 
 /// Parses a pass pipeline.
-pub fn parse_pass_pipeline(manager: pass::OperationManager, source: &str) -> LogicalResult {
-    LogicalResult::from_raw(unsafe {
+pub fn parse_pass_pipeline(manager: pass::OperationManager, source: &str) -> Result<(), Error> {
+    let result = LogicalResult::from_raw(unsafe {
         mlirParsePassPipeline(manager.to_raw(), StringRef::from(source).to_raw())
-    })
+    });
+
+    if result.is_success() {
+        Ok(())
+    } else {
+        Err(Error::ParsePassPipeline)
+    }
 }
 
 // TODO Use into_raw_parts.

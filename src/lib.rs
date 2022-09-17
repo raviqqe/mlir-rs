@@ -86,8 +86,7 @@ mod string_ref;
 pub mod utility;
 
 pub use self::{
-    context::Context, error::Error, execution_engine::ExecutionEngine,
-    logical_result::LogicalResult, string_ref::StringRef,
+    context::Context, error::Error, execution_engine::ExecutionEngine, string_ref::StringRef,
 };
 
 #[cfg(test)]

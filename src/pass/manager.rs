@@ -76,6 +76,7 @@ mod tests {
         ir::{Location, Module},
         pass::{self, transform::register_print_operation_stats},
         utility::{parse_pass_pipeline, register_all_dialects},
+        Error,
     };
     use indoc::indoc;
     use pretty_assertions::assert_eq;
@@ -214,21 +215,25 @@ mod tests {
         let context = Context::new();
         let manager = Manager::new(&context);
 
-        assert!(parse_pass_pipeline(
-            manager.as_operation_pass_manager(),
-            "builtin.module(func.func(print-op-stats{json=false}),\
+        assert_eq!(
+            parse_pass_pipeline(
+                manager.as_operation_pass_manager(),
+                "builtin.module(func.func(print-op-stats{json=false}),\
                 func.func(print-op-stats{json=false}))"
-        )
-        .is_failure());
+            ),
+            Err(Error::ParsePassPipeline)
+        );
 
         register_print_operation_stats();
 
-        assert!(parse_pass_pipeline(
-            manager.as_operation_pass_manager(),
-            "builtin.module(func.func(print-op-stats{json=false}),\
+        assert_eq!(
+            parse_pass_pipeline(
+                manager.as_operation_pass_manager(),
+                "builtin.module(func.func(print-op-stats{json=false}),\
                 func.func(print-op-stats{json=false}))"
-        )
-        .is_success());
+            ),
+            Ok(())
+        );
 
         assert_eq!(
             manager.as_operation_pass_manager().to_string(),
