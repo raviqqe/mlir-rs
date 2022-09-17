@@ -6,9 +6,11 @@ use std::{
 /// A Melior error.
 #[derive(Debug, Eq, PartialEq)]
 pub enum Error {
+    BlockArgumentExpected(String),
     BlockArgumentPosition(String, usize),
     FunctionExpected(String),
     InvokeFunction,
+    OperationResultExpected(String),
     OperationResultPosition(String, usize),
     RunPass,
     ParsePassPipeline,
@@ -17,6 +19,9 @@ pub enum Error {
 impl Display for Error {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         match self {
+            Self::BlockArgumentExpected(value) => {
+                write!(formatter, "block argument expected: {}", value)
+            }
             Self::BlockArgumentPosition(block, position) => {
                 write!(
                     formatter,
@@ -26,6 +31,9 @@ impl Display for Error {
             }
             Self::FunctionExpected(r#type) => write!(formatter, "function expected: {}", r#type),
             Self::InvokeFunction => write!(formatter, "failed to invoke JIT-compiled function"),
+            Self::OperationResultExpected(value) => {
+                write!(formatter, "operation result expected: {}", value)
+            }
             Self::OperationResultPosition(operation, position) => {
                 write!(
                     formatter,

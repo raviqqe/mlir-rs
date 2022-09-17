@@ -1,5 +1,5 @@
 use super::Value;
-use crate::ir::OperationRef;
+use crate::{ir::OperationRef, Error};
 use mlir_sys::{mlirOpResultGetOwner, mlirOpResultGetResultNumber};
 use std::ops::Deref;
 
@@ -28,6 +28,18 @@ impl<'a> Deref for OperationResult<'a> {
 
     fn deref(&self) -> &Self::Target {
         &self.value
+    }
+}
+
+impl<'a> TryFrom<Value<'a>> for OperationResult<'a> {
+    type Error = Error;
+
+    fn try_from(value: Value<'a>) -> Result<Self, Self::Error> {
+        if value.is_operation_result() {
+            Ok(unsafe { Self::from_value(value) })
+        } else {
+            Err(Error::OperationResultExpected(value.to_string()))
+        }
     }
 }
 

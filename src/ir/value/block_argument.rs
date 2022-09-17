@@ -1,5 +1,8 @@
 use super::Value;
-use crate::ir::{BlockRef, Type};
+use crate::{
+    ir::{BlockRef, Type},
+    Error,
+};
 use mlir_sys::{
     mlirBlockArgumentGetArgNumber, mlirBlockArgumentGetOwner, mlirBlockArgumentSetType,
 };
@@ -34,6 +37,18 @@ impl<'a> Deref for BlockArgument<'a> {
 
     fn deref(&self) -> &Self::Target {
         &self.value
+    }
+}
+
+impl<'a> TryFrom<Value<'a>> for BlockArgument<'a> {
+    type Error = Error;
+
+    fn try_from(value: Value<'a>) -> Result<Self, Self::Error> {
+        if value.is_block_argument() {
+            Ok(unsafe { Self::from_value(value) })
+        } else {
+            Err(Error::BlockArgumentExpected(value.to_string()))
+        }
     }
 }
 
