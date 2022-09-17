@@ -1,6 +1,7 @@
+use super::OperationPassManager;
 use crate::{
-    context::Context, logical_result::LogicalResult, module::Module,
-    operation_pass_manager::OperationPassManager, pass::Pass, string_ref::StringRef,
+    context::Context, logical_result::LogicalResult, module::Module, pass::Pass,
+    string_ref::StringRef,
 };
 use mlir_sys::{
     mlirPassManagerAddOwnedPass, mlirPassManagerCreate, mlirPassManagerDestroy,

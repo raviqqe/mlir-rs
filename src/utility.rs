@@ -1,6 +1,6 @@
 use crate::{
-    context::Context, dialect, logical_result::LogicalResult,
-    operation_pass_manager::OperationPassManager, string_ref::StringRef,
+    context::Context, dialect, logical_result::LogicalResult, pass::OperationPassManager,
+    string_ref::StringRef,
 };
 use mlir_sys::{
     mlirParsePassPipeline, mlirRegisterAllDialects, mlirRegisterAllLLVMTranslations,

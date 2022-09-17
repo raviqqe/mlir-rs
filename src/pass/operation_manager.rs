@@ -1,4 +1,5 @@
-use crate::{pass::Pass, pass_manager::PassManager, string_ref::StringRef};
+use super::PassManager;
+use crate::{pass::Pass, string_ref::StringRef};
 use mlir_sys::{
     mlirOpPassManagerAddOwnedPass, mlirOpPassManagerGetNestedUnder, mlirPrintPassPipeline,
     MlirOpPassManager, MlirStringRef,

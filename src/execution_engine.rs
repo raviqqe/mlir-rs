@@ -61,8 +61,7 @@ mod tests {
         context::Context,
         dialect,
         module::Module,
-        pass,
-        pass_manager::PassManager,
+        pass::{self, PassManager},
         utility::{register_all_dialects, register_all_llvm_translations},
     };
 
