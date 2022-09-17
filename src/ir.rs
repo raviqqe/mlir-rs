@@ -19,5 +19,5 @@ pub use self::{
     operation::{Operation, OperationRef},
     r#type::Type,
     region::{Region, RegionRef},
-    value::{BlockArgument, OperationResult, Value},
+    value::Value,
 };

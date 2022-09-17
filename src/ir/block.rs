@@ -1,4 +1,7 @@
-use super::{BlockArgument, Location, Operation, OperationRef, RegionRef, Type, Value};
+mod argument;
+
+pub use self::argument::Argument;
+use super::{Location, Operation, OperationRef, RegionRef, Type, Value};
 use crate::{
     context::Context,
     utility::{into_raw_array, print_callback},
@@ -96,12 +99,13 @@ pub struct BlockRef<'a> {
 
 impl<'c> BlockRef<'c> {
     /// Gets an argument at a position.
-    pub fn argument(&self, position: usize) -> Result<BlockArgument, Error> {
+    pub fn argument(&self, position: usize) -> Result<Argument, Error> {
         unsafe {
             if position < self.argument_count() as usize {
-                Ok(BlockArgument::from_value(Value::from_raw(
-                    mlirBlockGetArgument(self.raw, position as isize),
-                )))
+                Ok(Argument::from_value(Value::from_raw(mlirBlockGetArgument(
+                    self.raw,
+                    position as isize,
+                ))))
             } else {
                 Err(Error::BlockArgumentPosition(self.to_string(), position))
             }

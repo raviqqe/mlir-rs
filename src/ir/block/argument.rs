@@ -10,11 +10,11 @@ use std::ops::Deref;
 
 /// A block argument.
 #[derive(Clone, Copy, Debug)]
-pub struct BlockArgument<'a> {
+pub struct Argument<'a> {
     value: Value<'a>,
 }
 
-impl<'a> BlockArgument<'a> {
+impl<'a> Argument<'a> {
     pub fn argument_number(&self) -> usize {
         unsafe { mlirBlockArgumentGetArgNumber(self.value.to_raw()) as usize }
     }
@@ -32,7 +32,7 @@ impl<'a> BlockArgument<'a> {
     }
 }
 
-impl<'a> Deref for BlockArgument<'a> {
+impl<'a> Deref for Argument<'a> {
     type Target = Value<'a>;
 
     fn deref(&self) -> &Self::Target {
@@ -40,7 +40,7 @@ impl<'a> Deref for BlockArgument<'a> {
     }
 }
 
-impl<'a> TryFrom<Value<'a>> for BlockArgument<'a> {
+impl<'a> TryFrom<Value<'a>> for Argument<'a> {
     type Error = Error;
 
     fn try_from(value: Value<'a>) -> Result<Self, Self::Error> {

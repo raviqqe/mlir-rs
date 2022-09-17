@@ -5,11 +5,11 @@ use std::ops::Deref;
 
 /// An operation result.
 #[derive(Clone, Copy, Debug)]
-pub struct OperationResult<'a> {
+pub struct ResultValue<'a> {
     value: Value<'a>,
 }
 
-impl<'a> OperationResult<'a> {
+impl<'a> ResultValue<'a> {
     pub fn result_number(&self) -> usize {
         unsafe { mlirOpResultGetResultNumber(self.value.to_raw()) as usize }
     }
@@ -23,7 +23,7 @@ impl<'a> OperationResult<'a> {
     }
 }
 
-impl<'a> Deref for OperationResult<'a> {
+impl<'a> Deref for ResultValue<'a> {
     type Target = Value<'a>;
 
     fn deref(&self) -> &Self::Target {
@@ -31,7 +31,7 @@ impl<'a> Deref for OperationResult<'a> {
     }
 }
 
-impl<'a> TryFrom<Value<'a>> for OperationResult<'a> {
+impl<'a> TryFrom<Value<'a>> for ResultValue<'a> {
     type Error = Error;
 
     fn try_from(value: Value<'a>) -> Result<Self, Self::Error> {
