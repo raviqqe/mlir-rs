@@ -34,7 +34,7 @@ impl Default for Registry {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::context::Context;
+    use crate::{context::Context, dialect::Handle};
 
     #[test]
     fn new() {

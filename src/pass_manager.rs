@@ -72,7 +72,7 @@ impl<'c> Drop for PassManager<'c> {
 mod tests {
     use super::*;
     use crate::{
-        dialect_registry::DialectRegistry,
+        dialect,
         location::Location,
         pass,
         utility::{parse_pass_pipeline, register_all_dialects, register_print_operation_stats},
@@ -81,7 +81,7 @@ mod tests {
     use pretty_assertions::assert_eq;
 
     fn register_all_upstream_dialects(context: &Context) {
-        let registry = DialectRegistry::new();
+        let registry = dialect::Registry::new();
         register_all_dialects(&registry);
         context.append_dialect_registry(&registry);
     }

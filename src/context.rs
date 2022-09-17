@@ -1,4 +1,7 @@
-use crate::{dialect::Dialect, dialect_registry::DialectRegistry, string_ref::StringRef};
+use crate::{
+    dialect::{self, Dialect},
+    string_ref::StringRef,
+};
 use mlir_sys::{
     mlirContextAppendDialectRegistry, mlirContextCreate, mlirContextDestroy,
     mlirContextGetNumRegisteredDialects, mlirContextGetOrLoadDialect,
@@ -68,7 +71,7 @@ impl<'a> ContextRef<'a> {
     }
 
     /// Appends a dialect registry.
-    pub fn append_dialect_registry(&self, registry: &DialectRegistry) {
+    pub fn append_dialect_registry(&self, registry: &dialect::Registry) {
         unsafe { mlirContextAppendDialectRegistry(self.raw, registry.to_raw()) }
     }
 
@@ -102,6 +105,6 @@ mod tests {
     fn append_dialect_registry() {
         let context = Context::new();
 
-        context.append_dialect_registry(&DialectRegistry::new());
+        context.append_dialect_registry(&dialect::Registry::new());
     }
 }

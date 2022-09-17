@@ -87,9 +87,8 @@ impl<'a> Display for Value<'a> {
 #[cfg(test)]
 mod tests {
     use crate::{
-        attribute::Attribute, block::Block, context::Context, dialect_registry::DialectRegistry,
-        identifier::Identifier, location::Location, operation, r#type::Type,
-        utility::register_all_dialects,
+        attribute::Attribute, block::Block, context::Context, dialect, identifier::Identifier,
+        location::Location, operation, r#type::Type, utility::register_all_dialects,
     };
 
     #[test]
@@ -215,7 +214,7 @@ mod tests {
 
     #[test]
     fn display_with_dialect_loaded() {
-        let registry = DialectRegistry::new();
+        let registry = dialect::Registry::new();
         register_all_dialects(&registry);
 
         let context = Context::new();

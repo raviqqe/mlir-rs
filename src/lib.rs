@@ -31,7 +31,7 @@
 //!     utility::register_all_dialects,
 //! };
 //!
-//! let registry = DialectRegistry::new();
+//! let registry = dialect::Registry::new();
 //! register_all_dialects(&registry);
 //!
 //! let context = Context::new();
@@ -79,8 +79,6 @@ pub mod attribute;
 pub mod block;
 pub mod context;
 pub mod dialect;
-pub mod dialect_handle;
-pub mod dialect_registry;
 pub mod error;
 pub mod execution_engine;
 pub mod identifier;
@@ -100,16 +98,8 @@ pub mod value;
 #[cfg(test)]
 mod tests {
     use crate::{
-        attribute::Attribute,
-        block::Block,
-        context::Context,
-        dialect_registry::DialectRegistry,
-        identifier::Identifier,
-        location::Location,
-        module::Module,
-        operation::{self},
-        r#type::Type,
-        region::Region,
+        attribute::Attribute, block::Block, context::Context, dialect, identifier::Identifier,
+        location::Location, module::Module, operation, r#type::Type, region::Region,
         utility::register_all_dialects,
     };
 
@@ -124,7 +114,7 @@ mod tests {
 
     #[test]
     fn build_module_with_dialect() {
-        let registry = DialectRegistry::new();
+        let registry = dialect::Registry::new();
         let context = Context::new();
         context.append_dialect_registry(&registry);
         let module = Module::new(Location::unknown(&context));
@@ -135,7 +125,7 @@ mod tests {
 
     #[test]
     fn build_add() {
-        let registry = DialectRegistry::new();
+        let registry = dialect::Registry::new();
         register_all_dialects(&registry);
 
         let context = Context::new();
@@ -189,7 +179,7 @@ mod tests {
 
     #[test]
     fn build_sum() {
-        let registry = DialectRegistry::new();
+        let registry = dialect::Registry::new();
         register_all_dialects(&registry);
 
         let context = Context::new();

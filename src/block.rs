@@ -277,8 +277,7 @@ impl<'a> Display for BlockRef<'a> {
 mod tests {
     use super::*;
     use crate::{
-        dialect_registry::DialectRegistry, module::Module, operation, region::Region,
-        utility::register_all_dialects,
+        dialect, module::Module, operation, region::Region, utility::register_all_dialects,
     };
 
     #[test]
@@ -345,7 +344,7 @@ mod tests {
 
     #[test]
     fn terminator() {
-        let registry = DialectRegistry::new();
+        let registry = dialect::Registry::new();
         register_all_dialects(&registry);
 
         let context = Context::new();

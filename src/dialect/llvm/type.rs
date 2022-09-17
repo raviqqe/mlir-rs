@@ -52,7 +52,7 @@ pub fn void(context: &Context) -> Type {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::dialect_handle::DialectHandle;
+    use crate::dialect;
 
     fn create_context() -> Context {
         let context = Context::new();

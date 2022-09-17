@@ -48,15 +48,14 @@ impl<'c> Eq for Dialect<'c> {}
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::dialect_handle::DialectHandle;
 
     #[test]
     fn equal() {
         let context = Context::new();
 
         assert_eq!(
-            DialectHandle::func().load_dialect(&context),
-            DialectHandle::func().load_dialect(&context)
+            Handle::func().load_dialect(&context),
+            Handle::func().load_dialect(&context)
         );
     }
 
@@ -65,8 +64,8 @@ mod tests {
         let context = Context::new();
 
         assert_ne!(
-            DialectHandle::func().load_dialect(&context),
-            DialectHandle::llvm().load_dialect(&context)
+            Handle::func().load_dialect(&context),
+            Handle::llvm().load_dialect(&context)
         );
     }
 }

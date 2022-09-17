@@ -59,7 +59,7 @@ mod tests {
     use super::*;
     use crate::{
         context::Context,
-        dialect_registry::DialectRegistry,
+        dialect,
         module::Module,
         pass,
         pass_manager::PassManager,
@@ -68,7 +68,7 @@ mod tests {
 
     #[test]
     fn invoke_packed() {
-        let registry = DialectRegistry::new();
+        let registry = dialect::Registry::new();
         register_all_dialects(&registry);
 
         let context = Context::new();

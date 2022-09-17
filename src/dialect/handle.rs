@@ -1,3 +1,4 @@
+use super::Registry;
 use crate::{context::Context, dialect::Dialect, string_ref::StringRef};
 use mlir_sys::{
     mlirDialectHandleGetNamespace, mlirDialectHandleInsertDialect, mlirDialectHandleLoadDialect,
@@ -81,7 +82,7 @@ impl Handle {
     }
 
     /// Inserts a dialect into a dialect registry.
-    pub fn insert_dialect(&self, registry: &DialectRegistry) {
+    pub fn insert_dialect(&self, registry: &Registry) {
         unsafe { mlirDialectHandleInsertDialect(self.raw, registry.to_raw()) }
     }
 
@@ -121,7 +122,7 @@ mod tests {
 
     #[test]
     fn insert_dialect() {
-        let registry = dialect::Registry::new();
+        let registry = Registry::new();
 
         Handle::func().insert_dialect(&registry);
     }

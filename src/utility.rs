@@ -1,5 +1,5 @@
 use crate::{
-    context::Context, dialect_registry::DialectRegistry, logical_result::LogicalResult,
+    context::Context, dialect, logical_result::LogicalResult,
     operation_pass_manager::OperationPassManager, string_ref::StringRef,
 };
 use mlir_sys::{
@@ -9,7 +9,7 @@ use mlir_sys::{
 use std::sync::Once;
 
 /// Registers all dialects to a dialect registry.
-pub fn register_all_dialects(registry: &DialectRegistry) {
+pub fn register_all_dialects(registry: &dialect::Registry) {
     unsafe { mlirRegisterAllDialects(registry.to_raw()) }
 }
 
@@ -54,14 +54,14 @@ mod tests {
 
     #[test]
     fn register_dialects() {
-        let registry = DialectRegistry::new();
+        let registry = dialect::Registry::new();
 
         register_all_dialects(&registry);
     }
 
     #[test]
     fn register_dialects_twice() {
-        let registry = DialectRegistry::new();
+        let registry = dialect::Registry::new();
 
         register_all_dialects(&registry);
         register_all_dialects(&registry);
