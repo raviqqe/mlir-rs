@@ -1,5 +1,5 @@
 use super::{BlockArgument, Location, Operation, OperationRef, RegionRef, Type, Value};
-use crate::{context::Context, string_ref::StringRef, utility::into_raw_array};
+use crate::{context::Context, string_ref::StringRef, utility::into_raw_array, Error};
 use mlir_sys::{
     mlirBlockAddArgument, mlirBlockAppendOwnedOperation, mlirBlockCreate, mlirBlockDestroy,
     mlirBlockDetach, mlirBlockEqual, mlirBlockGetArgument, mlirBlockGetFirstOperation,
@@ -92,14 +92,14 @@ pub struct BlockRef<'a> {
 
 impl<'c> BlockRef<'c> {
     /// Gets an argument at a position.
-    pub fn argument(&self, position: usize) -> Option<BlockArgument> {
+    pub fn argument(&self, position: usize) -> Result<BlockArgument, Error> {
         unsafe {
             if position < self.argument_count() as usize {
-                Some(BlockArgument::from_value(Value::from_raw(
+                Ok(BlockArgument::from_value(Value::from_raw(
                     mlirBlockGetArgument(self.raw, position as isize),
                 )))
             } else {
-                None
+                Err(Error::BlockArgumentPosition(self.to_string(), position))
             }
         }
     }
@@ -294,8 +294,11 @@ mod tests {
     }
 
     #[test]
-    fn argument_none() {
-        assert!(Block::new(&[]).argument(0).is_none());
+    fn argument_error() {
+        assert_eq!(
+            Block::new(&[]).argument(0).unwrap_err(),
+            Error::BlockArgumentPosition("<<UNLINKED BLOCK>>\n".into(), 0)
+        );
     }
 
     #[test]

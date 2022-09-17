@@ -7,6 +7,7 @@ use super::{BlockRef, Identifier, OperationResult, RegionRef, Value};
 use crate::{
     context::{Context, ContextRef},
     string_ref::StringRef,
+    Error,
 };
 use core::fmt;
 use mlir_sys::{
@@ -95,15 +96,15 @@ impl<'a> OperationRef<'a> {
         unsafe { BlockRef::from_option_raw(mlirOperationGetBlock(self.raw)) }
     }
 
-    /// Gets a result at an index.
-    pub fn result(&self, index: usize) -> Option<OperationResult> {
+    /// Gets a result at a position.
+    pub fn result(&self, position: usize) -> Result<OperationResult, Error> {
         unsafe {
-            if index < self.result_count() as usize {
-                Some(OperationResult::from_value(Value::from_raw(
-                    mlirOperationGetResult(self.raw, index as isize),
+            if position < self.result_count() as usize {
+                Ok(OperationResult::from_value(Value::from_raw(
+                    mlirOperationGetResult(self.raw, position as isize),
                 )))
             } else {
-                None
+                Err(Error::OperationResultPosition(self.to_string(), position))
             }
         }
     }
@@ -216,6 +217,7 @@ mod tests {
         context::Context,
         ir::{Block, Location},
     };
+    use pretty_assertions::assert_eq;
 
     #[test]
     fn new() {
@@ -255,10 +257,13 @@ mod tests {
 
     #[test]
     fn result_none() {
-        assert!(Builder::new("foo", Location::unknown(&Context::new()),)
-            .build()
-            .result(0)
-            .is_none());
+        assert_eq!(
+            Builder::new("foo", Location::unknown(&Context::new()))
+                .build()
+                .result(0)
+                .unwrap_err(),
+            Error::OperationResultPosition("\"foo\"".into(), 0)
+        );
     }
 
     #[test]

@@ -122,7 +122,7 @@ impl<'c> Type<'c> {
     pub fn input(&self, position: usize) -> Result<Option<Self>, Error> {
         unsafe {
             if !mlirTypeIsAFunction(self.raw) {
-                return Err(Error::FunctionExpected(*self));
+                return Err(Error::FunctionExpected(self.to_string()));
             }
 
             Ok(Self::from_option_raw(mlirFunctionTypeGetInput(
@@ -136,7 +136,7 @@ impl<'c> Type<'c> {
     pub fn result(&self, position: usize) -> Result<Option<Self>, Error> {
         unsafe {
             if !mlirTypeIsAFunction(self.raw) {
-                return Err(Error::FunctionExpected(*self));
+                return Err(Error::FunctionExpected(self.to_string()));
             }
 
             Ok(Self::from_option_raw(mlirFunctionTypeGetResult(
@@ -150,7 +150,7 @@ impl<'c> Type<'c> {
     pub fn input_count(&self) -> Result<usize, Error> {
         unsafe {
             if !mlirTypeIsAFunction(self.raw) {
-                return Err(Error::FunctionExpected(*self));
+                return Err(Error::FunctionExpected(self.to_string()));
             }
 
             Ok(mlirFunctionTypeGetNumInputs(self.raw) as usize)
@@ -161,7 +161,7 @@ impl<'c> Type<'c> {
     pub fn result_count(&self) -> Result<usize, Error> {
         unsafe {
             if !mlirTypeIsAFunction(self.raw) {
-                return Err(Error::FunctionExpected(*self));
+                return Err(Error::FunctionExpected(self.to_string()));
             }
 
             Ok(mlirFunctionTypeGetNumResults(self.raw) as usize)
@@ -390,7 +390,10 @@ mod tests {
             let context = Context::new();
             let r#type = Type::integer(&context, 42);
 
-            assert_eq!(r#type.input(0), Err(Error::FunctionExpected(r#type)));
+            assert_eq!(
+                r#type.input(0),
+                Err(Error::FunctionExpected(r#type.to_string()))
+            );
         }
 
         #[test]
@@ -409,7 +412,10 @@ mod tests {
             let context = Context::new();
             let r#type = Type::integer(&context, 42);
 
-            assert_eq!(r#type.result(0), Err(Error::FunctionExpected(r#type)));
+            assert_eq!(
+                r#type.result(0),
+                Err(Error::FunctionExpected(r#type.to_string()))
+            );
         }
 
         #[test]
@@ -428,7 +434,10 @@ mod tests {
             let context = Context::new();
             let r#type = Type::integer(&context, 42);
 
-            assert_eq!(r#type.input_count(), Err(Error::FunctionExpected(r#type)));
+            assert_eq!(
+                r#type.input_count(),
+                Err(Error::FunctionExpected(r#type.to_string()))
+            );
         }
 
         #[test]
@@ -447,7 +456,10 @@ mod tests {
             let context = Context::new();
             let r#type = Type::integer(&context, 42);
 
-            assert_eq!(r#type.result_count(), Err(Error::FunctionExpected(r#type)));
+            assert_eq!(
+                r#type.result_count(),
+                Err(Error::FunctionExpected(r#type.to_string()))
+            );
         }
     }
 }

@@ -1,4 +1,3 @@
-use crate::ir::Type;
 use std::{
     error,
     fmt::{self, Display, Formatter},
@@ -6,16 +5,32 @@ use std::{
 
 /// A Melior error.
 #[derive(Debug, Eq, PartialEq)]
-pub enum Error<'c> {
-    FunctionExpected(Type<'c>),
+pub enum Error {
+    BlockArgumentPosition(String, usize),
+    FunctionExpected(String),
+    OperationResultPosition(String, usize),
 }
 
-impl<'c> Display for Error<'c> {
+impl Display for Error {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         match self {
+            Self::BlockArgumentPosition(block, position) => {
+                write!(
+                    formatter,
+                    "block argument position {} out of range: {}",
+                    position, block
+                )
+            }
             Self::FunctionExpected(r#type) => write!(formatter, "function expected: {}", r#type),
+            Self::OperationResultPosition(operation, position) => {
+                write!(
+                    formatter,
+                    "operation result position {} out of range: {}",
+                    position, operation
+                )
+            }
         }
     }
 }
 
-impl<'c> error::Error for Error<'c> {}
+impl error::Error for Error {}
