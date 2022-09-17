@@ -103,16 +103,18 @@ mod tests {
         let mut argument = 42;
         let mut result = -1;
 
-        assert!(unsafe {
-            engine.invoke_packed(
-                "add",
-                &mut [
-                    &mut argument as *mut i32 as *mut (),
-                    &mut result as *mut i32 as *mut (),
-                ],
-            )
-        }
-        .is_success());
+        assert_eq!(
+            unsafe {
+                engine.invoke_packed(
+                    "add",
+                    &mut [
+                        &mut argument as *mut i32 as *mut (),
+                        &mut result as *mut i32 as *mut (),
+                    ],
+                )
+            },
+            Ok(())
+        );
 
         assert_eq!(argument, 42);
         assert_eq!(result, 84);

@@ -1,6 +1,7 @@
 use super::OperationManager;
 use crate::{
     context::Context, ir::Module, logical_result::LogicalResult, pass::Pass, string_ref::StringRef,
+    Error,
 };
 use mlir_sys::{
     mlirPassManagerAddOwnedPass, mlirPassManagerCreate, mlirPassManagerDestroy,
@@ -52,8 +53,15 @@ impl<'c> Manager<'c> {
     }
 
     /// Runs passes added to a pass manager against a module.
-    pub fn run(&self, module: &mut Module) -> LogicalResult {
-        LogicalResult::from_raw(unsafe { mlirPassManagerRun(self.raw, module.to_raw()) })
+    pub fn run(&self, module: &mut Module) -> Result<(), Error> {
+        let result =
+            LogicalResult::from_raw(unsafe { mlirPassManagerRun(self.raw, module.to_raw()) });
+
+        if result.is_success() {
+            Ok(())
+        } else {
+            Err(Error::RunPass)
+        }
     }
 
     /// Converts a pass manager to an operation pass manager.

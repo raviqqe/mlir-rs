@@ -10,6 +10,7 @@ pub enum Error {
     FunctionExpected(String),
     InvokeFunction,
     OperationResultPosition(String, usize),
+    RunPass,
     ParsePassPipeline,
 }
 
@@ -32,7 +33,8 @@ impl Display for Error {
                     position, operation
                 )
             }
-            Self::ParsePassPipeline => write!(formatter, "parse pass pipeline"),
+            Self::RunPass => write!(formatter, "failed to run pass"),
+            Self::ParsePassPipeline => write!(formatter, "failed to parse pass pipeline"),
         }
     }
 }
