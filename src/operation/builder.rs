@@ -172,8 +172,14 @@ mod tests {
     #[test]
     fn enable_result_type_infrence() {
         let context = Context::new();
+        let location = Location::unknown(&context);
 
-        Builder::new("foo", Location::unknown(&context))
+        // context.load_all_available_dialects();
+        let block = Block::new(&[(Type::index(&context), location)]);
+        let argument = *block.argument(0).unwrap();
+
+        Builder::new("arith.addi", location)
+            .add_operands(&[argument, argument])
             .enable_result_type_infrence()
             .build();
     }
