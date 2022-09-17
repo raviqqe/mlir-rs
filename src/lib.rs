@@ -21,7 +21,7 @@
 //!     attribute::Attribute,
 //!     block::Block,
 //!     context::Context,
-//!     dialect_registry::DialectRegistry,
+//!     dialect,
 //!     identifier::Identifier,
 //!     location::Location,
 //!     module::Module,
