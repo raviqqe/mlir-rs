@@ -356,7 +356,7 @@ mod tests {
     fn debug() {
         let context = Context::new();
 
-        assert_eq!(format!("{:?}", Type::integer(&context, 42)), "i42");
+        assert_eq!(format!("{:?}", Type::integer(&context, 42)), "Type(i42)");
     }
 
     mod function {
