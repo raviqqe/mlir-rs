@@ -20,7 +20,7 @@ use mlir_sys::{
 };
 use std::{
     ffi::c_void,
-    fmt::{Display, Formatter},
+    fmt::{Debug, Display, Formatter},
     marker::PhantomData,
     mem::forget,
     ops::Deref,
@@ -75,7 +75,7 @@ impl<'c> Deref for Operation<'c> {
 /// A reference to an operation.
 // TODO Should we split context lifetimes? Or, is it transitively proven that
 // 'c > 'a?
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 pub struct OperationRef<'a> {
     raw: MlirOperation,
     _reference: PhantomData<&'a Operation<'a>>,
@@ -204,6 +204,14 @@ impl<'a> Display for OperationRef<'a> {
         }
 
         data.1
+    }
+}
+
+impl<'a> Debug for OperationRef<'a> {
+    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
+        write!(formatter, "OperationRef(\n")?;
+        Display::fmt(self, formatter)?;
+        write!(formatter, ")")
     }
 }
 
