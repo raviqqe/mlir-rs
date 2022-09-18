@@ -352,6 +352,13 @@ mod tests {
         assert_eq!(Type::integer(&context, 42).to_string(), "i42");
     }
 
+    #[test]
+    fn debug() {
+        let context = Context::new();
+
+        assert_eq!(format!("{:?}", Type::integer(&context, 42)), "i42");
+    }
+
     mod function {
         use super::*;
 
