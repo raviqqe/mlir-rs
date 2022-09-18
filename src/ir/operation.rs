@@ -295,7 +295,7 @@ mod tests {
             Builder::new("foo", Location::unknown(&context),)
                 .build()
                 .to_string(),
-            "\"foo\"() : () -> ()"
+            "\"foo\"() : () -> ()\n"
         );
     }
 
