@@ -6,14 +6,14 @@ use crate::utility::print_callback;
 use mlir_sys::{mlirValueEqual, mlirValuePrint, MlirValue};
 use std::{
     ffi::c_void,
-    fmt::{self, Display, Formatter},
+    fmt::{self, Debug, Display, Formatter},
     marker::PhantomData,
 };
 
 /// A value.
 // Values are always non-owning references to their parents, such as operations
 // and block arguments. See the `Value` class in the MLIR C++ API.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 pub struct Value<'a> {
     raw: MlirValue,
     _parent: PhantomData<&'a ()>,
@@ -53,6 +53,16 @@ impl<'a> Display for Value<'a> {
         }
 
         data.1
+    }
+}
+
+impl<'a> Debug for Value<'a> {
+    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
+        write!(formatter, "Value(\n")?;
+
+        Display::fmt(self, formatter)?;
+
+        write!(formatter, ")")
     }
 }
 
@@ -222,6 +232,27 @@ mod tests {
         assert_eq!(
             operation.result(0).unwrap().to_string(),
             "%c0 = arith.constant 0 : index\n"
+        );
+    }
+
+    #[test]
+    fn debug() {
+        let context = Context::new();
+        context.load_all_available_dialects();
+        let location = Location::unknown(&context);
+        let index_type = Type::parse(&context, "index").unwrap();
+
+        let operation = operation::Builder::new("arith.constant", location)
+            .add_results(&[index_type])
+            .add_attributes(&[(
+                Identifier::new(&context, "value"),
+                Attribute::parse(&context, "0 : index").unwrap(),
+            )])
+            .build();
+
+        assert_eq!(
+            format!("{:?}", operation.result(0).unwrap()),
+            "Value(\n%0 = \"arith.constant\"() {value = 0 : index} : () -> index\n)"
         );
     }
 }
