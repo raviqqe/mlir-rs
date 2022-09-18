@@ -209,7 +209,7 @@ impl<'a> Display for OperationRef<'a> {
 
 impl<'a> Debug for OperationRef<'a> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
-        write!(formatter, "OperationRef(\n")?;
+        writeln!(formatter, "OperationRef(")?;
         Display::fmt(self, formatter)?;
         write!(formatter, ")")
     }

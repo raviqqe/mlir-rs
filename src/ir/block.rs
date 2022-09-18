@@ -272,7 +272,7 @@ impl<'a> Display for BlockRef<'a> {
 
 impl<'a> Debug for BlockRef<'a> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
-        write!(formatter, "BlockRef(\n")?;
+        writeln!(formatter, "BlockRef(")?;
         Display::fmt(self, formatter)?;
         write!(formatter, ")")
     }
