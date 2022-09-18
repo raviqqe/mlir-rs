@@ -59,9 +59,7 @@ impl<'a> Display for Value<'a> {
 impl<'a> Debug for Value<'a> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         write!(formatter, "Value(\n")?;
-
         Display::fmt(self, formatter)?;
-
         write!(formatter, ")")
     }
 }

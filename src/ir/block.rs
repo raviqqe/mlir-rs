@@ -19,7 +19,7 @@ use mlir_sys::{
 };
 use std::{
     ffi::c_void,
-    fmt::{self, Display, Formatter},
+    fmt::{self, Debug, Display, Formatter},
     marker::PhantomData,
     mem::forget,
     ops::Deref,
@@ -93,7 +93,7 @@ impl<'c> Deref for Block<'c> {
 }
 
 /// A reference of a block.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 pub struct BlockRef<'a> {
     raw: MlirBlock,
     _reference: PhantomData<&'a Block<'a>>,
@@ -267,6 +267,14 @@ impl<'a> Display for BlockRef<'a> {
         }
 
         data.1
+    }
+}
+
+impl<'a> Debug for Value<'a> {
+    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
+        write!(formatter, "Value(\n")?;
+        Display::fmt(self, formatter)?;
+        write!(formatter, ")")
     }
 }
 
