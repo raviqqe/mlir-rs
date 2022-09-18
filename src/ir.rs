@@ -1,7 +1,7 @@
 //! IR objects and builders.
 
 mod attribute;
-mod block;
+pub mod block;
 mod identifier;
 mod location;
 mod module;
