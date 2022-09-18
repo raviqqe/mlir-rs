@@ -1,3 +1,5 @@
+//! Blocks.
+
 mod argument;
 
 pub use self::argument::Argument;
