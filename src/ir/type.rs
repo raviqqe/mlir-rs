@@ -219,7 +219,7 @@ impl<'c> Display for Type<'c> {
 
 impl<'c> Debug for Type<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
-        write!(formatter, "Type(\n")?;
+        write!(formatter, "Type(")?;
         Display::fmt(self, formatter)?;
         write!(formatter, ")")
     }
