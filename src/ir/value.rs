@@ -251,7 +251,7 @@ mod tests {
             .build();
 
         assert_eq!(
-            format!("{:?}", operation.result(0).unwrap()),
+            format!("{:?}", Value::from(operation.result(0).unwrap())),
             "Value(\n%0 = \"arith.constant\"() {value = 0 : index} : () -> index\n)"
         );
     }
