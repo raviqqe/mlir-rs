@@ -89,7 +89,10 @@ mod string_ref;
 pub mod utility;
 
 pub use self::{
-    context::Context, error::Error, execution_engine::ExecutionEngine, string_ref::StringRef,
+    context::{Context, ContextRef},
+    error::Error,
+    execution_engine::ExecutionEngine,
+    string_ref::StringRef,
 };
 
 #[cfg(test)]
