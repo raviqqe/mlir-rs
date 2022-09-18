@@ -18,7 +18,7 @@ use mlir_sys::{
 };
 use std::{
     ffi::c_void,
-    fmt::{self, Display, Formatter},
+    fmt::{self, Debug, Display, Formatter},
     marker::PhantomData,
 };
 
@@ -26,7 +26,7 @@ use super::Location;
 
 /// A type.
 // Types are always values but their internal storage is owned by contexts.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 pub struct Type<'c> {
     raw: MlirType,
     _context: PhantomData<&'c Context>,
@@ -214,6 +214,14 @@ impl<'c> Display for Type<'c> {
         }
 
         data.1
+    }
+}
+
+impl<'c> Debug for Type<'c> {
+    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
+        write!(formatter, "Type(\n")?;
+        Display::fmt(self, formatter)?;
+        write!(formatter, ")")
     }
 }
 
