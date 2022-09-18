@@ -3,7 +3,7 @@ use mlir_sys::{
     mlirValueDump, mlirValueGetType, mlirValueIsABlockArgument, mlirValueIsAOpResult, MlirValue,
 };
 
-/// A value-like trait.
+/// Trait for value-like types.
 pub trait ValueLike {
     /// Converts a raw value into a value.
     ///
