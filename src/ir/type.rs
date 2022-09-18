@@ -1,6 +1,6 @@
 //! Types and type IDs.
 
-mod id;
+pub mod id;
 
 pub use self::id::Id;
 use crate::{
