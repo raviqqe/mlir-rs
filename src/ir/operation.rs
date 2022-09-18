@@ -286,4 +286,29 @@ mod tests {
 
         operation.to_owned();
     }
+
+    #[test]
+    fn display() {
+        let context = Context::new();
+
+        assert_eq!(
+            Builder::new("foo", Location::unknown(&context),)
+                .build()
+                .to_string(),
+            "\"foo\"() : () -> ()"
+        );
+    }
+
+    #[test]
+    fn debug() {
+        let context = Context::new();
+
+        assert_eq!(
+            format!(
+                "{:?}",
+                *Builder::new("foo", Location::unknown(&context)).build()
+            ),
+            "OperationRef(\n\"foo\"() : () -> ()\n)"
+        );
+    }
 }
