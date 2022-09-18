@@ -487,7 +487,7 @@ mod tests {
     fn debug() {
         assert_eq!(
             format!("{:?}", *Block::new(&[])),
-            "BlockRef(<<UNLINKED BLOCK>>)\n"
+            "BlockRef(<<UNLINKED BLOCK>>\n)"
         );
     }
 }
