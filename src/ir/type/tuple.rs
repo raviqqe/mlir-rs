@@ -2,7 +2,7 @@ use super::TypeLike;
 use crate::{ir::Type, utility::into_raw_array, Context, Error};
 use mlir_sys::{
     mlirTupleTypeGet, mlirTupleTypeGetInput, mlirTupleTypeGetNumInputs, mlirTupleTypeGetNumResults,
-    mlirTupleTypeGetResult, MlirType,
+    mlirTupleTypeGetNumTypes, mlirTupleTypeGetResult, MlirType,
 };
 use std::fmt::{self, Display, Formatter};
 
@@ -14,15 +14,13 @@ pub struct Tuple<'c> {
 
 impl<'c> Tuple<'c> {
     /// Creates a tuple type.
-    pub fn new(context: &'c Context, inputs: &[Type<'c>], results: &[Type<'c>]) -> Self {
+    pub fn new(context: &'c Context, types: &[Type<'c>]) -> Self {
         Self {
             r#type: unsafe {
                 Type::from_raw(mlirTupleTypeGet(
                     context.to_raw(),
-                    inputs.len() as isize,
-                    into_raw_array(inputs.iter().map(|r#type| r#type.to_raw()).collect()),
-                    results.len() as isize,
-                    into_raw_array(results.iter().map(|r#type| r#type.to_raw()).collect()),
+                    types.len() as isize,
+                    into_raw_array(types.iter().map(|r#type| r#type.to_raw()).collect()),
                 ))
             },
         }
@@ -30,7 +28,7 @@ impl<'c> Tuple<'c> {
 
     /// Gets an input at a position.
     pub fn input(&self, position: usize) -> Result<Type, Error> {
-        if position < self.input_count() {
+        if position < self.type_count() {
             unsafe {
                 Ok(Type::from_raw(mlirTupleTypeGetInput(
                     self.r#type.to_raw(),
@@ -38,32 +36,13 @@ impl<'c> Tuple<'c> {
                 )))
             }
         } else {
-            Err(Error::TupleInputPosition(self.to_string(), position))
+            Err(Error::TupleElementPosition(self.to_string(), position))
         }
     }
 
-    /// Gets a result at a position.
-    pub fn result(&self, position: usize) -> Result<Type, Error> {
-        if position < self.result_count() {
-            unsafe {
-                Ok(Type::from_raw(mlirTupleTypeGetResult(
-                    self.r#type.to_raw(),
-                    position as isize,
-                )))
-            }
-        } else {
-            Err(Error::TupleResultPosition(self.to_string(), position))
-        }
-    }
-
-    /// Gets a number of inputs.
-    pub fn input_count(&self) -> usize {
-        unsafe { mlirTupleTypeGetNumInputs(self.r#type.to_raw()) as usize }
-    }
-
-    /// Gets a number of results.
-    pub fn result_count(&self) -> usize {
-        unsafe { mlirTupleTypeGetNumResults(self.r#type.to_raw()) as usize }
+    /// Gets a number of elements.
+    pub fn type_count(&self) -> usize {
+        unsafe { mlirTupleTypeGetNumTypes(self.r#type.to_raw()) as usize }
     }
 }
 
