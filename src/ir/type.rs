@@ -264,18 +264,6 @@ mod tests {
     }
 
     #[test]
-    fn context() {
-        Type::parse(&Context::new(), "i8").unwrap().context();
-    }
-
-    #[test]
-    fn id() {
-        let context = Context::new();
-
-        assert_eq!(Type::index(&context).id(), Type::index(&context).id());
-    }
-
-    #[test]
     fn equal() {
         let context = Context::new();
 
