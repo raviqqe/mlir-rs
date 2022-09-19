@@ -17,7 +17,7 @@ pub use self::{
     location::Location,
     module::Module,
     operation::{Operation, OperationRef},
-    r#type::Type,
+    r#type::{Type, TypeLike},
     region::{Region, RegionRef},
     value::{Value, ValueLike},
 };

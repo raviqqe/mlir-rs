@@ -1,20 +1,20 @@
 //! Types and type IDs.
 
+mod function;
 pub mod id;
+mod type_like;
 
+pub use self::function::Function;
 pub use self::id::Id;
+pub use self::type_like::TypeLike;
 use crate::{
-    context::{Context, ContextRef},
-    error::Error,
+    context::{Context},
     string_ref::StringRef,
-    utility::{into_raw_array, print_callback},
+    utility::{print_callback},
 };
 use mlir_sys::{
-    mlirBF16TypeGet, mlirF16TypeGet, mlirF32TypeGet, mlirF64TypeGet, mlirFunctionTypeGet,
-    mlirFunctionTypeGetInput, mlirFunctionTypeGetNumInputs, mlirFunctionTypeGetNumResults,
-    mlirFunctionTypeGetResult, mlirIndexTypeGet, mlirIntegerTypeGet, mlirIntegerTypeSignedGet,
-    mlirIntegerTypeUnsignedGet, mlirNoneTypeGet, mlirTypeDump, mlirTypeEqual, mlirTypeGetContext,
-    mlirTypeGetTypeID, mlirTypeIsAFunction, mlirTypeParseGet, mlirTypePrint, mlirVectorTypeGet,
+    mlirBF16TypeGet, mlirF16TypeGet, mlirF32TypeGet, mlirF64TypeGet, mlirIndexTypeGet, mlirIntegerTypeGet, mlirIntegerTypeSignedGet,
+    mlirIntegerTypeUnsignedGet, mlirNoneTypeGet, mlirTypeEqual, mlirTypeParseGet, mlirTypePrint, mlirVectorTypeGet,
     mlirVectorTypeGetChecked, MlirType,
 };
 use std::{
@@ -62,19 +62,6 @@ impl<'c> Type<'c> {
     /// Creates a float64 type.
     pub fn float64(context: &'c Context) -> Self {
         unsafe { Self::from_raw(mlirF64TypeGet(context.to_raw())) }
-    }
-
-    /// Creates an integer type.
-    pub fn function(context: &'c Context, inputs: &[Type<'c>], results: &[Type<'c>]) -> Self {
-        unsafe {
-            Self::from_raw(mlirFunctionTypeGet(
-                context.to_raw(),
-                inputs.len() as isize,
-                into_raw_array(inputs.iter().map(|r#type| r#type.to_raw()).collect()),
-                results.len() as isize,
-                into_raw_array(results.iter().map(|r#type| r#type.to_raw()).collect()),
-            ))
-        }
     }
 
     /// Creates an index type.
@@ -129,71 +116,6 @@ impl<'c> Type<'c> {
         }
     }
 
-    /// Gets a context.
-    pub fn context(&self) -> ContextRef<'c> {
-        unsafe { ContextRef::from_raw(mlirTypeGetContext(self.raw)) }
-    }
-
-    /// Gets an ID.
-    pub fn id(&self) -> Id {
-        unsafe { Id::from_raw(mlirTypeGetTypeID(self.raw)) }
-    }
-
-    /// Gets an input of a function type.
-    pub fn input(&self, position: usize) -> Result<Option<Self>, Error> {
-        unsafe {
-            if !mlirTypeIsAFunction(self.raw) {
-                return Err(Error::FunctionExpected(self.to_string()));
-            }
-
-            Ok(Self::from_option_raw(mlirFunctionTypeGetInput(
-                self.raw,
-                position as isize,
-            )))
-        }
-    }
-
-    /// Gets a result of a function type.
-    pub fn result(&self, position: usize) -> Result<Option<Self>, Error> {
-        unsafe {
-            if !mlirTypeIsAFunction(self.raw) {
-                return Err(Error::FunctionExpected(self.to_string()));
-            }
-
-            Ok(Self::from_option_raw(mlirFunctionTypeGetResult(
-                self.raw,
-                position as isize,
-            )))
-        }
-    }
-
-    /// Gets a number of inputs of a function type.
-    pub fn input_count(&self) -> Result<usize, Error> {
-        unsafe {
-            if !mlirTypeIsAFunction(self.raw) {
-                return Err(Error::FunctionExpected(self.to_string()));
-            }
-
-            Ok(mlirFunctionTypeGetNumInputs(self.raw) as usize)
-        }
-    }
-
-    /// Gets a number of results of a function type.
-    pub fn result_count(&self) -> Result<usize, Error> {
-        unsafe {
-            if !mlirTypeIsAFunction(self.raw) {
-                return Err(Error::FunctionExpected(self.to_string()));
-            }
-
-            Ok(mlirFunctionTypeGetNumResults(self.raw) as usize)
-        }
-    }
-
-    /// Dumps a type.
-    pub fn dump(&self) {
-        unsafe { mlirTypeDump(self.raw) }
-    }
-
     pub(crate) unsafe fn from_raw(raw: MlirType) -> Self {
         Self {
             raw,
@@ -210,6 +132,12 @@ impl<'c> Type<'c> {
     }
 
     pub(crate) unsafe fn to_raw(self) -> MlirType {
+        self.raw
+    }
+}
+
+impl<'c> TypeLike<'c> for Type<'c> {
+    unsafe fn to_raw(&self) -> MlirType {
         self.raw
     }
 }
@@ -246,10 +174,15 @@ impl<'c> Debug for Type<'c> {
     }
 }
 
+impl<'c> From<Function<'c>> for Type<'c> {
+    fn from(function: Function<'c>) -> Self {
+        unsafe { Self::from_raw(function.to_raw()) }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::error::Error;
 
     #[test]
     fn new() {
@@ -378,119 +311,5 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(format!("{:?}", Type::integer(&context, 42)), "Type(i42)");
-    }
-
-    mod function {
-        use super::*;
-
-        #[test]
-        fn function() {
-            let context = Context::new();
-            let integer = Type::integer(&context, 42);
-
-            assert_eq!(
-                Type::function(&context, &[integer, integer], &[integer]),
-                Type::parse(&context, "(i42, i42) -> i42").unwrap()
-            );
-        }
-
-        #[test]
-        fn multiple_results() {
-            let context = Context::new();
-            let integer = Type::integer(&context, 42);
-
-            assert_eq!(
-                Type::function(&context, &[], &[integer, integer]),
-                Type::parse(&context, "() -> (i42, i42)").unwrap()
-            );
-        }
-
-        #[test]
-        fn input() {
-            let context = Context::new();
-            let integer = Type::integer(&context, 42);
-
-            assert_eq!(
-                Type::function(&context, &[integer], &[]).input(0),
-                Ok(Some(integer))
-            );
-        }
-
-        #[test]
-        fn input_with_non_function() {
-            let context = Context::new();
-            let r#type = Type::integer(&context, 42);
-
-            assert_eq!(
-                r#type.input(0),
-                Err(Error::FunctionExpected(r#type.to_string()))
-            );
-        }
-
-        #[test]
-        fn result() {
-            let context = Context::new();
-            let integer = Type::integer(&context, 42);
-
-            assert_eq!(
-                Type::function(&context, &[], &[integer]).result(0),
-                Ok(Some(integer))
-            );
-        }
-
-        #[test]
-        fn result_with_non_function() {
-            let context = Context::new();
-            let r#type = Type::integer(&context, 42);
-
-            assert_eq!(
-                r#type.result(0),
-                Err(Error::FunctionExpected(r#type.to_string()))
-            );
-        }
-
-        #[test]
-        fn input_count() {
-            let context = Context::new();
-            let integer = Type::integer(&context, 42);
-
-            assert_eq!(
-                Type::function(&context, &[integer], &[]).input_count(),
-                Ok(1)
-            );
-        }
-
-        #[test]
-        fn input_count_with_non_function() {
-            let context = Context::new();
-            let r#type = Type::integer(&context, 42);
-
-            assert_eq!(
-                r#type.input_count(),
-                Err(Error::FunctionExpected(r#type.to_string()))
-            );
-        }
-
-        #[test]
-        fn result_count() {
-            let context = Context::new();
-            let integer = Type::integer(&context, 42);
-
-            assert_eq!(
-                Type::function(&context, &[], &[integer]).result_count(),
-                Ok(1)
-            );
-        }
-
-        #[test]
-        fn result_count_with_non_function() {
-            let context = Context::new();
-            let r#type = Type::integer(&context, 42);
-
-            assert_eq!(
-                r#type.result_count(),
-                Err(Error::FunctionExpected(r#type.to_string()))
-            );
-        }
     }
 }

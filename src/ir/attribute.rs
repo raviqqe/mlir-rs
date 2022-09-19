@@ -214,6 +214,7 @@ impl<'c> Display for Attribute<'c> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::ir::r#type::TypeLike;
 
     #[test]
     fn parse() {
