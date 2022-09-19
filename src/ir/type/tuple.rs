@@ -26,8 +26,8 @@ impl<'c> Tuple<'c> {
         }
     }
 
-    /// Gets an input at a position.
-    pub fn input(&self, position: usize) -> Result<Type, Error> {
+    /// Gets a field at a position.
+    pub fn r#type(&self, position: usize) -> Result<Type, Error> {
         if position < self.type_count() {
             unsafe {
                 Ok(Type::from_raw(mlirTupleTypeGetInput(
@@ -36,11 +36,11 @@ impl<'c> Tuple<'c> {
                 )))
             }
         } else {
-            Err(Error::TupleElementPosition(self.to_string(), position))
+            Err(Error::TupleFieldPosition(self.to_string(), position))
         }
     }
 
-    /// Gets a number of elements.
+    /// Gets a number of fields.
     pub fn type_count(&self) -> usize {
         unsafe { mlirTupleTypeGetNumTypes(self.r#type.to_raw()) as usize }
     }

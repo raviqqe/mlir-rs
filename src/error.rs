@@ -16,6 +16,7 @@ pub enum Error {
     OperationResultPosition(String, usize),
     ParsePassPipeline,
     RunPass,
+    TupleExpected(String),
     TupleFieldPosition(String, usize),
 }
 
@@ -56,6 +57,7 @@ impl Display for Error {
             }
             Self::ParsePassPipeline => write!(formatter, "failed to parse pass pipeline"),
             Self::RunPass => write!(formatter, "failed to run pass"),
+            Self::TupleExpected(r#type) => write!(formatter, "tuple expected: {}", r#type),
             Self::TupleFieldPosition(r#type, position) => {
                 write!(
                     formatter,
