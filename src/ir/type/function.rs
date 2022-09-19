@@ -95,7 +95,7 @@ impl<'c> TryFrom<Type<'c>> for Function<'c> {
         if r#type.is_function() {
             Ok(Self { r#type })
         } else {
-            Err(Error::BlockArgumentExpected(r#type.to_string()))
+            Err(Error::FunctionExpected(r#type.to_string()))
         }
     }
 }
