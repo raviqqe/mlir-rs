@@ -10,7 +10,7 @@ use crate::{
     utility::{into_raw_array, print_callback},
 };
 use mlir_sys::{
-    mlirFunctionTypeGet, mlirFunctionTypeGetInput, mlirFunctionTypeGetNumInputs,
+    mlirBF16TypeGet, mlirFunctionTypeGet, mlirFunctionTypeGetInput, mlirFunctionTypeGetNumInputs,
     mlirFunctionTypeGetNumResults, mlirFunctionTypeGetResult, mlirIndexTypeGet, mlirIntegerTypeGet,
     mlirIntegerTypeSignedGet, mlirIntegerTypeUnsignedGet, mlirNoneTypeGet, mlirTypeDump,
     mlirTypeEqual, mlirTypeGetContext, mlirTypeGetTypeID, mlirTypeIsAFunction, mlirTypeParseGet,
@@ -41,6 +41,11 @@ impl<'c> Type<'c> {
                 StringRef::from(source).to_raw(),
             ))
         }
+    }
+
+    /// Creates a bfloat16 type.
+    pub fn bfloat16(context: &'c Context) -> Self {
+        unsafe { Self::from_raw(mlirBF16TypeGet(context.to_raw())) }
     }
 
     /// Creates an integer type.
