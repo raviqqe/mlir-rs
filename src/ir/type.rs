@@ -10,11 +10,12 @@ use crate::{
     utility::{into_raw_array, print_callback},
 };
 use mlir_sys::{
-    mlirBF16TypeGet, mlirFunctionTypeGet, mlirFunctionTypeGetInput, mlirFunctionTypeGetNumInputs,
-    mlirFunctionTypeGetNumResults, mlirFunctionTypeGetResult, mlirIndexTypeGet, mlirIntegerTypeGet,
-    mlirIntegerTypeSignedGet, mlirIntegerTypeUnsignedGet, mlirNoneTypeGet, mlirTypeDump,
-    mlirTypeEqual, mlirTypeGetContext, mlirTypeGetTypeID, mlirTypeIsAFunction, mlirTypeParseGet,
-    mlirTypePrint, mlirVectorTypeGet, mlirVectorTypeGetChecked, MlirType,
+    mlirBF16TypeGet, mlirF16TypeGet, mlirF32TypeGet, mlirF64TypeGet, mlirFunctionTypeGet,
+    mlirFunctionTypeGetInput, mlirFunctionTypeGetNumInputs, mlirFunctionTypeGetNumResults,
+    mlirFunctionTypeGetResult, mlirIndexTypeGet, mlirIntegerTypeGet, mlirIntegerTypeSignedGet,
+    mlirIntegerTypeUnsignedGet, mlirNoneTypeGet, mlirTypeDump, mlirTypeEqual, mlirTypeGetContext,
+    mlirTypeGetTypeID, mlirTypeIsAFunction, mlirTypeParseGet, mlirTypePrint, mlirVectorTypeGet,
+    mlirVectorTypeGetChecked, MlirType,
 };
 use std::{
     ffi::c_void,
@@ -46,6 +47,21 @@ impl<'c> Type<'c> {
     /// Creates a bfloat16 type.
     pub fn bfloat16(context: &'c Context) -> Self {
         unsafe { Self::from_raw(mlirBF16TypeGet(context.to_raw())) }
+    }
+
+    /// Creates a float16 type.
+    pub fn float16(context: &'c Context) -> Self {
+        unsafe { Self::from_raw(mlirF16TypeGet(context.to_raw())) }
+    }
+
+    /// Creates a float32 type.
+    pub fn float32(context: &'c Context) -> Self {
+        unsafe { Self::from_raw(mlirF32TypeGet(context.to_raw())) }
+    }
+
+    /// Creates a float64 type.
+    pub fn float64(context: &'c Context) -> Self {
+        unsafe { Self::from_raw(mlirF64TypeGet(context.to_raw())) }
     }
 
     /// Creates an integer type.
