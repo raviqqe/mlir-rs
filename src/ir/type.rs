@@ -2,9 +2,10 @@
 
 mod function;
 pub mod id;
+mod tuple;
 mod type_like;
 
-pub use self::{function::Function, id::Id, type_like::TypeLike};
+pub use self::{function::Function, id::Id, tuple::Tuple, type_like::TypeLike};
 use super::Location;
 use crate::{context::Context, string_ref::StringRef, utility::print_callback};
 use mlir_sys::{
@@ -167,6 +168,12 @@ impl<'c> Debug for Type<'c> {
 impl<'c> From<Function<'c>> for Type<'c> {
     fn from(function: Function<'c>) -> Self {
         unsafe { Self::from_raw(function.to_raw()) }
+    }
+}
+
+impl<'c> From<Tuple<'c>> for Type<'c> {
+    fn from(tuple: Tuple<'c>) -> Self {
+        unsafe { Self::from_raw(tuple.to_raw()) }
     }
 }
 
