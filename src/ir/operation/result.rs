@@ -40,17 +40,7 @@ impl<'a> ValueLike for ResultValue<'a> {
 
 impl<'a> Display for ResultValue<'a> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
-        let mut data = (formatter, Ok(()));
-
-        unsafe {
-            mlirValuePrint(
-                self.value.to_raw(),
-                Some(print_callback),
-                &mut data as *mut _ as *mut c_void,
-            );
-        }
-
-        data.1
+        Value::from(*self).fmt(formatter)
     }
 }
 

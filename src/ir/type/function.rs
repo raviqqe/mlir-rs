@@ -36,22 +36,30 @@ impl<'c> Function<'c> {
     }
 
     /// Gets an input at a position.
-    pub fn input(&self, index: usize) -> Option<Type> {
-        unsafe {
-            Type::from_option_raw(mlirFunctionTypeGetInput(
-                self.r#type.to_raw(),
-                index as isize,
-            ))
+    pub fn input(&self, position: usize) -> Result<Type, Error> {
+        if position < self.input_count() {
+            unsafe {
+                Ok(Type::from_raw(mlirFunctionTypeGetInput(
+                    self.r#type.to_raw(),
+                    position as isize,
+                )))
+            }
+        } else {
+            Err(Error::FunctionInputPosition(self.to_string(), position))
         }
     }
 
     /// Gets a result at a position.
-    pub fn result(&self, position: usize) -> Option<Type> {
-        unsafe {
-            Type::from_option_raw(mlirFunctionTypeGetResult(
-                self.r#type.to_raw(),
-                position as isize,
-            ))
+    pub fn result(&self, position: usize) -> Result<Type, Error> {
+        if position < self.result_count() {
+            unsafe {
+                Ok(Type::from_raw(mlirFunctionTypeGetResult(
+                    self.r#type.to_raw(),
+                    position as isize,
+                )))
+            }
+        } else {
+            Err(Error::FunctionResultPosition(self.to_string(), position))
         }
     }
 
@@ -74,17 +82,7 @@ impl<'c> TypeLike<'c> for Function<'c> {
 
 impl<'c> Display for Function<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
-        let mut data = (formatter, Ok(()));
-
-        unsafe {
-            mlirTypePrint(
-                self.r#type.to_raw(),
-                Some(print_callback),
-                &mut data as *mut _ as *mut c_void,
-            );
-        }
-
-        data.1
+        Type::from(*self).fmt(formatter)
     }
 }
 
@@ -134,16 +132,20 @@ mod tests {
 
         assert_eq!(
             Function::new(&context, &[integer], &[]).input(0),
-            Some(integer)
+            Ok(integer)
         );
     }
 
     #[test]
-    fn input_none() {
+    fn input_error() {
         let context = Context::new();
         let integer = Type::integer(&context, 42);
+        let function = Function::new(&context, &[integer], &[]);
 
-        assert_eq!(Function::new(&context, &[integer], &[]).input(42), None,);
+        assert_eq!(
+            function.input(42),
+            Err(Error::FunctionInputPosition(function.to_string(), 42))
+        );
     }
 
     #[test]
@@ -153,16 +155,20 @@ mod tests {
 
         assert_eq!(
             Function::new(&context, &[], &[integer]).result(0),
-            Some(integer)
+            Ok(integer)
         );
     }
 
     #[test]
-    fn result_none() {
+    fn result_error() {
         let context = Context::new();
         let integer = Type::integer(&context, 42);
+        let function = Function::new(&context, &[], &[integer]);
 
-        assert_eq!(Function::new(&context, &[], &[integer]).result(42), None);
+        assert_eq!(
+            function.result(42),
+            Err(Error::FunctionResultPosition(function.to_string(), 42))
+        );
     }
 
     #[test]

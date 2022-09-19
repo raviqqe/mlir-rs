@@ -9,6 +9,8 @@ pub enum Error {
     BlockArgumentExpected(String),
     BlockArgumentPosition(String, usize),
     FunctionExpected(String),
+    FunctionInputPosition(String, usize),
+    FunctionResultPosition(String, usize),
     InvokeFunction,
     OperationResultExpected(String),
     OperationResultPosition(String, usize),
@@ -30,6 +32,16 @@ impl Display for Error {
                 )
             }
             Self::FunctionExpected(r#type) => write!(formatter, "function expected: {}", r#type),
+            Self::FunctionInputPosition(r#type, position) => write!(
+                formatter,
+                "function input position {} out of range: {}",
+                position, r#type
+            ),
+            Self::FunctionResultPosition(r#type, position) => write!(
+                formatter,
+                "function result position {} out of range: {}",
+                position, r#type
+            ),
             Self::InvokeFunction => write!(formatter, "failed to invoke JIT-compiled function"),
             Self::OperationResultExpected(value) => {
                 write!(formatter, "operation result expected: {}", value)
