@@ -12,6 +12,14 @@
 //! brew install llvm@15
 //! ```
 //!
+//! # Safety
+//!
+//! Although Melior aims to be completely safe, some part of the current API is not.
+//!
+//! - Access to operations, types, or attributes that belong to dialects not loaded in contexts can lead to runtime errors or segmentation faults in the worst case.
+//!   - The current fix plan is to load all dialects by default on creation of contexts. And we provide unsafe constructors of contexts for advanced users.
+//! - Foo
+//!
 //! # Examples
 //!
 //! ## Building a function to add integers
