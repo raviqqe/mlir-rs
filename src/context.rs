@@ -4,8 +4,9 @@ use crate::{
 };
 use mlir_sys::{
     mlirContextAppendDialectRegistry, mlirContextCreate, mlirContextDestroy,
+    mlirContextEnableMultithreading, mlirContextEqual, mlirContextGetNumLoadedDialects,
     mlirContextGetNumRegisteredDialects, mlirContextGetOrLoadDialect,
-    mlirContextLoadAllAvailableDialects, MlirContext,
+    mlirContextIsRegisteredOperation, mlirContextLoadAllAvailableDialects, MlirContext,
 };
 use std::{marker::PhantomData, ops::Deref};
 
@@ -60,6 +61,11 @@ impl<'a> ContextRef<'a> {
         unsafe { mlirContextGetNumRegisteredDialects(self.raw) as usize }
     }
 
+    /// Gets a number of loaded dialects.
+    pub fn loaded_dialect_count(&self) -> usize {
+        unsafe { mlirContextGetNumLoadedDialects(self.raw) as usize }
+    }
+
     /// Gets or loads a dialect.
     pub fn get_or_load_dialect(&self, name: &str) -> Dialect {
         unsafe {
@@ -80,6 +86,16 @@ impl<'a> ContextRef<'a> {
         unsafe { mlirContextLoadAllAvailableDialects(self.raw) }
     }
 
+    /// Enables multi-threading.
+    pub fn enable_multi_threading(&self, enabled: bool) {
+        unsafe { mlirContextEnableMultithreading(self.raw, enabled) }
+    }
+
+    /// Returns `true` if a given operation is reigstered in a context.
+    pub fn is_registered_operation(&self, name: &str) -> bool {
+        unsafe { mlirContextIsRegisteredOperation(self.raw, StringRef::from(name).to_raw()) }
+    }
+
     pub(crate) unsafe fn to_raw(self) -> MlirContext {
         self.raw
     }
@@ -91,6 +107,14 @@ impl<'a> ContextRef<'a> {
         }
     }
 }
+
+impl<'a> PartialEq for ContextRef<'a> {
+    fn eq(&self, other: &Self) -> bool {
+        unsafe { mlirContextEqual(self.raw, other.raw) }
+    }
+}
+
+impl<'a> Eq for ContextRef<'a> {}
 
 #[cfg(test)]
 mod tests {
