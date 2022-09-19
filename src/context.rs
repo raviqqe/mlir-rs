@@ -137,10 +137,38 @@ mod tests {
     }
 
     #[test]
+    fn registered_dialect_count() {
+        let context = Context::new();
+
+        assert_eq!(context.registered_dialect_count(), 1);
+    }
+
+    #[test]
+    fn loaded_dialect_count() {
+        let context = Context::new();
+
+        assert_eq!(context.loaded_dialect_count(), 1);
+    }
+
+    #[test]
     fn append_dialect_registry() {
         let context = Context::new();
 
         context.append_dialect_registry(&dialect::Registry::new());
+    }
+
+    #[test]
+    fn is_registered_operation() {
+        let context = Context::new();
+
+        assert!(context.is_registered_operation("builtin.module"));
+    }
+
+    #[test]
+    fn is_not_registered_operation() {
+        let context = Context::new();
+
+        assert!(!context.is_registered_operation("func.func"));
     }
 
     #[test]
