@@ -2,6 +2,7 @@
   "words": [
     "addf",
     "addi",
+    "bfloat",
     "canonicalize",
     "canonicalizer",
     "femtomc",
