@@ -1,3 +1,5 @@
+//! Type IDs and allocators
+
 mod allocator;
 
 pub use allocator::Allocator;
