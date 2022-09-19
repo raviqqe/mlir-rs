@@ -17,7 +17,7 @@
 //! Although Melior aims to be completely safe, some part of the current API is not.
 //!
 //! - Access to operations, types, or attributes that belong to dialects not loaded in contexts can lead to runtime errors or segmentation faults in the worst case.
-//!   - Fix plan: Load all dialects by default on creation of contexts. And we provide unsafe constructors of contexts for advanced users.
+//!   - Fix plan: Load all dialects by default on creation of contexts, and provide unsafe constructors of contexts for advanced users.
 //! - IR object references returned from functions that move ownership of arguments might get invalidated later.
 //!   - This is because we need to borrow `&self` rather than `&mut self` to return such references.
 //!   - e.g. `Region::append_block()`
