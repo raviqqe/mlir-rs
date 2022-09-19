@@ -4,9 +4,10 @@ use crate::{
 };
 use mlir_sys::{
     mlirContextAppendDialectRegistry, mlirContextCreate, mlirContextDestroy,
-    mlirContextEnableMultithreading, mlirContextEqual, mlirContextGetNumLoadedDialects,
-    mlirContextGetNumRegisteredDialects, mlirContextGetOrLoadDialect,
-    mlirContextIsRegisteredOperation, mlirContextLoadAllAvailableDialects, MlirContext,
+    mlirContextEnableMultithreading, mlirContextEqual, mlirContextGetAllowUnregisteredDialects,
+    mlirContextGetNumLoadedDialects, mlirContextGetNumRegisteredDialects,
+    mlirContextGetOrLoadDialect, mlirContextIsRegisteredOperation,
+    mlirContextLoadAllAvailableDialects, mlirContextSetAllowUnregisteredDialects, MlirContext,
 };
 use std::{marker::PhantomData, ops::Deref};
 
@@ -91,6 +92,16 @@ impl<'a> ContextRef<'a> {
         unsafe { mlirContextEnableMultithreading(self.raw, enabled) }
     }
 
+    /// Returns `true` if unregistered dialects are allowed.
+    pub fn allow_unregistered_dialects(&self) -> bool {
+        unsafe { mlirContextGetAllowUnregisteredDialects(self.raw) }
+    }
+
+    /// Set if unregistered dialects are allowed.
+    pub fn set_allow_unregistered_dialects(&self, allowed: bool) {
+        unsafe { mlirContextSetAllowUnregisteredDialects(self.raw, allowed) }
+    }
+
     /// Returns `true` if a given operation is reigstered in a context.
     pub fn is_registered_operation(&self, name: &str) -> bool {
         unsafe { mlirContextIsRegisteredOperation(self.raw, StringRef::from(name).to_raw()) }
@@ -130,5 +141,35 @@ mod tests {
         let context = Context::new();
 
         context.append_dialect_registry(&dialect::Registry::new());
+    }
+
+    #[test]
+    fn enable_multi_threading() {
+        let context = Context::new();
+
+        context.enable_multi_threading(true);
+    }
+
+    #[test]
+    fn disable_multi_threading() {
+        let context = Context::new();
+
+        context.enable_multi_threading(false);
+    }
+
+    #[test]
+    fn allow_unregistered_dialects() {
+        let context = Context::new();
+
+        assert!(!context.allow_unregistered_dialects());
+    }
+
+    #[test]
+    fn set_allow_unregistered_dialects() {
+        let context = Context::new();
+
+        context.set_allow_unregistered_dialects(true);
+
+        assert!(context.allow_unregistered_dialects());
     }
 }
