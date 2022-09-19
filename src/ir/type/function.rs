@@ -36,7 +36,7 @@ impl<'c> Function<'c> {
     }
 
     /// Gets an input at a position.
-    fn input(&self, index: usize) -> Option<Type> {
+    pub fn input(&self, index: usize) -> Option<Type> {
         unsafe {
             Type::from_option_raw(mlirFunctionTypeGetInput(
                 self.r#type.to_raw(),
@@ -46,7 +46,7 @@ impl<'c> Function<'c> {
     }
 
     /// Gets a result at a position.
-    fn result(&self, position: usize) -> Option<Type> {
+    pub fn result(&self, position: usize) -> Option<Type> {
         unsafe {
             Type::from_option_raw(mlirFunctionTypeGetResult(
                 self.r#type.to_raw(),
@@ -56,12 +56,12 @@ impl<'c> Function<'c> {
     }
 
     /// Gets a number of inputs.
-    fn input_count(&self) -> usize {
+    pub fn input_count(&self) -> usize {
         unsafe { mlirFunctionTypeGetNumInputs(self.r#type.to_raw()) as usize }
     }
 
     /// Gets a number of results.
-    fn result_count(&self) -> usize {
+    pub fn result_count(&self) -> usize {
         unsafe { mlirFunctionTypeGetNumResults(self.r#type.to_raw()) as usize }
     }
 }

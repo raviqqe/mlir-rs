@@ -1,14 +1,8 @@
 use super::Id;
-
-
-use crate::{
-    context::{ContextRef},
-};
+use crate::context::ContextRef;
 use mlir_sys::{
-    mlirTypeDump, mlirTypeGetContext,
-    mlirTypeGetTypeID, mlirTypeIsAFunction, MlirType,
+    mlirTypeDump, mlirTypeGetContext, mlirTypeGetTypeID, mlirTypeIsAFunction, MlirType,
 };
-
 
 pub trait TypeLike<'c> {
     unsafe fn to_raw(&self) -> MlirType;
