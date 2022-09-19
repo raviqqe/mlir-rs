@@ -97,7 +97,7 @@ mod tests {
     use crate::Context;
 
     #[test]
-    fn function() {
+    fn new() {
         let context = Context::new();
         let integer = Type::integer(&context, 42);
 
