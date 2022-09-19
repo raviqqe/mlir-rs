@@ -139,6 +139,14 @@ mod tests {
     }
 
     #[test]
+    fn input_none() {
+        let context = Context::new();
+        let integer = Type::integer(&context, 42);
+
+        assert_eq!(Function::new(&context, &[integer], &[]).input(42), None,);
+    }
+
+    #[test]
     fn result() {
         let context = Context::new();
         let integer = Type::integer(&context, 42);
@@ -147,6 +155,14 @@ mod tests {
             Function::new(&context, &[], &[integer]).result(0),
             Some(integer)
         );
+    }
+
+    #[test]
+    fn result_none() {
+        let context = Context::new();
+        let integer = Type::integer(&context, 42);
+
+        assert_eq!(Function::new(&context, &[], &[integer]).result(42), None);
     }
 
     #[test]
