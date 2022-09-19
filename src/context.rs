@@ -102,7 +102,7 @@ impl<'a> ContextRef<'a> {
         unsafe { mlirContextSetAllowUnregisteredDialects(self.raw, allowed) }
     }
 
-    /// Returns `true` if a given operation is reigstered in a context.
+    /// Returns `true` if a given operation is registered in a context.
     pub fn is_registered_operation(&self, name: &str) -> bool {
         unsafe { mlirContextIsRegisteredOperation(self.raw, StringRef::from(name).to_raw()) }
     }
