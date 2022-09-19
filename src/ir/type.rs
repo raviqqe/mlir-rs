@@ -22,7 +22,6 @@ use std::{
     fmt::{self, Debug, Display, Formatter},
     marker::PhantomData,
 };
-
 use super::Location;
 
 /// A type.
