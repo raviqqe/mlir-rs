@@ -6,6 +6,7 @@ use mlir_sys::{
     MlirType,
 };
 
+/// Trait for type-like types.
 pub trait TypeLike<'c> {
     /// Converts a type into a raw type.
     fn to_raw(&self) -> MlirType;
