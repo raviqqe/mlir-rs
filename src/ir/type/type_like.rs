@@ -2,8 +2,8 @@ use super::Id;
 use crate::context::ContextRef;
 use mlir_sys::{
     mlirTypeDump, mlirTypeGetContext, mlirTypeGetTypeID, mlirTypeIsABF16, mlirTypeIsAF16,
-    mlirTypeIsAF32, mlirTypeIsAF64, mlirTypeIsAFunction, mlirTypeIsATuple, mlirTypeIsAVector,
-    MlirType,
+    mlirTypeIsAF32, mlirTypeIsAF64, mlirTypeIsAFunction, mlirTypeIsAMemRef, mlirTypeIsATuple,
+    mlirTypeIsAVector, MlirType,
 };
 
 /// Trait for type-like types.
@@ -44,6 +44,11 @@ pub trait TypeLike<'c> {
     /// Returns `true` if a type is a function.
     fn is_function(&self) -> bool {
         unsafe { mlirTypeIsAFunction(self.to_raw()) }
+    }
+
+    /// Returns `true` if a type is a memory reference.
+    fn is_mem_ref(&self) -> bool {
+        unsafe { mlirTypeIsAMemRef(self.to_raw()) }
     }
 
     /// Returns `true` if a type is a tuple.
