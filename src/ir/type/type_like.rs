@@ -5,7 +5,8 @@ use mlir_sys::{
 };
 
 pub trait TypeLike<'c> {
-    unsafe fn to_raw(&self) -> MlirType;
+    /// Converts a type into a raw type.
+    fn to_raw(&self) -> MlirType;
 
     /// Gets a context.
     fn context(&self) -> ContextRef<'c> {

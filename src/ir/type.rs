@@ -4,25 +4,20 @@ mod function;
 pub mod id;
 mod type_like;
 
-pub use self::function::Function;
-pub use self::id::Id;
-pub use self::type_like::TypeLike;
-use crate::{
-    context::{Context},
-    string_ref::StringRef,
-    utility::{print_callback},
-};
+pub use self::{function::Function, id::Id, type_like::TypeLike};
+use super::Location;
+use crate::{context::Context, string_ref::StringRef, utility::print_callback};
 use mlir_sys::{
-    mlirBF16TypeGet, mlirF16TypeGet, mlirF32TypeGet, mlirF64TypeGet, mlirIndexTypeGet, mlirIntegerTypeGet, mlirIntegerTypeSignedGet,
-    mlirIntegerTypeUnsignedGet, mlirNoneTypeGet, mlirTypeEqual, mlirTypeParseGet, mlirTypePrint, mlirVectorTypeGet,
-    mlirVectorTypeGetChecked, MlirType,
+    mlirBF16TypeGet, mlirF16TypeGet, mlirF32TypeGet, mlirF64TypeGet, mlirIndexTypeGet,
+    mlirIntegerTypeGet, mlirIntegerTypeSignedGet, mlirIntegerTypeUnsignedGet, mlirNoneTypeGet,
+    mlirTypeEqual, mlirTypeParseGet, mlirTypePrint, mlirVectorTypeGet, mlirVectorTypeGetChecked,
+    MlirType,
 };
 use std::{
     ffi::c_void,
     fmt::{self, Debug, Display, Formatter},
     marker::PhantomData,
 };
-use super::Location;
 
 /// A type.
 // Types are always values but their internal storage is owned by contexts.
@@ -129,14 +124,10 @@ impl<'c> Type<'c> {
             Some(Self::from_raw(raw))
         }
     }
-
-    pub(crate) unsafe fn to_raw(self) -> MlirType {
-        self.raw
-    }
 }
 
 impl<'c> TypeLike<'c> for Type<'c> {
-    unsafe fn to_raw(&self) -> MlirType {
+    fn to_raw(&self) -> MlirType {
         self.raw
     }
 }

@@ -4,7 +4,7 @@ mod builder;
 mod result;
 
 pub use self::{builder::Builder, result::ResultValue};
-use super::{BlockRef, Identifier, RegionRef, Value, ValueLike};
+use super::{BlockRef, Identifier, RegionRef, Value};
 use crate::{
     context::{Context, ContextRef},
     utility::print_callback,

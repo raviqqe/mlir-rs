@@ -19,15 +19,17 @@ pub struct Value<'a> {
     _parent: PhantomData<&'a ()>,
 }
 
-impl<'a> ValueLike for Value<'a> {
-    unsafe fn from_raw(value: MlirValue) -> Self {
+impl<'a> Value<'a> {
+    pub(crate) unsafe fn from_raw(value: MlirValue) -> Self {
         Self {
             raw: value,
             _parent: Default::default(),
         }
     }
+}
 
-    unsafe fn to_raw(&self) -> MlirValue {
+impl<'a> ValueLike for Value<'a> {
+    fn to_raw(&self) -> MlirValue {
         self.raw
     }
 }

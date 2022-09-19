@@ -5,19 +5,8 @@ use mlir_sys::{
 
 /// Trait for value-like types.
 pub trait ValueLike {
-    /// Converts a raw value into a value.
-    ///
-    /// # Safety
-    ///
-    /// This function might create invalid values if raw values do not meet certain conditions.
-    unsafe fn from_raw(value: MlirValue) -> Self;
-
     /// Converts a value into a raw value.
-    ///
-    /// # Safety
-    ///
-    /// This function might create invalid values if raw values do not meet certain conditions.
-    unsafe fn to_raw(&self) -> MlirValue;
+    fn to_raw(&self) -> MlirValue;
 
     /// Gets a type.
     fn r#type(&self) -> Type {

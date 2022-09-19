@@ -3,7 +3,7 @@
 mod argument;
 
 pub use self::argument::Argument;
-use super::{Location, Operation, OperationRef, RegionRef, Type, Value, ValueLike};
+use super::{Location, Operation, OperationRef, RegionRef, Type, TypeLike, Value};
 use crate::{
     context::Context,
     utility::{into_raw_array, print_callback},
@@ -283,7 +283,7 @@ mod tests {
     use super::*;
     use crate::{
         dialect,
-        ir::{operation, Module, Region},
+        ir::{operation, Module, Region, ValueLike},
         utility::register_all_dialects,
     };
 

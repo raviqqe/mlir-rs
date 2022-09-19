@@ -1,17 +1,10 @@
 use super::TypeLike;
-use crate::{
-    ir::Type,
-    utility::{into_raw_array, print_callback},
-    Context, Error,
-};
+use crate::{ir::Type, utility::into_raw_array, Context, Error};
 use mlir_sys::{
     mlirFunctionTypeGet, mlirFunctionTypeGetInput, mlirFunctionTypeGetNumInputs,
-    mlirFunctionTypeGetNumResults, mlirFunctionTypeGetResult, mlirTypePrint, MlirType,
+    mlirFunctionTypeGetNumResults, mlirFunctionTypeGetResult, MlirType,
 };
-use std::{
-    ffi::c_void,
-    fmt::{self, Display, Formatter},
-};
+use std::fmt::{self, Display, Formatter};
 
 /// A function type.
 #[derive(Clone, Copy, Debug)]
@@ -75,7 +68,7 @@ impl<'c> Function<'c> {
 }
 
 impl<'c> TypeLike<'c> for Function<'c> {
-    unsafe fn to_raw(&self) -> MlirType {
+    fn to_raw(&self) -> MlirType {
         self.r#type.to_raw()
     }
 }
