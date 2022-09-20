@@ -80,7 +80,12 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            Type::from(MemRef::new(&context, &[])),
+            Type::from(MemRef::new(
+                Type::index(&context),
+                &[42, 42],
+                Attribute::parse(&context, "foo").unwrap(),
+                Attribute::parse(&context, "foo").unwrap(),
+            )),
             Type::parse(&context, "memref<>").unwrap()
         );
     }
