@@ -286,7 +286,7 @@ checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
 [[package]]
 name = "mlir-sys"
 version = "0.1.2"
-source = "git+https://github.com/raviqqe/mlir-sys#d8ea2f99f0ae0f461fa9f51a41bc1e1daf3e07b4"
+source = "git+https://github.com/raviqqe/mlir-sys#5e5f395b430cacbf935285b364f0353af6ed2344"
 dependencies = [
  "bindgen",
 ]
