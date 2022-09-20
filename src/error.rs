@@ -12,6 +12,7 @@ pub enum Error {
     FunctionInputPosition(String, usize),
     FunctionResultPosition(String, usize),
     InvokeFunction,
+    MemRefExpected(String),
     OperationResultExpected(String),
     OperationResultPosition(String, usize),
     ParsePassPipeline,
@@ -45,6 +46,7 @@ impl Display for Error {
                 position, r#type
             ),
             Self::InvokeFunction => write!(formatter, "failed to invoke JIT-compiled function"),
+            Self::MemRefExpected(r#type) => write!(formatter, "mem-ref expected: {}", r#type),
             Self::OperationResultExpected(value) => {
                 write!(formatter, "operation result expected: {}", value)
             }

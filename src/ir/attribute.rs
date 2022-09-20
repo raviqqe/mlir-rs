@@ -167,7 +167,7 @@ impl<'c> Attribute<'c> {
         unsafe { mlirAttributeDump(self.raw) }
     }
 
-    unsafe fn from_raw(raw: MlirAttribute) -> Self {
+    pub(crate) unsafe fn from_raw(raw: MlirAttribute) -> Self {
         Self {
             raw,
             _context: Default::default(),

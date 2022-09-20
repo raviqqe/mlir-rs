@@ -2,9 +2,11 @@
 
 mod function;
 pub mod id;
+mod mem_ref;
 mod tuple;
 mod type_like;
 
+use self::mem_ref::MemRef;
 pub use self::{function::Function, id::Id, tuple::Tuple, type_like::TypeLike};
 use super::Location;
 use crate::{context::Context, string_ref::StringRef, utility::print_callback};
@@ -168,6 +170,12 @@ impl<'c> Debug for Type<'c> {
 impl<'c> From<Function<'c>> for Type<'c> {
     fn from(function: Function<'c>) -> Self {
         unsafe { Self::from_raw(function.to_raw()) }
+    }
+}
+
+impl<'c> From<MemRef<'c>> for Type<'c> {
+    fn from(mem_ref: MemRef<'c>) -> Self {
+        unsafe { Self::from_raw(mem_ref.to_raw()) }
     }
 }
 
