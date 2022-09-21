@@ -1,10 +1,11 @@
 use super::TypeLike;
 use crate::{
-    ir::{Attribute, Type},
+    ir::{affine_map::AffineMap, Attribute, Type},
     Error,
 };
 use mlir_sys::{
-    mlirMemRefTypeGet, mlirMemRefTypeGetLayout, mlirMemRefTypeGetMemorySpace, MlirType,
+    mlirMemRefTypeGet, mlirMemRefTypeGetAffineMap, mlirMemRefTypeGetLayout,
+    mlirMemRefTypeGetMemorySpace, MlirType,
 };
 use std::fmt::{self, Display, Formatter};
 
@@ -38,6 +39,11 @@ impl<'c> MemRef<'c> {
     /// Gets a layout.
     pub fn layout(&self) -> Attribute<'c> {
         unsafe { Attribute::from_raw(mlirMemRefTypeGetLayout(self.r#type.to_raw())) }
+    }
+
+    /// Gets an affine map.
+    pub fn affine_map(&self) -> AffineMap<'c> {
+        unsafe { AffineMap::from_raw(mlirMemRefTypeGetAffineMap(self.r#type.to_raw())) }
     }
 
     /// Gets a memory space.
@@ -104,6 +110,19 @@ mod tests {
             .layout(),
             Attribute::parse(&context, "affine_map<(d0, d1) -> (d0, d1)>").unwrap(),
         );
+    }
+
+    #[test]
+    fn affine_map() {
+        let context = Context::new();
+
+        MemRef::new(
+            Type::integer(&context, 42),
+            &[42, 42],
+            Attribute::null(),
+            Attribute::null(),
+        )
+        .affine_map();
     }
 
     #[test]
