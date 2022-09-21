@@ -82,11 +82,43 @@ mod tests {
         assert_eq!(
             Type::from(MemRef::new(
                 Type::integer(&context, 42),
-                &[42, 42],
+                &[42],
                 Attribute::null(),
                 Attribute::null(),
             )),
-            Type::parse(&context, "memref<42x42xi42>").unwrap()
+            Type::parse(&context, "memref<42xi42>").unwrap()
+        );
+    }
+
+    #[test]
+    fn layout() {
+        let context = Context::new();
+
+        assert_eq!(
+            MemRef::new(
+                Type::integer(&context, 42),
+                &[42, 42],
+                Attribute::null(),
+                Attribute::null(),
+            )
+            .layout(),
+            Attribute::parse(&context, "affine_map<(d0, d1) -> (d0, d1)>").unwrap(),
+        );
+    }
+
+    #[test]
+    fn memory_space() {
+        let context = Context::new();
+
+        assert_eq!(
+            MemRef::new(
+                Type::integer(&context, 42),
+                &[42, 42],
+                Attribute::null(),
+                Attribute::null(),
+            )
+            .memory_space(),
+            Attribute::null(),
         );
     }
 }

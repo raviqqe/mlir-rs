@@ -16,13 +16,13 @@ use mlir_sys::{
 };
 use std::{
     ffi::c_void,
-    fmt::{self, Display, Formatter},
+    fmt::{self, Debug, Display, Formatter},
     marker::PhantomData,
 };
 
 /// An attribute.
 // Attributes are always values but their internal storage is owned by contexts.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 pub struct Attribute<'c> {
     raw: MlirAttribute,
     _context: PhantomData<&'c Context>,
@@ -208,6 +208,12 @@ impl<'c> Display for Attribute<'c> {
         }
 
         data.1
+    }
+}
+
+impl<'c> Debug for Attribute<'c> {
+    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
+        Display::fmt(self, formatter)
     }
 }
 
