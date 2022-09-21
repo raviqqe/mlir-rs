@@ -116,13 +116,17 @@ mod tests {
     fn affine_map() {
         let context = Context::new();
 
-        MemRef::new(
-            Type::integer(&context, 42),
-            &[42, 42],
-            Attribute::null(),
-            Attribute::null(),
-        )
-        .affine_map();
+        assert_eq!(
+            MemRef::new(
+                Type::integer(&context, 42),
+                &[42, 42],
+                Attribute::null(),
+                Attribute::null(),
+            )
+            .affine_map()
+            .to_string(),
+            "(d0, d1) -> (d0, d1)"
+        );
     }
 
     #[test]
