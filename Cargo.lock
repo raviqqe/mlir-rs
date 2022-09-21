@@ -206,9 +206,9 @@ checksum = "adab1eaa3408fb7f0c777a73e7465fd5656136fc93b670eb6df3c88c2c1344e3"
 
 [[package]]
 name = "insta"
-version = "1.19.1"
+version = "1.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fc61e98be01e89296f3343a878e9f8ca75a494cb5aaf29df65ef55734aeb85f5"
+checksum = "58a931b01c76064c5be919faa2ef0dc570e9a889dcd1e5fef08a8ca6eb4d6c0b"
 dependencies = [
  "console",
  "linked-hash-map",
@@ -286,7 +286,7 @@ checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
 [[package]]
 name = "mlir-sys"
 version = "0.1.2"
-source = "git+https://github.com/raviqqe/mlir-sys#d8ea2f99f0ae0f461fa9f51a41bc1e1daf3e07b4"
+source = "git+https://github.com/raviqqe/mlir-sys#5e5f395b430cacbf935285b364f0353af6ed2344"
 dependencies = [
  "bindgen",
 ]
