@@ -83,8 +83,8 @@ mod tests {
             Type::from(MemRef::new(
                 Type::index(&context),
                 &[42, 42],
-                Attribute::parse(&context, "foo").unwrap(),
-                Attribute::parse(&context, "foo").unwrap(),
+                Attribute::null(),
+                Attribute::null(),
             )),
             Type::parse(&context, "memref<>").unwrap()
         );
