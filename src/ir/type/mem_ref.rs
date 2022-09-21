@@ -34,7 +34,7 @@ impl<'c> MemRef<'c> {
         }
     }
 
-    /// Creates a mem-ref type with validation.
+    /// Creates a mem-ref type with diagnostics.
     pub fn checked(
         location: Location<'c>,
         r#type: Type<'c>,

@@ -97,7 +97,7 @@ impl<'c> Type<'c> {
         }
     }
 
-    /// Creates a vector type.
+    /// Creates a vector type with diagnostics.
     pub fn vector_checked(
         location: Location<'c>,
         dimensions: &[u64],
