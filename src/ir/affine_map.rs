@@ -25,7 +25,7 @@ impl<'c> AffineMap<'c> {
         unsafe { ContextRef::from_raw(mlirAffineMapGetContext(self.raw)) }
     }
 
-    /// Dumps an attribute.
+    /// Dumps an affine map.
     pub fn dump(&self) {
         unsafe { mlirAffineMapDump(self.raw) }
     }
