@@ -81,12 +81,12 @@ mod tests {
 
         assert_eq!(
             Type::from(MemRef::new(
-                Type::index(&context),
+                Type::integer(&context, 42),
                 &[42, 42],
                 Attribute::null(),
                 Attribute::null(),
             )),
-            Type::parse(&context, "memref<>").unwrap()
+            Type::parse(&context, "memref<42x42xi42>").unwrap()
         );
     }
 }
