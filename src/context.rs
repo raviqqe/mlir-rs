@@ -9,7 +9,7 @@ use mlir_sys::{
     mlirContextGetOrLoadDialect, mlirContextIsRegisteredOperation,
     mlirContextLoadAllAvailableDialects, mlirContextSetAllowUnregisteredDialects, MlirContext,
 };
-use std::{marker::PhantomData, ops::Deref};
+use std::{borrow::Borrow, marker::PhantomData, ops::Deref};
 
 /// A context of IR, dialects, and passes.
 ///
@@ -45,6 +45,12 @@ impl Deref for Context {
     type Target = ContextRef<'static>;
 
     fn deref(&self) -> &Self::Target {
+        &self.r#ref
+    }
+}
+
+impl<'a> Borrow<ContextRef<'a>> for &'a Context {
+    fn borrow(&self) -> &ContextRef<'a> {
         &self.r#ref
     }
 }
