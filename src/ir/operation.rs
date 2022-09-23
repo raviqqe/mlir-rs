@@ -22,66 +22,17 @@ use std::{
     ffi::c_void,
     fmt::{Debug, Display, Formatter},
     marker::PhantomData,
-    mem::forget,
+    mem::{forget, transmute},
     ops::Deref,
 };
 
 /// An operation.
-#[derive(Debug)]
 pub struct Operation<'c> {
-    r#ref: OperationRef<'static>,
+    raw: MlirOperation,
     _context: PhantomData<&'c Context>,
 }
 
 impl<'c> Operation<'c> {
-    pub(crate) unsafe fn from_raw(raw: MlirOperation) -> Self {
-        Self {
-            r#ref: OperationRef::from_raw(raw),
-            _context: Default::default(),
-        }
-    }
-
-    pub(crate) unsafe fn into_raw(self) -> MlirOperation {
-        let operation = self.raw;
-
-        forget(self);
-
-        operation
-    }
-}
-
-impl<'c> Drop for Operation<'c> {
-    fn drop(&mut self) {
-        unsafe { mlirOperationDestroy(self.raw) };
-    }
-}
-
-impl<'c> PartialEq for Operation<'c> {
-    fn eq(&self, other: &Self) -> bool {
-        self.r#ref == other.r#ref
-    }
-}
-
-impl<'c> Eq for Operation<'c> {}
-
-impl<'c> Deref for Operation<'c> {
-    type Target = OperationRef<'static>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.r#ref
-    }
-}
-
-/// A reference to an operation.
-// TODO Should we split context lifetimes? Or, is it transitively proven that
-// 'c > 'a?
-#[derive(Clone, Copy)]
-pub struct OperationRef<'a> {
-    raw: MlirOperation,
-    _reference: PhantomData<&'a Operation<'a>>,
-}
-
-impl<'a> OperationRef<'a> {
     /// Gets a context.
     pub fn context(&self) -> ContextRef {
         unsafe { ContextRef::from_raw(mlirOperationGetContext(self.raw)) }
@@ -163,6 +114,70 @@ impl<'a> OperationRef<'a> {
         unsafe { Operation::from_raw(mlirOperationClone(self.raw)) }
     }
 
+    pub(crate) unsafe fn from_raw(raw: MlirOperation) -> Self {
+        Self {
+            raw,
+            _context: Default::default(),
+        }
+    }
+
+    pub(crate) unsafe fn into_raw(self) -> MlirOperation {
+        let operation = self.raw;
+
+        forget(self);
+
+        operation
+    }
+}
+
+impl<'c> Drop for Operation<'c> {
+    fn drop(&mut self) {
+        unsafe { mlirOperationDestroy(self.raw) };
+    }
+}
+
+impl<'c> PartialEq for Operation<'c> {
+    fn eq(&self, other: &Self) -> bool {
+        unsafe { mlirOperationEqual(self.raw, other.raw) }
+    }
+}
+
+impl<'c> Eq for Operation<'c> {}
+
+impl<'a> Display for Operation<'a> {
+    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
+        let mut data = (formatter, Ok(()));
+
+        unsafe {
+            mlirOperationPrint(
+                self.raw,
+                Some(print_callback),
+                &mut data as *mut _ as *mut c_void,
+            );
+        }
+
+        data.1
+    }
+}
+
+impl<'c> Debug for Operation<'c> {
+    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
+        writeln!(formatter, "Operation(")?;
+        Display::fmt(self, formatter)?;
+        write!(formatter, ")")
+    }
+}
+
+/// A reference to an operation.
+// TODO Should we split context lifetimes? Or, is it transitively proven that
+// 'c > 'a?
+#[derive(Clone, Copy)]
+pub struct OperationRef<'a> {
+    raw: MlirOperation,
+    _reference: PhantomData<&'a Operation<'a>>,
+}
+
+impl<'a> OperationRef<'a> {
     pub(crate) unsafe fn to_raw(self) -> MlirOperation {
         self.raw
     }
@@ -191,27 +206,23 @@ impl<'a> PartialEq for OperationRef<'a> {
 
 impl<'a> Eq for OperationRef<'a> {}
 
+impl<'a> Deref for OperationRef<'a> {
+    type Target = Operation<'a>;
+
+    fn deref(&self) -> &Self::Target {
+        unsafe { transmute(self) }
+    }
+}
+
 impl<'a> Display for OperationRef<'a> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
-        let mut data = (formatter, Ok(()));
-
-        unsafe {
-            mlirOperationPrint(
-                self.raw,
-                Some(print_callback),
-                &mut data as *mut _ as *mut c_void,
-            );
-        }
-
-        data.1
+        Display::fmt(self.deref(), formatter)
     }
 }
 
 impl<'a> Debug for OperationRef<'a> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
-        writeln!(formatter, "OperationRef(")?;
-        Display::fmt(self, formatter)?;
-        write!(formatter, ")")
+        Debug::fmt(self.deref(), formatter)
     }
 }
 
@@ -306,9 +317,9 @@ mod tests {
         assert_eq!(
             format!(
                 "{:?}",
-                *Builder::new("foo", Location::unknown(&context)).build()
+                Builder::new("foo", Location::unknown(&context)).build()
             ),
-            "OperationRef(\n\"foo\"() : () -> ()\n)"
+            "Operation(\n\"foo\"() : () -> ()\n)"
         );
     }
 }
