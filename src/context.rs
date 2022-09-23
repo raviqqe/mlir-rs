@@ -9,7 +9,7 @@ use mlir_sys::{
     mlirContextGetOrLoadDialect, mlirContextIsRegisteredOperation,
     mlirContextLoadAllAvailableDialects, mlirContextSetAllowUnregisteredDialects, MlirContext,
 };
-use std::{marker::PhantomData, ops::Deref};
+use std::{marker::PhantomData, mem::transmute, ops::Deref};
 
 /// A context of IR, dialects, and passes.
 ///
@@ -17,46 +17,17 @@ use std::{marker::PhantomData, ops::Deref};
 /// instances.
 #[derive(Debug)]
 pub struct Context {
-    r#ref: ContextRef<'static>,
+    raw: MlirContext,
 }
 
 impl Context {
     /// Creates a context.
     pub fn new() -> Self {
         Self {
-            r#ref: unsafe { ContextRef::from_raw(mlirContextCreate()) },
+            raw: unsafe { mlirContextCreate() },
         }
     }
-}
 
-impl Drop for Context {
-    fn drop(&mut self) {
-        unsafe { mlirContextDestroy(self.raw) };
-    }
-}
-
-impl Default for Context {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl Deref for Context {
-    type Target = ContextRef<'static>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.r#ref
-    }
-}
-
-/// A reference to a context.
-#[derive(Clone, Copy, Debug)]
-pub struct ContextRef<'a> {
-    raw: MlirContext,
-    _reference: PhantomData<&'a Context>,
-}
-
-impl<'a> ContextRef<'a> {
     /// Gets a number of registered dialects.
     pub fn registered_dialect_count(&self) -> usize {
         unsafe { mlirContextGetNumRegisteredDialects(self.raw) as usize }
@@ -107,15 +78,44 @@ impl<'a> ContextRef<'a> {
         unsafe { mlirContextIsRegisteredOperation(self.raw, StringRef::from(name).to_raw()) }
     }
 
-    pub(crate) unsafe fn to_raw(self) -> MlirContext {
+    pub(crate) unsafe fn to_raw(&self) -> MlirContext {
         self.raw
     }
+}
 
+impl Drop for Context {
+    fn drop(&mut self) {
+        unsafe { mlirContextDestroy(self.raw) };
+    }
+}
+
+impl Default for Context {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// A reference to a context.
+#[derive(Clone, Copy, Debug)]
+pub struct ContextRef<'a> {
+    raw: MlirContext,
+    _reference: PhantomData<&'a Context>,
+}
+
+impl<'a> ContextRef<'a> {
     pub(crate) unsafe fn from_raw(raw: MlirContext) -> Self {
         Self {
             raw,
             _reference: Default::default(),
         }
+    }
+}
+
+impl<'a> Deref for ContextRef<'a> {
+    type Target = Context;
+
+    fn deref(&self) -> &Self::Target {
+        unsafe { transmute(self) }
     }
 }
 
