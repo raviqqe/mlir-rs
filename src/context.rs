@@ -95,6 +95,14 @@ impl Default for Context {
     }
 }
 
+impl<'a> PartialEq for Context {
+    fn eq(&self, other: &Self) -> bool {
+        unsafe { mlirContextEqual(self.raw, other.raw) }
+    }
+}
+
+impl Eq for Context {}
+
 /// A reference to a context.
 #[derive(Clone, Copy, Debug)]
 pub struct ContextRef<'a> {
