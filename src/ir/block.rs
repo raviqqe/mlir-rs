@@ -342,7 +342,7 @@ mod tests {
         let region = Region::new();
         let block = region.append_block(Block::new(&[]));
 
-        assert_eq!(block.parent_region(), Some(*region));
+        assert_eq!(block.parent_region(), Some(*region.as_ref()));
     }
 
     #[test]
