@@ -303,6 +303,7 @@ mod tests {
         ir::{operation, Module, Region, ValueLike},
         utility::register_all_dialects,
     };
+    use pretty_assertions::assert_eq;
 
     #[test]
     fn new() {
@@ -504,7 +505,7 @@ mod tests {
     fn debug() {
         assert_eq!(
             format!("{:?}", &Block::new(&[])),
-            "BlockRef(\n<<UNLINKED BLOCK>>\n)"
+            "Block(\n<<UNLINKED BLOCK>>\n)"
         );
     }
 }
