@@ -156,7 +156,7 @@ mod tests {
         let context = Context::new();
 
         Builder::new("foo", Location::unknown(&context))
-            .add_successors(&[*Block::new(&[])])
+            .add_successors(&[*Block::new(&[]).as_ref()])
             .build();
     }
 

@@ -21,14 +21,13 @@ use std::{
     ffi::c_void,
     fmt::{self, Debug, Display, Formatter},
     marker::PhantomData,
-    mem::forget,
+    mem::{forget, transmute},
     ops::Deref,
 };
 
 /// A block.
-#[derive(Debug)]
 pub struct Block<'c> {
-    r#ref: BlockRef<'static>,
+    raw: MlirBlock,
     _context: PhantomData<&'c Context>,
 }
 
@@ -54,52 +53,6 @@ impl<'c> Block<'c> {
         }
     }
 
-    pub(crate) unsafe fn from_raw(raw: MlirBlock) -> Self {
-        Self {
-            r#ref: BlockRef::from_raw(raw),
-            _context: Default::default(),
-        }
-    }
-
-    pub(crate) unsafe fn into_raw(self) -> MlirBlock {
-        let block = self.raw;
-
-        forget(self);
-
-        block
-    }
-}
-
-impl<'c> Drop for Block<'c> {
-    fn drop(&mut self) {
-        unsafe { mlirBlockDestroy(self.raw) };
-    }
-}
-
-impl<'c> PartialEq for Block<'c> {
-    fn eq(&self, other: &Self) -> bool {
-        self.r#ref == other.r#ref
-    }
-}
-
-impl<'c> Eq for Block<'c> {}
-
-impl<'c> Deref for Block<'c> {
-    type Target = BlockRef<'static>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.r#ref
-    }
-}
-
-/// A reference of a block.
-#[derive(Clone, Copy)]
-pub struct BlockRef<'a> {
-    raw: MlirBlock,
-    _reference: PhantomData<&'a Block<'a>>,
-}
-
-impl<'c> BlockRef<'c> {
     /// Gets an argument at a position.
     pub fn argument(&self, position: usize) -> Result<Argument, Error> {
         unsafe {
@@ -229,32 +182,44 @@ impl<'c> BlockRef<'c> {
     pub(crate) unsafe fn from_raw(raw: MlirBlock) -> Self {
         Self {
             raw,
-            _reference: Default::default(),
+            _context: Default::default(),
         }
     }
 
-    pub(crate) unsafe fn from_option_raw(raw: MlirBlock) -> Option<Self> {
-        if raw.ptr.is_null() {
-            None
-        } else {
-            Some(Self::from_raw(raw))
-        }
+    pub(crate) unsafe fn into_raw(self) -> MlirBlock {
+        let block = self.raw;
+
+        forget(self);
+
+        block
     }
 
-    pub(crate) unsafe fn to_raw(self) -> MlirBlock {
+    pub(crate) unsafe fn to_raw(&self) -> MlirBlock {
         self.raw
     }
 }
 
-impl<'a> PartialEq for BlockRef<'a> {
+impl<'c> Drop for Block<'c> {
+    fn drop(&mut self) {
+        unsafe { mlirBlockDestroy(self.raw) };
+    }
+}
+
+impl<'c> PartialEq for Block<'c> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirBlockEqual(self.raw, other.raw) }
     }
 }
 
-impl<'a> Eq for BlockRef<'a> {}
+impl<'c> Eq for Block<'c> {}
 
-impl<'a> Display for BlockRef<'a> {
+impl<'c, 'a> AsRef<BlockRef<'a>> for Block<'c> {
+    fn as_ref(&self) -> &BlockRef<'a> {
+        unsafe { transmute(self) }
+    }
+}
+
+impl<'c> Display for Block<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         let mut data = (formatter, Ok(()));
 
@@ -270,11 +235,63 @@ impl<'a> Display for BlockRef<'a> {
     }
 }
 
-impl<'a> Debug for BlockRef<'a> {
+impl<'c> Debug for Block<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
-        writeln!(formatter, "BlockRef(")?;
+        writeln!(formatter, "Block(")?;
         Display::fmt(self, formatter)?;
         write!(formatter, ")")
+    }
+}
+
+/// A reference of a block.
+#[derive(Clone, Copy)]
+pub struct BlockRef<'a> {
+    raw: MlirBlock,
+    _reference: PhantomData<&'a Block<'a>>,
+}
+
+impl<'c> BlockRef<'c> {
+    pub(crate) unsafe fn from_raw(raw: MlirBlock) -> Self {
+        Self {
+            raw,
+            _reference: Default::default(),
+        }
+    }
+
+    pub(crate) unsafe fn from_option_raw(raw: MlirBlock) -> Option<Self> {
+        if raw.ptr.is_null() {
+            None
+        } else {
+            Some(Self::from_raw(raw))
+        }
+    }
+}
+
+impl<'a> Deref for BlockRef<'a> {
+    type Target = Block<'a>;
+
+    fn deref(&self) -> &Self::Target {
+        unsafe { transmute(self) }
+    }
+}
+
+impl<'a> PartialEq for BlockRef<'a> {
+    fn eq(&self, other: &Self) -> bool {
+        unsafe { mlirBlockEqual(self.raw, other.raw) }
+    }
+}
+
+impl<'a> Eq for BlockRef<'a> {}
+
+impl<'a> Display for BlockRef<'a> {
+    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
+        Display::fmt(self.deref(), formatter)
+    }
+}
+
+impl<'a> Debug for BlockRef<'a> {
+    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
+        Debug::fmt(self.deref(), formatter)
     }
 }
 
@@ -486,7 +503,7 @@ mod tests {
     #[test]
     fn debug() {
         assert_eq!(
-            format!("{:?}", *Block::new(&[])),
+            format!("{:?}", &Block::new(&[])),
             "BlockRef(\n<<UNLINKED BLOCK>>\n)"
         );
     }

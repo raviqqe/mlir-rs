@@ -76,6 +76,6 @@ mod tests {
         let r#type = Type::parse(&context, "index").unwrap();
         let block = Block::new(&[(r#type, Location::unknown(&context))]);
 
-        assert_eq!(block.argument(0).unwrap().owner(), *block);
+        assert_eq!(&*block.argument(0).unwrap().owner(), &block);
     }
 }

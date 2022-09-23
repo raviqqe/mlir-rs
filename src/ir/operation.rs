@@ -198,14 +198,6 @@ impl<'a> OperationRef<'a> {
     }
 }
 
-impl<'a> PartialEq for OperationRef<'a> {
-    fn eq(&self, other: &Self) -> bool {
-        unsafe { mlirOperationEqual(self.raw, other.raw) }
-    }
-}
-
-impl<'a> Eq for OperationRef<'a> {}
-
 impl<'a> Deref for OperationRef<'a> {
     type Target = Operation<'a>;
 
@@ -213,6 +205,14 @@ impl<'a> Deref for OperationRef<'a> {
         unsafe { transmute(self) }
     }
 }
+
+impl<'a> PartialEq for OperationRef<'a> {
+    fn eq(&self, other: &Self) -> bool {
+        unsafe { mlirOperationEqual(self.raw, other.raw) }
+    }
+}
+
+impl<'a> Eq for OperationRef<'a> {}
 
 impl<'a> Display for OperationRef<'a> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
@@ -258,7 +258,7 @@ mod tests {
         let operation =
             block.append_operation(Builder::new("foo", Location::unknown(&Context::new())).build());
 
-        assert_eq!(operation.block(), Some(*block));
+        assert_eq!(operation.block(), Some(*block.as_ref()));
     }
 
     #[test]
