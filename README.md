@@ -85,6 +85,10 @@ cargo add melior
 brew install llvm@15
 ```
 
+## Documentation
+
+On [GitHub Pages](https://raviqqe.github.io/melior/melior/).
+
 ## Contribution
 
 Contribution is welcome! But, Melior is still in the alpha stage as well as the MLIR C API. Note that the API is unstable and can have breaking changes in the future.
