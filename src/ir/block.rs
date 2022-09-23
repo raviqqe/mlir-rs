@@ -25,7 +25,7 @@ use std::{
     ops::Deref,
 };
 
-/// A block
+/// A block.
 #[derive(Debug)]
 pub struct Block<'c> {
     r#ref: BlockRef<'static>,
