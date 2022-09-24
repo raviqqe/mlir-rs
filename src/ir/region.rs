@@ -99,12 +99,6 @@ impl PartialEq for Region {
 
 impl Eq for Region {}
 
-impl<'a> AsRef<RegionRef<'a>> for Region {
-    fn as_ref(&self) -> &RegionRef<'a> {
-        unsafe { transmute(self) }
-    }
-}
-
 /// A reference to a region.
 #[derive(Clone, Copy, Debug)]
 pub struct RegionRef<'a> {
@@ -130,7 +124,7 @@ impl<'a> RegionRef<'a> {
 }
 
 impl<'a> Deref for RegionRef<'a> {
-    type Target = RegionRef<'static>;
+    type Target = Region;
 
     fn deref(&self) -> &Self::Target {
         unsafe { transmute(self) }

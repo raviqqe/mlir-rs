@@ -1,6 +1,6 @@
 use crate::{
     context::Context,
-    ir::{Attribute, BlockRef, Identifier, Location, Region, Type, TypeLike, Value, ValueLike},
+    ir::{Attribute, Block, Identifier, Location, Region, Type, TypeLike, Value, ValueLike},
     string_ref::StringRef,
     utility::into_raw_array,
 };
@@ -78,7 +78,7 @@ impl<'c> Builder<'c> {
     /// Adds successor blocks.
     // TODO Fix this to ensure blocks are alive while they are referenced by the
     // operation.
-    pub fn add_successors(mut self, successors: &[BlockRef]) -> Self {
+    pub fn add_successors(mut self, successors: &[&Block<'c>]) -> Self {
         unsafe {
             mlirOperationStateAddSuccessors(
                 &mut self.raw,
@@ -156,7 +156,7 @@ mod tests {
         let context = Context::new();
 
         Builder::new("foo", Location::unknown(&context))
-            .add_successors(&[*Block::new(&[]).as_ref()])
+            .add_successors(&[&Block::new(&[])])
             .build();
     }
 

@@ -258,7 +258,7 @@ mod tests {
         let operation =
             block.append_operation(Builder::new("foo", Location::unknown(&Context::new())).build());
 
-        assert_eq!(operation.block(), Some(*block.as_ref()));
+        assert_eq!(operation.block().as_deref(), Some(&block));
     }
 
     #[test]

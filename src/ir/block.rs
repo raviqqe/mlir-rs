@@ -213,12 +213,6 @@ impl<'c> PartialEq for Block<'c> {
 
 impl<'c> Eq for Block<'c> {}
 
-impl<'c, 'a> AsRef<BlockRef<'a>> for Block<'c> {
-    fn as_ref(&self) -> &BlockRef<'a> {
-        unsafe { transmute(self) }
-    }
-}
-
 impl<'c> Display for Block<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         let mut data = (formatter, Ok(()));
@@ -342,7 +336,7 @@ mod tests {
         let region = Region::new();
         let block = region.append_block(Block::new(&[]));
 
-        assert_eq!(block.parent_region(), Some(*region.as_ref()));
+        assert_eq!(block.parent_region().as_deref(), Some(&region));
     }
 
     #[test]
