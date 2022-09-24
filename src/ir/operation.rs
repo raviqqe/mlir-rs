@@ -109,11 +109,6 @@ impl<'c> Operation<'c> {
         unsafe { mlirOperationDump(self.raw) }
     }
 
-    /// Clones an operation.
-    pub fn to_owned(&self) -> Operation {
-        unsafe { Operation::from_raw(mlirOperationClone(self.raw)) }
-    }
-
     pub(crate) unsafe fn from_raw(raw: MlirOperation) -> Self {
         Self {
             raw,
@@ -127,6 +122,12 @@ impl<'c> Operation<'c> {
         forget(self);
 
         operation
+    }
+}
+
+impl<'c> Clone for Operation<'c> {
+    fn clone(&self) -> Self {
+        unsafe { Operation::from_raw(mlirOperationClone(self.raw)) }
     }
 }
 
@@ -291,11 +292,11 @@ mod tests {
     }
 
     #[test]
-    fn to_owned() {
+    fn clone() {
         let context = Context::new();
         let operation = Builder::new("foo", Location::unknown(&context)).build();
 
-        operation.to_owned();
+        let _ = operation.clone();
     }
 
     #[test]
