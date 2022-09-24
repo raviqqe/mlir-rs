@@ -95,7 +95,7 @@ impl Default for Context {
     }
 }
 
-impl<'a> PartialEq for Context {
+impl PartialEq for Context {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirContextEqual(self.raw, other.raw) }
     }
