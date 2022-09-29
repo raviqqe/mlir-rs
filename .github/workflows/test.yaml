@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
+      - uses: raviqqe/enable-homebrew@main
       - run: tools/setup.sh
       - run: cargo build
   test:
@@ -22,5 +23,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
+      - uses: raviqqe/enable-homebrew@main
       - run: tools/setup.sh
       - run: cargo test
