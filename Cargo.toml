@@ -13,5 +13,5 @@ once_cell = "1"
 
 [dev-dependencies]
 indoc = "1.0.7"
-insta = "1.21.1"
+insta = "1.21.2"
 pretty_assertions = "1.3.0"
