@@ -12,6 +12,6 @@ mlir-sys = "0.1"
 once_cell = "1"
 
 [dev-dependencies]
-indoc = "1.0.8"
+indoc = "2.0.0"
 insta = "1.26.0"
 pretty_assertions = "1.3.0"
