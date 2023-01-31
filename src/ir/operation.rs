@@ -51,7 +51,7 @@ impl<'c> Operation<'c> {
     /// Gets a result at a position.
     pub fn result(&self, position: usize) -> Result<result::ResultValue, Error> {
         unsafe {
-            if position < self.result_count() as usize {
+            if position < self.result_count() {
                 Ok(result::ResultValue::from_raw(mlirOperationGetResult(
                     self.raw,
                     position as isize,
@@ -70,7 +70,7 @@ impl<'c> Operation<'c> {
     /// Gets a result at an index.
     pub fn region(&self, index: usize) -> Option<RegionRef> {
         unsafe {
-            if index < self.region_count() as usize {
+            if index < self.region_count() {
                 Some(RegionRef::from_raw(mlirOperationGetRegion(
                     self.raw,
                     index as isize,

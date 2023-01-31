@@ -25,46 +25,41 @@ impl Display for Error {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         match self {
             Self::BlockArgumentExpected(value) => {
-                write!(formatter, "block argument expected: {}", value)
+                write!(formatter, "block argument expected: {value}")
             }
             Self::BlockArgumentPosition(block, position) => {
                 write!(
                     formatter,
-                    "block argument position {} out of range: {}",
-                    position, block
+                    "block argument position {position} out of range: {block}"
                 )
             }
-            Self::FunctionExpected(r#type) => write!(formatter, "function expected: {}", r#type),
+            Self::FunctionExpected(r#type) => write!(formatter, "function expected: {type}"),
             Self::FunctionInputPosition(r#type, position) => write!(
                 formatter,
-                "function input position {} out of range: {}",
-                position, r#type
+                "function input position {position} out of range: {type}"
             ),
             Self::FunctionResultPosition(r#type, position) => write!(
                 formatter,
-                "function result position {} out of range: {}",
-                position, r#type
+                "function result position {position} out of range: {type}"
             ),
             Self::InvokeFunction => write!(formatter, "failed to invoke JIT-compiled function"),
-            Self::MemRefExpected(r#type) => write!(formatter, "mem-ref expected: {}", r#type),
+            Self::MemRefExpected(r#type) => write!(formatter, "mem-ref expected: {type}"),
             Self::OperationResultExpected(value) => {
-                write!(formatter, "operation result expected: {}", value)
+                write!(formatter, "operation result expected: {value}")
             }
             Self::OperationResultPosition(operation, position) => {
                 write!(
                     formatter,
-                    "operation result position {} out of range: {}",
-                    position, operation
+                    "operation result position {position} out of range: {operation}"
                 )
             }
             Self::ParsePassPipeline => write!(formatter, "failed to parse pass pipeline"),
             Self::RunPass => write!(formatter, "failed to run pass"),
-            Self::TupleExpected(r#type) => write!(formatter, "tuple expected: {}", r#type),
+            Self::TupleExpected(r#type) => write!(formatter, "tuple expected: {type}"),
             Self::TupleFieldPosition(r#type, position) => {
                 write!(
                     formatter,
-                    "tuple field position {} out of range: {}",
-                    position, r#type
+                    "tuple field position {position} out of range: {type}"
                 )
             }
         }

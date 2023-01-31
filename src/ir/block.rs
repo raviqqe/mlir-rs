@@ -56,7 +56,7 @@ impl<'c> Block<'c> {
     /// Gets an argument at a position.
     pub fn argument(&self, position: usize) -> Result<Argument, Error> {
         unsafe {
-            if position < self.argument_count() as usize {
+            if position < self.argument_count() {
                 Ok(Argument::from_raw(mlirBlockGetArgument(
                     self.raw,
                     position as isize,
