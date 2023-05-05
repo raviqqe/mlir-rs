@@ -2,7 +2,7 @@
 
 use super::Pass;
 use mlir_sys::{
-    mlirCreateConversionConvertArithmeticToLLVM, mlirCreateConversionConvertControlFlowToLLVM,
+    mlirCreateConversionArithToLLVMConversionPass, mlirCreateConversionConvertControlFlowToLLVM,
     mlirCreateConversionConvertControlFlowToSPIRV, mlirCreateConversionConvertFuncToLLVM,
     mlirCreateConversionConvertMathToLLVM, mlirCreateConversionConvertMathToLibm,
     mlirCreateConversionConvertMathToSPIRV,
@@ -10,7 +10,7 @@ use mlir_sys::{
 
 /// Creates a pass to convert the `arith` dialect to the `llvm` dialect.
 pub fn convert_arithmetic_to_llvm() -> Pass {
-    Pass::from_raw_fn(mlirCreateConversionConvertArithmeticToLLVM)
+    Pass::from_raw_fn(mlirCreateConversionArithToLLVMConversionPass)
 }
 
 /// Creates a pass to convert the `cf` dialect to the `llvm` dialect.

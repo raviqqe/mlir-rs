@@ -10,6 +10,7 @@ use mlir_sys::{
 use std::{
     ffi::c_void,
     fmt::{self, Formatter},
+    ptr::null_mut,
     sync::Once,
 };
 
@@ -33,8 +34,14 @@ pub fn register_all_passes() {
 
 /// Parses a pass pipeline.
 pub fn parse_pass_pipeline(manager: pass::OperationManager, source: &str) -> Result<(), Error> {
+    // TODO Handle parse errors.
     let result = LogicalResult::from_raw(unsafe {
-        mlirParsePassPipeline(manager.to_raw(), StringRef::from(source).to_raw())
+        mlirParsePassPipeline(
+            manager.to_raw(),
+            StringRef::from(source).to_raw(),
+            None,
+            null_mut(),
+        )
     });
 
     if result.is_success() {
