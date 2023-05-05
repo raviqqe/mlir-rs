@@ -18,7 +18,7 @@ jobs:
       matrix:
         os:
           - ubuntu-22.04
-          # TODO Support macOS with LLVM 15.
+          # TODO Support macOS with LLVM 16.
           # - macos-12
     runs-on: ${{ matrix.os }}
     steps:
