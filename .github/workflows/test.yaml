@@ -6,9 +6,10 @@ on:
   pull_request:
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: Swatinem/rust-cache@v2
       - uses: raviqqe/enable-homebrew@main
       - run: tools/setup.sh
       - run: cargo build
@@ -17,12 +18,13 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-22.04
+          - ubuntu-latest
           # TODO Support macOS with LLVM 15.
           # - macos-12
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
+      - uses: Swatinem/rust-cache@v2
       - uses: raviqqe/enable-homebrew@main
       - run: tools/setup.sh
       - run: cargo test
