@@ -104,7 +104,7 @@ mod tests {
 
         assert_eq!(pass_manager.run(&mut module), Ok(()));
 
-        let engine = ExecutionEngine::new(&module, 2, &[]);
+        let engine = ExecutionEngine::new(&module, 2, &[], false);
 
         let mut argument = 42;
         let mut result = -1;
