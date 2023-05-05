@@ -8,7 +8,7 @@ repository = "https://github.com/raviqqe/melior"
 documentation = "https://raviqqe.github.io/melior/melior/"
 
 [dependencies]
-mlir-sys = "0.1"
+mlir-sys = "0.2"
 once_cell = "1"
 
 [dev-dependencies]
