@@ -223,14 +223,12 @@ mod tests {
         let context = Context::new();
         let manager = Manager::new(&context);
 
-        assert_eq!(
-            parse_pass_pipeline(
-                manager.as_operation_pass_manager(),
-                "builtin.module(func.func(print-op-stats{json=false}),\
+        insta::assert_display_snapshot!(parse_pass_pipeline(
+            manager.as_operation_pass_manager(),
+            "builtin.module(func.func(print-op-stats{json=false}),\
                 func.func(print-op-stats{json=false}))"
-            ),
-            Err(Error::ParsePassPipeline("MLIR Textual PassPipeline Parser:1:11: error: 'print-op-stats' does not refer to a registered pass or pass pipeline\nfunc.func(print-op-stats{json=false}),func.func(print-op-stats{json=false})\n          ^\n".into()))
-        );
+        )
+        .unwrap_err());
 
         register_print_operation_stats();
 

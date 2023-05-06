@@ -54,7 +54,7 @@ impl Display for Error {
                 )
             }
             Self::ParsePassPipeline(message) => {
-                write!(formatter, "failed to parse pass pipeline: {}", message)
+                write!(formatter, "failed to parse pass pipeline:\n{}", message)
             }
             Self::RunPass => write!(formatter, "failed to run pass"),
             Self::TupleExpected(r#type) => write!(formatter, "tuple expected: {type}"),
