@@ -10,7 +10,6 @@ use mlir_sys::{
 use std::{
     ffi::c_void,
     fmt::{self, Formatter},
-    ptr::null_mut,
     sync::Once,
 };
 
@@ -34,20 +33,34 @@ pub fn register_all_passes() {
 
 /// Parses a pass pipeline.
 pub fn parse_pass_pipeline(manager: pass::OperationManager, source: &str) -> Result<(), Error> {
-    // TODO Handle parse errors.
+    let mut error_message = None;
+
     let result = LogicalResult::from_raw(unsafe {
         mlirParsePassPipeline(
             manager.to_raw(),
             StringRef::from(source).to_raw(),
-            None,
-            null_mut(),
+            Some(handle_parse_error),
+            &mut error_message as *mut _ as *mut _,
         )
     });
 
     if result.is_success() {
         Ok(())
     } else {
-        Err(Error::ParsePassPipeline)
+        Err(Error::ParsePassPipeline(error_message.unwrap_or_else(
+            || "failed to parse error message in UTF-8".into(),
+        )))
+    }
+}
+
+unsafe extern "C" fn handle_parse_error(raw_string: MlirStringRef, data: *mut c_void) {
+    let string = StringRef::from_raw(raw_string);
+    let data = &mut *(data as *mut Option<String>);
+
+    if let Some(message) = data {
+        message.extend(string.as_str())
+    } else {
+        *data = string.as_str().map(String::from).ok();
     }
 }
 

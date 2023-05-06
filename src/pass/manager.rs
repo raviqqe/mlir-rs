@@ -229,7 +229,7 @@ mod tests {
                 "builtin.module(func.func(print-op-stats{json=false}),\
                 func.func(print-op-stats{json=false}))"
             ),
-            Err(Error::ParsePassPipeline)
+            Err(Error::ParsePassPipeline("MLIR Textual PassPipeline Parser:1:11: error: 'print-op-stats' does not refer to a registered pass or pass pipeline\nfunc.func(print-op-stats{json=false}),func.func(print-op-stats{json=false})\n          ^\n".into()))
         );
 
         register_print_operation_stats();

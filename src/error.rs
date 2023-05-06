@@ -15,7 +15,7 @@ pub enum Error {
     MemRefExpected(String),
     OperationResultExpected(String),
     OperationResultPosition(String, usize),
-    ParsePassPipeline,
+    ParsePassPipeline(String),
     RunPass,
     TupleExpected(String),
     TupleFieldPosition(String, usize),
@@ -53,7 +53,9 @@ impl Display for Error {
                     "operation result position {position} out of range: {operation}"
                 )
             }
-            Self::ParsePassPipeline => write!(formatter, "failed to parse pass pipeline"),
+            Self::ParsePassPipeline(message) => {
+                write!(formatter, "failed to parse pass pipeline: {}", message)
+            }
             Self::RunPass => write!(formatter, "failed to run pass"),
             Self::TupleExpected(r#type) => write!(formatter, "tuple expected: {type}"),
             Self::TupleFieldPosition(r#type, position) => {
