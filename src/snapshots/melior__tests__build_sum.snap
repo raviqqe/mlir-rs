@@ -5,13 +5,13 @@ expression: module.as_operation()
 module {
   func.func @sum(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
     %c0 = arith.constant 0 : index
-    %0 = memref.dim %arg0, %c0 : memref<?xf32>
+    %dim = memref.dim %arg0, %c0 : memref<?xf32>
     %c1 = arith.constant 1 : index
-    scf.for %arg2 = %c0 to %0 step %c1 {
-      %1 = memref.load %arg0[%arg2] : memref<?xf32>
-      %2 = memref.load %arg1[%arg2] : memref<?xf32>
-      %3 = arith.addf %1, %2 : f32
-      memref.store %3, %arg0[%arg2] : memref<?xf32>
+    scf.for %arg2 = %c0 to %dim step %c1 {
+      %0 = memref.load %arg0[%arg2] : memref<?xf32>
+      %1 = memref.load %arg1[%arg2] : memref<?xf32>
+      %2 = arith.addf %0, %1 : f32
+      memref.store %2, %arg0[%arg2] : memref<?xf32>
     }
     return
   }
