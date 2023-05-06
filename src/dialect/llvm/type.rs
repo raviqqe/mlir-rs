@@ -108,7 +108,7 @@ mod tests {
 
         assert_eq!(
             super::array(i32, 4),
-            Type::parse(&context, "!llvm.array<4xi32>").unwrap()
+            Type::parse(&context, "!llvm.array<4 x i32>").unwrap()
         );
     }
 
