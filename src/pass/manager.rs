@@ -204,8 +204,7 @@ mod tests {
     fn print_pass_pipeline() {
         let context = Context::new();
         let manager = Manager::new(&context);
-        let module_manager = manager.nested_under("builtin.module");
-        let function_manager = module_manager.nested_under("func.func");
+        let function_manager = manager.nested_under("func.func");
 
         function_manager.add_pass(pass::transform::print_operation_stats());
 
@@ -214,10 +213,9 @@ mod tests {
             "builtin.module(func.func(print-op-stats{json=false}))"
         );
         assert_eq!(
-            module_manager.to_string(),
+            function_manager.to_string(),
             "func.func(print-op-stats{json=false})"
         );
-        assert_eq!(function_manager.to_string(), "print-op-stats{json=false}");
     }
 
     #[test]
