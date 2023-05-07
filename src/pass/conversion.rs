@@ -8,7 +8,7 @@ use mlir_sys::{
     mlirCreateConversionConvertMathToSPIRV,
 };
 
-// TODO Unify a namming convention.
+// TODO Unify a naming convention.
 
 /// Creates a pass to convert the `arith` dialect to the `llvm` dialect.
 pub fn convert_arithmetic_to_llvm() -> Pass {
