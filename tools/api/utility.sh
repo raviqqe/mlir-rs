@@ -1,5 +1,3 @@
-directory=$(dirname $0)
-
 count() {
   wc -l
 }
@@ -10,7 +8,7 @@ filter_api() {
 
 implemented_api() {
   (
-    cd $directory/../melior
+    cd $(dirname $0)/../../melior
 
     cargo install cargo-expand
     cargo expand | filter_api

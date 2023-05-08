@@ -2,7 +2,7 @@
 
 set -e
 
-. $(dirname $0)/../utility.sh
+. $(dirname $0)/utility.sh
 
 directory=/tmp/melior
 
