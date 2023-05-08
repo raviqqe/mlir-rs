@@ -1,6 +1,6 @@
 //! GPU passes.
 
-melior_macro::conversion_passes!(
+melior_macro::gpu_passes!(
     // spell-checker: disable-next-line
     mlirCreateGPUGPULowerMemorySpaceAttributesPass,
     mlirCreateGPUGpuAsyncRegionPass,
