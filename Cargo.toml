@@ -1,5 +1,5 @@
 [workspace]
-members = ["melior"]
+members = ["macro", "melior"]
 
 [profile.release]
 lto = true
