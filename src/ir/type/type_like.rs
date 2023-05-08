@@ -107,6 +107,27 @@ mod tests {
     }
 
     #[test]
+    fn is_integer() {
+        let context = Context::new();
+
+        assert!(Type::integer(&context, 64).is_integer());
+    }
+
+    #[test]
+    fn get_width() {
+        let context = Context::new();
+
+        assert_eq!(Type::integer(&context, 64).get_width(), Some(64));
+    }
+
+    #[test]
+    fn is_index() {
+        let context = Context::new();
+
+        assert!(Type::index(&context).is_index());
+    }
+
+    #[test]
     fn is_bfloat16() {
         let context = Context::new();
 
