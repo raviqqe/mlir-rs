@@ -12,4 +12,4 @@ quote = "1"
 syn = { version = "2", features = ["full"] }
 
 [dev-dependencies]
-autophagy = { path = "../autophagy" }
+mlir-sys = "0.2"

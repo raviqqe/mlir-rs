@@ -3,6 +3,16 @@
 version = 3
 
 [[package]]
+name = "autophagy-macro"
+version = "0.1.0"
+dependencies = [
+ "mlir-sys",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.15",
+]
+
+[[package]]
 name = "bindgen"
 version = "0.65.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
