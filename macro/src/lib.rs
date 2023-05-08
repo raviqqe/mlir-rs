@@ -1,3 +1,4 @@
+mod arith;
 mod parse;
 mod pass;
 mod type_check_functions;
