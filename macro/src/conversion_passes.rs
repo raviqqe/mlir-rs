@@ -24,7 +24,7 @@ pub fn generate(identifiers: &[Ident]) -> Result<TokenStream, Box<dyn Error>> {
         stream.extend(TokenStream::from(quote! {
             #[doc = #document]
             pub fn #function_name() -> crate::pass::Pass {
-                crate::pass::Pass::_macro_from_raw_fn(mlir_sys::#identifier)
+                crate::pass::Pass::__private_from_raw_fn(mlir_sys::#identifier)
             }
         }));
     }

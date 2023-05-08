@@ -24,7 +24,7 @@ impl Pass {
         self.raw
     }
 
-    pub fn _macro_from_raw_fn(create_raw: unsafe extern "C" fn() -> MlirPass) -> Self {
+    pub fn __private_from_raw_fn(create_raw: unsafe extern "C" fn() -> MlirPass) -> Self {
         Self::from_raw_fn(create_raw)
     }
 }
