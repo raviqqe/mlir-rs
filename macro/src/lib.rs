@@ -1,5 +1,5 @@
 mod parse;
-mod passes;
+mod pass;
 mod type_check_functions;
 
 use parse::IdentifierList;
@@ -19,7 +19,7 @@ pub fn type_check_functions(stream: TokenStream) -> TokenStream {
 pub fn conversion_passes(stream: TokenStream) -> TokenStream {
     let identifiers = parse_macro_input!(stream as IdentifierList);
 
-    convert_result(passes::generate(identifiers.identifiers(), |mut name| {
+    convert_result(pass::generate(identifiers.identifiers(), |mut name| {
         if let Some(other) = name.strip_prefix("Conversion") {
             name = other.into();
         }
@@ -40,7 +40,7 @@ pub fn conversion_passes(stream: TokenStream) -> TokenStream {
 pub fn transform_passes(stream: TokenStream) -> TokenStream {
     let identifiers = parse_macro_input!(stream as IdentifierList);
 
-    convert_result(passes::generate(identifiers.identifiers(), |name| {
+    convert_result(pass::generate(identifiers.identifiers(), |name| {
         name.strip_prefix("Transforms").unwrap_or(name).into()
     }))
 }
