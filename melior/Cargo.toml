@@ -10,6 +10,7 @@ readme = "../README.md"
 keywords = ["mlir", "llvm"]
 
 [dependencies]
+melior-macro = { version = "0.1", path = "../macro" }
 mlir-sys = "0.2"
 once_cell = "1"
 
