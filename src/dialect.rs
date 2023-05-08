@@ -1,5 +1,6 @@
 //! Dialect handles, instances, and registry.
 
+pub mod func;
 mod handle;
 pub mod llvm;
 mod registry;
