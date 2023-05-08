@@ -1,11 +1,11 @@
 directory=$(dirname $0)
 
 count() {
-  sort -u | wc -l
+  wc -l
 }
 
 filter_api() {
-  grep -o '\(m\|M\)lir[A-Z][a-zA-Z0-9]*' | grep -iv -e python -e isnull
+  grep -o '[mM]lir[A-Z][a-zA-Z0-9]*' | grep -iv -e python -e isnull | sort -u
 }
 
 implemented_api() {
