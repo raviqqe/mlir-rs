@@ -9,6 +9,10 @@ pub fn generate(identifiers: &[Ident]) -> Result<TokenStream, Box<dyn Error>> {
             name = other.into();
         }
 
+        if let Some(other) = name.strip_prefix("Convert") {
+            name = other.into();
+        }
+
         if let Some(other) = name.strip_suffix("ConversionPass") {
             name = other.into();
         }
