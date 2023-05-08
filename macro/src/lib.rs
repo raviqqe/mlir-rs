@@ -1,5 +1,6 @@
 mod conversion_passes;
 mod parse;
+mod type_check_functions;
 
 use parse::IdentifierList;
 use proc_macro::TokenStream;
@@ -11,7 +12,7 @@ use syn::parse_macro_input;
 pub fn type_check_functions(stream: TokenStream) -> TokenStream {
     let identifiers = parse_macro_input!(stream as IdentifierList);
 
-    convert_result(conversion_passes::generate(identifiers.identifiers()))
+    convert_result(type_check_functions::generate(identifiers.identifiers()))
 }
 
 #[proc_macro]
