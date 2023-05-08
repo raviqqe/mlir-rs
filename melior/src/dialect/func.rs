@@ -33,7 +33,6 @@ pub fn r#return<'c>(operands: &[Value], location: Location<'c>) -> Operation<'c>
 mod tests {
     use super::*;
     use crate::{
-        dialect::arith::addi,
         ir::{Attribute, Block, Module, Type},
         test::load_all_dialects,
         Context,
@@ -51,22 +50,16 @@ mod tests {
 
         let function = {
             let region = Region::new();
-            let block = Block::new(&[(integer_type, location), (integer_type, location)]);
+            let block = Block::new(&[(integer_type, location)]);
 
-            let sum = block.append_operation(addi(
-                block.argument(0).unwrap().into(),
-                block.argument(1).unwrap().into(),
-                location,
-            ));
-
-            block.append_operation(r#return(&[sum.result(0).unwrap().into()], location));
+            block.append_operation(r#return(&[block.argument(0).unwrap().into()], location));
 
             region.append_block(block);
 
             func(
                 &context,
                 Attribute::parse(&context, "\"add\"").unwrap(),
-                Attribute::parse(&context, "(i64, i64) -> i64").unwrap(),
+                Attribute::parse(&context, "(i64) -> i64").unwrap(),
                 region,
                 Location::unknown(&context),
             )
@@ -74,7 +67,7 @@ mod tests {
 
         module.body().append_operation(function);
 
-        assert!(module.as_operation().verify());
         insta::assert_display_snapshot!(module.as_operation());
+        assert!(module.as_operation().verify());
     }
 }

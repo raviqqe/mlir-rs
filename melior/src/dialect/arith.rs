@@ -39,7 +39,7 @@ melior_macro::arith_binary_operators!(
 mod tests {
     use super::*;
     use crate::{
-        dialect::func::{self, func},
+        dialect::func,
         ir::{Attribute, Block, Location, Module, Region, Type},
         test::load_all_dialects,
         Context,
