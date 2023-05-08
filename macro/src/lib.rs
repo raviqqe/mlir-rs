@@ -11,7 +11,7 @@ use syn::parse_macro_input;
 pub fn conversion_passes(stream: TokenStream) -> TokenStream {
     let identifiers = parse_macro_input!(stream as IdentifierList);
 
-    convert_result(conversion_passes::generate(&identifiers.identifiers()))
+    convert_result(conversion_passes::generate(identifiers.identifiers()))
 }
 
 fn convert_result(result: Result<TokenStream, Box<dyn Error>>) -> TokenStream {

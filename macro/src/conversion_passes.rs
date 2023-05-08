@@ -29,5 +29,5 @@ pub fn generate(identifiers: &[Ident]) -> Result<TokenStream, Box<dyn Error>> {
         }));
     }
 
-    Ok(stream.into())
+    Ok(stream)
 }
