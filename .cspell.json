@@ -5,6 +5,8 @@
     "bfloat",
     "canonicalize",
     "canonicalizer",
+    "divf",
+    "divi",
     "femtomc",
     "hasher",
     "indoc",
@@ -14,9 +16,13 @@
     "melior",
     "memref",
     "mlir",
+    "mulf",
+    "muli",
     "rustc",
     "sccp",
     "spirv",
-    "stdc"
+    "stdc",
+    "subf",
+    "subi"
   ]
 }
