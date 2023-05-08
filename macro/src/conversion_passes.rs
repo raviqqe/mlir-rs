@@ -5,7 +5,7 @@ use std::error::Error;
 
 pub fn generate(identifiers: &[Ident]) -> Result<TokenStream, Box<dyn Error>> {
     passes::generate(identifiers, |mut name| {
-        if let Some(other) = name.strip_prefix("mlirCreateConversion") {
+        if let Some(other) = name.strip_prefix("Conversion") {
             name = other.into();
         }
 

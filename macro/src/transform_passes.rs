@@ -5,8 +5,6 @@ use std::error::Error;
 
 pub fn generate(identifiers: &[Ident]) -> Result<TokenStream, Box<dyn Error>> {
     passes::generate(identifiers, |name| {
-        name.strip_prefix("mlirCreateTransforms")
-            .unwrap_or(name)
-            .into()
+        name.strip_prefix("Transforms").unwrap_or(name).into()
     })
 }

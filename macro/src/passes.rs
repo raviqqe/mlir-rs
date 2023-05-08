@@ -11,7 +11,7 @@ pub fn generate(
     let mut stream = TokenStream::new();
 
     for identifier in identifiers {
-        let name = extract_pass_name(&identifier.to_string());
+        let name = extract_pass_name(&identifier.to_string().strip_prefix("mlirCreate").unwrap());
 
         let function_name = Ident::new(&name.to_case(Case::Snake), identifier.span());
         let document = format!(" Creates a pass of `{}`.", name);
