@@ -20,7 +20,7 @@ pub fn generate(identifiers: &[Ident]) -> Result<TokenStream, Box<dyn Error>> {
         stream.extend(TokenStream::from(quote! {
             #[doc = #document]
             pub fn #function_name(&self) -> bool {
-                unsafe { #name(self.to_raw()) }
+                unsafe { #identifier(self.to_raw()) }
             }
         }));
     }
