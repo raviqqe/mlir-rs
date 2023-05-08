@@ -33,6 +33,11 @@ pub fn function<'c>(
     }
 }
 
+/// Creates an LLVM opaque pointer type.
+pub fn opaque_pointer(context: &Context) -> Type {
+    Type::parse(context, "!llvm.ptr").unwrap()
+}
+
 /// Creates an LLVM pointer type.
 pub fn pointer(r#type: Type, address_space: u32) -> Type {
     unsafe { Type::from_raw(mlirLLVMPointerTypeGet(r#type.to_raw(), address_space)) }
@@ -67,6 +72,16 @@ mod tests {
         context.get_or_load_dialect("llvm");
 
         context
+    }
+
+    #[test]
+    fn opaque_pointer() {
+        let context = create_context();
+
+        assert_eq!(
+            super::opaque_pointer(&context),
+            Type::parse(&context, "!llvm.ptr").unwrap()
+        );
     }
 
     #[test]
