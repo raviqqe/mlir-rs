@@ -24,5 +24,25 @@ pub fn generate(
         }));
     }
 
+    for identifier in identifiers {
+        let name = identifier.to_string();
+        let name = name.strip_prefix("mlirCreate").unwrap();
+
+        let foreign_function_name =
+            Ident::new(&("mlirRegister".to_owned() + &name), identifier.span());
+        let function_name = Ident::new(
+            &("register_".to_owned() + &extract_pass_name(name).to_case(Case::Snake)),
+            identifier.span(),
+        );
+        let document = format!(" Registers a pass of `{}`.", name);
+
+        stream.extend(TokenStream::from(quote! {
+            #[doc = #document]
+            pub fn #function_name() {
+                unsafe { mlir_sys::#foreign_function_name() }
+            }
+        }));
+    }
+
     Ok(stream)
 }
