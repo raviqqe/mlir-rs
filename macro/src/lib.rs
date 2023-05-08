@@ -20,19 +20,9 @@ pub fn conversion_passes(stream: TokenStream) -> TokenStream {
     let identifiers = parse_macro_input!(stream as IdentifierList);
 
     convert_result(pass::generate(identifiers.identifiers(), |mut name| {
-        if let Some(other) = name.strip_prefix("Conversion") {
-            name = other;
-        }
-
-        if let Some(other) = name.strip_prefix("Convert") {
-            name = other;
-        }
-
-        if let Some(other) = name.strip_suffix("ConversionPass") {
-            name = other;
-        }
-
-        name.into()
+        name = name.strip_prefix("Conversion").unwrap_or(name);
+        name = name.strip_prefix("Convert").unwrap_or(name);
+        name.strip_suffix("ConversionPass").unwrap_or(name).into()
     }))
 }
 
