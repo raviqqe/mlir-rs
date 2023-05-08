@@ -21,11 +21,11 @@ pub fn generate_binary_operators(names: &[Ident]) -> Result<TokenStream, Box<dyn
     stream.extend(TokenStream::from(quote! {
         fn binary_operator<'c>(
             name: &str,
-            lhs: Value,
-            rhs: Value,
-            location: Location<'c>,
+            lhs: crate::ir::value::Value,
+            rhs: crate::ir::value::Value,
+            location: crate::location::Location<'c>,
         ) -> Operation<'c> {
-            Builder::new(name, location)
+            crate::operation::Builder::new(name, location)
                 .add_operands(&[lhs, rhs])
                 .enable_result_type_inference()
                 .build()
