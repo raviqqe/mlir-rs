@@ -100,7 +100,7 @@ mod tests {
 
         pass_manager
             .nested_under("func.func")
-            .add_pass(pass::conversion::convert_arithmetic_to_llvm());
+            .add_pass(pass::conversion::arith_to_llvm());
 
         assert_eq!(pass_manager.run(&mut module), Ok(()));
 

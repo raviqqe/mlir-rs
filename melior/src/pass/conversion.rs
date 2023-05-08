@@ -1,6 +1,7 @@
 //! Dialect conversion passes.
 
 melior_macro::conversion_passes!(
+    mlirCreateConversionArithToLLVMConversionPass,
     mlirCreateConversionConvertAffineForToGPU,
     mlirCreateConversionConvertAffineToStandard,
     mlirCreateConversionConvertAMDGPUToROCDL,
@@ -55,5 +56,5 @@ melior_macro::conversion_passes!(
     mlirCreateConversionTosaToLinalg,
     mlirCreateConversionTosaToLinalgNamed,
     mlirCreateConversionTosaToSCF,
-    mlirCreateConversionTosaToTensor
+    mlirCreateConversionTosaToTensor,
 );
