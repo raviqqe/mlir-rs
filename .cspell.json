@@ -1,7 +1,5 @@
 {
   "words": [
-    "addf",
-    "addi",
     "amdgpu",
     "apdl",
     "bfloat",
@@ -11,8 +9,6 @@
     "canonicalizer",
     "codegen",
     "detensorize",
-    "divf",
-    "divi",
     "elementwise",
     "femtomc",
     "funcs",
@@ -25,8 +21,6 @@
     "melior",
     "memref",
     "mlir",
-    "mulf",
-    "muli",
     "nvgpu",
     "nvvm",
     "rocdl",
@@ -35,8 +29,6 @@
     "sparsification",
     "spirv",
     "stdc",
-    "subf",
-    "subi",
     "tosa",
     "unranked",
     "vulkan"

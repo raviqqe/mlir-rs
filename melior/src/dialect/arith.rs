@@ -1,5 +1,7 @@
 //! `arith` dialect
 
+// spell-checker: disable
+
 melior_macro::arith_binary_operators!(
     addf,
     addi,
