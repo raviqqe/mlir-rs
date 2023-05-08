@@ -1,5 +1,6 @@
 use crate::ir::{operation::Builder, Location, Operation, Value};
 
+/// Create a `arith.addi` operation.
 pub fn addi<'c>(lhs: Value, rhs: Value, location: Location<'c>) -> Operation<'c> {
     binary_operator("arith.addi", lhs, rhs, location)
 }
