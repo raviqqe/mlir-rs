@@ -35,9 +35,6 @@ pub fn generate(identifiers: &[Ident]) -> Result<TokenStream, Box<dyn Error>> {
 fn map_type_name(name: &str) -> String {
     match name {
         "bf_16" | "f_16" | "f_32" | "f_64" => name.replace("_", ""),
-        name if name.contains(FLOAT_8E5M2_PATTERN) => {
-            name.replace(FLOAT_8E5M2_PATTERN, "8e5m2").into()
-        }
-        name => name.into(),
+        name => name.replace(FLOAT_8E5M2_PATTERN, "8e5m2").into(),
     }
 }
