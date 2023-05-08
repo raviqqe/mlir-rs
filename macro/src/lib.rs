@@ -1,7 +1,5 @@
-mod conversion_passes;
 mod parse;
 mod passes;
-mod transform_passes;
 mod type_check_functions;
 
 use parse::IdentifierList;
@@ -21,14 +19,30 @@ pub fn type_check_functions(stream: TokenStream) -> TokenStream {
 pub fn conversion_passes(stream: TokenStream) -> TokenStream {
     let identifiers = parse_macro_input!(stream as IdentifierList);
 
-    convert_result(conversion_passes::generate(identifiers.identifiers()))
+    convert_result(passes::generate(identifiers.identifiers(), |mut name| {
+        if let Some(other) = name.strip_prefix("Conversion") {
+            name = other.into();
+        }
+
+        if let Some(other) = name.strip_prefix("Convert") {
+            name = other.into();
+        }
+
+        if let Some(other) = name.strip_suffix("ConversionPass") {
+            name = other.into();
+        }
+
+        name.into()
+    }))
 }
 
 #[proc_macro]
 pub fn transform_passes(stream: TokenStream) -> TokenStream {
     let identifiers = parse_macro_input!(stream as IdentifierList);
 
-    convert_result(transform_passes::generate(identifiers.identifiers()))
+    convert_result(passes::generate(identifiers.identifiers(), |name| {
+        name.strip_prefix("Transforms").unwrap_or(name).into()
+    }))
 }
 
 fn convert_result(result: Result<TokenStream, Box<dyn Error>>) -> TokenStream {
