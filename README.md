@@ -2,7 +2,6 @@
 
 [![GitHub Action](https://img.shields.io/github/actions/workflow/status/raviqqe/melior/test.yaml?branch=main&style=flat-square)](https://github.com/raviqqe/melior/actions?query=workflow%3Atest)
 [![Crate](https://img.shields.io/crates/v/melior.svg?style=flat-square)](https://crates.io/crates/melior)
-![API coverage](https://img.shields.io/badge/api%20coverage-36%25-blue.svg?style=flat-square)
 [![License](https://img.shields.io/github/license/raviqqe/melior.svg?style=flat-square)](LICENSE)
 
 The rustic MLIR bindings for Rust
