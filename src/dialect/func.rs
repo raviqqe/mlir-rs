@@ -12,8 +12,8 @@ pub fn func<'c>(
 ) -> Operation<'c> {
     Builder::new("func.func", location)
         .add_attributes(&[
-            (Identifier::new(&context, "sym_name"), name),
-            (Identifier::new(&context, "function_type"), r#type),
+            (Identifier::new(context, "sym_name"), name),
+            (Identifier::new(context, "function_type"), r#type),
         ])
         .add_regions(vec![region])
         .build()
