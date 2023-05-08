@@ -1,7 +1,13 @@
 [package]
 name = "melior-macro"
+description = "Internal macros for Melior"
 version = "0.1.0"
 edition = "2021"
+license = "Apache-2.0"
+repository = "https://github.com/raviqqe/melior"
+documentation = "https://raviqqe.github.io/melior/melior/"
+readme = "../README.md"
+keywords = ["mlir", "llvm"]
 
 [lib]
 proc-macro = true
