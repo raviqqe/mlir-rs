@@ -21,15 +21,15 @@ pub fn conversion_passes(stream: TokenStream) -> TokenStream {
 
     convert_result(pass::generate(identifiers.identifiers(), |mut name| {
         if let Some(other) = name.strip_prefix("Conversion") {
-            name = other.into();
+            name = other;
         }
 
         if let Some(other) = name.strip_prefix("Convert") {
-            name = other.into();
+            name = other;
         }
 
         if let Some(other) = name.strip_suffix("ConversionPass") {
-            name = other.into();
+            name = other;
         }
 
         name.into()

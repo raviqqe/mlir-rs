@@ -11,7 +11,7 @@ pub fn generate(
     let mut stream = TokenStream::new();
 
     for identifier in identifiers {
-        let name = extract_pass_name(&identifier.to_string().strip_prefix("mlirCreate").unwrap());
+        let name = extract_pass_name(identifier.to_string().strip_prefix("mlirCreate").unwrap());
 
         let function_name = Ident::new(&name.to_case(Case::Snake), identifier.span());
         let document = format!(" Creates a pass of `{}`.", name);
@@ -29,7 +29,7 @@ pub fn generate(
         let name = name.strip_prefix("mlirCreate").unwrap();
 
         let foreign_function_name =
-            Ident::new(&("mlirRegister".to_owned() + &name), identifier.span());
+            Ident::new(&("mlirRegister".to_owned() + name), identifier.span());
         let function_name = Ident::new(
             &("register_".to_owned() + &extract_pass_name(name).to_case(Case::Snake)),
             identifier.span(),
