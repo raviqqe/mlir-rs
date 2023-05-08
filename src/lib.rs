@@ -103,6 +103,8 @@ pub mod ir;
 mod logical_result;
 pub mod pass;
 mod string_ref;
+#[cfg(test)]
+mod test;
 pub mod utility;
 
 pub use self::{

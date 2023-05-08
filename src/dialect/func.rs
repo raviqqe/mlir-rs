@@ -29,18 +29,11 @@ pub fn r#return<'c>(operands: &[Value], location: Location<'c>) -> Operation<'c>
 mod tests {
     use super::*;
     use crate::{
-        dialect::{arith::addi, Registry},
+        dialect::arith::addi,
         ir::{Attribute, Block, Module, Type},
-        utility::register_all_dialects,
+        test::load_all_dialects,
         Context,
     };
-
-    fn load_all_dialects(context: &Context) {
-        let registry = Registry::new();
-        register_all_dialects(&registry);
-        context.append_dialect_registry(&registry);
-        context.load_all_available_dialects();
-    }
 
     #[test]
     fn run_on_function_in_nested_module() {
