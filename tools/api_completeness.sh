@@ -6,7 +6,7 @@ cd $(dirname $0)/..
 cd melior
 
 count() {
-  grep -o '\(m\|M\)lir[A-Z][a-zA-Z0-9]*' | grep -iv python | sort -u | wc -l
+  grep -o '\(m\|M\)lir[A-Z][a-zA-Z0-9]*' | grep -iv -e python -e isnull | sort -u | wc -l
 }
 
 implemented_count() {
