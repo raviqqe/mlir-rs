@@ -35,7 +35,7 @@ impl<'c> Location<'c> {
     }
 
     /// Creates a fused location.
-    pub fn fused(context: &Context, locations: &[Self], attribute: Attribute) -> Self {
+    pub fn fused(context: &'c Context, locations: &[Self], attribute: Attribute) -> Self {
         unsafe {
             Self::from_raw(mlirLocationFusedGet(
                 context.to_raw(),
@@ -47,7 +47,7 @@ impl<'c> Location<'c> {
     }
 
     /// Creates a name location.
-    pub fn name(context: &Context, name: &str, child: Location) -> Self {
+    pub fn name(context: &'c Context, name: &str, child: Location) -> Self {
         unsafe {
             Self::from_raw(mlirLocationNameGet(
                 context.to_raw(),
@@ -58,7 +58,7 @@ impl<'c> Location<'c> {
     }
 
     /// Creates an unknown location.
-    pub fn unknown(context: &Context) -> Self {
+    pub fn unknown(context: &'c Context) -> Self {
         unsafe { Self::from_raw(mlirLocationUnknownGet(context.to_raw())) }
     }
 
