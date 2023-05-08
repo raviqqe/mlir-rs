@@ -19,8 +19,8 @@ pub fn generate(identifiers: &[Ident]) -> Result<TokenStream, Box<dyn Error>> {
 
         stream.extend(TokenStream::from(quote! {
             #[doc = #document]
-            pub fn #function_name(&self) -> bool {
-                unsafe { #identifier(self.to_raw()) }
+            fn #function_name(&self) -> bool {
+                unsafe { mlir_sys::#identifier(self.to_raw()) }
             }
         }));
     }

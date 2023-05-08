@@ -1,9 +1,7 @@
 use super::Id;
 use crate::context::ContextRef;
 use mlir_sys::{
-    mlirIntegerTypeGetWidth, mlirTypeDump, mlirTypeGetContext, mlirTypeGetTypeID, mlirTypeIsABF16,
-    mlirTypeIsAF16, mlirTypeIsAF32, mlirTypeIsAF64, mlirTypeIsAFunction, mlirTypeIsAIndex,
-    mlirTypeIsAInteger, mlirTypeIsAMemRef, mlirTypeIsATuple, mlirTypeIsAVector, MlirType,
+    mlirIntegerTypeGetWidth, mlirTypeDump, mlirTypeGetContext, mlirTypeGetTypeID, MlirType,
 };
 
 /// Trait for type-like types.
@@ -21,11 +19,6 @@ pub trait TypeLike<'c> {
         unsafe { Id::from_raw(mlirTypeGetTypeID(self.to_raw())) }
     }
 
-    /// Returns `true` if a type is integer.
-    fn is_integer(&self) -> bool {
-        unsafe { mlirTypeIsAInteger(self.to_raw()) }
-    }
-
     /// Gets a bit width of an integer type.
     fn get_width(&self) -> Option<usize> {
         if self.is_integer() {
@@ -35,55 +28,46 @@ pub trait TypeLike<'c> {
         }
     }
 
-    /// Returns `true` if a type is index.
-    fn is_index(&self) -> bool {
-        unsafe { mlirTypeIsAIndex(self.to_raw()) }
-    }
-
-    /// Returns `true` if a type is bfloat16.
-    fn is_bfloat16(&self) -> bool {
-        unsafe { mlirTypeIsABF16(self.to_raw()) }
-    }
-
-    /// Returns `true` if a type is float16.
-    fn is_float16(&self) -> bool {
-        unsafe { mlirTypeIsAF16(self.to_raw()) }
-    }
-
-    /// Returns `true` if a type is float32.
-    fn is_float32(&self) -> bool {
-        unsafe { mlirTypeIsAF32(self.to_raw()) }
-    }
-
-    /// Returns `true` if a type is float64.
-    fn is_float64(&self) -> bool {
-        unsafe { mlirTypeIsAF64(self.to_raw()) }
-    }
-
-    /// Returns `true` if a type is a function.
-    fn is_function(&self) -> bool {
-        unsafe { mlirTypeIsAFunction(self.to_raw()) }
-    }
-
-    /// Returns `true` if a type is a memory reference.
-    fn is_mem_ref(&self) -> bool {
-        unsafe { mlirTypeIsAMemRef(self.to_raw()) }
-    }
-
-    /// Returns `true` if a type is a tuple.
-    fn is_tuple(&self) -> bool {
-        unsafe { mlirTypeIsATuple(self.to_raw()) }
-    }
-
-    /// Returns `true` if a type is a vector.
-    fn is_vector(&self) -> bool {
-        unsafe { mlirTypeIsAVector(self.to_raw()) }
-    }
-
     /// Dumps a type.
     fn dump(&self) {
         unsafe { mlirTypeDump(self.to_raw()) }
     }
+
+    melior_macro::type_check_functions!(
+        mlirTypeIsAAnyQuantizedType,
+        mlirTypeIsABF16,
+        mlirTypeIsACalibratedQuantizedType,
+        mlirTypeIsAComplex,
+        mlirTypeIsAF16,
+        mlirTypeIsAF32,
+        mlirTypeIsAF64,
+        mlirTypeIsAFloat8E4M3FN,
+        mlirTypeIsAFloat8E5M2,
+        mlirTypeIsAFunction,
+        mlirTypeIsAIndex,
+        mlirTypeIsAInteger,
+        mlirTypeIsAMemRef,
+        mlirTypeIsANone,
+        mlirTypeIsAOpaque,
+        mlirTypeIsAPDLAttributeType,
+        mlirTypeIsAPDLOperationType,
+        mlirTypeIsAPDLRangeType,
+        mlirTypeIsAPDLType,
+        mlirTypeIsAPDLTypeType,
+        mlirTypeIsAPDLValueType,
+        mlirTypeIsAQuantizedType,
+        mlirTypeIsARankedTensor,
+        mlirTypeIsAShaped,
+        mlirTypeIsATensor,
+        mlirTypeIsATransformAnyOpType,
+        mlirTypeIsATransformOperationType,
+        mlirTypeIsATuple,
+        mlirTypeIsAUniformQuantizedPerAxisType,
+        mlirTypeIsAUniformQuantizedType,
+        mlirTypeIsAUnrankedMemRef,
+        mlirTypeIsAUnrankedTensor,
+        mlirTypeIsAVector,
+    );
 }
 
 #[cfg(test)]
