@@ -19,6 +19,8 @@ melior_macro::arith_binary_operators!(
     minui,
     mulf,
     muli,
+    mulsi_extended,
+    mului_extended,
     subf,
     subi,
 );
