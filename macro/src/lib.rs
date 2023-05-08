@@ -8,6 +8,13 @@ use std::error::Error;
 use syn::parse_macro_input;
 
 #[proc_macro]
+pub fn type_check_functions(stream: TokenStream) -> TokenStream {
+    let identifiers = parse_macro_input!(stream as IdentifierList);
+
+    convert_result(conversion_passes::generate(identifiers.identifiers()))
+}
+
+#[proc_macro]
 pub fn conversion_passes(stream: TokenStream) -> TokenStream {
     let identifiers = parse_macro_input!(stream as IdentifierList);
 
