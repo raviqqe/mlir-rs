@@ -1,4 +1,4 @@
-//! Dialect conversion passes.
+//! Linalg passes.
 
 melior_macro::conversion_passes!(
     mlirCreateLinalgConvertElementwiseToLinalg,

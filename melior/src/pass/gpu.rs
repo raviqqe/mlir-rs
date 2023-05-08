@@ -1,4 +1,4 @@
-//! Dialect conversion passes.
+//! GPU passes.
 
 melior_macro::conversion_passes!(
     // spell-checker: disable-next-line

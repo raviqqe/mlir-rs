@@ -1,4 +1,4 @@
-//! Dialect conversion passes.
+//! Sparse tensor passes.
 
 melior_macro::sparse_tensor_passes!(
     mlirCreateSparseTensorPostSparsificationRewrite,
