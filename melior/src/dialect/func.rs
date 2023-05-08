@@ -67,7 +67,7 @@ mod tests {
 
         module.body().append_operation(function);
 
-        insta::assert_display_snapshot!(module.as_operation());
         assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
     }
 }
