@@ -1,19 +1,17 @@
-mod attribute_list;
-mod instruction;
-mod utility;
+mod conversion_passes;
+mod parse;
 
-use self::attribute_list::AttributeList;
+use parse::IdentifierList;
 use proc_macro::TokenStream;
 use quote::quote;
 use std::error::Error;
-use syn::{parse_macro_input, ItemFn};
+use syn::parse_macro_input;
 
-#[proc_macro_attribute]
-pub fn instruction(attributes: TokenStream, item: TokenStream) -> TokenStream {
-    let attributes = parse_macro_input!(attributes as AttributeList);
-    let function = parse_macro_input!(item as ItemFn);
+#[proc_macro]
+pub fn conversion_passes(stream: TokenStream) -> TokenStream {
+    let identifiers = parse_macro_input!(stream as IdentifierList);
 
-    convert_result(instruction::generate(&attributes, &function))
+    convert_result(conversion_passes::generate(&identifiers.identifiers()))
 }
 
 fn convert_result(result: Result<TokenStream, Box<dyn Error>>) -> TokenStream {

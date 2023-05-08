@@ -1,9 +1,7 @@
-use autophagy_macro::instruction;
+use melior_macro::conversion_passes;
 
-#[instruction]
-pub fn foo() {}
-
-#[instruction]
-pub fn bar(x: usize) -> usize {
-    x
-}
+conversion_passes!(
+    mlirCreateConversionArithToLLVMConversionPass,
+    mlirCreateConversionConvertControlFlowToLLVM,
+    mlirCreateConversionConvertControlFlowToSPIRV,
+);

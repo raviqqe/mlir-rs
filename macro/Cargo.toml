@@ -1,5 +1,5 @@
 [package]
-name = "autophagy-macro"
+name = "melior-macro"
 version = "0.1.0"
 edition = "2021"
 
@@ -13,4 +13,5 @@ quote = "1"
 syn = { version = "2", features = ["full"] }
 
 [dev-dependencies]
+melior = { path = "../melior" }
 mlir-sys = "0.2"
