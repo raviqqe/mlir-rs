@@ -2,15 +2,19 @@
   "words": [
     "addf",
     "addi",
+    "amdgpu",
     "bfloat",
+    "bufferization",
     "canonicalize",
     "canonicalizer",
     "divf",
     "divi",
     "femtomc",
+    "funcs",
     "hasher",
     "indoc",
     "insta",
+    "interp",
     "libm",
     "linalg",
     "melior",
@@ -18,11 +22,16 @@
     "mlir",
     "mulf",
     "muli",
+    "nvgpu",
+    "nvvm",
+    "rocdl",
     "rustc",
     "sccp",
     "spirv",
     "stdc",
     "subf",
-    "subi"
+    "subi",
+    "tosa",
+    "vulkan"
   ]
 }
