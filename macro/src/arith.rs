@@ -27,9 +27,9 @@ pub fn generate_binary_operators(names: &[Ident]) -> Result<TokenStream, Box<dyn
             name: &str,
             lhs: crate::ir::Value,
             rhs: crate::ir::Value,
-            location: crate::ir::location::Location<'c>,
-        ) -> Operation<'c> {
-            crate::operation::Builder::new(name, location)
+            location: crate::ir::Location<'c>,
+        ) -> crate::ir::Operation<'c> {
+            crate::ir::operation::Builder::new(name, location)
                 .add_operands(&[lhs, rhs])
                 .enable_result_type_inference()
                 .build()
