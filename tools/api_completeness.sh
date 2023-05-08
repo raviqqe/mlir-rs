@@ -2,20 +2,6 @@
 
 set -e
 
-cd $(dirname $0)/..
-cd melior
+. $(dirname $0)/utility.sh
 
-count() {
-  grep -o '\(m\|M\)lir[A-Z][a-zA-Z0-9]*' | grep -iv -e python -e isnull | sort -u | wc -l
-}
-
-implemented_count() {
-  cargo install cargo-expand
-  cargo expand | count
-}
-
-upstream_count() {
-  cat $(find $(brew --prefix llvm)/include/mlir-c -type f) | count
-}
-
-echo $(implemented_count) / $(upstream_count) | bc -l
+echo $(implemented_api | count) / $(all_api | count) | bc -l
