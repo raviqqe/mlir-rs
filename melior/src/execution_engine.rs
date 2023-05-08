@@ -96,7 +96,7 @@ mod tests {
         .unwrap();
 
         let pass_manager = pass::Manager::new(&context);
-        pass_manager.add_pass(pass::conversion::convert_func_to_llvm());
+        pass_manager.add_pass(pass::conversion::func_to_llvm());
 
         pass_manager
             .nested_under("func.func")

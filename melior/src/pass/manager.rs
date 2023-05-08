@@ -82,7 +82,7 @@ mod tests {
     use crate::{
         dialect,
         ir::{Location, Module},
-        pass::{self, transform::register_print_operation_stats},
+        pass::{self, transform::register_print_op_stats},
         utility::{parse_pass_pipeline, register_all_dialects},
     };
     use indoc::indoc;
@@ -105,7 +105,7 @@ mod tests {
     fn add_pass() {
         let context = Context::new();
 
-        Manager::new(&context).add_pass(pass::conversion::convert_func_to_llvm());
+        Manager::new(&context).add_pass(pass::conversion::func_to_llvm());
     }
 
     #[test]
@@ -128,7 +128,7 @@ mod tests {
         let context = Context::new();
         let manager = Manager::new(&context);
 
-        manager.add_pass(pass::conversion::convert_func_to_llvm());
+        manager.add_pass(pass::conversion::func_to_llvm());
         manager
             .run(&mut Module::new(Location::unknown(&context)))
             .unwrap();
@@ -153,7 +153,7 @@ mod tests {
         .unwrap();
 
         let manager = Manager::new(&context);
-        manager.add_pass(pass::transform::print_operation_stats());
+        manager.add_pass(pass::transform::print_op_stats());
 
         assert_eq!(manager.run(&mut module), Ok(()));
     }
@@ -186,7 +186,7 @@ mod tests {
         let manager = Manager::new(&context);
         manager
             .nested_under("func.func")
-            .add_pass(pass::transform::print_operation_stats());
+            .add_pass(pass::transform::print_op_stats());
 
         assert_eq!(manager.run(&mut module), Ok(()));
 
@@ -194,7 +194,7 @@ mod tests {
         manager
             .nested_under("builtin.module")
             .nested_under("func.func")
-            .add_pass(pass::transform::print_operation_stats());
+            .add_pass(pass::transform::print_op_stats());
 
         assert_eq!(manager.run(&mut module), Ok(()));
     }
@@ -205,7 +205,7 @@ mod tests {
         let manager = Manager::new(&context);
         let function_manager = manager.nested_under("func.func");
 
-        function_manager.add_pass(pass::transform::print_operation_stats());
+        function_manager.add_pass(pass::transform::print_op_stats());
 
         assert_eq!(
             manager.as_operation_pass_manager().to_string(),
@@ -229,7 +229,7 @@ mod tests {
         )
         .unwrap_err());
 
-        register_print_operation_stats();
+        register_print_op_stats();
 
         assert_eq!(
             parse_pass_pipeline(
