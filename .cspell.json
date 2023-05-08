@@ -3,6 +3,7 @@
     "addf",
     "addi",
     "amdgpu",
+    "apdl",
     "bfloat",
     "bufferization",
     "canonicalize",
@@ -32,6 +33,7 @@
     "subf",
     "subi",
     "tosa",
+    "unranked",
     "vulkan"
   ]
 }
