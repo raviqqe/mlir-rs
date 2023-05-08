@@ -1,0 +1,37 @@
+use crate::attribute_list::AttributeList;
+use std::error::Error;
+use syn::{parse::Parse, parse_str, Expr, ExprLit, Lit, Meta, Path};
+
+const DEFAULT_CRATE_NAME: &str = "autophagy";
+
+pub fn parse_crate_path(attributes: &AttributeList) -> Result<Path, Box<dyn Error>> {
+    Ok(parse_string_attribute(attributes, "crate")?.unwrap_or(parse_str(DEFAULT_CRATE_NAME)?))
+}
+
+fn parse_string_attribute<T: Parse>(
+    attributes: &AttributeList,
+    key: &str,
+) -> Result<Option<T>, Box<dyn Error>> {
+    Ok(attributes
+        .variables()
+        .find_map(|meta| match meta {
+            Meta::NameValue(name_value) => {
+                if name_value.path.is_ident(key) {
+                    if let Expr::Lit(ExprLit {
+                        lit: Lit::Str(string),
+                        ..
+                    }) = &name_value.value
+                    {
+                        Some(string.value())
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
+            }
+            _ => None,
+        })
+        .map(|string| parse_str(&string))
+        .transpose()?)
+}
