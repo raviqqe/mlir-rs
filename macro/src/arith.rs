@@ -12,7 +12,11 @@ pub fn generate_binary_operators(names: &[Ident]) -> Result<TokenStream, Box<dyn
 
         stream.extend(TokenStream::from(quote! {
             #[doc = #document]
-            pub fn #name<'c>(lhs: Value, rhs: Value, location: Location<'c>) -> Operation<'c> {
+            pub fn #name<'c>(
+                lhs: crate::ir::Value,
+                rhs: crate::ir::Value,
+                location: crate::ir::Location<'c>,
+            ) -> crate::ir::Operation<'c> {
                 binary_operator(#operation_name, lhs, rhs, location)
             }
         }));
@@ -21,9 +25,9 @@ pub fn generate_binary_operators(names: &[Ident]) -> Result<TokenStream, Box<dyn
     stream.extend(TokenStream::from(quote! {
         fn binary_operator<'c>(
             name: &str,
-            lhs: crate::ir::value::Value,
-            rhs: crate::ir::value::Value,
-            location: crate::location::Location<'c>,
+            lhs: crate::ir::Value,
+            rhs: crate::ir::Value,
+            location: crate::ir::location::Location<'c>,
         ) -> Operation<'c> {
             crate::operation::Builder::new(name, location)
                 .add_operands(&[lhs, rhs])
