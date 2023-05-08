@@ -3,6 +3,7 @@ use crate::{
     Context,
 };
 
+/// Create a `func.func` operation.
 pub fn func<'c>(
     context: &'c Context,
     name: Attribute<'c>,
@@ -19,6 +20,7 @@ pub fn func<'c>(
         .build()
 }
 
+/// Create a `func.return` operation.
 pub fn r#return<'c>(operands: &[Value], location: Location<'c>) -> Operation<'c> {
     Builder::new("func.return", location)
         .add_operands(operands)
