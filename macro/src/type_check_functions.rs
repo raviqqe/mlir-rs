@@ -5,7 +5,7 @@ use quote::quote;
 use std::error::Error;
 
 const FLOAT_8E5M2_PATTERN: &str = "8_e_5_m_2";
-const FLOAT_8E4M3_FN_PATTERN: &str = "float_8_e_4_m_3_fn";
+const FLOAT_8E4M3_FN_PATTERN: &str = "8_e_4_m_3";
 
 pub fn generate(identifiers: &[Ident]) -> Result<TokenStream, Box<dyn Error>> {
     let mut stream = TokenStream::new();
