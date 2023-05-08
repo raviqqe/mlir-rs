@@ -21,6 +21,7 @@ melior_macro::arith_binary_operators!(
     muli,
     mulsi_extended,
     mului_extended,
+    ori,
     remf,
     remsi,
     remui,
@@ -29,4 +30,5 @@ melior_macro::arith_binary_operators!(
     shrui,
     subf,
     subi,
+    xori,
 );
