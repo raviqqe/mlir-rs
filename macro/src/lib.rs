@@ -10,6 +10,13 @@ use std::error::Error;
 use syn::parse_macro_input;
 
 #[proc_macro]
+pub fn arith_binary_operators(stream: TokenStream) -> TokenStream {
+    let identifiers = parse_macro_input!(stream as IdentifierList);
+
+    convert_result(arith::generate_binary_operators(identifiers.identifiers()))
+}
+
+#[proc_macro]
 pub fn type_check_functions(stream: TokenStream) -> TokenStream {
     let identifiers = parse_macro_input!(stream as IdentifierList);
 
