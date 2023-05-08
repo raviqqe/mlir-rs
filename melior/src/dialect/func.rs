@@ -1,3 +1,5 @@
+//! `func` dialect
+
 use crate::{
     ir::{operation::Builder, Attribute, Identifier, Location, Operation, Region, Value},
     Context,

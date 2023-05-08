@@ -1,3 +1,5 @@
+//! `arith` dialect
+
 melior_macro::arith_binary_operators!(
     addf,
     addi,

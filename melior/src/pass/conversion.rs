@@ -1,4 +1,4 @@
-//! Dialect conversion passes.
+//! Conversion passes.
 
 melior_macro::conversion_passes!(
     mlirCreateConversionArithToLLVMConversionPass,
