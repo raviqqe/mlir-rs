@@ -30,8 +30,9 @@ pub fn generate(
 
         let foreign_function_name =
             Ident::new(&("mlirRegister".to_owned() + name), identifier.span());
+        let name = extract_pass_name(name);
         let function_name = Ident::new(
-            &("register_".to_owned() + &extract_pass_name(name).to_case(Case::Snake)),
+            &("register_".to_owned() + &name.to_case(Case::Snake)),
             identifier.span(),
         );
         let document = format!(" Registers a pass of `{}`.", name);
