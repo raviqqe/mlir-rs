@@ -126,7 +126,7 @@ impl<'c> Builder<'c> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{context::Context, dialect, ir::Block, utility::register_all_dialects};
+    use crate::{context::Context, ir::Block, test::load_all_dialects};
 
     #[test]
     fn new() {
@@ -174,12 +174,8 @@ mod tests {
 
     #[test]
     fn enable_result_type_inference() {
-        let registry = dialect::Registry::new();
-        register_all_dialects(&registry);
-
         let context = Context::new();
-        context.append_dialect_registry(&registry);
-        context.load_all_available_dialects();
+        load_all_dialects(&context);
 
         let location = Location::unknown(&context);
         let r#type = Type::index(&context);

@@ -83,9 +83,8 @@ mod tests {
     use super::*;
     use crate::{
         context::Context,
-        dialect,
         ir::{operation, Attribute, Block, Identifier, Location},
-        utility::register_all_dialects,
+        test::load_all_dialects,
     };
 
     #[test]
@@ -191,7 +190,7 @@ mod tests {
     #[test]
     fn display() {
         let context = Context::new();
-        context.load_all_available_dialects();
+
         let location = Location::unknown(&context);
         let index_type = Type::parse(&context, "index").unwrap();
 
@@ -211,12 +210,8 @@ mod tests {
 
     #[test]
     fn display_with_dialect_loaded() {
-        let registry = dialect::Registry::new();
-        register_all_dialects(&registry);
-
         let context = Context::new();
-        context.append_dialect_registry(&registry);
-        context.load_all_available_dialects();
+        load_all_dialects(&context);
 
         let location = Location::unknown(&context);
         let index_type = Type::parse(&context, "index").unwrap();
@@ -238,7 +233,8 @@ mod tests {
     #[test]
     fn debug() {
         let context = Context::new();
-        context.load_all_available_dialects();
+        load_all_dialects(&context);
+
         let location = Location::unknown(&context);
         let index_type = Type::parse(&context, "index").unwrap();
 
@@ -252,7 +248,7 @@ mod tests {
 
         assert_eq!(
             format!("{:?}", Value::from(operation.result(0).unwrap())),
-            "Value(\n%0 = \"arith.constant\"() {value = 0 : index} : () -> index\n)"
+            "Value(\n%c0 = arith.constant 0 : index\n)"
         );
     }
 }

@@ -103,6 +103,8 @@ pub mod ir;
 mod logical_result;
 pub mod pass;
 mod string_ref;
+#[cfg(test)]
+mod test;
 pub mod utility;
 
 pub use self::{
@@ -118,7 +120,7 @@ mod tests {
         context::Context,
         dialect,
         ir::{operation, Attribute, Block, Identifier, Location, Module, Region, Type},
-        utility::register_all_dialects,
+        test::load_all_dialects,
     };
 
     #[test]
@@ -143,12 +145,8 @@ mod tests {
 
     #[test]
     fn build_add() {
-        let registry = dialect::Registry::new();
-        register_all_dialects(&registry);
-
         let context = Context::new();
-        context.append_dialect_registry(&registry);
-        context.get_or_load_dialect("func");
+        load_all_dialects(&context);
 
         let location = Location::unknown(&context);
         let module = Module::new(location);
@@ -200,14 +198,8 @@ mod tests {
 
     #[test]
     fn build_sum() {
-        let registry = dialect::Registry::new();
-        register_all_dialects(&registry);
-
         let context = Context::new();
-        context.append_dialect_registry(&registry);
-        context.get_or_load_dialect("func");
-        context.get_or_load_dialect("memref");
-        context.get_or_load_dialect("scf");
+        load_all_dialects(&context);
 
         let location = Location::unknown(&context);
         let module = Module::new(location);

@@ -293,9 +293,8 @@ impl<'a> Debug for BlockRef<'a> {
 mod tests {
     use super::*;
     use crate::{
-        dialect,
         ir::{operation, Module, Region, ValueLike},
-        utility::register_all_dialects,
+        test::load_all_dialects,
     };
     use pretty_assertions::assert_eq;
 
@@ -366,12 +365,8 @@ mod tests {
 
     #[test]
     fn terminator() {
-        let registry = dialect::Registry::new();
-        register_all_dialects(&registry);
-
         let context = Context::new();
-        context.append_dialect_registry(&registry);
-        context.load_all_available_dialects();
+        load_all_dialects(&context);
 
         let block = Block::new(&[]);
 
