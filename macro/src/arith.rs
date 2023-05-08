@@ -7,7 +7,7 @@ pub fn generate_binary_operators(names: &[Ident]) -> Result<TokenStream, Box<dyn
     let mut stream = TokenStream::new();
 
     for name in names {
-        let document = format!(" Creates an operation of `arith.{}`.", name);
+        let document = format!(" Creates an `arith.{}` operation.", name);
         let operation_name = format!("arith.{}", name);
 
         stream.extend(TokenStream::from(quote! {

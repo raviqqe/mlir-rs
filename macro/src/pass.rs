@@ -21,7 +21,7 @@ pub fn generate(
         );
 
         let function_name = Ident::new(&name.to_case(Case::Snake), identifier.span());
-        let document = format!(" Creates a pass of `{}`.", name);
+        let document = format!(" Creates a `{}` pass.", name);
 
         stream.extend(TokenStream::from(quote! {
             #[doc = #document]
@@ -42,7 +42,7 @@ pub fn generate(
             &("register_".to_owned() + &name.to_case(Case::Snake)),
             identifier.span(),
         );
-        let document = format!(" Registers a pass of `{}`.", name);
+        let document = format!(" Registers a `{}` pass.", name);
 
         stream.extend(TokenStream::from(quote! {
             #[doc = #document]
