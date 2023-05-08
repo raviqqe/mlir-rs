@@ -10,7 +10,11 @@ pub fn generate(identifiers: &[Ident]) -> Result<TokenStream, Box<dyn Error>> {
     for identifier in identifiers {
         let mut name = identifier.to_string();
 
-        if let Some(other) = name.strip_prefix("mlirCreate") {
+        if let Some(other) = name.strip_prefix("mlirCreateConversion") {
+            name = other.into();
+        }
+
+        if let Some(other) = name.strip_prefix("Convert") {
             name = other.into();
         }
 
