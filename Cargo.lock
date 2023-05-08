@@ -180,6 +180,7 @@ version = "0.4.4"
 dependencies = [
  "indoc",
  "insta",
+ "melior-macro",
  "mlir-sys",
  "once_cell",
  "pretty_assertions",
