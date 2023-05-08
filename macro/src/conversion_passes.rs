@@ -14,22 +14,12 @@ pub fn generate(identifiers: &[Ident]) -> Result<TokenStream, Box<dyn Error>> {
             name = other.into();
         }
 
-        if let Some(other) = name.strip_prefix("Convert") {
-            name = other.into();
-        }
-
         if let Some(other) = name.strip_suffix("ConversionPass") {
             name = other.into();
         }
 
-        let name = name.to_case(Case::Snake);
-        let dialects = name.split("_to_").collect::<Vec<_>>();
-        let function_name = Ident::new(&name, identifier.span());
-        let document = format!(
-            " Converts `{}` dialect to `{}` dialect.",
-            map_dialect_name(&dialects[0]),
-            map_dialect_name(&dialects[1]),
-        );
+        let function_name = Ident::new(&name.to_case(Case::Snake), identifier.span());
+        let document = format!(" Creates a pass of `{}`.", name);
 
         stream.extend(TokenStream::from(quote! {
             #[doc = #document]
@@ -40,11 +30,4 @@ pub fn generate(identifiers: &[Ident]) -> Result<TokenStream, Box<dyn Error>> {
     }
 
     Ok(stream.into())
-}
-
-fn map_dialect_name(name: &str) -> &str {
-    match name {
-        "control_flow" => "cf",
-        name => name,
-    }
 }

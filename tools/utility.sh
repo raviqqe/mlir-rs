@@ -18,5 +18,5 @@ implemented_api() {
 }
 
 all_api() {
-  cat $(find $(brew --prefix llvm)/include/mlir-c -type f) | filter_api
+  cat $(find $(brew --prefix llvm)/include -type f) | filter_api
 }
