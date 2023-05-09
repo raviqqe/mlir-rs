@@ -57,7 +57,7 @@ impl<'c> Attribute<'c> {
 }
 
 impl<'c> AttributeLike<'c> for Attribute<'c> {
-    unsafe fn to_raw(&self) -> MlirAttribute {
+    fn to_raw(&self) -> MlirAttribute {
         self.raw
     }
 }

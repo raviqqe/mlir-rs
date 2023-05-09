@@ -13,12 +13,7 @@ use mlir_sys::{
 /// Trait for attribute-like types.
 pub trait AttributeLike<'c> {
     /// Converts a attribute into a raw attribute.
-    ///
-    /// # Safety
-    ///
-    /// The returned raw object might be invalidated on destruction of its
-    /// context.
-    unsafe fn to_raw(&self) -> MlirAttribute;
+    fn to_raw(&self) -> MlirAttribute;
 
     /// Gets a context.
     fn context(&self) -> ContextRef<'c> {
