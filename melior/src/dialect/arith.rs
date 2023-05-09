@@ -57,7 +57,7 @@ melior_macro::binary_operations!(
 
 melior_macro::unary_operations!(arith, [negf, truncf]);
 
-melior_macro::typed_unary_operations!(arith, [bitcast, trunci, uitofp]);
+melior_macro::typed_unary_operations!(arith, [bitcast, sitofp, trunci, uitofp]);
 
 #[cfg(test)]
 mod tests {
@@ -152,58 +152,80 @@ mod tests {
         );
     }
 
-    #[test]
-    fn compile_bitcast() {
-        let context = create_context();
+    mod typed_unary {
+        use super::*;
 
-        compile_operation(
-            &context,
-            |block| {
-                bitcast(
-                    block.argument(0).unwrap().into(),
-                    Type::float64(&context),
-                    Location::unknown(&context),
-                )
-            },
-            &[Type::integer(&context, 64)],
-            "(i64) -> f64",
-        );
-    }
+        #[test]
+        fn compile_bitcast() {
+            let context = create_context();
 
-    #[test]
-    fn compile_trunci() {
-        let context = create_context();
+            compile_operation(
+                &context,
+                |block| {
+                    bitcast(
+                        block.argument(0).unwrap().into(),
+                        Type::float64(&context),
+                        Location::unknown(&context),
+                    )
+                },
+                &[Type::integer(&context, 64)],
+                "(i64) -> f64",
+            );
+        }
 
-        compile_operation(
-            &context,
-            |block| {
-                trunci(
-                    block.argument(0).unwrap().into(),
-                    Type::integer(&context, 32),
-                    Location::unknown(&context),
-                )
-            },
-            &[Type::integer(&context, 64)],
-            "(i64) -> i32",
-        );
-    }
+        #[test]
+        fn compile_sitofp() {
+            let context = create_context();
 
-    #[test]
-    fn compile_uitofp() {
-        let context = create_context();
+            compile_operation(
+                &context,
+                |block| {
+                    sitofp(
+                        block.argument(0).unwrap().into(),
+                        Type::float64(&context),
+                        Location::unknown(&context),
+                    )
+                },
+                &[Type::integer(&context, 32)],
+                "(i32) -> f64",
+            );
+        }
 
-        compile_operation(
-            &context,
-            |block| {
-                uitofp(
-                    block.argument(0).unwrap().into(),
-                    Type::float64(&context),
-                    Location::unknown(&context),
-                )
-            },
-            &[Type::integer(&context, 32)],
-            "(i32) -> f64",
-        );
+        #[test]
+        fn compile_trunci() {
+            let context = create_context();
+
+            compile_operation(
+                &context,
+                |block| {
+                    trunci(
+                        block.argument(0).unwrap().into(),
+                        Type::integer(&context, 32),
+                        Location::unknown(&context),
+                    )
+                },
+                &[Type::integer(&context, 64)],
+                "(i64) -> i32",
+            );
+        }
+
+        #[test]
+        fn compile_uitofp() {
+            let context = create_context();
+
+            compile_operation(
+                &context,
+                |block| {
+                    uitofp(
+                        block.argument(0).unwrap().into(),
+                        Type::float64(&context),
+                        Location::unknown(&context),
+                    )
+                },
+                &[Type::integer(&context, 32)],
+                "(i32) -> f64",
+            );
+        }
     }
 
     #[test]
