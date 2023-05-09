@@ -246,15 +246,11 @@ mod tests {
                         .build(),
                 );
 
-                let add = loop_block.append_operation(
-                    operation::Builder::new("arith.addf", location)
-                        .add_operands(&[
-                            lhs.result(0).unwrap().into(),
-                            rhs.result(0).unwrap().into(),
-                        ])
-                        .add_results(&[f32_type])
-                        .build(),
-                );
+                let add = loop_block.append_operation(arith::addf(
+                    lhs.result(0).unwrap().into(),
+                    rhs.result(0).unwrap().into(),
+                    location,
+                ));
 
                 loop_block.append_operation(
                     operation::Builder::new("memref.store", location)
