@@ -105,10 +105,7 @@ mod tests {
     use crate::{
         context::Context,
         dialect::{self, arith, func, scf},
-        ir::{
-            attribute, operation, r#type, Attribute, Block, Identifier, Location, Module, Region,
-            Type,
-        },
+        ir::{attribute, operation, r#type, Attribute, Block, Location, Module, Region, Type},
         test::load_all_dialects,
     };
 
@@ -145,38 +142,24 @@ mod tests {
         let function = {
             let block = Block::new(&[(integer_type, location), (integer_type, location)]);
 
-            let sum = block.append_operation(
-                operation::Builder::new("arith.addi", location)
-                    .add_operands(&[
-                        block.argument(0).unwrap().into(),
-                        block.argument(1).unwrap().into(),
-                    ])
-                    .add_results(&[integer_type])
-                    .build(),
-            );
+            let sum = block.append_operation(arith::addi(
+                block.argument(0).unwrap().into(),
+                block.argument(1).unwrap().into(),
+                location,
+            ));
 
-            block.append_operation(
-                operation::Builder::new("func.return", Location::unknown(&context))
-                    .add_operands(&[sum.result(0).unwrap().into()])
-                    .build(),
-            );
+            block.append_operation(func::r#return(&[sum.result(0).unwrap().into()], location));
 
             let region = Region::new();
             region.append_block(block);
 
-            operation::Builder::new("func.func", Location::unknown(&context))
-                .add_attributes(&[
-                    (
-                        Identifier::new(&context, "function_type"),
-                        Attribute::parse(&context, "(i64, i64) -> i64").unwrap(),
-                    ),
-                    (
-                        Identifier::new(&context, "sym_name"),
-                        Attribute::parse(&context, "\"add\"").unwrap(),
-                    ),
-                ])
-                .add_regions(vec![region])
-                .build()
+            func::func(
+                &context,
+                Attribute::parse(&context, "\"add\"").unwrap(),
+                Attribute::parse(&context, "(i64, i64) -> i64").unwrap(),
+                region,
+                Location::unknown(&context),
+            )
         };
 
         module.body().append_operation(function);
