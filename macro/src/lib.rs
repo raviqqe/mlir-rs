@@ -1,3 +1,4 @@
+mod attribute;
 mod operation;
 mod parse;
 mod pass;
