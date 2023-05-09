@@ -8,7 +8,7 @@ use super::{r#type, Type};
 use crate::{context::Context, string_ref::StringRef, utility::print_callback};
 use mlir_sys::{
     mlirAttributeEqual, mlirAttributeGetNull, mlirAttributeParseGet, mlirAttributePrint,
-    MlirAttribute,
+    mlirUnitAttrGet, MlirAttribute,
 };
 use std::{
     ffi::c_void,
@@ -35,7 +35,11 @@ impl<'c> Attribute<'c> {
         }
     }
 
-    /// Creates a null attribute.
+    /// Creates a unit attribute.
+    pub fn unit(context: &'c Context) -> Self {
+        unsafe { Self::from_raw(mlirUnitAttrGet(context.to_raw())) }
+    }
+
     pub(crate) unsafe fn null() -> Self {
         unsafe { Self::from_raw(mlirAttributeGetNull()) }
     }
