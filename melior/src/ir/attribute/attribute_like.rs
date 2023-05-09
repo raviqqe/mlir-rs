@@ -1,6 +1,5 @@
-use crate::ContextRef;
-
 use super::{r#type, Type};
+use crate::ContextRef;
 use mlir_sys::{
     mlirAttributeDump, mlirAttributeGetContext, mlirAttributeGetType, mlirAttributeGetTypeID,
     mlirAttributeIsAAffineMap, mlirAttributeIsAArray, mlirAttributeIsABool,
@@ -32,102 +31,93 @@ pub trait AttributeLike<'c> {
     }
 
     /// Gets a type ID.
-    fn type_id(&self) -> Option<r#type::Id> {
-        if self.is_null() {
-            None
-        } else {
-            unsafe { Some(r#type::Id::from_raw(mlirAttributeGetTypeID(self.to_raw()))) }
-        }
-    }
-
-    /// Returns `true` if an attribute is null.
-    fn is_null(&self) -> bool {
-        unsafe { self.to_raw() }.ptr.is_null()
+    fn type_id(&self) -> r#type::Id {
+        unsafe { r#type::Id::from_raw(mlirAttributeGetTypeID(self.to_raw())) }
     }
 
     /// Returns `true` if an attribute is a affine map.
     fn is_affine_map(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsAAffineMap(self.to_raw()) }
+        unsafe { mlirAttributeIsAAffineMap(self.to_raw()) }
     }
 
     /// Returns `true` if an attribute is a array.
     fn is_array(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsAArray(self.to_raw()) }
+        unsafe { mlirAttributeIsAArray(self.to_raw()) }
     }
 
     /// Returns `true` if an attribute is a bool.
     fn is_bool(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsABool(self.to_raw()) }
+        unsafe { mlirAttributeIsABool(self.to_raw()) }
     }
 
     /// Returns `true` if an attribute is dense elements.
     fn is_dense_elements(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsADenseElements(self.to_raw()) }
+        unsafe { mlirAttributeIsADenseElements(self.to_raw()) }
     }
 
     /// Returns `true` if an attribute is dense integer elements.
     fn is_dense_integer_elements(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsADenseIntElements(self.to_raw()) }
+        unsafe { mlirAttributeIsADenseIntElements(self.to_raw()) }
     }
 
     /// Returns `true` if an attribute is dense float elements.
     fn is_dense_float_elements(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsADenseFPElements(self.to_raw()) }
+        unsafe { mlirAttributeIsADenseFPElements(self.to_raw()) }
     }
 
     /// Returns `true` if an attribute is a dictionary.
     fn is_dictionary(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsADictionary(self.to_raw()) }
+        unsafe { mlirAttributeIsADictionary(self.to_raw()) }
     }
 
     /// Returns `true` if an attribute is elements.
     fn is_elements(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsAElements(self.to_raw()) }
+        unsafe { mlirAttributeIsAElements(self.to_raw()) }
     }
 
     /// Returns `true` if an attribute is a float.
     fn is_float(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsAFloat(self.to_raw()) }
+        unsafe { mlirAttributeIsAFloat(self.to_raw()) }
     }
 
     /// Returns `true` if an attribute is an integer.
     fn is_integer(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsAInteger(self.to_raw()) }
+        unsafe { mlirAttributeIsAInteger(self.to_raw()) }
     }
 
     /// Returns `true` if an attribute is an integer set.
     fn is_integer_set(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsAIntegerSet(self.to_raw()) }
+        unsafe { mlirAttributeIsAIntegerSet(self.to_raw()) }
     }
 
     /// Returns `true` if an attribute is opaque.
     fn is_opaque(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsAOpaque(self.to_raw()) }
+        unsafe { mlirAttributeIsAOpaque(self.to_raw()) }
     }
 
     /// Returns `true` if an attribute is sparse elements.
     fn is_sparse_elements(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsASparseElements(self.to_raw()) }
+        unsafe { mlirAttributeIsASparseElements(self.to_raw()) }
     }
 
     /// Returns `true` if an attribute is a string.
     fn is_string(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsAString(self.to_raw()) }
+        unsafe { mlirAttributeIsAString(self.to_raw()) }
     }
 
     /// Returns `true` if an attribute is a symbol.
     fn is_symbol(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsASymbolRef(self.to_raw()) }
+        unsafe { mlirAttributeIsASymbolRef(self.to_raw()) }
     }
 
     /// Returns `true` if an attribute is a type.
     fn is_type(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsAType(self.to_raw()) }
+        unsafe { mlirAttributeIsAType(self.to_raw()) }
     }
 
     /// Returns `true` if an attribute is a unit.
     fn is_unit(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsAUnit(self.to_raw()) }
+        unsafe { mlirAttributeIsAUnit(self.to_raw()) }
     }
 
     /// Dumps a attribute.

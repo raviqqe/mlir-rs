@@ -138,7 +138,7 @@ mod tests {
 
         assert_eq!(
             Attribute::parse(&context, "42 : index").unwrap().type_id(),
-            Some(Type::index(&context).id())
+            Type::index(&context).id()
         );
     }
 
