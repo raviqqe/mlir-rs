@@ -1,5 +1,18 @@
 //! `arith` dialect
 
+use crate::ir::Operation;
+
+/// Creates an `arith.constqnt` operation.
+pub fn constant<'c>(
+    value: crate::ir::Value,
+    location: crate::ir::Location<'c>,
+) -> crate::ir::Operation<'c> {
+    crate::ir::operation::Builder::new("arith.constant", location)
+        .add_operands(&[value])
+        .enable_result_type_inference()
+        .build()
+}
+
 // spell-checker: disable
 
 melior_macro::arith_binary_operators!(
