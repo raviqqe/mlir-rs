@@ -3,6 +3,7 @@ mod operation;
 mod parse;
 mod pass;
 mod r#type;
+mod utility;
 
 use parse::{DialectOperationSet, IdentifierList};
 use proc_macro::TokenStream;
