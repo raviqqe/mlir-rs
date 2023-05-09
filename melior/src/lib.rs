@@ -54,7 +54,6 @@
 //! let integer_type = Type::integer(&context, 64);
 //!
 //! let function = {
-//!     let region = Region::new();
 //!     let block = Block::new(&[(integer_type, location), (integer_type, location)]);
 //!
 //!     let sum = block.append_operation(arith::addi(
@@ -65,6 +64,7 @@
 //!
 //!     block.append_operation(func::r#return(&[sum.result(0).unwrap().into()], location));
 //!
+//!     let region = Region::new();
 //!     region.append_block(block);
 //!
 //!     func::func(
@@ -140,7 +140,6 @@ mod tests {
         let integer_type = Type::integer(&context, 64);
 
         let function = {
-            let region = Region::new();
             let block = Block::new(&[(integer_type, location), (integer_type, location)]);
 
             let sum = block.append_operation(
@@ -159,6 +158,7 @@ mod tests {
                     .build(),
             );
 
+            let region = Region::new();
             region.append_block(block);
 
             operation::Builder::new("func.func", Location::unknown(&context))
@@ -193,7 +193,6 @@ mod tests {
         let memref_type = Type::parse(&context, "memref<?xf32>").unwrap();
 
         let function = {
-            let function_region = Region::new();
             let function_block = Block::new(&[(memref_type, location), (memref_type, location)]);
             let index_type = Type::parse(&context, "index").unwrap();
 
@@ -279,7 +278,6 @@ mod tests {
             function_block.append_operation(
                 {
                     let loop_region = Region::new();
-
                     loop_region.append_block(loop_block);
 
                     operation::Builder::new("scf.for", location)
@@ -297,6 +295,7 @@ mod tests {
                 operation::Builder::new("func.return", Location::unknown(&context)).build(),
             );
 
+            let function_region = Region::new();
             function_region.append_block(function_block);
 
             operation::Builder::new("func.func", Location::unknown(&context))
