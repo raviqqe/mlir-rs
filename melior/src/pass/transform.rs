@@ -1,4 +1,4 @@
-//! General transformation passes.
+//! Transform passes.
 
 melior_macro::transform_passes!(
     mlirCreateTransformsCSE,

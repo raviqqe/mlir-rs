@@ -1,4 +1,4 @@
-//! `async` dialect passes.
+//! Async passes.
 
 melior_macro::async_passes!(
     mlirCreateAsyncAsyncFuncToAsyncRuntime,
