@@ -56,6 +56,46 @@ mod tests {
     };
 
     #[test]
+    fn create_constant() {
+        let context = Context::new();
+        load_all_dialects(&context);
+
+        let location = Location::unknown(&context);
+        let module = Module::new(location);
+
+        let integer_type = Type::integer(&context, 64);
+
+        let function = {
+            let region = Region::new();
+            let block = Block::new(&[(integer_type, location)]);
+
+            block.append_operation(func::r#return(
+                &[block
+                    .append_operation(constant(block.argument(0).unwrap().into(), location))
+                    .result(0)
+                    .unwrap()
+                    .into()],
+                location,
+            ));
+
+            region.append_block(block);
+
+            func::func(
+                &context,
+                Attribute::parse(&context, "\"add\"").unwrap(),
+                Attribute::parse(&context, "(i64, i64) -> i64").unwrap(),
+                region,
+                Location::unknown(&context),
+            )
+        };
+
+        module.body().append_operation(function);
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
     fn create_addi() {
         let context = Context::new();
         load_all_dialects(&context);
