@@ -1,7 +1,7 @@
 //! `arith` dialect
 
 use crate::{
-    ir::{operation, Attribute, Identifier, IntegerAttribute, Location, Operation, Type, Value},
+    ir::{attribute, operation, Attribute, Identifier, Location, Operation, Type, Value},
     Context,
 };
 
@@ -86,7 +86,7 @@ fn cmp<'c>(
     operation::Builder::new(name, location)
         .add_attributes(&[(
             Identifier::new(context, "predicate"),
-            IntegerAttribute::new(predicate, Type::integer(context, 64)).into(),
+            attribute::Integer::new(predicate, Type::integer(context, 64)).into(),
         )])
         .add_operands(&[lhs, rhs])
         .enable_result_type_inference()

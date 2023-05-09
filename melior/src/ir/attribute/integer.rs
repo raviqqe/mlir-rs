@@ -12,13 +12,13 @@ use std::{
 /// An integer attribute.
 // Attributes are always values but their internal storage is owned by contexts.
 #[derive(Clone, Copy)]
-pub struct IntegerAttribute<'c> {
+pub struct Integer<'c> {
     raw: MlirAttribute,
     _context: PhantomData<&'c Context>,
 }
 
-impl<'c> IntegerAttribute<'c> {
-    /// Creates an integer attribute.
+impl<'c> Integer<'c> {
+    /// Creates an integer.
     pub fn new(integer: i64, r#type: Type<'c>) -> Self {
         Self {
             raw: unsafe { mlirIntegerAttrGet(r#type.to_raw(), integer) },
@@ -31,13 +31,13 @@ impl<'c> IntegerAttribute<'c> {
     }
 }
 
-impl<'c> Display for IntegerAttribute<'c> {
+impl<'c> Display for Integer<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Display::fmt(&Attribute::from(*self), formatter)
     }
 }
 
-impl<'c> Debug for IntegerAttribute<'c> {
+impl<'c> Debug for Integer<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Display::fmt(self, formatter)
     }
