@@ -49,11 +49,10 @@ pub fn generate_unary(dialect: &Ident, names: &[Ident]) -> Result<TokenStream, B
         stream.extend(TokenStream::from(quote! {
             #[doc = #document]
             pub fn #name<'c>(
-                lhs: crate::ir::Value,
-                rhs: crate::ir::Value,
+                value: crate::ir::Value,
                 location: crate::ir::Location<'c>,
             ) -> crate::ir::Operation<'c> {
-                unary_operator(#operation_name, lhs, rhs, location)
+                unary_operator(#operation_name, value, location)
             }
         }));
     }
