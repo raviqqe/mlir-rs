@@ -26,10 +26,10 @@ context.load_all_available_dialects();
 let location = Location::unknown(&context);
 let module = Module::new(location);
 
-let integer_type = Type::integer(&context, 64);
+let index_type = Type::index(&context);
 
 let function = {
-    let block = Block::new(&[(integer_type, location), (integer_type, location)]);
+    let block = Block::new(&[(index_type, location), (index_type, location)]);
 
     let sum = block.append_operation(arith::addi(
         block.argument(0).unwrap().into(),
@@ -45,7 +45,7 @@ let function = {
     func::func(
         &context,
         Attribute::parse(&context, "\"add\"").unwrap(),
-        Attribute::parse(&context, "(i64, i64) -> i64").unwrap(),
+        Attribute::parse(&context, "(index, index) -> index").unwrap(),
         region,
         location,
     )

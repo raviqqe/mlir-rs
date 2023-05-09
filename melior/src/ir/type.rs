@@ -7,8 +7,10 @@ mod mem_ref;
 mod tuple;
 mod type_like;
 
-pub use self::{function::Function, id::Id, tuple::Tuple, type_like::TypeLike};
-pub use self::{integer::Integer, mem_ref::MemRef};
+pub use self::{
+    function::Function, id::Id, integer::Integer, mem_ref::MemRef, tuple::Tuple,
+    type_like::TypeLike,
+};
 use super::Location;
 use crate::{context::Context, string_ref::StringRef, utility::print_callback};
 use mlir_sys::{

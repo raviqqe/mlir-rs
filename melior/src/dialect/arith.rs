@@ -86,7 +86,7 @@ fn cmp<'c>(
     operation::Builder::new(name, location)
         .add_attributes(&[(
             Identifier::new(context, "predicate"),
-            attribute::Integer::new(predicate, r#type::Integer::new(context, 64).into()).into(),
+            attribute::Integer::new(predicate, r#type::Integer::new(context, 64)).into(),
         )])
         .add_operands(&[lhs, rhs])
         .enable_result_type_inference()
