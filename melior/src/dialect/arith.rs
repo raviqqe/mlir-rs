@@ -1,11 +1,18 @@
 //! `arith` dialect
 
-use crate::ir::{operation, Location, Operation, Value};
+use crate::{
+    ir::{operation, Attribute, Identifier, Location, Operation},
+    Context,
+};
 
 /// Creates an `arith.constqnt` operation.
-pub fn constant<'c>(value: Value, location: Location<'c>) -> Operation<'c> {
+pub fn constant<'c>(
+    context: &'c Context,
+    value: Attribute<'c>,
+    location: Location<'c>,
+) -> Operation<'c> {
     operation::Builder::new("arith.constant", location)
-        .add_operands(&[value])
+        .add_attributes(&[(Identifier::new(context, "value"), value)])
         .enable_result_type_inference()
         .build()
 }
@@ -71,7 +78,11 @@ mod tests {
 
             block.append_operation(func::r#return(
                 &[block
-                    .append_operation(constant(block.argument(0).unwrap().into(), location))
+                    .append_operation(constant(
+                        &context,
+                        Attribute::parse(&context, "42 : i64").unwrap(),
+                        location,
+                    ))
                     .result(0)
                     .unwrap()
                     .into()],
