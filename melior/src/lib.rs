@@ -104,8 +104,11 @@ pub use self::{
 mod tests {
     use crate::{
         context::Context,
-        dialect::{self, scf},
-        ir::{operation, r#type, Attribute, Block, Identifier, Location, Module, Region, Type},
+        dialect::{self, arith, scf},
+        ir::{
+            attribute, operation, r#type, Attribute, Block, Identifier, Location, Module, Region,
+            Type,
+        },
         test::load_all_dialects,
     };
 
@@ -196,15 +199,11 @@ mod tests {
             let function_block = Block::new(&[(memref_type, location), (memref_type, location)]);
             let index_type = Type::parse(&context, "index").unwrap();
 
-            let zero = function_block.append_operation(
-                operation::Builder::new("arith.constant", location)
-                    .add_results(&[index_type])
-                    .add_attributes(&[(
-                        Identifier::new(&context, "value"),
-                        Attribute::parse(&context, "0 : index").unwrap(),
-                    )])
-                    .build(),
-            );
+            let zero = function_block.append_operation(arith::constant(
+                &context,
+                attribute::Integer::new(0, Type::index(&context)).into(),
+                location,
+            ));
 
             let dim = function_block.append_operation(
                 operation::Builder::new("memref.dim", location)
@@ -218,15 +217,11 @@ mod tests {
 
             let loop_block = Block::new(&[(index_type, location)]);
 
-            let one = function_block.append_operation(
-                operation::Builder::new("arith.constant", location)
-                    .add_results(&[index_type])
-                    .add_attributes(&[(
-                        Identifier::new(&context, "value"),
-                        Attribute::parse(&context, "1 : index").unwrap(),
-                    )])
-                    .build(),
-            );
+            let one = function_block.append_operation(arith::constant(
+                &context,
+                attribute::Integer::new(1, Type::index(&context)).into(),
+                location,
+            ));
 
             {
                 let f32_type = Type::float32(&context);
