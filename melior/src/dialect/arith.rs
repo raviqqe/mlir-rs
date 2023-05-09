@@ -173,7 +173,6 @@ mod tests {
         let location = Location::unknown(context);
         let module = Module::new(location);
 
-        let region = Region::new();
         let block = Block::new(
             &block_argument_types
                 .iter()
@@ -190,6 +189,7 @@ mod tests {
             location,
         ));
 
+        let region = Region::new();
         region.append_block(block);
 
         let function = func::func(
@@ -500,7 +500,6 @@ mod tests {
         let integer_type = Type::integer(&context, 64);
 
         let function = {
-            let region = Region::new();
             let block = Block::new(&[(integer_type, location), (integer_type, location)]);
 
             let sum = block.append_operation(addi(
@@ -511,6 +510,7 @@ mod tests {
 
             block.append_operation(func::r#return(&[sum.result(0).unwrap().into()], location));
 
+            let region = Region::new();
             region.append_block(block);
 
             func::func(

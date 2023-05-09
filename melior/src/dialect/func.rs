@@ -49,11 +49,11 @@ mod tests {
         let integer_type = Type::integer(&context, 64);
 
         let function = {
-            let region = Region::new();
             let block = Block::new(&[(integer_type, location)]);
 
             block.append_operation(r#return(&[block.argument(0).unwrap().into()], location));
 
+            let region = Region::new();
             region.append_block(block);
 
             func(

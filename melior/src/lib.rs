@@ -36,7 +36,7 @@
 //! ```rust
 //! use melior::{
 //!     Context,
-//!     dialect,
+//!     dialect::{self, arith, func},
 //!     ir::*,
 //!     utility::register_all_dialects,
 //! };
@@ -46,7 +46,7 @@
 //!
 //! let context = Context::new();
 //! context.append_dialect_registry(&registry);
-//! context.get_or_load_dialect("func");
+//! context.load_all_available_dialects();
 //!
 //! let location = Location::unknown(&context);
 //! let module = Module::new(location);
@@ -54,40 +54,26 @@
 //! let integer_type = Type::integer(&context, 64);
 //!
 //! let function = {
-//!     let region = Region::new();
 //!     let block = Block::new(&[(integer_type, location), (integer_type, location)]);
 //!
-//!     let sum = block.append_operation(
-//!         operation::Builder::new("arith.addi", location)
-//!             .add_operands(&[
-//!                 block.argument(0).unwrap().into(),
-//!                 block.argument(1).unwrap().into(),
-//!             ])
-//!             .add_results(&[integer_type])
-//!             .build(),
-//!     );
+//!     let sum = block.append_operation(arith::addi(
+//!         block.argument(0).unwrap().into(),
+//!         block.argument(1).unwrap().into(),
+//!         location
+//!     ));
 //!
-//!     block.append_operation(
-//!         operation::Builder::new("func.return", Location::unknown(&context))
-//!             .add_operands(&[sum.result(0).unwrap().into()])
-//!             .build(),
-//!     );
+//!     block.append_operation(func::r#return(&[sum.result(0).unwrap().into()], location));
 //!
+//!     let region = Region::new();
 //!     region.append_block(block);
 //!
-//!     operation::Builder::new("func.func", Location::unknown(&context))
-//!         .add_attributes(&[
-//!             (
-//!                 Identifier::new(&context, "function_type"),
-//!                 Attribute::parse(&context, "(i64, i64) -> i64").unwrap(),
-//!             ),
-//!             (
-//!                 Identifier::new(&context, "sym_name"),
-//!                 Attribute::parse(&context, "\"add\"").unwrap(),
-//!             ),
-//!         ])
-//!         .add_regions(vec![region])
-//!         .build()
+//!     func::func(
+//!         &context,
+//!         Attribute::parse(&context, "\"add\"").unwrap(),
+//!         Attribute::parse(&context, "(i64, i64) -> i64").unwrap(),  
+//!         region,
+//!         location,
+//!     )
 //! };
 //!
 //! module.body().append_operation(function);
@@ -154,7 +140,6 @@ mod tests {
         let integer_type = Type::integer(&context, 64);
 
         let function = {
-            let region = Region::new();
             let block = Block::new(&[(integer_type, location), (integer_type, location)]);
 
             let sum = block.append_operation(
@@ -173,6 +158,7 @@ mod tests {
                     .build(),
             );
 
+            let region = Region::new();
             region.append_block(block);
 
             operation::Builder::new("func.func", Location::unknown(&context))
@@ -207,7 +193,6 @@ mod tests {
         let memref_type = Type::parse(&context, "memref<?xf32>").unwrap();
 
         let function = {
-            let function_region = Region::new();
             let function_block = Block::new(&[(memref_type, location), (memref_type, location)]);
             let index_type = Type::parse(&context, "index").unwrap();
 
@@ -293,7 +278,6 @@ mod tests {
             function_block.append_operation(
                 {
                     let loop_region = Region::new();
-
                     loop_region.append_block(loop_block);
 
                     operation::Builder::new("scf.for", location)
@@ -311,6 +295,7 @@ mod tests {
                 operation::Builder::new("func.return", Location::unknown(&context)).build(),
             );
 
+            let function_region = Region::new();
             function_region.append_block(function_block);
 
             operation::Builder::new("func.func", Location::unknown(&context))
