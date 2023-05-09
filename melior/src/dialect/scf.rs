@@ -30,14 +30,14 @@ pub fn r#for<'c>(
 
 /// Creates a `scf.while` operation.
 pub fn r#while<'c>(
-    initial: Value<'c>,
+    initial_values: &[Value<'c>],
     result_types: &[Type<'c>],
     before_region: Region,
     after_region: Region,
     location: Location<'c>,
 ) -> Operation<'c> {
     Builder::new("scf.while", location)
-        .add_operands(&[initial])
+        .add_operands(initial_values)
         .add_results(result_types)
         .add_regions(vec![before_region, after_region])
         .build()
@@ -148,7 +148,7 @@ mod tests {
                 ));
 
                 block.append_operation(r#while(
-                    initial.result(0).unwrap().into(),
+                    &[initial.result(0).unwrap().into()],
                     &[index_type],
                     {
                         let block = Block::new(&[(index_type, location)]);
@@ -234,7 +234,7 @@ mod tests {
                 ));
 
                 block.append_operation(r#while(
-                    initial.result(0).unwrap().into(),
+                    &[initial.result(0).unwrap().into()],
                     &[float_type],
                     {
                         let block = Block::new(&[(index_type, location)]);
@@ -273,6 +273,100 @@ mod tests {
 
                         block.append_operation(r#yield(
                             &[result.result(0).unwrap().into()],
+                            location,
+                        ));
+
+                        let region = Region::new();
+                        region.append_block(block);
+                        region
+                    },
+                    location,
+                ));
+
+                block.append_operation(func::r#return(&[], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            location,
+        ));
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
+    fn compile_while_with_multiple_arguments_and_results() {
+        let context = Context::new();
+        load_all_dialects(&context);
+
+        let location = Location::unknown(&context);
+        let module = Module::new(location);
+        let index_type = Type::index(&context);
+
+        module.body().append_operation(func::func(
+            &context,
+            Attribute::parse(&context, "\"foo\"").unwrap(),
+            Attribute::parse(&context, "() -> ()").unwrap(),
+            {
+                let block = Block::new(&[]);
+
+                let initial = block.append_operation(arith::constant(
+                    &context,
+                    attribute::Integer::new(0, index_type).into(),
+                    location,
+                ));
+
+                block.append_operation(r#while(
+                    &[
+                        initial.result(0).unwrap().into(),
+                        initial.result(0).unwrap().into(),
+                    ],
+                    &[index_type, index_type],
+                    {
+                        let block = Block::new(&[(index_type, location), (index_type, location)]);
+
+                        let condition = block.append_operation(arith::constant(
+                            &context,
+                            attribute::Integer::new(0, r#type::Integer::new(&context, 1).into())
+                                .into(),
+                            location,
+                        ));
+
+                        let result = block.append_operation(arith::constant(
+                            &context,
+                            attribute::Integer::new(42, Type::index(&context).into()).into(),
+                            location,
+                        ));
+
+                        block.append_operation(super::condition(
+                            condition.result(0).unwrap().into(),
+                            &[
+                                result.result(0).unwrap().into(),
+                                result.result(0).unwrap().into(),
+                            ],
+                            location,
+                        ));
+
+                        let region = Region::new();
+                        region.append_block(block);
+                        region
+                    },
+                    {
+                        let block = Block::new(&[(index_type, location), (index_type, location)]);
+
+                        let result = block.append_operation(arith::constant(
+                            &context,
+                            attribute::Integer::new(42, index_type).into(),
+                            location,
+                        ));
+
+                        block.append_operation(r#yield(
+                            &[
+                                result.result(0).unwrap().into(),
+                                result.result(0).unwrap().into(),
+                            ],
                             location,
                         ));
 
