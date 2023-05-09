@@ -50,6 +50,7 @@ pub fn cmpf<'c>(
     cmp(context, "arith.cmpf", predicate as i64, lhs, rhs, location)
 }
 
+// `arith.cmpi` predicate
 pub enum CmpiPredicate {
     Eq,
     Ne,
