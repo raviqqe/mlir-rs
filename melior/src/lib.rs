@@ -46,7 +46,7 @@
 //!
 //! let context = Context::new();
 //! context.append_dialect_registry(&registry);
-//! context.get_or_load_dialect("func");
+//! context.load_all_available_dialects();
 //!
 //! let location = Location::unknown(&context);
 //! let module = Module::new(location);
