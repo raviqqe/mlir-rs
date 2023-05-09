@@ -85,39 +85,37 @@ mod tests {
         let location = Location::unknown(&context);
         let module = Module::new(location);
 
-        let function = {
-            let region = Region::new();
-            let block = Block::new(
-                &block_argument_types
-                    .iter()
-                    .map(|&r#type| (r#type, location))
-                    .collect::<Vec<_>>(),
-            );
+        let region = Region::new();
+        let block = Block::new(
+            &block_argument_types
+                .iter()
+                .map(|&r#type| (r#type, location))
+                .collect::<Vec<_>>(),
+        );
 
-            block.append_operation(func::r#return(
-                &[block
-                    .append_operation(operation(&block))
-                    .result(0)
-                    .unwrap()
-                    .into()],
-                location,
-            ));
+        let operation = operation(&block);
+        let name = operation.name();
+        let name = name.as_string_ref().as_str().unwrap();
 
-            region.append_block(block);
+        block.append_operation(func::r#return(
+            &[block.append_operation(operation).result(0).unwrap().into()],
+            location,
+        ));
 
-            func::func(
-                &context,
-                Attribute::parse(&context, "\"foo\"").unwrap(),
-                Attribute::parse(&context, function_type).unwrap(),
-                region,
-                Location::unknown(&context),
-            )
-        };
+        region.append_block(block);
+
+        let function = func::func(
+            &context,
+            Attribute::parse(&context, "\"foo\"").unwrap(),
+            Attribute::parse(&context, function_type).unwrap(),
+            region,
+            Location::unknown(&context),
+        );
 
         module.body().append_operation(function);
 
         assert!(module.as_operation().verify());
-        insta::assert_display_snapshot!(module.as_operation());
+        insta::assert_display_snapshot!(name, module.as_operation());
     }
 
     #[test]
