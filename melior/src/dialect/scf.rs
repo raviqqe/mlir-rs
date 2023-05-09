@@ -267,7 +267,7 @@ mod tests {
 
                         let result = block.append_operation(arith::constant(
                             &context,
-                            attribute::Float::new(42.0, float_type).into(),
+                            attribute::Float::new(&context, 42.0, float_type).into(),
                             location,
                         ));
 

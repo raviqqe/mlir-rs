@@ -1,9 +1,10 @@
 //! Attributes.
 
 mod attribute_like;
+mod float;
 mod integer;
 
-pub use self::{attribute_like::AttributeLike, integer::Integer};
+pub use self::{attribute_like::AttributeLike, float::Float, integer::Integer};
 use super::{r#type, Type};
 use crate::{context::Context, string_ref::StringRef, utility::print_callback};
 use mlir_sys::{
@@ -93,6 +94,12 @@ impl<'c> Display for Attribute<'c> {
 impl<'c> Debug for Attribute<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Display::fmt(self, formatter)
+    }
+}
+
+impl<'c> From<Float<'c>> for Attribute<'c> {
+    fn from(attribute: Float<'c>) -> Self {
+        unsafe { Self::from_raw(attribute.to_raw()) }
     }
 }
 
