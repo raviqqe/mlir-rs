@@ -153,6 +153,24 @@ mod tests {
     }
 
     #[test]
+    fn compile_bitcast() {
+        let context = create_context();
+
+        compile_operation(
+            &context,
+            |block| {
+                bitcast(
+                    block.argument(0).unwrap().into(),
+                    Type::float64(&context),
+                    Location::unknown(&context),
+                )
+            },
+            &[Type::integer(&context, 64)],
+            "(i64) -> f64",
+        );
+    }
+
+    #[test]
     fn compile_addi() {
         let context = Context::new();
         load_all_dialects(&context);
