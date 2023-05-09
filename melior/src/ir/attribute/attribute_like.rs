@@ -12,7 +12,7 @@ use mlir_sys::{
 
 /// Trait for attribute-like types.
 pub trait AttributeLike<'c> {
-    /// Converts a attributeinto a raw attribute.
+    /// Converts a attribute into a raw attribute.
     ///
     /// # Safety
     ///
