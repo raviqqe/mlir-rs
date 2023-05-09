@@ -230,7 +230,7 @@ mod tests {
             );
 
             {
-                let f32_type = Type::parse(&context, "f32").unwrap();
+                let f32_type = Type::float32(&context);
 
                 let lhs = loop_block.append_operation(
                     operation::Builder::new("memref.load", location)
