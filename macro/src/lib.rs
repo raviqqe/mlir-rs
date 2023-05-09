@@ -35,10 +35,17 @@ pub fn typed_unary_operations(stream: TokenStream) -> TokenStream {
 }
 
 #[proc_macro]
-pub fn r#type(stream: TokenStream) -> TokenStream {
+pub fn type_check_functions(stream: TokenStream) -> TokenStream {
     let identifiers = parse_macro_input!(stream as IdentifierList);
 
     convert_result(r#type::generate(identifiers.identifiers()))
+}
+
+#[proc_macro]
+pub fn attribute_check_functions(stream: TokenStream) -> TokenStream {
+    let identifiers = parse_macro_input!(stream as IdentifierList);
+
+    convert_result(attribute::generate(identifiers.identifiers()))
 }
 
 #[proc_macro]

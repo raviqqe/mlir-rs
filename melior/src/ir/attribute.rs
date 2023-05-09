@@ -164,20 +164,20 @@ mod tests {
     }
 
     #[test]
-    fn is_dense_integer_elements() {
+    fn is_dense_int_elements() {
         assert!(
             Attribute::parse(&Context::new(), "dense<42> : tensor<42xi8>")
                 .unwrap()
-                .is_dense_integer_elements()
+                .is_dense_int_elements()
         );
     }
 
     #[test]
-    fn is_dense_float_elements() {
+    fn is_dense_fp_elements() {
         assert!(
             Attribute::parse(&Context::new(), "dense<42.0> : tensor<42xf32>")
                 .unwrap()
-                .is_dense_float_elements()
+                .is_dense_fp_elements()
         );
     }
 
@@ -249,7 +249,7 @@ mod tests {
     fn is_symbol() {
         assert!(Attribute::parse(&Context::new(), "@foo")
             .unwrap()
-            .is_symbol());
+            .is_symbol_ref());
     }
 
     #[test]
