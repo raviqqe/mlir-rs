@@ -57,7 +57,10 @@ melior_macro::binary_operations!(
 
 melior_macro::unary_operations!(arith, [negf, truncf]);
 
-melior_macro::typed_unary_operations!(arith, [bitcast, extf, extsi, extui, sitofp, trunci, uitofp]);
+melior_macro::typed_unary_operations!(
+    arith,
+    [bitcast, extf, extsi, extui, fptosi, fptoui, sitofp, trunci, uitofp]
+);
 
 #[cfg(test)]
 mod tests {
@@ -224,6 +227,42 @@ mod tests {
                 },
                 &[Type::integer(&context, 32)],
                 "(i32) -> i64",
+            );
+        }
+
+        #[test]
+        fn compile_fptosi() {
+            let context = create_context();
+
+            compile_operation(
+                &context,
+                |block| {
+                    fptosi(
+                        block.argument(0).unwrap().into(),
+                        Type::integer(&context, 64),
+                        Location::unknown(&context),
+                    )
+                },
+                &[Type::float32(&context)],
+                "(f32) -> i64",
+            );
+        }
+
+        #[test]
+        fn compile_fptoui() {
+            let context = create_context();
+
+            compile_operation(
+                &context,
+                |block| {
+                    fptoui(
+                        block.argument(0).unwrap().into(),
+                        Type::integer(&context, 64),
+                        Location::unknown(&context),
+                    )
+                },
+                &[Type::float32(&context)],
+                "(f32) -> i64",
             );
         }
 
