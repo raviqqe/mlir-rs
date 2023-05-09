@@ -1,0 +1,12 @@
+---
+source: melior/src/dialect/arith.rs
+assertion_line: 117
+expression: module.as_operation()
+---
+module {
+  func.func @foo(%arg0: i32) -> f64 {
+    %0 = arith.uitofp %arg0 : i32 to f64
+    return %0 : f64
+  }
+}
+
