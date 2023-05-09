@@ -19,6 +19,7 @@ pub enum Error {
     RunPass,
     TupleExpected(String),
     TupleFieldPosition(String, usize),
+    TypedAttributeExpected(&'static str, String),
 }
 
 impl Display for Error {
@@ -63,6 +64,9 @@ impl Display for Error {
                     formatter,
                     "tuple field position {position} out of range: {type}"
                 )
+            }
+            Self::TypedAttributeExpected(r#type, attribute) => {
+                write!(formatter, "{type} attribute expected: {attribute}")
             }
         }
     }
