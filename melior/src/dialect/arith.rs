@@ -118,7 +118,7 @@ mod tests {
     }
 
     #[test]
-    fn create_constant() {
+    fn compile_constant() {
         let context = create_context();
 
         compile_operation(
@@ -136,7 +136,7 @@ mod tests {
     }
 
     #[test]
-    fn create_negf() {
+    fn compile_negf() {
         let context = create_context();
 
         compile_operation(
@@ -153,7 +153,7 @@ mod tests {
     }
 
     #[test]
-    fn create_addi() {
+    fn compile_addi() {
         let context = Context::new();
         load_all_dialects(&context);
 
