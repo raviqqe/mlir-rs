@@ -1,19 +1,29 @@
-mod arith;
+mod operation;
 mod parse;
 mod pass;
 mod type_check_functions;
 
-use parse::IdentifierList;
+use parse::{DialectOperationSet, IdentifierList};
 use proc_macro::TokenStream;
 use quote::quote;
 use std::error::Error;
 use syn::parse_macro_input;
 
 #[proc_macro]
-pub fn arith_binary_operators(stream: TokenStream) -> TokenStream {
-    let identifiers = parse_macro_input!(stream as IdentifierList);
+pub fn unary_operations(stream: TokenStream) -> TokenStream {
+    let set = parse_macro_input!(stream as DialectOperationSet);
 
-    convert_result(arith::generate_binary_operators(identifiers.identifiers()))
+    convert_result(operation::generate_unary(&set.dialect(), set.identifiers()))
+}
+
+#[proc_macro]
+pub fn binary_operations(stream: TokenStream) -> TokenStream {
+    let set = parse_macro_input!(stream as DialectOperationSet);
+
+    convert_result(operation::generate_binary(
+        &set.dialect(),
+        set.identifiers(),
+    ))
 }
 
 #[proc_macro]
