@@ -91,7 +91,7 @@ mod tests {
     fn r#type() {
         let context = Context::new();
         let location = Location::unknown(&context);
-        let index_type = Type::parse(&context, "index").unwrap();
+        let index_type = Type::index(&context);
 
         let operation = operation::Builder::new("arith.constant", location)
             .add_results(&[index_type])
@@ -108,7 +108,7 @@ mod tests {
     fn is_operation_result() {
         let context = Context::new();
         let location = Location::unknown(&context);
-        let r#type = Type::parse(&context, "index").unwrap();
+        let r#type = Type::index(&context);
 
         let operation = operation::Builder::new("arith.constant", location)
             .add_results(&[r#type])
@@ -124,7 +124,7 @@ mod tests {
     #[test]
     fn is_block_argument() {
         let context = Context::new();
-        let r#type = Type::parse(&context, "index").unwrap();
+        let r#type = Type::index(&context);
         let block = Block::new(&[(r#type, Location::unknown(&context))]);
 
         assert!(block.argument(0).unwrap().is_block_argument());
@@ -134,7 +134,7 @@ mod tests {
     fn dump() {
         let context = Context::new();
         let location = Location::unknown(&context);
-        let index_type = Type::parse(&context, "index").unwrap();
+        let index_type = Type::index(&context);
 
         let value = operation::Builder::new("arith.constant", location)
             .add_results(&[index_type])
@@ -151,7 +151,7 @@ mod tests {
     fn equal() {
         let context = Context::new();
         let location = Location::unknown(&context);
-        let index_type = Type::parse(&context, "index").unwrap();
+        let index_type = Type::index(&context);
 
         let operation = operation::Builder::new("arith.constant", location)
             .add_results(&[index_type])
@@ -169,7 +169,7 @@ mod tests {
     fn not_equal() {
         let context = Context::new();
         let location = Location::unknown(&context);
-        let index_type = Type::parse(&context, "index").unwrap();
+        let index_type = Type::index(&context);
 
         let operation = || {
             operation::Builder::new("arith.constant", location)
@@ -192,7 +192,7 @@ mod tests {
         let context = Context::new();
 
         let location = Location::unknown(&context);
-        let index_type = Type::parse(&context, "index").unwrap();
+        let index_type = Type::index(&context);
 
         let operation = operation::Builder::new("arith.constant", location)
             .add_results(&[index_type])
@@ -214,7 +214,7 @@ mod tests {
         load_all_dialects(&context);
 
         let location = Location::unknown(&context);
-        let index_type = Type::parse(&context, "index").unwrap();
+        let index_type = Type::index(&context);
 
         let operation = operation::Builder::new("arith.constant", location)
             .add_results(&[index_type])
@@ -236,7 +236,7 @@ mod tests {
         load_all_dialects(&context);
 
         let location = Location::unknown(&context);
-        let index_type = Type::parse(&context, "index").unwrap();
+        let index_type = Type::index(&context);
 
         let operation = operation::Builder::new("arith.constant", location)
             .add_results(&[index_type])
