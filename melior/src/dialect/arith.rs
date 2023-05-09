@@ -5,6 +5,8 @@ use crate::{
     Context,
 };
 
+// spell-checker: disable
+
 /// Creates an `arith.constant` operation.
 pub fn constant<'c>(
     context: &'c Context,
@@ -17,7 +19,18 @@ pub fn constant<'c>(
         .build()
 }
 
-// spell-checker: disable
+/// Creates an `arith.cmpf` operation.
+pub fn cmpf<'c>(
+    name: &str,
+    lhs: crate::ir::Value,
+    rhs: crate::ir::Value,
+    location: crate::ir::Location<'c>,
+) -> crate::ir::Operation<'c> {
+    crate::ir::operation::Builder::new(name, location)
+        .add_operands(&[lhs, rhs])
+        .enable_result_type_inference()
+        .build()
+}
 
 melior_macro::binary_operations!(
     arith,
