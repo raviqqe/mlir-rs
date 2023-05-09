@@ -1,6 +1,6 @@
 use super::{Attribute, AttributeLike};
 use crate::{
-    ir::{r#type, TypeLike},
+    ir::{Type, TypeLike},
     Context, Error,
 };
 use mlir_sys::{mlirIntegerAttrGet, MlirAttribute};
@@ -19,7 +19,7 @@ pub struct Integer<'c> {
 
 impl<'c> Integer<'c> {
     /// Creates an integer.
-    pub fn new(integer: i64, r#type: r#type::Integer<'c>) -> Self {
+    pub fn new(integer: i64, r#type: Type<'c>) -> Self {
         unsafe { Self::from_raw(mlirIntegerAttrGet(r#type.to_raw(), integer)) }
     }
 
