@@ -275,19 +275,17 @@ mod tests {
                 loop_block.append_operation(scf::r#yield(location));
             }
 
-            function_block.append_operation({
-                let loop_region = Region::new();
-                loop_region.append_block(loop_block);
-
-                operation::Builder::new("scf.for", location)
-                    .add_operands(&[
-                        zero.result(0).unwrap().into(),
-                        dim.result(0).unwrap().into(),
-                        one.result(0).unwrap().into(),
-                    ])
-                    .add_regions(vec![loop_region])
-                    .build()
-            });
+            function_block.append_operation(scf::r#for(
+                zero.result(0).unwrap().into(),
+                dim.result(0).unwrap().into(),
+                one.result(0).unwrap().into(),
+                {
+                    let loop_region = Region::new();
+                    loop_region.append_block(loop_block);
+                    loop_region
+                },
+                location,
+            ));
 
             function_block.append_operation(
                 operation::Builder::new("func.return", Location::unknown(&context)).build(),
