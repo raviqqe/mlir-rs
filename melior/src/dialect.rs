@@ -5,6 +5,7 @@ pub mod func;
 mod handle;
 pub mod llvm;
 mod registry;
+pub mod scf;
 
 pub use self::{handle::Handle, registry::Registry};
 use crate::{

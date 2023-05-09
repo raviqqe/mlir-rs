@@ -104,7 +104,7 @@ pub use self::{
 mod tests {
     use crate::{
         context::Context,
-        dialect,
+        dialect::{self, scf},
         ir::{operation, r#type, Attribute, Block, Identifier, Location, Module, Region, Type},
         test::load_all_dialects,
     };
@@ -272,24 +272,22 @@ mod tests {
                         .build(),
                 );
 
-                loop_block.append_operation(operation::Builder::new("scf.yield", location).build());
+                loop_block.append_operation(scf::r#yield(location));
             }
 
-            function_block.append_operation(
-                {
-                    let loop_region = Region::new();
-                    loop_region.append_block(loop_block);
+            function_block.append_operation({
+                let loop_region = Region::new();
+                loop_region.append_block(loop_block);
 
-                    operation::Builder::new("scf.for", location)
-                        .add_operands(&[
-                            zero.result(0).unwrap().into(),
-                            dim.result(0).unwrap().into(),
-                            one.result(0).unwrap().into(),
-                        ])
-                        .add_regions(vec![loop_region])
-                }
-                .build(),
-            );
+                operation::Builder::new("scf.for", location)
+                    .add_operands(&[
+                        zero.result(0).unwrap().into(),
+                        dim.result(0).unwrap().into(),
+                        one.result(0).unwrap().into(),
+                    ])
+                    .add_regions(vec![loop_region])
+                    .build()
+            });
 
             function_block.append_operation(
                 operation::Builder::new("func.return", Location::unknown(&context)).build(),
