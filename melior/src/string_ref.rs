@@ -26,7 +26,7 @@ pub struct StringRef<'a> {
 
 impl<'a> StringRef<'a> {
     /// Converts a string reference into a `str`.
-    pub fn as_str(&self) -> Result<&str, Utf8Error> {
+    pub fn as_str(&self) -> Result<&'a str, Utf8Error> {
         unsafe {
             let bytes = slice::from_raw_parts(self.raw.data as *mut u8, self.raw.length);
 

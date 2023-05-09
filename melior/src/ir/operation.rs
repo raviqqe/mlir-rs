@@ -34,12 +34,12 @@ pub struct Operation<'c> {
 
 impl<'c> Operation<'c> {
     /// Gets a context.
-    pub fn context(&self) -> ContextRef {
+    pub fn context(&self) -> ContextRef<'c> {
         unsafe { ContextRef::from_raw(mlirOperationGetContext(self.raw)) }
     }
 
     /// Gets a name.
-    pub fn name(&self) -> Identifier {
+    pub fn name(&self) -> Identifier<'c> {
         unsafe { Identifier::from_raw(mlirOperationGetName(self.raw)) }
     }
 
