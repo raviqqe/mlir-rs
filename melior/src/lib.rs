@@ -216,8 +216,7 @@ mod tests {
                     .build(),
             );
 
-            let loop_block = Block::new(&[]);
-            loop_block.add_argument(index_type, location);
+            let loop_block = Block::new(&[(index_type, location)]);
 
             let one = function_block.append_operation(
                 operation::Builder::new("arith.constant", location)
