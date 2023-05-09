@@ -1,4 +1,5 @@
 use convert_case::{Case, Casing};
+use once_cell::sync::Lazy;
 use proc_macro::TokenStream;
 use proc_macro2::Ident;
 use quote::quote;
