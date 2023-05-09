@@ -209,4 +209,90 @@ mod tests {
         assert!(module.as_operation().verify());
         insta::assert_display_snapshot!(module.as_operation());
     }
+
+    #[test]
+    fn compile_while_with_different_argument_and_result_types() {
+        let context = Context::new();
+        load_all_dialects(&context);
+
+        let location = Location::unknown(&context);
+        let module = Module::new(location);
+        let index_type = Type::index(&context);
+        let float_type = Type::float64(&context);
+
+        module.body().append_operation(func::func(
+            &context,
+            Attribute::parse(&context, "\"foo\"").unwrap(),
+            Attribute::parse(&context, "() -> ()").unwrap(),
+            {
+                let block = Block::new(&[]);
+
+                let initial = block.append_operation(arith::constant(
+                    &context,
+                    attribute::Integer::new(0, index_type).into(),
+                    location,
+                ));
+
+                block.append_operation(r#while(
+                    initial.result(0).unwrap().into(),
+                    &[float_type],
+                    {
+                        let block = Block::new(&[(index_type, location)]);
+
+                        let condition = block.append_operation(arith::constant(
+                            &context,
+                            attribute::Integer::new(0, r#type::Integer::new(&context, 1).into())
+                                .into(),
+                            location,
+                        ));
+
+                        let result = block.append_operation(arith::constant(
+                            &context,
+                            attribute::Integer::new(42, Type::index(&context).into()).into(),
+                            location,
+                        ));
+
+                        block.append_operation(super::condition(
+                            condition.result(0).unwrap().into(),
+                            &[result.result(0).unwrap().into()],
+                            location,
+                        ));
+
+                        let region = Region::new();
+                        region.append_block(block);
+                        region
+                    },
+                    {
+                        let block = Block::new(&[(index_type, location)]);
+
+                        let result = block.append_operation(arith::constant(
+                            &context,
+                            attribute::Float::new(42.0, float_type).into(),
+                            location,
+                        ));
+
+                        block.append_operation(r#yield(
+                            &[result.result(0).unwrap().into()],
+                            location,
+                        ));
+
+                        let region = Region::new();
+                        region.append_block(block);
+                        region
+                    },
+                    location,
+                ));
+
+                block.append_operation(func::r#return(&[], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            location,
+        ));
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
 }
