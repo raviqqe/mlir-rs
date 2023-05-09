@@ -42,20 +42,12 @@ pub enum CmpfPredicate {
 /// Creates an `arith.cmpf` operation.
 pub fn cmpf<'c>(
     context: &'c Context,
-    name: &str,
     predicate: CmpfPredicate,
     lhs: Value,
     rhs: Value,
     location: Location<'c>,
 ) -> Operation<'c> {
-    operation::Builder::new(name, location)
-        .add_attributes(&[(
-            Identifier::new(context, "predicate"),
-            IntegerAttribute::new(predicate as i64, Type::integer(&context, 64)).into(),
-        )])
-        .add_operands(&[lhs, rhs])
-        .enable_result_type_inference()
-        .build()
+    cmp(context, "arith.cmpf", predicate as i64, lhs, rhs, location)
 }
 
 pub enum CmpiPredicate {
@@ -69,6 +61,35 @@ pub enum CmpiPredicate {
     Ule,
     Ugt,
     Uge,
+}
+
+/// Creates an `arith.cmpi` operation.
+pub fn cmpi<'c>(
+    context: &'c Context,
+    predicate: CmpiPredicate,
+    lhs: Value,
+    rhs: Value,
+    location: Location<'c>,
+) -> Operation<'c> {
+    cmp(context, "arith.cmpi", predicate as i64, lhs, rhs, location)
+}
+
+fn cmp<'c>(
+    context: &'c Context,
+    name: &str,
+    predicate: i64,
+    lhs: Value,
+    rhs: Value,
+    location: Location<'c>,
+) -> Operation<'c> {
+    operation::Builder::new(name, location)
+        .add_attributes(&[(
+            Identifier::new(context, "predicate"),
+            IntegerAttribute::new(predicate as i64, Type::integer(&context, 64)).into(),
+        )])
+        .add_operands(&[lhs, rhs])
+        .enable_result_type_inference()
+        .build()
 }
 
 melior_macro::binary_operations!(
