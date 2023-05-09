@@ -1,7 +1,7 @@
 //! `arith` dialect
 
 use crate::{
-    ir::{operation, Attribute, Identifier, Location, Operation},
+    ir::{operation, Attribute, Identifier, Location, Operation, Value},
     Context,
 };
 
@@ -13,6 +13,14 @@ pub fn constant<'c>(
 ) -> Operation<'c> {
     operation::Builder::new("arith.constant", location)
         .add_attributes(&[(Identifier::new(context, "value"), value)])
+        .enable_result_type_inference()
+        .build()
+}
+
+/// Creates an `arith.negf` operation.
+pub fn negf<'c>(value: Value, location: Location<'c>) -> Operation<'c> {
+    operation::Builder::new("arith.negf", location)
+        .add_operands(&[value])
         .enable_result_type_inference()
         .build()
 }
@@ -93,7 +101,7 @@ mod tests {
 
             func::func(
                 &context,
-                Attribute::parse(&context, "\"add\"").unwrap(),
+                Attribute::parse(&context, "\"foo\"").unwrap(),
                 Attribute::parse(&context, "(i64) -> i64").unwrap(),
                 region,
                 Location::unknown(&context),
@@ -132,7 +140,7 @@ mod tests {
 
             func::func(
                 &context,
-                Attribute::parse(&context, "\"add\"").unwrap(),
+                Attribute::parse(&context, "\"foo\"").unwrap(),
                 Attribute::parse(&context, "(i64, i64) -> i64").unwrap(),
                 region,
                 Location::unknown(&context),
