@@ -104,7 +104,7 @@ pub use self::{
 mod tests {
     use crate::{
         context::Context,
-        dialect::{self, arith, scf},
+        dialect::{self, arith, func, scf},
         ir::{
             attribute, operation, r#type, Attribute, Block, Identifier, Location, Module, Region,
             Type,
@@ -277,26 +277,18 @@ mod tests {
                 location,
             ));
 
-            function_block.append_operation(
-                operation::Builder::new("func.return", Location::unknown(&context)).build(),
-            );
+            function_block.append_operation(func::r#return(&[], location));
 
             let function_region = Region::new();
             function_region.append_block(function_block);
 
-            operation::Builder::new("func.func", Location::unknown(&context))
-                .add_attributes(&[
-                    (
-                        Identifier::new(&context, "function_type"),
-                        Attribute::parse(&context, "(memref<?xf32>, memref<?xf32>) -> ()").unwrap(),
-                    ),
-                    (
-                        Identifier::new(&context, "sym_name"),
-                        Attribute::parse(&context, "\"sum\"").unwrap(),
-                    ),
-                ])
-                .add_regions(vec![function_region])
-                .build()
+            func::func(
+                &context,
+                Attribute::parse(&context, "\"sum\"").unwrap(),
+                Attribute::parse(&context, "(memref<?xf32>, memref<?xf32>) -> ()").unwrap(),
+                function_region,
+                Location::unknown(&context),
+            )
         };
 
         module.body().append_operation(function);
