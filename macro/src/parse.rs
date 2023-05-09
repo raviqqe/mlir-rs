@@ -37,7 +37,7 @@ impl DialectOperationSet {
     }
 
     pub fn identifiers(&self) -> &[Ident] {
-        &self.identifiers.identifiers()
+        self.identifiers.identifiers()
     }
 }
 

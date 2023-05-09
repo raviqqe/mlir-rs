@@ -55,7 +55,7 @@ melior_macro::binary_operations!(
     ]
 );
 
-melior_macro::unary_operations!(arith, [negf]);
+melior_macro::unary_operations!(arith, [negf, truncf]);
 
 #[cfg(test)]
 mod tests {

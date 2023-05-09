@@ -13,17 +13,14 @@ use syn::parse_macro_input;
 pub fn unary_operations(stream: TokenStream) -> TokenStream {
     let set = parse_macro_input!(stream as DialectOperationSet);
 
-    convert_result(operation::generate_unary(&set.dialect(), set.identifiers()))
+    convert_result(operation::generate_unary(set.dialect(), set.identifiers()))
 }
 
 #[proc_macro]
 pub fn binary_operations(stream: TokenStream) -> TokenStream {
     let set = parse_macro_input!(stream as DialectOperationSet);
 
-    convert_result(operation::generate_binary(
-        &set.dialect(),
-        set.identifiers(),
-    ))
+    convert_result(operation::generate_binary(set.dialect(), set.identifiers()))
 }
 
 #[proc_macro]
