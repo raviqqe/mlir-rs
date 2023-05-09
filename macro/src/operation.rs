@@ -87,9 +87,10 @@ pub fn generate_typed_unary(
             #[doc = #document]
             pub fn #name<'c>(
                 value: crate::ir::Value,
+                r#type: crate::ir::Type<'c>,
                 location: crate::ir::Location<'c>,
             ) -> crate::ir::Operation<'c> {
-                unary_operator(#operation_name, value, location)
+                unary_operator(#operation_name, value, r#type, location)
             }
         }));
     }
