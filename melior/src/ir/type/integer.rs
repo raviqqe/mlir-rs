@@ -1,7 +1,7 @@
 use super::TypeLike;
 use crate::{ir::Type, Context, Error};
 use mlir_sys::{
-    mlirIndexTypeGet, mlirIntegerTypeGet, mlirIntegerTypeGetWidth, mlirIntegerTypeIsSigned,
+    mlirIntegerTypeGet, mlirIntegerTypeGetWidth, mlirIntegerTypeIsSigned,
     mlirIntegerTypeIsSignless, mlirIntegerTypeIsUnsigned, mlirIntegerTypeSignedGet,
     mlirIntegerTypeUnsignedGet, MlirType,
 };
