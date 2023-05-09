@@ -59,7 +59,19 @@ melior_macro::unary_operations!(arith, [negf, truncf]);
 
 melior_macro::typed_unary_operations!(
     arith,
-    [bitcast, extf, extsi, extui, fptosi, fptoui, sitofp, trunci, uitofp]
+    [
+        bitcast,
+        extf,
+        extsi,
+        extui,
+        fptosi,
+        fptoui,
+        index_cast,
+        index_castui,
+        sitofp,
+        trunci,
+        uitofp
+    ]
 );
 
 #[cfg(test)]
@@ -263,6 +275,42 @@ mod tests {
                 },
                 &[Type::float32(&context)],
                 "(f32) -> i64",
+            );
+        }
+
+        #[test]
+        fn compile_index_cast() {
+            let context = create_context();
+
+            compile_operation(
+                &context,
+                |block| {
+                    index_cast(
+                        block.argument(0).unwrap().into(),
+                        Type::integer(&context, 64),
+                        Location::unknown(&context),
+                    )
+                },
+                &[Type::index(&context)],
+                "(index) -> i64",
+            );
+        }
+
+        #[test]
+        fn compile_index_castui() {
+            let context = create_context();
+
+            compile_operation(
+                &context,
+                |block| {
+                    index_castui(
+                        block.argument(0).unwrap().into(),
+                        Type::integer(&context, 64),
+                        Location::unknown(&context),
+                    )
+                },
+                &[Type::index(&context)],
+                "(index) -> i64",
             );
         }
 
