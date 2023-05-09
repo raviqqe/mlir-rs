@@ -82,7 +82,7 @@ mod tests {
         block_argument_types: &[Type<'c>],
         function_type: &str,
     ) {
-        let location = Location::unknown(&context);
+        let location = Location::unknown(context);
         let module = Module::new(location);
 
         let region = Region::new();
@@ -105,11 +105,11 @@ mod tests {
         region.append_block(block);
 
         let function = func::func(
-            &context,
-            Attribute::parse(&context, "\"foo\"").unwrap(),
-            Attribute::parse(&context, function_type).unwrap(),
+            context,
+            Attribute::parse(context, "\"foo\"").unwrap(),
+            Attribute::parse(context, function_type).unwrap(),
             region,
-            Location::unknown(&context),
+            Location::unknown(context),
         );
 
         module.body().append_operation(function);

@@ -32,7 +32,7 @@ impl<'c> Identifier<'c> {
     }
 
     /// Converts an identifier into a string reference.
-    pub fn as_string_ref<'a>(&'a self) -> StringRef<'a> {
+    pub fn as_string_ref(&self) -> StringRef {
         unsafe { StringRef::from_raw(mlirIdentifierStr(self.raw)) }
     }
 
