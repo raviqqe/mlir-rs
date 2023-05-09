@@ -44,7 +44,10 @@ impl<'c> TryFrom<Attribute<'c>> for Integer<'c> {
         if attribute.is_integer() {
             Ok(unsafe { Self::from_raw(attribute.to_raw()) })
         } else {
-            Err(Error::IntegerAttributeExpected())
+            Err(Error::TypedAttributeExpected(
+                "integer",
+                format!("{}", attribute),
+            ))
         }
     }
 }
