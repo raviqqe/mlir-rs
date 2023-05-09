@@ -212,8 +212,8 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            Type::vector(&[42], Type::index(&context,)),
-            Type::parse(&context, "vector<42xindex>").unwrap()
+            Type::vector(&[42], Type::float64(&context)),
+            Type::parse(&context, "vector<42xf64>").unwrap()
         );
     }
 

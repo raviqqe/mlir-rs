@@ -118,8 +118,8 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            Type::from(MemRef::new(Type::index(&context), &[42], None, None,)),
-            Type::parse(&context, "memref<42xindex>").unwrap()
+            Type::from(MemRef::new(Type::float64(&context), &[42], None, None,)),
+            Type::parse(&context, "memref<42xf64>").unwrap()
         );
     }
 
