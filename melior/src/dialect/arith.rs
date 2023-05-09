@@ -1,4 +1,4 @@
-//! `arith` dialect
+//! `arith` dialect.
 
 use crate::{
     ir::{attribute, operation, r#type, Attribute, Identifier, Location, Operation, Value},

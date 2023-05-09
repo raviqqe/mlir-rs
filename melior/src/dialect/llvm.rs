@@ -1,3 +1,3 @@
-//! `llvm` dialect
+//! `llvm` dialect.
 
 pub mod r#type;
