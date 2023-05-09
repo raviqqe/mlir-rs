@@ -98,11 +98,12 @@ pub fn generate_typed_unary(
         fn unary_operator<'c>(
             name: &str,
             value: crate::ir::Value,
+            r#type: crate::ir::Type<'c>,
             location: crate::ir::Location<'c>,
         ) -> crate::ir::Operation<'c> {
             crate::ir::operation::Builder::new(name, location)
                 .add_operands(&[value])
-                .enable_result_type_inference()
+                .add_results(&[r#type])
                 .build()
         }
     }));
