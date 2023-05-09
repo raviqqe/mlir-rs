@@ -31,6 +31,7 @@
     "sparsification",
     "spirv",
     "stdc",
+    "strided",
     "tosa",
     "unranked",
     "vulkan"
