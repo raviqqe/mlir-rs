@@ -1,0 +1,11 @@
+---
+source: melior/src/dialect/arith.rs
+expression: module.as_operation()
+---
+module {
+  func.func @foo(%arg0: i32) -> i64 {
+    %0 = arith.extui %arg0 : i32 to i64
+    return %0 : i64
+  }
+}
+
