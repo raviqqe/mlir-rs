@@ -83,7 +83,7 @@ mod tests {
             func::func(
                 &context,
                 Attribute::parse(&context, "\"add\"").unwrap(),
-                Attribute::parse(&context, "(i64, i64) -> i64").unwrap(),
+                Attribute::parse(&context, "(i64) -> i64").unwrap(),
                 region,
                 Location::unknown(&context),
             )
