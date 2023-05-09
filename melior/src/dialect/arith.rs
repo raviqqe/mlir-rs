@@ -56,7 +56,7 @@ mod tests {
     };
 
     #[test]
-    fn run_on_function_in_nested_module() {
+    fn create_addi() {
         let context = Context::new();
         load_all_dialects(&context);
 
