@@ -293,7 +293,7 @@ impl<'a> Debug for BlockRef<'a> {
 mod tests {
     use super::*;
     use crate::{
-        ir::{operation, Module, Region, ValueLike},
+        ir::{operation, r#type, Module, Region, ValueLike},
         test::load_all_dialects,
     };
     use pretty_assertions::assert_eq;
@@ -306,7 +306,7 @@ mod tests {
     #[test]
     fn argument() {
         let context = Context::new();
-        let r#type = Type::integer(&context, 64);
+        let r#type = r#type::Integer::new(&context, 64).into();
 
         assert_eq!(
             Block::new(&[(r#type, Location::unknown(&context))])

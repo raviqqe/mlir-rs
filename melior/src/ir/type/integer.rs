@@ -1,6 +1,9 @@
 use super::TypeLike;
 use crate::{ir::Type, Context, Error};
-use mlir_sys::{mlirIntegerTypeGet, mlirIntegerTypeGetWidth, MlirType};
+use mlir_sys::{
+    mlirIntegerTypeGet, mlirIntegerTypeGetWidth, mlirIntegerTypeSignedGet,
+    mlirIntegerTypeUnsignedGet, MlirType,
+};
 use std::fmt::{self, Display, Formatter};
 
 /// A integer type.
@@ -17,9 +20,25 @@ impl<'c> Integer<'c> {
         }
     }
 
+    /// Creates a signed integer type.
+    pub fn signed(context: &'c Context, bits: u32) -> Self {
+        unsafe { Self::from_raw(mlirIntegerTypeSignedGet(context.to_raw(), bits)) }
+    }
+
+    /// Creates an unsigned integer type.
+    pub fn unsigned(context: &'c Context, bits: u32) -> Self {
+        unsafe { Self::from_raw(mlirIntegerTypeUnsignedGet(context.to_raw(), bits)) }
+    }
+
     /// Gets a bit width.
     pub fn width(&self) -> u32 {
         unsafe { mlirIntegerTypeGetWidth(self.to_raw()) }
+    }
+
+    fn from_raw(raw: MlirType) -> Self {
+        Self {
+            r#type: unsafe { Type::from_raw(raw) },
+        }
     }
 }
 
@@ -50,6 +69,41 @@ impl<'c> TryFrom<Type<'c>> for Integer<'c> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn new() {
+        assert!(Integer::new(&Context::new(), 64).is_integer());
+    }
+
+    #[test]
+    fn signed() {
+        assert!(Integer::signed(&Context::new(), 64).is_integer());
+    }
+
+    #[test]
+    fn unsigned() {
+        assert!(Integer::unsigned(&Context::new(), 64).is_integer());
+    }
+
+    #[test]
+    fn signed_integer() {
+        let context = Context::new();
+
+        assert_eq!(
+            Type::from(Integer::signed(&context, 42)),
+            Type::parse(&context, "si42").unwrap()
+        );
+    }
+
+    #[test]
+    fn unsigned_integer() {
+        let context = Context::new();
+
+        assert_eq!(
+            Type::from(Integer::unsigned(&context, 42)),
+            Type::parse(&context, "ui42").unwrap()
+        );
+    }
 
     #[test]
     fn get_width() {

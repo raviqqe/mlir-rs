@@ -105,7 +105,7 @@ mod tests {
     use crate::{
         context::Context,
         dialect,
-        ir::{operation, Attribute, Block, Identifier, Location, Module, Region, Type},
+        ir::{operation, r#type, Attribute, Block, Identifier, Location, Module, Region, Type},
         test::load_all_dialects,
     };
 
@@ -137,7 +137,7 @@ mod tests {
         let location = Location::unknown(&context);
         let module = Module::new(location);
 
-        let integer_type = Type::integer(&context, 64);
+        let integer_type = r#type::Integer::new(&context, 64).into();
 
         let function = {
             let block = Block::new(&[(integer_type, location), (integer_type, location)]);

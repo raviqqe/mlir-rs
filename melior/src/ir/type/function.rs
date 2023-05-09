@@ -99,29 +99,29 @@ mod tests {
     #[test]
     fn new() {
         let context = Context::new();
-        let integer = Type::integer(&context, 42);
+        let integer = Type::index(&context);
 
         assert_eq!(
             Type::from(Function::new(&context, &[integer, integer], &[integer])),
-            Type::parse(&context, "(i42, i42) -> i42").unwrap()
+            Type::parse(&context, "(index, index) -> index").unwrap()
         );
     }
 
     #[test]
     fn multiple_results() {
         let context = Context::new();
-        let integer = Type::integer(&context, 42);
+        let integer = Type::index(&context);
 
         assert_eq!(
             Type::from(Function::new(&context, &[], &[integer, integer])),
-            Type::parse(&context, "() -> (i42, i42)").unwrap()
+            Type::parse(&context, "() -> (index, index)").unwrap()
         );
     }
 
     #[test]
     fn input() {
         let context = Context::new();
-        let integer = Type::integer(&context, 42);
+        let integer = Type::index(&context);
 
         assert_eq!(
             Function::new(&context, &[integer], &[]).input(0),
@@ -132,7 +132,7 @@ mod tests {
     #[test]
     fn input_error() {
         let context = Context::new();
-        let integer = Type::integer(&context, 42);
+        let integer = Type::index(&context);
         let function = Function::new(&context, &[integer], &[]);
 
         assert_eq!(
@@ -144,7 +144,7 @@ mod tests {
     #[test]
     fn result() {
         let context = Context::new();
-        let integer = Type::integer(&context, 42);
+        let integer = Type::index(&context);
 
         assert_eq!(
             Function::new(&context, &[], &[integer]).result(0),
@@ -155,7 +155,7 @@ mod tests {
     #[test]
     fn result_error() {
         let context = Context::new();
-        let integer = Type::integer(&context, 42);
+        let integer = Type::index(&context);
         let function = Function::new(&context, &[], &[integer]);
 
         assert_eq!(
@@ -167,7 +167,7 @@ mod tests {
     #[test]
     fn input_count() {
         let context = Context::new();
-        let integer = Type::integer(&context, 42);
+        let integer = Type::index(&context);
 
         assert_eq!(Function::new(&context, &[integer], &[]).input_count(), 1);
     }
@@ -175,7 +175,7 @@ mod tests {
     #[test]
     fn result_count() {
         let context = Context::new();
-        let integer = Type::integer(&context, 42);
+        let integer = Type::index(&context);
 
         assert_eq!(Function::new(&context, &[], &[integer]).result_count(), 1);
     }

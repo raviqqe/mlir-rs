@@ -1,7 +1,7 @@
 //! `arith` dialect
 
 use crate::{
-    ir::{attribute, operation, Attribute, Identifier, Location, Operation, Type, Value},
+    ir::{attribute, operation, r#type, Attribute, Identifier, Location, Operation, Value},
     Context,
 };
 
@@ -86,7 +86,7 @@ fn cmp<'c>(
     operation::Builder::new(name, location)
         .add_attributes(&[(
             Identifier::new(context, "predicate"),
-            attribute::Integer::new(predicate, Type::integer(context, 64)).into(),
+            attribute::Integer::new(predicate, r#type::Integer::new(context, 64).into()).into(),
         )])
         .add_operands(&[lhs, rhs])
         .enable_result_type_inference()
@@ -219,7 +219,7 @@ mod tests {
                     Location::unknown(&context),
                 )
             },
-            &[Type::integer(&context, 64)],
+            &[r#type::Integer::new(&context, 64).into()],
             "(i64) -> i64",
         );
     }
@@ -268,7 +268,7 @@ mod tests {
         #[test]
         fn compile_cmpi() {
             let context = create_context();
-            let integer_type = Type::integer(&context, 64);
+            let integer_type = r#type::Integer::new(&context, 64).into();
 
             compile_operation(
                 &context,
@@ -303,7 +303,7 @@ mod tests {
                         Location::unknown(&context),
                     )
                 },
-                &[Type::integer(&context, 64)],
+                &[r#type::Integer::new(&context, 64).into()],
                 "(i64) -> f64",
             );
         }
@@ -335,11 +335,11 @@ mod tests {
                 |block| {
                     extsi(
                         block.argument(0).unwrap().into(),
-                        Type::integer(&context, 64),
+                        r#type::Integer::new(&context, 64).into(),
                         Location::unknown(&context),
                     )
                 },
-                &[Type::integer(&context, 32)],
+                &[r#type::Integer::new(&context, 32).into()],
                 "(i32) -> i64",
             );
         }
@@ -353,11 +353,11 @@ mod tests {
                 |block| {
                     extui(
                         block.argument(0).unwrap().into(),
-                        Type::integer(&context, 64),
+                        r#type::Integer::new(&context, 64).into(),
                         Location::unknown(&context),
                     )
                 },
-                &[Type::integer(&context, 32)],
+                &[r#type::Integer::new(&context, 32).into()],
                 "(i32) -> i64",
             );
         }
@@ -371,7 +371,7 @@ mod tests {
                 |block| {
                     fptosi(
                         block.argument(0).unwrap().into(),
-                        Type::integer(&context, 64),
+                        r#type::Integer::new(&context, 64).into(),
                         Location::unknown(&context),
                     )
                 },
@@ -389,7 +389,7 @@ mod tests {
                 |block| {
                     fptoui(
                         block.argument(0).unwrap().into(),
-                        Type::integer(&context, 64),
+                        r#type::Integer::new(&context, 64).into(),
                         Location::unknown(&context),
                     )
                 },
@@ -407,7 +407,7 @@ mod tests {
                 |block| {
                     index_cast(
                         block.argument(0).unwrap().into(),
-                        Type::integer(&context, 64),
+                        r#type::Integer::new(&context, 64).into(),
                         Location::unknown(&context),
                     )
                 },
@@ -425,7 +425,7 @@ mod tests {
                 |block| {
                     index_castui(
                         block.argument(0).unwrap().into(),
-                        Type::integer(&context, 64),
+                        r#type::Integer::new(&context, 64).into(),
                         Location::unknown(&context),
                     )
                 },
@@ -447,7 +447,7 @@ mod tests {
                         Location::unknown(&context),
                     )
                 },
-                &[Type::integer(&context, 32)],
+                &[r#type::Integer::new(&context, 32).into()],
                 "(i32) -> f64",
             );
         }
@@ -461,11 +461,11 @@ mod tests {
                 |block| {
                     trunci(
                         block.argument(0).unwrap().into(),
-                        Type::integer(&context, 32),
+                        r#type::Integer::new(&context, 32).into(),
                         Location::unknown(&context),
                     )
                 },
-                &[Type::integer(&context, 64)],
+                &[r#type::Integer::new(&context, 64).into()],
                 "(i64) -> i32",
             );
         }
@@ -483,7 +483,7 @@ mod tests {
                         Location::unknown(&context),
                     )
                 },
-                &[Type::integer(&context, 32)],
+                &[r#type::Integer::new(&context, 32).into()],
                 "(i32) -> f64",
             );
         }
@@ -497,7 +497,7 @@ mod tests {
         let location = Location::unknown(&context);
         let module = Module::new(location);
 
-        let integer_type = Type::integer(&context, 64);
+        let integer_type = r#type::Integer::new(&context, 64).into();
 
         let function = {
             let block = Block::new(&[(integer_type, location), (integer_type, location)]);

@@ -63,7 +63,10 @@ pub trait TypeLike<'c> {
 mod tests {
     use super::*;
     use crate::{
-        ir::{r#type::Function, Type},
+        ir::{
+            r#type::{Function, Integer},
+            Type,
+        },
         Context,
     };
 
@@ -83,7 +86,7 @@ mod tests {
     fn is_integer() {
         let context = Context::new();
 
-        assert!(Type::integer(&context, 64).is_integer());
+        assert!(Integer::new(&context, 64).is_integer());
     }
 
     #[test]
@@ -111,7 +114,7 @@ mod tests {
     fn is_vector() {
         let context = Context::new();
 
-        assert!(Type::vector(&[42], Type::integer(&context, 32)).is_vector());
+        assert!(Type::vector(&[42], Type::index(&context)).is_vector());
     }
 
     #[test]

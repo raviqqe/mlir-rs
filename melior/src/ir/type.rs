@@ -8,14 +8,13 @@ mod tuple;
 mod type_like;
 
 pub use self::{function::Function, id::Id, tuple::Tuple, type_like::TypeLike};
-use self::{integer::Integer, mem_ref::MemRef};
+pub use self::{integer::Integer, mem_ref::MemRef};
 use super::Location;
 use crate::{context::Context, string_ref::StringRef, utility::print_callback};
 use mlir_sys::{
     mlirBF16TypeGet, mlirF16TypeGet, mlirF32TypeGet, mlirF64TypeGet, mlirIndexTypeGet,
-    mlirIntegerTypeGet, mlirIntegerTypeSignedGet, mlirIntegerTypeUnsignedGet, mlirNoneTypeGet,
-    mlirTypeEqual, mlirTypeParseGet, mlirTypePrint, mlirVectorTypeGet, mlirVectorTypeGetChecked,
-    MlirType,
+    mlirNoneTypeGet, mlirTypeEqual, mlirTypeParseGet, mlirTypePrint, mlirVectorTypeGet,
+    mlirVectorTypeGetChecked, MlirType,
 };
 use std::{
     ffi::c_void,
@@ -65,21 +64,6 @@ impl<'c> Type<'c> {
     /// Creates an index type.
     pub fn index(context: &'c Context) -> Self {
         unsafe { Self::from_raw(mlirIndexTypeGet(context.to_raw())) }
-    }
-
-    /// Creates an integer type.
-    pub fn integer(context: &'c Context, bits: u32) -> Self {
-        unsafe { Self::from_raw(mlirIntegerTypeGet(context.to_raw(), bits)) }
-    }
-
-    /// Creates a signed integer type.
-    pub fn signed_integer(context: &'c Context, bits: u32) -> Self {
-        unsafe { Self::from_raw(mlirIntegerTypeSignedGet(context.to_raw(), bits)) }
-    }
-
-    /// Creates an unsigned integer type.
-    pub fn unsigned_integer(context: &'c Context, bits: u32) -> Self {
-        unsafe { Self::from_raw(mlirIntegerTypeUnsignedGet(context.to_raw(), bits)) }
     }
 
     /// Creates a none type.
@@ -206,28 +190,8 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            Type::integer(&context, 42),
+            Type::from(Integer::new(&context, 42)),
             Type::parse(&context, "i42").unwrap()
-        );
-    }
-
-    #[test]
-    fn signed_integer() {
-        let context = Context::new();
-
-        assert_eq!(
-            Type::signed_integer(&context, 42),
-            Type::parse(&context, "si42").unwrap()
-        );
-    }
-
-    #[test]
-    fn unsigned_integer() {
-        let context = Context::new();
-
-        assert_eq!(
-            Type::unsigned_integer(&context, 42),
-            Type::parse(&context, "ui42").unwrap()
         );
     }
 
@@ -246,8 +210,8 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            Type::vector(&[42], Type::integer(&context, 32)),
-            Type::parse(&context, "vector<42xi32>").unwrap()
+            Type::vector(&[42], Type::index(&context,)),
+            Type::parse(&context, "vector<42xindex>").unwrap()
         );
     }
 
@@ -256,7 +220,7 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            Type::vector(&[0], Type::integer(&context, 32)).to_string(),
+            Type::vector(&[0], Integer::new(&context, 32).into()).to_string(),
             "vector<0xi32>"
         );
     }
@@ -269,7 +233,7 @@ mod tests {
             Type::vector_checked(
                 Location::unknown(&context),
                 &[42],
-                Type::integer(&context, 32)
+                Integer::new(&context, 32).into()
             ),
             Type::parse(&context, "vector<42xi32>")
         );
@@ -296,20 +260,20 @@ mod tests {
     fn not_equal() {
         let context = Context::new();
 
-        assert_ne!(Type::index(&context), Type::integer(&context, 1));
+        assert_ne!(Type::index(&context), Type::float64(&context));
     }
 
     #[test]
     fn display() {
         let context = Context::new();
 
-        assert_eq!(Type::integer(&context, 42).to_string(), "i42");
+        assert_eq!(Type::index(&context).to_string(), "index");
     }
 
     #[test]
     fn debug() {
         let context = Context::new();
 
-        assert_eq!(format!("{:?}", Type::integer(&context, 42)), "Type(i42)");
+        assert_eq!(format!("{:?}", Type::index(&context)), "Type(index)");
     }
 }

@@ -46,7 +46,7 @@ mod tests {
         let location = Location::unknown(&context);
         let module = Module::new(location);
 
-        let integer_type = Type::integer(&context, 64);
+        let integer_type = Type::index(&context);
 
         let function = {
             let block = Block::new(&[(integer_type, location)]);
@@ -59,7 +59,7 @@ mod tests {
             func(
                 &context,
                 Attribute::parse(&context, "\"add\"").unwrap(),
-                Attribute::parse(&context, "(i64) -> i64").unwrap(),
+                Attribute::parse(&context, "(index) -> index").unwrap(),
                 region,
                 Location::unknown(&context),
             )
