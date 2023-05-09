@@ -65,8 +65,10 @@ impl<'c> Attribute<'c> {
             Some(Self::from_raw(raw))
         }
     }
+}
 
-    pub(crate) unsafe fn to_raw(self) -> MlirAttribute {
+impl<'c> AttributeLike<'c> for Attribute<'c> {
+    unsafe fn to_raw(&self) -> MlirAttribute {
         self.raw
     }
 }

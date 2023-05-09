@@ -1,6 +1,6 @@
 use super::TypeLike;
 use crate::{
-    ir::{affine_map::AffineMap, Attribute, Location, Type},
+    ir::{affine_map::AffineMap, attribute::AttributeLike, Attribute, Location, Type},
     Error,
 };
 use mlir_sys::{

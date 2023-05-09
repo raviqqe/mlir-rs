@@ -1,4 +1,4 @@
-use super::Attribute;
+use super::{Attribute, AttributeLike};
 use crate::{
     ir::{Type, TypeLike},
     Context,
@@ -25,8 +25,10 @@ impl<'c> Integer<'c> {
             _context: Default::default(),
         }
     }
+}
 
-    pub(crate) unsafe fn to_raw(self) -> MlirAttribute {
+impl<'c> AttributeLike<'c> for Integer<'c> {
+    unsafe fn to_raw(&self) -> MlirAttribute {
         self.raw
     }
 }

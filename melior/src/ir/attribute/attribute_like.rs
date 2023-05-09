@@ -2,22 +2,20 @@ use crate::ContextRef;
 
 use super::r#type;
 use super::Type;
+use mlir_sys::{mlirAttributeDump, mlirAttributeGetType, mlirAttributeGetTypeID, MlirAttribute};
 use mlir_sys::{
-    mlirAttributeDump, mlirAttributeEqual, mlirAttributeGetContext, mlirAttributeGetNull,
-    mlirAttributeGetType, mlirAttributeGetTypeID, mlirAttributeIsAAffineMap, mlirAttributeIsAArray,
+    mlirAttributeGetContext, mlirAttributeIsAAffineMap, mlirAttributeIsAArray,
     mlirAttributeIsABool, mlirAttributeIsADenseElements, mlirAttributeIsADenseFPElements,
     mlirAttributeIsADenseIntElements, mlirAttributeIsADictionary, mlirAttributeIsAElements,
     mlirAttributeIsAFloat, mlirAttributeIsAInteger, mlirAttributeIsAIntegerSet,
     mlirAttributeIsAOpaque, mlirAttributeIsASparseElements, mlirAttributeIsAString,
-    mlirAttributeIsASymbolRef, mlirAttributeIsAType, mlirAttributeIsAUnit, mlirAttributeParseGet,
-    mlirAttributePrint, MlirAttribute,
+    mlirAttributeIsASymbolRef, mlirAttributeIsAType, mlirAttributeIsAUnit,
 };
-use mlir_sys::{mlirAttributeDump, mlirAttributeGetType, mlirAttributeGetTypeID, MlirAttribute};
 
 /// Trait for attribute-like types.
-pub trait AttributeLike {
+pub trait AttributeLike<'c> {
     /// Converts a attribute into a raw attribute.
-    fn to_raw(&self) -> MlirAttribute;
+    unsafe fn to_raw(&self) -> MlirAttribute;
 
     /// Gets a context.
     fn context(&self) -> ContextRef<'c> {

@@ -13,7 +13,7 @@ mod value;
 
 pub use self::{
     affine_map::AffineMap,
-    attribute::Attribute,
+    attribute::{Attribute, AttributeLike},
     block::{Block, BlockRef},
     identifier::Identifier,
     location::Location,
