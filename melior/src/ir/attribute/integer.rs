@@ -23,7 +23,7 @@ impl<'c> Integer<'c> {
         unsafe { Self::from_raw(mlirIntegerAttrGet(r#type.to_raw(), integer)) }
     }
 
-    pub(crate) unsafe fn from_raw(raw: MlirAttribute) -> Self {
+    unsafe fn from_raw(raw: MlirAttribute) -> Self {
         Self {
             raw,
             _context: Default::default(),
