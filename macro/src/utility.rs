@@ -1,21 +1,14 @@
 use once_cell::sync::Lazy;
-
 use regex::{Captures, Regex};
 
-static FLOAT_8_PATTERN: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r#"float_8_e_[0-9]_m_[0-9](_fn)?"#).unwrap());
+static PATTERN: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r#"(bf_16|f_16|f_32|f_64|i_8|i_16|i_32|i_64|float_8_e_[0-9]_m_[0-9](_fn)?)"#)
+        .unwrap()
+});
 
 pub fn map_name(name: &str) -> String {
-    let mut name: String = name.into();
-
-    for pattern in [
-        "bf_16", "f_16", "f_32", "f_64", "i_8", "i_16", "i_32", "i_64",
-    ] {
-        name = name.replace(pattern, &pattern.replace('_', ""));
-    }
-
-    FLOAT_8_PATTERN
-        .replace(&name, |captures: &Captures| {
+    PATTERN
+        .replace_all(name, |captures: &Captures| {
             captures.get(0).unwrap().as_str().replace('_', "")
         })
         .to_string()
