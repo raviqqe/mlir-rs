@@ -5,7 +5,7 @@ use crate::{
     Context,
 };
 
-/// Creates an `arith.constqnt` operation.
+/// Creates an `arith.constant` operation.
 pub fn constant<'c>(
     context: &'c Context,
     value: Attribute<'c>,
