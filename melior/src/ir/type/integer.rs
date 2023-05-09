@@ -1,7 +1,7 @@
 use super::TypeLike;
 use crate::{ir::Type, Context, Error};
 use mlir_sys::{
-    mlirIntegerTypeGet, mlirIntegerTypeGetWidth, mlirIntegerTypeIsSigned,
+    mlirIndexTypeGet, mlirIntegerTypeGet, mlirIntegerTypeGetWidth, mlirIntegerTypeIsSigned,
     mlirIntegerTypeIsSignless, mlirIntegerTypeIsUnsigned, mlirIntegerTypeSignedGet,
     mlirIntegerTypeUnsignedGet, MlirType,
 };
@@ -14,7 +14,7 @@ pub struct Integer<'c> {
 }
 
 impl<'c> Integer<'c> {
-    /// Creates a integer type.
+    /// Creates an integer type.
     pub fn new(context: &'c Context, bits: u32) -> Self {
         Self {
             r#type: unsafe { Type::from_raw(mlirIntegerTypeGet(context.to_raw(), bits)) },
