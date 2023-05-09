@@ -28,13 +28,19 @@ mod tests {
 
     #[test]
     fn map_normal_type_name() {
-        assert_eq!(map_type_name("index"), "index");
-        assert_eq!(map_type_name("integer"), "integer");
+        assert_eq!(map_name("index"), "index");
+        assert_eq!(map_name("integer"), "integer");
+    }
+
+    #[test]
+    fn map_integer_type_name() {
+        assert_eq!(map_name("i_64"), "i_64");
     }
 
     #[test]
     fn map_float_type_name() {
-        assert_eq!(map_type_name("float_8_e_5_m_2"), "float8e5m2");
-        assert_eq!(map_type_name("float_8_e_4_m_3_fn"), "float8e4m3fn");
+        assert_eq!(map_name("f_64"), "f64");
+        assert_eq!(map_name("float_8_e_5_m_2"), "float8e5m2");
+        assert_eq!(map_name("float_8_e_4_m_3_fn"), "float8e4m3fn");
     }
 }
