@@ -127,4 +127,24 @@ mod tests {
 
         assert_eq!(Integer::new(&context, 64).width(), 64);
     }
+
+    #[test]
+    fn check_sign() {
+        let context = Context::new();
+        let signless = Integer::new(&context, 42);
+        let signed = Integer::signed(&context, 42);
+        let unsigned = Integer::unsigned(&context, 42);
+
+        assert!(signless.is_signless());
+        assert!(!signed.is_signless());
+        assert!(!unsigned.is_signless());
+
+        assert!(!signless.is_signed());
+        assert!(signed.is_signed());
+        assert!(!unsigned.is_signed());
+
+        assert!(!signless.is_unsigned());
+        assert!(!signed.is_unsigned());
+        assert!(unsigned.is_unsigned());
+    }
 }
