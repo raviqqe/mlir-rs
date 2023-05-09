@@ -42,7 +42,6 @@ fn map_type_name(name: &str) -> String {
             .replace(name, |captures: &Captures| {
                 captures.get(0).unwrap().as_str().replace('_', "")
             })
-            .to_owned()
             .to_string(),
     }
 }
