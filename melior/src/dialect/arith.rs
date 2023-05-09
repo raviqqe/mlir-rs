@@ -240,6 +240,51 @@ mod tests {
         );
     }
 
+    mod cmp {
+        use super::*;
+
+        #[test]
+        fn compile_cmpf() {
+            let context = create_context();
+
+            compile_operation(
+                &context,
+                |block| {
+                    cmpf(
+                        &context,
+                        CmpfPredicate::Oeq,
+                        block.argument(0).unwrap().into(),
+                        block.argument(1).unwrap().into(),
+                        Location::unknown(&context),
+                    )
+                },
+                &[Type::float64(&context), Type::float64(&context)],
+                "(f64, f64) -> i1",
+            );
+        }
+
+        #[test]
+        fn compile_cmpi() {
+            let context = create_context();
+            let integer_type = Type::integer(&context, 64);
+
+            compile_operation(
+                &context,
+                |block| {
+                    cmpi(
+                        &context,
+                        CmpiPredicate::Eq,
+                        block.argument(0).unwrap().into(),
+                        block.argument(1).unwrap().into(),
+                        Location::unknown(&context),
+                    )
+                },
+                &[integer_type, integer_type],
+                "(i64, i64) -> i1",
+            );
+        }
+    }
+
     mod typed_unary {
         use super::*;
 
