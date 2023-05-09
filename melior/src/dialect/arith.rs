@@ -1,7 +1,7 @@
 //! `arith` dialect
 
 use crate::{
-    ir::{operation, Attribute, Identifier, Location, Operation},
+    ir::{operation, Attribute, Identifier, Location, Operation, Value},
     Context,
 };
 
@@ -41,15 +41,31 @@ pub enum CmpfPredicate {
 
 /// Creates an `arith.cmpf` operation.
 pub fn cmpf<'c>(
+    context: &'c Context,
     name: &str,
-    lhs: crate::ir::Value,
-    rhs: crate::ir::Value,
-    location: crate::ir::Location<'c>,
-) -> crate::ir::Operation<'c> {
-    crate::ir::operation::Builder::new(name, location)
+    predicate: CmpfPredicate,
+    lhs: Value,
+    rhs: Value,
+    location: Location<'c>,
+) -> Operation<'c> {
+    operation::Builder::new(name, location)
+        .add_attributes(&[(Identifier::new(context, "predicate"), Attribute::new())])
         .add_operands(&[lhs, rhs])
         .enable_result_type_inference()
         .build()
+}
+
+pub enum CmpiPredicate {
+    Eq,
+    Ne,
+    Slt,
+    Sle,
+    Sgt,
+    Sge,
+    Ult,
+    Ule,
+    Ugt,
+    Uge,
 }
 
 melior_macro::binary_operations!(
