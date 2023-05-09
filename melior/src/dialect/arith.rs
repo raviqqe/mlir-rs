@@ -19,6 +19,26 @@ pub fn constant<'c>(
         .build()
 }
 
+// `arith.cmpf` predicate
+pub enum CmpfPredicate {
+    False,
+    Oeq,
+    Ogt,
+    Oge,
+    Olt,
+    Ole,
+    One,
+    Ord,
+    Ueq,
+    Ugt,
+    Uge,
+    Ult,
+    Ule,
+    Une,
+    Uno,
+    True,
+}
+
 /// Creates an `arith.cmpf` operation.
 pub fn cmpf<'c>(
     name: &str,
