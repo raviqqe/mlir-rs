@@ -20,16 +20,16 @@ impl<'c> MemRef<'c> {
     pub fn new(
         r#type: Type<'c>,
         dimensions: &[u64],
-        layout: Attribute<'c>,
-        memory_space: Attribute<'c>,
+        layout: Option<Attribute<'c>>,
+        memory_space: Option<Attribute<'c>>,
     ) -> Self {
         unsafe {
             Self::from_raw(mlirMemRefTypeGet(
                 r#type.to_raw(),
                 dimensions.len() as isize,
                 dimensions.as_ptr() as *const i64,
-                layout.to_raw(),
-                memory_space.to_raw(),
+                layout.unwrap_or_else(|| Attribute::null()).to_raw(),
+                memory_space.unwrap_or_else(|| Attribute::null()).to_raw(),
             ))
         }
     }
@@ -65,8 +65,8 @@ impl<'c> MemRef<'c> {
     }
 
     /// Gets a memory space.
-    pub fn memory_space(&self) -> Attribute<'c> {
-        unsafe { Attribute::from_raw(mlirMemRefTypeGetMemorySpace(self.r#type.to_raw())) }
+    pub fn memory_space(&self) -> Option<Attribute<'c>> {
+        unsafe { Attribute::from_option_raw(mlirMemRefTypeGetMemorySpace(self.r#type.to_raw())) }
     }
 
     unsafe fn from_raw(raw: MlirType) -> Self {
@@ -118,12 +118,7 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            Type::from(MemRef::new(
-                Type::integer(&context, 42),
-                &[42],
-                Attribute::null(),
-                Attribute::null(),
-            )),
+            Type::from(MemRef::new(Type::integer(&context, 42), &[42], None, None,)),
             Type::parse(&context, "memref<42xi42>").unwrap()
         );
     }
@@ -133,13 +128,7 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            MemRef::new(
-                Type::integer(&context, 42),
-                &[42, 42],
-                Attribute::null(),
-                Attribute::null(),
-            )
-            .layout(),
+            MemRef::new(Type::integer(&context, 42), &[42, 42], None, None,).layout(),
             Attribute::parse(&context, "affine_map<(d0, d1) -> (d0, d1)>").unwrap(),
         );
     }
@@ -149,14 +138,9 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            MemRef::new(
-                Type::integer(&context, 42),
-                &[42, 42],
-                Attribute::null(),
-                Attribute::null(),
-            )
-            .affine_map()
-            .to_string(),
+            MemRef::new(Type::integer(&context, 42), &[42, 42], None, None,)
+                .affine_map()
+                .to_string(),
             "(d0, d1) -> (d0, d1)"
         );
     }
@@ -166,14 +150,8 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            MemRef::new(
-                Type::integer(&context, 42),
-                &[42, 42],
-                Attribute::null(),
-                Attribute::null(),
-            )
-            .memory_space(),
-            Attribute::null(),
+            MemRef::new(Type::integer(&context, 42), &[42, 42], None, None).memory_space(),
+            None,
         );
     }
 }

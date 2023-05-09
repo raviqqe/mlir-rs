@@ -1,20 +1,24 @@
 use crate::ContextRef;
 
-use super::r#type;
-use super::Type;
-use mlir_sys::{mlirAttributeDump, mlirAttributeGetType, mlirAttributeGetTypeID, MlirAttribute};
+use super::{r#type, Type};
 use mlir_sys::{
-    mlirAttributeGetContext, mlirAttributeIsAAffineMap, mlirAttributeIsAArray,
-    mlirAttributeIsABool, mlirAttributeIsADenseElements, mlirAttributeIsADenseFPElements,
+    mlirAttributeDump, mlirAttributeGetContext, mlirAttributeGetType, mlirAttributeGetTypeID,
+    mlirAttributeIsAAffineMap, mlirAttributeIsAArray, mlirAttributeIsABool,
+    mlirAttributeIsADenseElements, mlirAttributeIsADenseFPElements,
     mlirAttributeIsADenseIntElements, mlirAttributeIsADictionary, mlirAttributeIsAElements,
     mlirAttributeIsAFloat, mlirAttributeIsAInteger, mlirAttributeIsAIntegerSet,
     mlirAttributeIsAOpaque, mlirAttributeIsASparseElements, mlirAttributeIsAString,
-    mlirAttributeIsASymbolRef, mlirAttributeIsAType, mlirAttributeIsAUnit,
+    mlirAttributeIsASymbolRef, mlirAttributeIsAType, mlirAttributeIsAUnit, MlirAttribute,
 };
 
 /// Trait for attribute-like types.
 pub trait AttributeLike<'c> {
-    /// Converts a attribute into a raw attribute.
+    /// Converts a attributeinto a raw attribute.
+    ///
+    /// # Safety
+    ///
+    /// The returned raw object might be invalidated on destruction of its
+    /// context.
     unsafe fn to_raw(&self) -> MlirAttribute;
 
     /// Gets a context.
@@ -38,7 +42,7 @@ pub trait AttributeLike<'c> {
 
     /// Returns `true` if an attribute is null.
     fn is_null(&self) -> bool {
-        self.to_raw().ptr.is_null()
+        unsafe { self.to_raw() }.ptr.is_null()
     }
 
     /// Returns `true` if an attribute is a affine map.

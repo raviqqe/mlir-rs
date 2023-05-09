@@ -3,23 +3,12 @@
 mod attribute_like;
 mod integer;
 
-pub use self::attribute_like::AttributeLike;
-pub use self::integer::Integer;
+pub use self::{attribute_like::AttributeLike, integer::Integer};
 use super::{r#type, Type};
-use crate::{
-    context::{Context, ContextRef},
-    string_ref::StringRef,
-    utility::print_callback,
-};
+use crate::{context::Context, string_ref::StringRef, utility::print_callback};
 use mlir_sys::{
-    mlirAttributeDump, mlirAttributeEqual, mlirAttributeGetContext, mlirAttributeGetNull,
-    mlirAttributeGetType, mlirAttributeGetTypeID, mlirAttributeIsAAffineMap, mlirAttributeIsAArray,
-    mlirAttributeIsABool, mlirAttributeIsADenseElements, mlirAttributeIsADenseFPElements,
-    mlirAttributeIsADenseIntElements, mlirAttributeIsADictionary, mlirAttributeIsAElements,
-    mlirAttributeIsAFloat, mlirAttributeIsAInteger, mlirAttributeIsAIntegerSet,
-    mlirAttributeIsAOpaque, mlirAttributeIsASparseElements, mlirAttributeIsAString,
-    mlirAttributeIsASymbolRef, mlirAttributeIsAType, mlirAttributeIsAUnit, mlirAttributeParseGet,
-    mlirAttributePrint, MlirAttribute,
+    mlirAttributeEqual, mlirAttributeGetNull, mlirAttributeParseGet, mlirAttributePrint,
+    MlirAttribute,
 };
 use std::{
     ffi::c_void,
@@ -47,7 +36,7 @@ impl<'c> Attribute<'c> {
     }
 
     /// Creates a null attribute.
-    pub fn null() -> Self {
+    pub(crate) unsafe fn null() -> Self {
         unsafe { Self::from_raw(mlirAttributeGetNull()) }
     }
 
@@ -58,7 +47,7 @@ impl<'c> Attribute<'c> {
         }
     }
 
-    unsafe fn from_option_raw(raw: MlirAttribute) -> Option<Self> {
+    pub(crate) unsafe fn from_option_raw(raw: MlirAttribute) -> Option<Self> {
         if raw.ptr.is_null() {
             None
         } else {
@@ -127,11 +116,6 @@ mod tests {
     }
 
     #[test]
-    fn null() {
-        assert_eq!(Attribute::null().to_string(), "<<NULL ATTRIBUTE>>");
-    }
-
-    #[test]
     fn context() {
         Attribute::parse(&Context::new(), "unit").unwrap().context();
     }
@@ -142,13 +126,8 @@ mod tests {
 
         assert_eq!(
             Attribute::parse(&context, "unit").unwrap().r#type(),
-            Some(Type::none(&context))
+            Type::none(&context)
         );
-    }
-
-    #[test]
-    fn type_none() {
-        assert_eq!(Attribute::null().r#type(), None);
     }
 
     // TODO Fix this.
@@ -161,11 +140,6 @@ mod tests {
             Attribute::parse(&context, "42 : index").unwrap().type_id(),
             Some(Type::index(&context).id())
         );
-    }
-
-    #[test]
-    fn is_null() {
-        assert!(Attribute::null().is_null());
     }
 
     #[test]
@@ -269,11 +243,6 @@ mod tests {
     #[test]
     fn is_unit() {
         assert!(Attribute::parse(&Context::new(), "unit").unwrap().is_unit());
-    }
-
-    #[test]
-    fn is_not_unit() {
-        assert!(!Attribute::null().is_unit());
     }
 
     #[test]
