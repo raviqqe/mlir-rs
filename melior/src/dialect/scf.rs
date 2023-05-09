@@ -17,6 +17,8 @@ pub fn r#for<'c>(
 }
 
 /// Creates a `scf.yield` operation.
-pub fn r#yield(location: Location) -> Operation {
-    Builder::new("scf.yield", location).build()
+pub fn r#yield<'c>(values: &[Value<'c>], location: Location<'c>) -> Operation<'c> {
+    Builder::new("scf.yield", location)
+        .add_operands(values)
+        .build()
 }

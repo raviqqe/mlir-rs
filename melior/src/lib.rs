@@ -272,7 +272,7 @@ mod tests {
                         .build(),
                 );
 
-                loop_block.append_operation(scf::r#yield(location));
+                loop_block.append_operation(scf::r#yield(&[], location));
             }
 
             function_block.append_operation(scf::r#for(
