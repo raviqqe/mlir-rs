@@ -1,13 +1,10 @@
 //! `arith` dialect
 
-use crate::ir::Operation;
+use crate::ir::{operation, Location, Operation, Value};
 
 /// Creates an `arith.constqnt` operation.
-pub fn constant<'c>(
-    value: crate::ir::Value,
-    location: crate::ir::Location<'c>,
-) -> crate::ir::Operation<'c> {
-    crate::ir::operation::Builder::new("arith.constant", location)
+pub fn constant<'c>(value: Value, location: Location<'c>) -> Operation<'c> {
+    operation::Builder::new("arith.constant", location)
         .add_operands(&[value])
         .enable_result_type_inference()
         .build()
