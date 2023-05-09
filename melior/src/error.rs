@@ -20,6 +20,7 @@ pub enum Error {
     TupleExpected(String),
     TupleFieldPosition(String, usize),
     TypedAttributeExpected(&'static str, String),
+    TypeExpected(&'static str, String),
 }
 
 impl Display for Error {
@@ -67,6 +68,9 @@ impl Display for Error {
             }
             Self::TypedAttributeExpected(r#type, attribute) => {
                 write!(formatter, "{type} attribute expected: {attribute}")
+            }
+            Self::TypeExpected(r#type, actual) => {
+                write!(formatter, "{type} type expected: {actual}")
             }
         }
     }

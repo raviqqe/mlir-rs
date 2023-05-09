@@ -103,7 +103,7 @@ impl<'c> TryFrom<Type<'c>> for MemRef<'c> {
         if r#type.is_mem_ref() {
             Ok(Self { r#type })
         } else {
-            Err(Error::MemRefExpected(r#type.to_string()))
+            Err(Error::TypeExpected("mem ref", r#type.to_string()))
         }
     }
 }

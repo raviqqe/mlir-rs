@@ -62,7 +62,7 @@ impl<'c> TryFrom<Type<'c>> for Tuple<'c> {
         if r#type.is_tuple() {
             Ok(Self { r#type })
         } else {
-            Err(Error::TupleExpected(r#type.to_string()))
+            Err(Error::TypeExpected("tuple", r#type.to_string()))
         }
     }
 }
