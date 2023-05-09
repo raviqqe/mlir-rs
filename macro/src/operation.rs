@@ -8,7 +8,7 @@ pub fn generate_binary(dialect: &Ident, names: &[Ident]) -> Result<TokenStream, 
 
     for name in names {
         let document = create_document(dialect, name);
-        let operation_name = format!("{}.{}", dialect, name);
+        let operation_name = create_operation_name(dialect, name);
 
         stream.extend(TokenStream::from(quote! {
             #[doc = #document]
@@ -44,7 +44,7 @@ pub fn generate_unary(dialect: &Ident, names: &[Ident]) -> Result<TokenStream, B
 
     for name in names {
         let document = create_document(dialect, name);
-        let operation_name = format!("{}.{}", dialect, name);
+        let operation_name = create_operation_name(dialect, name);
 
         stream.extend(TokenStream::from(quote! {
             #[doc = #document]
@@ -81,7 +81,7 @@ pub fn generate_typed_unary(
 
     for name in names {
         let document = create_document(dialect, name);
-        let operation_name = format!("{}.{}", dialect, name);
+        let operation_name = create_operation_name(dialect, name);
 
         stream.extend(TokenStream::from(quote! {
             #[doc = #document]
@@ -90,13 +90,13 @@ pub fn generate_typed_unary(
                 r#type: crate::ir::Type<'c>,
                 location: crate::ir::Location<'c>,
             ) -> crate::ir::Operation<'c> {
-                unary_operator(#operation_name, value, r#type, location)
+                typed_unary_operator(#operation_name, value, r#type, location)
             }
         }));
     }
 
     stream.extend(TokenStream::from(quote! {
-        fn unary_operator<'c>(
+        fn typed_unary_operator<'c>(
             name: &str,
             value: crate::ir::Value,
             r#type: crate::ir::Type<'c>,
@@ -113,5 +113,12 @@ pub fn generate_typed_unary(
 }
 
 fn create_document(dialect: &Ident, name: &Ident) -> String {
-    format!(" Creates an `{}.{}` operation.", dialect, name)
+    format!(
+        " Creates an `{}` operation.",
+        create_operation_name(dialect, name)
+    )
+}
+
+fn create_operation_name(dialect: &Ident, name: &Ident) -> String {
+    format!("{}.{}", dialect, name)
 }

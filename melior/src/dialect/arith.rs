@@ -57,6 +57,8 @@ melior_macro::binary_operations!(
 
 melior_macro::unary_operations!(arith, [negf, truncf]);
 
+melior_macro::typed_unary_operations!(arith, [bitcast]);
+
 #[cfg(test)]
 mod tests {
     use super::*;
