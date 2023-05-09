@@ -1,3 +1,5 @@
+//! Attributes.
+
 mod integer;
 
 pub use self::integer::Integer;
