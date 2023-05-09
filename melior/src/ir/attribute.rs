@@ -1,7 +1,6 @@
 mod integer;
 
-use self::integer::IntegerAttribute;
-
+pub use self::integer::IntegerAttribute;
 use super::{r#type, Type};
 use crate::{
     context::{Context, ContextRef},
@@ -218,7 +217,7 @@ impl<'c> Debug for Attribute<'c> {
 
 impl<'c> From<IntegerAttribute<'c>> for Attribute<'c> {
     fn from(attribute: IntegerAttribute<'c>) -> Self {
-        Self::from_raw(attribute.to_raw())
+        unsafe { Self::from_raw(attribute.to_raw()) }
     }
 }
 
