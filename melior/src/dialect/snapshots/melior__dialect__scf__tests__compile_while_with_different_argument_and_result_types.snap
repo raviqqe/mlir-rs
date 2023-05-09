@@ -1,0 +1,20 @@
+---
+source: melior/src/dialect/scf.rs
+expression: module.as_operation()
+---
+module {
+  func.func @foo() {
+    %c0 = arith.constant 0 : index
+    %0 = scf.while (%arg0 = %c0) : (index) -> f64 {
+      %false = arith.constant false
+      %cst = arith.constant 4.200000e+01 : f64
+      scf.condition(%false) %cst : f64
+    } do {
+    ^bb0(%arg0: f64):
+      %c42 = arith.constant 42 : index
+      scf.yield %c42 : index
+    }
+    return
+  }
+}
+

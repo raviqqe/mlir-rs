@@ -248,7 +248,7 @@ mod tests {
 
                         let result = block.append_operation(arith::constant(
                             &context,
-                            attribute::Integer::new(42, Type::index(&context).into()).into(),
+                            attribute::Float::new(&context, 42.0, float_type).into(),
                             location,
                         ));
 
@@ -263,11 +263,11 @@ mod tests {
                         region
                     },
                     {
-                        let block = Block::new(&[(index_type, location)]);
+                        let block = Block::new(&[(float_type, location)]);
 
                         let result = block.append_operation(arith::constant(
                             &context,
-                            attribute::Float::new(&context, 42.0, float_type).into(),
+                            attribute::Integer::new(42, Type::index(&context).into()).into(),
                             location,
                         ));
 
