@@ -28,7 +28,7 @@ impl<'c> Integer<'c> {
 }
 
 impl<'c> AttributeLike<'c> for Integer<'c> {
-    unsafe fn to_raw(&self) -> MlirAttribute {
+    fn to_raw(&self) -> MlirAttribute {
         self.raw
     }
 }
