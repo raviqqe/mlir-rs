@@ -1,7 +1,9 @@
 //! Attributes.
 
+mod attribute_like;
 mod integer;
 
+pub use self::attribute_like::AttributeLike;
 pub use self::integer::Integer;
 use super::{r#type, Type};
 use crate::{
@@ -47,124 +49,6 @@ impl<'c> Attribute<'c> {
     /// Creates a null attribute.
     pub fn null() -> Self {
         unsafe { Self::from_raw(mlirAttributeGetNull()) }
-    }
-
-    /// Gets a type.
-    pub fn r#type(&self) -> Option<Type<'c>> {
-        if self.is_null() {
-            None
-        } else {
-            unsafe { Some(Type::from_raw(mlirAttributeGetType(self.raw))) }
-        }
-    }
-
-    /// Gets a type ID.
-    pub fn type_id(&self) -> Option<r#type::Id> {
-        if self.is_null() {
-            None
-        } else {
-            unsafe { Some(r#type::Id::from_raw(mlirAttributeGetTypeID(self.raw))) }
-        }
-    }
-
-    /// Returns `true` if an attribute is null.
-    pub fn is_null(&self) -> bool {
-        self.raw.ptr.is_null()
-    }
-
-    /// Returns `true` if an attribute is a affine map.
-    pub fn is_affine_map(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsAAffineMap(self.raw) }
-    }
-
-    /// Returns `true` if an attribute is a array.
-    pub fn is_array(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsAArray(self.raw) }
-    }
-
-    /// Returns `true` if an attribute is a bool.
-    pub fn is_bool(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsABool(self.raw) }
-    }
-
-    /// Returns `true` if an attribute is dense elements.
-    pub fn is_dense_elements(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsADenseElements(self.raw) }
-    }
-
-    /// Returns `true` if an attribute is dense integer elements.
-    pub fn is_dense_integer_elements(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsADenseIntElements(self.raw) }
-    }
-
-    /// Returns `true` if an attribute is dense float elements.
-    pub fn is_dense_float_elements(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsADenseFPElements(self.raw) }
-    }
-
-    /// Returns `true` if an attribute is a dictionary.
-    pub fn is_dictionary(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsADictionary(self.raw) }
-    }
-
-    /// Returns `true` if an attribute is elements.
-    pub fn is_elements(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsAElements(self.raw) }
-    }
-
-    /// Returns `true` if an attribute is a float.
-    pub fn is_float(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsAFloat(self.raw) }
-    }
-
-    /// Returns `true` if an attribute is an integer.
-    pub fn is_integer(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsAInteger(self.raw) }
-    }
-
-    /// Returns `true` if an attribute is an integer set.
-    pub fn is_integer_set(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsAIntegerSet(self.raw) }
-    }
-
-    /// Returns `true` if an attribute is opaque.
-    pub fn is_opaque(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsAOpaque(self.raw) }
-    }
-
-    /// Returns `true` if an attribute is sparse elements.
-    pub fn is_sparse_elements(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsASparseElements(self.raw) }
-    }
-
-    /// Returns `true` if an attribute is a string.
-    pub fn is_string(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsAString(self.raw) }
-    }
-
-    /// Returns `true` if an attribute is a symbol.
-    pub fn is_symbol(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsASymbolRef(self.raw) }
-    }
-
-    /// Returns `true` if an attribute is a type.
-    pub fn is_type(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsAType(self.raw) }
-    }
-
-    /// Returns `true` if an attribute is a unit.
-    pub fn is_unit(&self) -> bool {
-        !self.is_null() && unsafe { mlirAttributeIsAUnit(self.raw) }
-    }
-
-    /// Gets a context.
-    pub fn context(&self) -> ContextRef<'c> {
-        unsafe { ContextRef::from_raw(mlirAttributeGetContext(self.raw)) }
-    }
-
-    /// Dumps an attribute.
-    pub fn dump(&self) {
-        unsafe { mlirAttributeDump(self.raw) }
     }
 
     pub(crate) unsafe fn from_raw(raw: MlirAttribute) -> Self {
