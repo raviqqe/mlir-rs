@@ -1,6 +1,5 @@
 ---
 source: melior/src/dialect/arith.rs
-assertion_line: 117
 expression: module.as_operation()
 ---
 module {
