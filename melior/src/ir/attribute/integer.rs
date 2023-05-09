@@ -38,9 +38,11 @@ impl<'c> AttributeLike<'c> for Integer<'c> {
 }
 
 impl<'c> TryFrom<Attribute<'c>> for Integer<'c> {
-    fn from(attribute: Attribute<'c>) -> Result<Self, Error> {
+    type Error = Error;
+
+    fn try_from(attribute: Attribute<'c>) -> Result<Self, Self::Error> {
         if attribute.is_integer() {
-            Ok(Self::from_raw(attribute.to_raw()))
+            Ok(unsafe { Self::from_raw(attribute.to_raw()) })
         } else {
             Err(Error::IntegerAttributeExpected())
         }
