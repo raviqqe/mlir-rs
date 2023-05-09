@@ -247,6 +247,7 @@ mod tests {
         #[test]
         fn compile_cmpf() {
             let context = create_context();
+            let float_type = Type::float64(&context);
 
             compile_operation(
                 &context,
@@ -259,7 +260,7 @@ mod tests {
                         Location::unknown(&context),
                     )
                 },
-                &[Type::float64(&context), Type::float64(&context)],
+                &[float_type, float_type],
                 "(f64, f64) -> i1",
             );
         }
