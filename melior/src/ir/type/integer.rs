@@ -1,7 +1,8 @@
 use super::TypeLike;
 use crate::{ir::Type, Context, Error};
 use mlir_sys::{
-    mlirIntegerTypeGet, mlirIntegerTypeGetWidth, mlirIntegerTypeSignedGet,
+    mlirIntegerTypeGet, mlirIntegerTypeGetWidth, mlirIntegerTypeIsSigned,
+    mlirIntegerTypeIsSignless, mlirIntegerTypeIsUnsigned, mlirIntegerTypeSignedGet,
     mlirIntegerTypeUnsignedGet, MlirType,
 };
 use std::fmt::{self, Display, Formatter};
@@ -33,6 +34,21 @@ impl<'c> Integer<'c> {
     /// Gets a bit width.
     pub fn width(&self) -> u32 {
         unsafe { mlirIntegerTypeGetWidth(self.to_raw()) }
+    }
+
+    /// Checks if an integer type is signed.
+    pub fn is_signed(&self) -> bool {
+        unsafe { mlirIntegerTypeIsSigned(self.to_raw()) }
+    }
+
+    /// Checks if an integer type is signless.
+    pub fn is_signless(&self) -> bool {
+        unsafe { mlirIntegerTypeIsSignless(self.to_raw()) }
+    }
+
+    /// Checks if an integer type is unsigned.
+    pub fn is_unsigned(&self) -> bool {
+        unsafe { mlirIntegerTypeIsUnsigned(self.to_raw()) }
     }
 
     fn from_raw(raw: MlirType) -> Self {
