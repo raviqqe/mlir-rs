@@ -202,6 +202,7 @@ dependencies = [
  "convert_case",
  "melior",
  "mlir-sys",
+ "once_cell",
  "proc-macro2",
  "quote",
  "regex",
