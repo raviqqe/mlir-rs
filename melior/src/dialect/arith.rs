@@ -70,27 +70,33 @@ mod tests {
         Context,
     };
 
-    #[test]
-    fn create_constant() {
+    fn create_context() -> Context {
         let context = Context::new();
         load_all_dialects(&context);
+        context
+    }
 
+    fn compile_operation<'c>(
+        context: &'c Context,
+        operation: impl Fn(&Block<'c>) -> Operation<'c>,
+        block_argument_types: &[Type<'c>],
+        function_type: &str,
+    ) {
         let location = Location::unknown(&context);
         let module = Module::new(location);
 
-        let integer_type = Type::integer(&context, 64);
-
         let function = {
             let region = Region::new();
-            let block = Block::new(&[(integer_type, location)]);
+            let block = Block::new(
+                &block_argument_types
+                    .iter()
+                    .map(|&r#type| (r#type, location))
+                    .collect::<Vec<_>>(),
+            );
 
             block.append_operation(func::r#return(
                 &[block
-                    .append_operation(constant(
-                        &context,
-                        Attribute::parse(&context, "42 : i64").unwrap(),
-                        location,
-                    ))
+                    .append_operation(operation(&block))
                     .result(0)
                     .unwrap()
                     .into()],
@@ -102,7 +108,7 @@ mod tests {
             func::func(
                 &context,
                 Attribute::parse(&context, "\"foo\"").unwrap(),
-                Attribute::parse(&context, "(i64) -> i64").unwrap(),
+                Attribute::parse(&context, function_type).unwrap(),
                 region,
                 Location::unknown(&context),
             )
@@ -112,6 +118,41 @@ mod tests {
 
         assert!(module.as_operation().verify());
         insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
+    fn create_constant() {
+        let context = create_context();
+
+        compile_operation(
+            &context,
+            |_| {
+                constant(
+                    &context,
+                    Attribute::parse(&context, "42 : i64").unwrap(),
+                    Location::unknown(&context),
+                )
+            },
+            &[Type::integer(&context, 64)],
+            "(i64) -> i64",
+        );
+    }
+
+    #[test]
+    fn create_negf() {
+        let context = create_context();
+
+        compile_operation(
+            &context,
+            |block| {
+                negf(
+                    block.argument(0).unwrap().into(),
+                    Location::unknown(&context),
+                )
+            },
+            &[Type::float64(&context)],
+            "(f64) -> f64",
+        );
     }
 
     #[test]
