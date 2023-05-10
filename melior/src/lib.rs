@@ -106,7 +106,9 @@ mod tests {
         context::Context,
         dialect::{self, arith, func, scf},
         ir::{
-            attribute::IntegerAttribute, operation::OperationBuilder, r#type::IntegerType,
+            attribute::{IntegerAttribute, StringAttribute, TypeAttribute},
+            operation::OperationBuilder,
+            r#type::{FunctionType, IntegerType},
             Attribute, Block, Location, Module, Region, Type,
         },
         test::load_all_dialects,
@@ -158,8 +160,12 @@ mod tests {
 
             func::func(
                 &context,
-                Attribute::parse(&context, "\"add\"").unwrap(),
-                Attribute::parse(&context, "(i64, i64) -> i64").unwrap(),
+                StringAttribute::new(&context, "add").into(),
+                TypeAttribute::new(
+                    FunctionType::new(&context, &[integer_type, integer_type], &[integer_type])
+                        .into(),
+                )
+                .into(),
                 region,
                 Location::unknown(&context),
             )

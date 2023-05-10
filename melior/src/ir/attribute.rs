@@ -122,6 +122,18 @@ impl<'c> From<IntegerAttribute<'c>> for Attribute<'c> {
     }
 }
 
+impl<'c> From<StringAttribute<'c>> for Attribute<'c> {
+    fn from(attribute: StringAttribute<'c>) -> Self {
+        unsafe { Self::from_raw(attribute.to_raw()) }
+    }
+}
+
+impl<'c> From<TypeAttribute<'c>> for Attribute<'c> {
+    fn from(attribute: TypeAttribute<'c>) -> Self {
+        unsafe { Self::from_raw(attribute.to_raw()) }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
