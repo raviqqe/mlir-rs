@@ -1,5 +1,7 @@
-use super::{r#type, Type};
-use crate::ContextRef;
+use crate::{
+    ir::{r#type, Type},
+    ContextRef,
+};
 use melior_macro::attribute_check_functions;
 use mlir_sys::{
     mlirAttributeDump, mlirAttributeGetContext, mlirAttributeGetType, mlirAttributeGetTypeID,

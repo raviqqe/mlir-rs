@@ -7,12 +7,12 @@ mod dense_i64_array;
 mod float;
 mod integer;
 mod string;
+mod r#type;
 
 pub use self::{
     attribute_like::AttributeLike, dense_i64_array::DenseI64ArrayAttribute, float::FloatAttribute,
-    integer::IntegerAttribute, string::StringAttribute,
+    integer::IntegerAttribute, r#type::TypeAttribute, string::StringAttribute,
 };
-use super::{r#type, Type};
 use crate::{context::Context, string_ref::StringRef, utility::print_callback};
 use mlir_sys::{
     mlirAttributeEqual, mlirAttributeGetNull, mlirAttributeParseGet, mlirAttributePrint,
@@ -125,7 +125,7 @@ impl<'c> From<IntegerAttribute<'c>> for Attribute<'c> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ir::r#type::TypeLike;
+    use crate::ir::{Type, TypeLike};
 
     #[test]
     fn parse() {
