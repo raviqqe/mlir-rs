@@ -60,7 +60,7 @@ melior_macro::binary_operations!(
     index,
     [
         add, and, ceildivs, ceildivu, divs, divu, floordivs, maxs, maxu, mins, minu, mul, or, rems,
-        remu, shl, shrs, shrui, sub, xor,
+        remu, shl, shrs, shru, sub, xor,
     ]
 );
 
