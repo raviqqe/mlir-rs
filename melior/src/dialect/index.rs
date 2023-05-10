@@ -35,7 +35,7 @@ pub fn cmp<'c>(
         .add_attributes(&[(
             Identifier::new(context, "pred"),
             Attribute::parse(
-                &context,
+                context,
                 match predicate {
                     CmpiPredicate::Eq => "#index<cmp_predicate eq>",
                     CmpiPredicate::Ne => "#index<cmp_predicate ne>",
