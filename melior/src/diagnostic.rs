@@ -39,11 +39,11 @@ impl<'c> Diagnostic<'c> {
         if index < self.note_count() {
             Ok(unsafe { Self::from_raw(mlirDiagnosticGetNote(self.raw, index as isize)) })
         } else {
-            Err(Error::PositionOutOfBounds(
-                "diagnostic note",
-                self.to_string(),
+            Err(Error::PositionOutOfBounds {
+                name: "diagnostic note",
+                value: self.to_string(),
                 index,
-            ))
+            })
         }
     }
 

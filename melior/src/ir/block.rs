@@ -54,15 +54,19 @@ impl<'c> Block<'c> {
     }
 
     /// Gets an argument at a position.
-    pub fn argument(&self, position: usize) -> Result<Argument, Error> {
+    pub fn argument(&self, index: usize) -> Result<Argument, Error> {
         unsafe {
-            if position < self.argument_count() {
+            if index < self.argument_count() {
                 Ok(Argument::from_raw(mlirBlockGetArgument(
                     self.raw,
-                    position as isize,
+                    index as isize,
                 )))
             } else {
-                Err(Error::BlockArgumentPosition(self.to_string(), position))
+                Err(Error::PositionOutOfBounds {
+                    name: "block argument",
+                    value: self.to_string(),
+                    index,
+                })
             }
         }
     }
@@ -321,7 +325,11 @@ mod tests {
     fn argument_error() {
         assert_eq!(
             Block::new(&[]).argument(0).unwrap_err(),
-            Error::BlockArgumentPosition("<<UNLINKED BLOCK>>\n".into(), 0)
+            Error::PositionOutOfBounds {
+                name: "block argument",
+                value: "<<UNLINKED BLOCK>>\n".into(),
+                index: 0,
+            }
         );
     }
 
