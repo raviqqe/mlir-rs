@@ -3,7 +3,6 @@ use crate::{Context, Error};
 use mlir_sys::{
     mlirArrayAttrGetNumElements, mlirDenseI64ArrayGet, mlirDenseI64ArrayGetElement, MlirAttribute,
 };
-use std::fmt::{self, Debug, Display, Formatter};
 
 /// An dense i64 array attribute.
 #[derive(Clone, Copy)]
@@ -49,12 +48,6 @@ impl<'c> DenseI64ArrayAttribute<'c> {
     }
 }
 
-impl<'c> AttributeLike<'c> for DenseI64ArrayAttribute<'c> {
-    fn to_raw(&self) -> MlirAttribute {
-        self.attribute.to_raw()
-    }
-}
-
 impl<'c> TryFrom<Attribute<'c>> for DenseI64ArrayAttribute<'c> {
     type Error = Error;
 
@@ -70,17 +63,7 @@ impl<'c> TryFrom<Attribute<'c>> for DenseI64ArrayAttribute<'c> {
     }
 }
 
-impl<'c> Display for DenseI64ArrayAttribute<'c> {
-    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
-        Display::fmt(&self.attribute, formatter)
-    }
-}
-
-impl<'c> Debug for DenseI64ArrayAttribute<'c> {
-    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
-        Display::fmt(self, formatter)
-    }
-}
+attribute_traits!(DenseI64ArrayAttribute);
 
 #[cfg(test)]
 mod tests {
