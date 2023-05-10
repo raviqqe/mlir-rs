@@ -83,7 +83,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn get_element() {
+    fn element() {
         let context = Context::new();
         let attribute = DenseI64ArrayAttribute::new(&context, &[1, 2, 3]);
 
@@ -94,5 +94,13 @@ mod tests {
             attribute.element(3),
             Err(Error::ArrayElementPosition(..))
         ));
+    }
+
+    #[test]
+    fn len() {
+        let context = Context::new();
+        let attribute = DenseI64ArrayAttribute::new(&context, &[1, 2, 3]);
+
+        assert_eq!(attribute.len(), 3);
     }
 }
