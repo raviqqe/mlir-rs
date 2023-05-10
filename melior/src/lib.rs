@@ -36,9 +36,8 @@
 //! ```rust
 //! use melior::{
 //!     Context,
-//!     dialect::{self, arith, DialectRegistry, func},
-//!     ir::*,
-//!     ir::{attribute::{StringAttribute, TypeAttribute}, r#type::FunctionType},
+//!     dialect::{arith, DialectRegistry, func},
+//!     ir::{*, attribute::{StringAttribute, TypeAttribute}, r#type::FunctionType},
 //!     utility::register_all_dialects,
 //! };
 //!
