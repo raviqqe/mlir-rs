@@ -1,12 +1,11 @@
 use mlir_sys::MlirLogicalResult;
 
 /// A logical result of success or failure.
+#[derive(Clone, Copy, Debug)]
 pub(crate) struct LogicalResult {
     raw: MlirLogicalResult,
 }
 
-// TODO Delete this and replace it with `bool`?
-#[allow(unused)]
 impl LogicalResult {
     /// Creates a success result.
     pub fn success() -> Self {
@@ -28,12 +27,27 @@ impl LogicalResult {
     }
 
     /// Returns `true` if a result is failure.
+    #[allow(dead_code)]
     pub fn is_failure(&self) -> bool {
         self.raw.value == 0
     }
 
     pub(crate) fn from_raw(result: MlirLogicalResult) -> Self {
         Self { raw: result }
+    }
+
+    pub(crate) fn to_raw(self) -> MlirLogicalResult {
+        self.raw
+    }
+}
+
+impl From<bool> for LogicalResult {
+    fn from(ok: bool) -> Self {
+        if ok {
+            Self::success()
+        } else {
+            Self::failure()
+        }
     }
 }
 

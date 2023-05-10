@@ -1,15 +1,18 @@
 use crate::{
     dialect::{Dialect, DialectRegistry},
+    logical_result::LogicalResult,
     string_ref::StringRef,
+    Diagnostic, DiagnosticHandlerId,
 };
 use mlir_sys::{
-    mlirContextAppendDialectRegistry, mlirContextCreate, mlirContextDestroy,
-    mlirContextEnableMultithreading, mlirContextEqual, mlirContextGetAllowUnregisteredDialects,
-    mlirContextGetNumLoadedDialects, mlirContextGetNumRegisteredDialects,
-    mlirContextGetOrLoadDialect, mlirContextIsRegisteredOperation,
-    mlirContextLoadAllAvailableDialects, mlirContextSetAllowUnregisteredDialects, MlirContext,
+    mlirContextAppendDialectRegistry, mlirContextAttachDiagnosticHandler, mlirContextCreate,
+    mlirContextDestroy, mlirContextDetachDiagnosticHandler, mlirContextEnableMultithreading,
+    mlirContextEqual, mlirContextGetAllowUnregisteredDialects, mlirContextGetNumLoadedDialects,
+    mlirContextGetNumRegisteredDialects, mlirContextGetOrLoadDialect,
+    mlirContextIsRegisteredOperation, mlirContextLoadAllAvailableDialects,
+    mlirContextSetAllowUnregisteredDialects, MlirContext, MlirDiagnostic, MlirLogicalResult,
 };
-use std::{marker::PhantomData, mem::transmute, ops::Deref};
+use std::{ffi::c_void, marker::PhantomData, mem::transmute, ops::Deref};
 
 /// A context of IR, dialects, and passes.
 ///
@@ -80,6 +83,37 @@ impl Context {
 
     pub(crate) unsafe fn to_raw(&self) -> MlirContext {
         self.raw
+    }
+
+    /// Attaches a diagnostic handler.
+    pub fn attach_diagnostic_handler<F: FnMut(Diagnostic) -> bool>(
+        &self,
+        handler: F,
+    ) -> DiagnosticHandlerId {
+        unsafe extern "C" fn handle<F: FnMut(Diagnostic) -> bool>(
+            diagnostic: MlirDiagnostic,
+            user_data: *mut c_void,
+        ) -> MlirLogicalResult {
+            LogicalResult::from((*(user_data as *mut F))(Diagnostic::from_raw(diagnostic))).to_raw()
+        }
+
+        unsafe extern "C" fn destroy<F: FnMut(Diagnostic) -> bool>(user_data: *mut c_void) {
+            drop(Box::from_raw(user_data as *mut F));
+        }
+
+        unsafe {
+            DiagnosticHandlerId::from_raw(mlirContextAttachDiagnosticHandler(
+                self.to_raw(),
+                Some(handle::<F>),
+                Box::into_raw(Box::new(handler)) as *mut _,
+                Some(destroy::<F>),
+            ))
+        }
+    }
+
+    /// Detaches a diagnostic handler.
+    pub fn detach_diagnostic_handler(&self, id: DiagnosticHandlerId) {
+        unsafe { mlirContextDetachDiagnosticHandler(self.to_raw(), id.to_raw()) }
     }
 }
 
@@ -207,5 +241,17 @@ mod tests {
         context.set_allow_unregistered_dialects(true);
 
         assert!(context.allow_unregistered_dialects());
+    }
+
+    #[test]
+    fn attach_and_detach_diagnostic_handler() {
+        let context = Context::new();
+
+        let id = context.attach_diagnostic_handler(|diagnostic| {
+            println!("{}", diagnostic);
+            true
+        });
+
+        context.detach_diagnostic_handler(id);
     }
 }
