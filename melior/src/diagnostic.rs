@@ -6,8 +6,6 @@ use crate::{ir::Location, utility::print_callback, Error};
 use mlir_sys::{
     mlirDiagnosticGetLocation, mlirDiagnosticGetNote, mlirDiagnosticGetNumNotes,
     mlirDiagnosticGetSeverity, mlirDiagnosticPrint, MlirDiagnostic,
-    MlirDiagnosticSeverity_MlirDiagnosticError, MlirDiagnosticSeverity_MlirDiagnosticNote,
-    MlirDiagnosticSeverity_MlirDiagnosticRemark, MlirDiagnosticSeverity_MlirDiagnosticWarning,
 };
 use std::{
     ffi::c_void,
@@ -27,14 +25,8 @@ impl<'c> Diagnostic<'c> {
     }
 
     pub fn severity(&self) -> DiagnosticSeverity {
-        #[allow(non_upper_case_globals)]
-        match unsafe { mlirDiagnosticGetSeverity(self.raw) } {
-            MlirDiagnosticSeverity_MlirDiagnosticError => DiagnosticSeverity::Error,
-            MlirDiagnosticSeverity_MlirDiagnosticNote => DiagnosticSeverity::Note,
-            MlirDiagnosticSeverity_MlirDiagnosticRemark => DiagnosticSeverity::Remark,
-            MlirDiagnosticSeverity_MlirDiagnosticWarning => DiagnosticSeverity::Warning,
-            _ => unreachable!("unexpected diagnostic severity"),
-        }
+        DiagnosticSeverity::try_from(unsafe { mlirDiagnosticGetSeverity(self.raw) })
+            .unwrap_or_else(|error| unreachable!("{}", error))
     }
 
     pub fn note_count(&self) -> usize {
