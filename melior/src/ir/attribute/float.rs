@@ -30,16 +30,4 @@ impl<'c> FloatAttribute<'c> {
     }
 }
 
-impl<'c> TryFrom<Attribute<'c>> for FloatAttribute<'c> {
-    type Error = Error;
-
-    fn try_from(attribute: Attribute<'c>) -> Result<Self, Self::Error> {
-        if attribute.is_float() {
-            Ok(unsafe { Self::from_raw(attribute.to_raw()) })
-        } else {
-            Err(Error::AttributeExpected("float", format!("{}", attribute)))
-        }
-    }
-}
-
-attribute_traits!(FloatAttribute);
+attribute_traits!(FloatAttribute, is_float, "float");

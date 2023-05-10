@@ -48,22 +48,11 @@ impl<'c> DenseI64ArrayAttribute<'c> {
     }
 }
 
-impl<'c> TryFrom<Attribute<'c>> for DenseI64ArrayAttribute<'c> {
-    type Error = Error;
-
-    fn try_from(attribute: Attribute<'c>) -> Result<Self, Self::Error> {
-        if attribute.is_dense_i64_array() {
-            Ok(unsafe { Self::from_raw(attribute.to_raw()) })
-        } else {
-            Err(Error::AttributeExpected(
-                "dense i64 array",
-                format!("{}", attribute),
-            ))
-        }
-    }
-}
-
-attribute_traits!(DenseI64ArrayAttribute);
+attribute_traits!(
+    DenseI64ArrayAttribute,
+    is_dense_i64_array,
+    "dense i64 array"
+);
 
 #[cfg(test)]
 mod tests {

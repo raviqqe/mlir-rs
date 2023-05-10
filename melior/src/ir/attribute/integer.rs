@@ -24,19 +24,4 @@ impl<'c> IntegerAttribute<'c> {
     }
 }
 
-impl<'c> TryFrom<Attribute<'c>> for IntegerAttribute<'c> {
-    type Error = Error;
-
-    fn try_from(attribute: Attribute<'c>) -> Result<Self, Self::Error> {
-        if attribute.is_integer() {
-            Ok(unsafe { Self::from_raw(attribute.to_raw()) })
-        } else {
-            Err(Error::AttributeExpected(
-                "integer",
-                format!("{}", attribute),
-            ))
-        }
-    }
-}
-
-attribute_traits!(IntegerAttribute);
+attribute_traits!(IntegerAttribute, is_integer, "integer");

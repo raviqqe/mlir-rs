@@ -1,5 +1,19 @@
 macro_rules! attribute_traits {
-    ($name: ident) => {
+    ($name: ident, $is_type: ident, $string: expr) => {
+        impl<'c> TryFrom<crate::ir::attribute::Attribute<'c>> for $name<'c> {
+            type Error = crate::Error;
+
+            fn try_from(
+                attribute: crate::ir::attribute::Attribute<'c>,
+            ) -> Result<Self, Self::Error> {
+                if attribute.$is_type() {
+                    Ok(unsafe { Self::from_raw(attribute.to_raw()) })
+                } else {
+                    Err(Error::AttributeExpected($string, attribute.to_string()))
+                }
+            }
+        }
+
         impl<'c> crate::ir::attribute::AttributeLike<'c> for $name<'c> {
             fn to_raw(&self) -> mlir_sys::MlirAttribute {
                 self.attribute.to_raw()
