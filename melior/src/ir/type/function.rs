@@ -28,7 +28,7 @@ impl<'c> FunctionType<'c> {
     }
 
     /// Gets an input at a position.
-    pub fn input(&self, position: usize) -> Result<Type, Error> {
+    pub fn input(&self, position: usize) -> Result<Type<'c>, Error> {
         if position < self.input_count() {
             unsafe {
                 Ok(Type::from_raw(mlirFunctionTypeGetInput(
@@ -42,7 +42,7 @@ impl<'c> FunctionType<'c> {
     }
 
     /// Gets a result at a position.
-    pub fn result(&self, position: usize) -> Result<Type, Error> {
+    pub fn result(&self, position: usize) -> Result<Type<'c>, Error> {
         if position < self.result_count() {
             unsafe {
                 Ok(Type::from_raw(mlirFunctionTypeGetResult(

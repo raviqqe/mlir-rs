@@ -9,6 +9,7 @@
     "bufferize",
     "canonicalize",
     "canonicalizer",
+    "cmpi",
     "codegen",
     "detensorize",
     "elementwise",

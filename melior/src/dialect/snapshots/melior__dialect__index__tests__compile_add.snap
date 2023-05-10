@@ -1,0 +1,11 @@
+---
+source: melior/src/dialect/index.rs
+expression: module.as_operation()
+---
+module {
+  func.func @foo(%arg0: index, %arg1: index) -> index {
+    %0 = index.add %arg0, %arg1
+    return %0 : index
+  }
+}
+
