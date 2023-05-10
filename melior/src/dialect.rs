@@ -3,6 +3,7 @@
 pub mod arith;
 pub mod func;
 mod handle;
+pub mod index;
 pub mod llvm;
 mod registry;
 pub mod scf;
