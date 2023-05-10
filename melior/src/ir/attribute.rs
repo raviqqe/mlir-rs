@@ -2,7 +2,6 @@
 
 #[macro_use]
 mod r#macro;
-
 mod attribute_like;
 mod dense_i64_array;
 mod float;
