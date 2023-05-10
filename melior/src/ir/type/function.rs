@@ -4,7 +4,6 @@ use mlir_sys::{
     mlirFunctionTypeGet, mlirFunctionTypeGetInput, mlirFunctionTypeGetNumInputs,
     mlirFunctionTypeGetNumResults, mlirFunctionTypeGetResult, MlirType,
 };
-use std::fmt::{self, Display, Formatter};
 
 /// A function type.
 #[derive(Clone, Copy, Debug)]
@@ -67,29 +66,7 @@ impl<'c> FunctionType<'c> {
     }
 }
 
-impl<'c> TypeLike<'c> for FunctionType<'c> {
-    fn to_raw(&self) -> MlirType {
-        self.r#type.to_raw()
-    }
-}
-
-impl<'c> Display for FunctionType<'c> {
-    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
-        Type::from(*self).fmt(formatter)
-    }
-}
-
-impl<'c> TryFrom<Type<'c>> for FunctionType<'c> {
-    type Error = Error;
-
-    fn try_from(r#type: Type<'c>) -> Result<Self, Self::Error> {
-        if r#type.is_function() {
-            Ok(Self { r#type })
-        } else {
-            Err(Error::TypeExpected("function", r#type.to_string()))
-        }
-    }
-}
+type_traits!(FunctionType, is_function, "function");
 
 #[cfg(test)]
 mod tests {
