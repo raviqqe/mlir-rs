@@ -76,3 +76,26 @@ impl<'a> Display for Diagnostic<'a> {
         data.1
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{ir::Module, Context};
+
+    #[test]
+    fn handle_diagnostic() {
+        let mut message = None;
+        let context = Context::new();
+
+        context.attach_diagnostic_handler(|diagnostic| {
+            message = Some(diagnostic.to_string());
+            true
+        });
+
+        Module::parse(&context, "foo");
+
+        assert_eq!(
+            message.unwrap(),
+            "custom op 'foo' is unknown (tried 'builtin.foo' as well)"
+        );
+    }
+}
