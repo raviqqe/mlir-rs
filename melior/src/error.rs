@@ -15,7 +15,11 @@ pub enum Error {
     InvokeFunction,
     OperationResultExpected(String),
     OperationResultPosition(String, usize),
-    PositionOutOfBounds(&'static str, String, usize),
+    PositionOutOfBounds {
+        name: &'static str,
+        value: String,
+        index: usize,
+    },
     ParsePassPipeline(String),
     RunPass,
     TupleFieldPosition(String, usize),
@@ -38,46 +42,17 @@ impl Display for Error {
             Self::BlockArgumentExpected(value) => {
                 write!(formatter, "block argument expected: {value}")
             }
-            Self::BlockArgumentPosition(block, position) => {
-                write!(
-                    formatter,
-                    "block argument position {position} out of bounds: {block}"
-                )
-            }
-            Self::FunctionInputPosition(r#type, position) => write!(
-                formatter,
-                "function input position {position} out of bounds: {type}"
-            ),
-            Self::FunctionResultPosition(r#type, position) => write!(
-                formatter,
-                "function result position {position} out of bounds: {type}"
-            ),
             Self::InvokeFunction => write!(formatter, "failed to invoke JIT-compiled function"),
             Self::OperationResultExpected(value) => {
                 write!(formatter, "operation result expected: {value}")
             }
-            Self::OperationResultPosition(operation, position) => {
-                write!(
-                    formatter,
-                    "operation result position {position} out of bounds: {operation}"
-                )
-            }
             Self::ParsePassPipeline(message) => {
                 write!(formatter, "failed to parse pass pipeline:\n{}", message)
             }
-            Self::PositionOutOfBounds(name, display, position) => {
-                write!(
-                    formatter,
-                    "{name} position {position} out of bounds: {display}"
-                )
+            Self::PositionOutOfBounds { name, value, index } => {
+                write!(formatter, "{name} position {index} out of bounds: {value}")
             }
             Self::RunPass => write!(formatter, "failed to run pass"),
-            Self::TupleFieldPosition(r#type, position) => {
-                write!(
-                    formatter,
-                    "tuple field position {position} out of bounds: {type}"
-                )
-            }
             Self::TypeExpected(r#type, actual) => {
                 write!(formatter, "{type} type expected: {actual}")
             }
