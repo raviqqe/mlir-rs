@@ -201,7 +201,7 @@ mod tests {
 
         let function = func::func(
             context,
-            StringAttribute::new(&context, "foo"),
+            StringAttribute::new(context, "foo"),
             TypeAttribute::new(function_type.into()),
             region,
             Location::unknown(context),
@@ -235,7 +235,7 @@ mod tests {
     #[test]
     fn compile_negf() {
         let context = create_context();
-        let f64_type = Type::float64(&context).into();
+        let f64_type = Type::float64(&context);
 
         compile_operation(
             &context,
@@ -409,7 +409,7 @@ mod tests {
                 &[Type::float32(&context)],
                 FunctionType::new(
                     &context,
-                    &[Type::float32(&context).into()],
+                    &[Type::float32(&context)],
                     &[IntegerType::new(&context, 64).into()],
                 ),
             );
@@ -431,7 +431,7 @@ mod tests {
                 &[Type::float32(&context)],
                 FunctionType::new(
                     &context,
-                    &[Type::float32(&context).into()],
+                    &[Type::float32(&context)],
                     &[IntegerType::new(&context, 64).into()],
                 ),
             );
@@ -453,7 +453,7 @@ mod tests {
                 &[Type::index(&context)],
                 FunctionType::new(
                     &context,
-                    &[Type::index(&context).into()],
+                    &[Type::index(&context)],
                     &[IntegerType::new(&context, 64).into()],
                 ),
             );
@@ -475,7 +475,7 @@ mod tests {
                 &[Type::index(&context)],
                 FunctionType::new(
                     &context,
-                    &[Type::index(&context).into()],
+                    &[Type::index(&context)],
                     &[IntegerType::new(&context, 64).into()],
                 ),
             );
@@ -498,7 +498,7 @@ mod tests {
                 FunctionType::new(
                     &context,
                     &[IntegerType::new(&context, 32).into()],
-                    &[Type::float64(&context).into()],
+                    &[Type::float64(&context)],
                 ),
             );
         }
@@ -542,7 +542,7 @@ mod tests {
                 FunctionType::new(
                     &context,
                     &[IntegerType::new(&context, 32).into()],
-                    &[Type::float64(&context).into()],
+                    &[Type::float64(&context)],
                 ),
             );
         }

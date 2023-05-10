@@ -37,7 +37,7 @@ pub fn r#return<'c>(operands: &[Value], location: Location<'c>) -> Operation<'c>
 mod tests {
     use super::*;
     use crate::{
-        ir::{r#type::FunctionType, Attribute, Block, Module, Type},
+        ir::{r#type::FunctionType, Block, Module, Type},
         test::load_all_dialects,
         Context,
     };

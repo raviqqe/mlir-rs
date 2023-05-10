@@ -38,6 +38,7 @@
 //!     Context,
 //!     dialect::{self, arith, DialectRegistry, func},
 //!     ir::*,
+//!     ir::{attribute::{StringAttribute, TypeAttribute}, r#type::FunctionType},
 //!     utility::register_all_dialects,
 //! };
 //!
@@ -70,7 +71,7 @@
 //!     func::func(
 //!         &context,
 //!         StringAttribute::new(&context, "add"),
-//!         Attribute::parse(&context, "(index, index) -> index").unwrap(),  
+//!         TypeAttribute::new(FunctionType::new(&context, &[index_type, index_type], &[index_type]).into()),  
 //!         region,
 //!         location,
 //!     )
@@ -108,8 +109,8 @@ mod tests {
         ir::{
             attribute::{IntegerAttribute, StringAttribute, TypeAttribute},
             operation::OperationBuilder,
-            r#type::{FunctionType, IntegerType, MemRefType},
-            Attribute, Block, Location, Module, Region, Type,
+            r#type::{FunctionType, IntegerType},
+            Block, Location, Module, Region, Type,
         },
         test::load_all_dialects,
     };
@@ -160,12 +161,11 @@ mod tests {
 
             func::func(
                 &context,
-                StringAttribute::new(&context, "add").into(),
+                StringAttribute::new(&context, "add"),
                 TypeAttribute::new(
                     FunctionType::new(&context, &[integer_type, integer_type], &[integer_type])
                         .into(),
-                )
-                .into(),
+                ),
                 region,
                 Location::unknown(&context),
             )
