@@ -10,7 +10,7 @@ mod string;
 
 pub use self::{
     attribute_like::AttributeLike, dense_i64_array::DenseI64ArrayAttribute, float::FloatAttribute,
-    integer::IntegerAttribute,
+    integer::IntegerAttribute, string::StringAttribute,
 };
 use super::{r#type, Type};
 use crate::{context::Context, string_ref::StringRef, utility::print_callback};
