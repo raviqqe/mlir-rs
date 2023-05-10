@@ -7,7 +7,6 @@ use mlir_sys::{
     mlirMemRefTypeGet, mlirMemRefTypeGetAffineMap, mlirMemRefTypeGetChecked,
     mlirMemRefTypeGetLayout, mlirMemRefTypeGetMemorySpace, MlirType,
 };
-use std::fmt::{self, Display, Formatter};
 
 /// A mem-ref type.
 #[derive(Clone, Copy, Debug)]
@@ -69,12 +68,6 @@ impl<'c> MemRefType<'c> {
         unsafe { Attribute::from_option_raw(mlirMemRefTypeGetMemorySpace(self.r#type.to_raw())) }
     }
 
-    unsafe fn from_raw(raw: MlirType) -> Self {
-        Self {
-            r#type: Type::from_raw(raw),
-        }
-    }
-
     unsafe fn from_option_raw(raw: MlirType) -> Option<Self> {
         if raw.ptr.is_null() {
             None
@@ -84,29 +77,7 @@ impl<'c> MemRefType<'c> {
     }
 }
 
-impl<'c> TypeLike<'c> for MemRefType<'c> {
-    fn to_raw(&self) -> MlirType {
-        self.r#type.to_raw()
-    }
-}
-
-impl<'c> Display for MemRefType<'c> {
-    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
-        Type::from(*self).fmt(formatter)
-    }
-}
-
-impl<'c> TryFrom<Type<'c>> for MemRefType<'c> {
-    type Error = Error;
-
-    fn try_from(r#type: Type<'c>) -> Result<Self, Self::Error> {
-        if r#type.is_mem_ref() {
-            Ok(Self { r#type })
-        } else {
-            Err(Error::TypeExpected("mem ref", r#type.to_string()))
-        }
-    }
-}
+type_traits!(MemRefType, is_mem_ref, "mem ref");
 
 #[cfg(test)]
 mod tests {

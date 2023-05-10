@@ -31,11 +31,5 @@ macro_rules! type_traits {
                 std::fmt::Display::fmt(&self.r#type, formatter)
             }
         }
-
-        impl<'c> std::fmt::Debug for $name<'c> {
-            fn fmt(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
-                std::fmt::Display::fmt(self, formatter)
-            }
-        }
     };
 }

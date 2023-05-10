@@ -1,7 +1,6 @@
 use super::TypeLike;
 use crate::{ir::Type, utility::into_raw_array, Context, Error};
 use mlir_sys::{mlirTupleTypeGet, mlirTupleTypeGetNumTypes, mlirTupleTypeGetType, MlirType};
-use std::fmt::{self, Display, Formatter};
 
 /// A tuple type.
 #[derive(Clone, Copy, Debug)]
@@ -12,28 +11,26 @@ pub struct TupleType<'c> {
 impl<'c> TupleType<'c> {
     /// Creates a tuple type.
     pub fn new(context: &'c Context, types: &[Type<'c>]) -> Self {
-        Self {
-            r#type: unsafe {
-                Type::from_raw(mlirTupleTypeGet(
-                    context.to_raw(),
-                    types.len() as isize,
-                    into_raw_array(types.iter().map(|r#type| r#type.to_raw()).collect()),
-                ))
-            },
+        unsafe {
+            Self::from_raw(mlirTupleTypeGet(
+                context.to_raw(),
+                types.len() as isize,
+                into_raw_array(types.iter().map(|r#type| r#type.to_raw()).collect()),
+            ))
         }
     }
 
     /// Gets a field at a position.
-    pub fn r#type(&self, position: usize) -> Result<Type, Error> {
-        if position < self.type_count() {
+    pub fn r#type(&self, index: usize) -> Result<Type, Error> {
+        if index < self.type_count() {
             unsafe {
                 Ok(Type::from_raw(mlirTupleTypeGetType(
                     self.r#type.to_raw(),
-                    position as isize,
+                    index as isize,
                 )))
             }
         } else {
-            Err(Error::TupleFieldPosition(self.to_string(), position))
+            Err(Error::TupleFieldPosition(self.to_string(), index))
         }
     }
 
@@ -43,29 +40,7 @@ impl<'c> TupleType<'c> {
     }
 }
 
-impl<'c> TypeLike<'c> for TupleType<'c> {
-    fn to_raw(&self) -> MlirType {
-        self.r#type.to_raw()
-    }
-}
-
-impl<'c> Display for TupleType<'c> {
-    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
-        Type::from(*self).fmt(formatter)
-    }
-}
-
-impl<'c> TryFrom<Type<'c>> for TupleType<'c> {
-    type Error = Error;
-
-    fn try_from(r#type: Type<'c>) -> Result<Self, Self::Error> {
-        if r#type.is_tuple() {
-            Ok(Self { r#type })
-        } else {
-            Err(Error::TypeExpected("tuple", r#type.to_string()))
-        }
-    }
-}
+type_traits!(TupleType, is_tuple, "tuple");
 
 #[cfg(test)]
 mod tests {

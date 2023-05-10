@@ -5,7 +5,6 @@ use mlir_sys::{
     mlirIntegerTypeIsSignless, mlirIntegerTypeIsUnsigned, mlirIntegerTypeSignedGet,
     mlirIntegerTypeUnsignedGet, MlirType,
 };
-use std::fmt::{self, Display, Formatter};
 
 /// A integer type.
 #[derive(Clone, Copy, Debug)]
@@ -50,37 +49,9 @@ impl<'c> IntegerType<'c> {
     pub fn is_unsigned(&self) -> bool {
         unsafe { mlirIntegerTypeIsUnsigned(self.to_raw()) }
     }
-
-    fn from_raw(raw: MlirType) -> Self {
-        Self {
-            r#type: unsafe { Type::from_raw(raw) },
-        }
-    }
 }
 
-impl<'c> TypeLike<'c> for IntegerType<'c> {
-    fn to_raw(&self) -> MlirType {
-        self.r#type.to_raw()
-    }
-}
-
-impl<'c> Display for IntegerType<'c> {
-    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
-        Type::from(*self).fmt(formatter)
-    }
-}
-
-impl<'c> TryFrom<Type<'c>> for IntegerType<'c> {
-    type Error = Error;
-
-    fn try_from(r#type: Type<'c>) -> Result<Self, Self::Error> {
-        if r#type.is_integer() {
-            Ok(Self { r#type })
-        } else {
-            Err(Error::TypeExpected("integer", r#type.to_string()))
-        }
-    }
-}
+type_traits!(IntegerType, is_integer, "integer");
 
 #[cfg(test)]
 mod tests {
