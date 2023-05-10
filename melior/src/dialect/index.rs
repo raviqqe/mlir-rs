@@ -58,8 +58,7 @@ mod tests {
         dialect::func,
         ir::{
             attribute::{StringAttribute, TypeAttribute},
-            r#type::FunctionType,
-            Attribute, Block, Location, Module, Region, Type,
+            r#type::FunctionType, Block, Location, Module, Region, Type,
         },
         test::load_all_dialects,
         Context,
@@ -114,7 +113,7 @@ mod tests {
     #[test]
     fn compile_constant() {
         let context = create_context();
-        let index_type = Type::index(&context).into();
+        let index_type = Type::index(&context);
 
         compile_operation(
             &context,
@@ -132,7 +131,7 @@ mod tests {
     #[test]
     fn compile_cmp() {
         let context = create_context();
-        let index_type = Type::index(&context).into();
+        let index_type = Type::index(&context);
 
         compile_operation(
             &context,
@@ -192,7 +191,7 @@ mod tests {
                 },
                 FunctionType::new(
                     &context,
-                    &[Type::index(&context).into()],
+                    &[Type::index(&context)],
                     &[IntegerType::new(&context, 64).into()],
                 ),
             );
