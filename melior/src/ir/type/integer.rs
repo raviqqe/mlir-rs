@@ -9,11 +9,11 @@ use std::fmt::{self, Display, Formatter};
 
 /// A integer type.
 #[derive(Clone, Copy, Debug)]
-pub struct Integer<'c> {
+pub struct IntegerType<'c> {
     r#type: Type<'c>,
 }
 
-impl<'c> Integer<'c> {
+impl<'c> IntegerType<'c> {
     /// Creates an integer type.
     pub fn new(context: &'c Context, bits: u32) -> Self {
         Self {
@@ -58,19 +58,19 @@ impl<'c> Integer<'c> {
     }
 }
 
-impl<'c> TypeLike<'c> for Integer<'c> {
+impl<'c> TypeLike<'c> for IntegerType<'c> {
     fn to_raw(&self) -> MlirType {
         self.r#type.to_raw()
     }
 }
 
-impl<'c> Display for Integer<'c> {
+impl<'c> Display for IntegerType<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Type::from(*self).fmt(formatter)
     }
 }
 
-impl<'c> TryFrom<Type<'c>> for Integer<'c> {
+impl<'c> TryFrom<Type<'c>> for IntegerType<'c> {
     type Error = Error;
 
     fn try_from(r#type: Type<'c>) -> Result<Self, Self::Error> {
@@ -88,17 +88,17 @@ mod tests {
 
     #[test]
     fn new() {
-        assert!(Integer::new(&Context::new(), 64).is_integer());
+        assert!(IntegerType::new(&Context::new(), 64).is_integer());
     }
 
     #[test]
     fn signed() {
-        assert!(Integer::signed(&Context::new(), 64).is_integer());
+        assert!(IntegerType::signed(&Context::new(), 64).is_integer());
     }
 
     #[test]
     fn unsigned() {
-        assert!(Integer::unsigned(&Context::new(), 64).is_integer());
+        assert!(IntegerType::unsigned(&Context::new(), 64).is_integer());
     }
 
     #[test]
@@ -106,7 +106,7 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            Type::from(Integer::signed(&context, 42)),
+            Type::from(IntegerType::signed(&context, 42)),
             Type::parse(&context, "si42").unwrap()
         );
     }
@@ -116,7 +116,7 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            Type::from(Integer::unsigned(&context, 42)),
+            Type::from(IntegerType::unsigned(&context, 42)),
             Type::parse(&context, "ui42").unwrap()
         );
     }
@@ -125,15 +125,15 @@ mod tests {
     fn get_width() {
         let context = Context::new();
 
-        assert_eq!(Integer::new(&context, 64).width(), 64);
+        assert_eq!(IntegerType::new(&context, 64).width(), 64);
     }
 
     #[test]
     fn check_sign() {
         let context = Context::new();
-        let signless = Integer::new(&context, 42);
-        let signed = Integer::signed(&context, 42);
-        let unsigned = Integer::unsigned(&context, 42);
+        let signless = IntegerType::new(&context, 42);
+        let signed = IntegerType::signed(&context, 42);
+        let unsigned = IntegerType::unsigned(&context, 42);
 
         assert!(signless.is_signless());
         assert!(!signed.is_signless());

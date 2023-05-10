@@ -8,7 +8,7 @@ mod tuple;
 mod type_like;
 
 pub use self::{
-    function::Function, id::Id, integer::Integer, mem_ref::MemRef, tuple::Tuple,
+    function::FunctionType, id::Id, integer::Integer, mem_ref::MemRefType, tuple::TupleType,
     type_like::TypeLike,
 };
 use super::Location;
@@ -154,8 +154,8 @@ impl<'c> Debug for Type<'c> {
     }
 }
 
-impl<'c> From<Function<'c>> for Type<'c> {
-    fn from(function: Function<'c>) -> Self {
+impl<'c> From<FunctionType<'c>> for Type<'c> {
+    fn from(function: FunctionType<'c>) -> Self {
         unsafe { Self::from_raw(function.to_raw()) }
     }
 }
@@ -166,14 +166,14 @@ impl<'c> From<Integer<'c>> for Type<'c> {
     }
 }
 
-impl<'c> From<MemRef<'c>> for Type<'c> {
-    fn from(mem_ref: MemRef<'c>) -> Self {
+impl<'c> From<MemRefType<'c>> for Type<'c> {
+    fn from(mem_ref: MemRefType<'c>) -> Self {
         unsafe { Self::from_raw(mem_ref.to_raw()) }
     }
 }
 
-impl<'c> From<Tuple<'c>> for Type<'c> {
-    fn from(tuple: Tuple<'c>) -> Self {
+impl<'c> From<TupleType<'c>> for Type<'c> {
+    fn from(tuple: TupleType<'c>) -> Self {
         unsafe { Self::from_raw(tuple.to_raw()) }
     }
 }

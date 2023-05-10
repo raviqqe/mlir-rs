@@ -137,7 +137,7 @@ mod tests {
         let location = Location::unknown(&context);
         let module = Module::new(location);
 
-        let integer_type = r#type::Integer::new(&context, 64).into();
+        let integer_type = r#type::IntegerType::new(&context, 64).into();
 
         let function = {
             let block = Block::new(&[(integer_type, location), (integer_type, location)]);

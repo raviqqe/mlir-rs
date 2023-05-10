@@ -11,11 +11,11 @@ use std::fmt::{self, Display, Formatter};
 
 /// A mem-ref type.
 #[derive(Clone, Copy, Debug)]
-pub struct MemRef<'c> {
+pub struct MemRefType<'c> {
     r#type: Type<'c>,
 }
 
-impl<'c> MemRef<'c> {
+impl<'c> MemRefType<'c> {
     /// Creates a mem-ref type.
     pub fn new(
         r#type: Type<'c>,
@@ -84,19 +84,19 @@ impl<'c> MemRef<'c> {
     }
 }
 
-impl<'c> TypeLike<'c> for MemRef<'c> {
+impl<'c> TypeLike<'c> for MemRefType<'c> {
     fn to_raw(&self) -> MlirType {
         self.r#type.to_raw()
     }
 }
 
-impl<'c> Display for MemRef<'c> {
+impl<'c> Display for MemRefType<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Type::from(*self).fmt(formatter)
     }
 }
 
-impl<'c> TryFrom<Type<'c>> for MemRef<'c> {
+impl<'c> TryFrom<Type<'c>> for MemRefType<'c> {
     type Error = Error;
 
     fn try_from(r#type: Type<'c>) -> Result<Self, Self::Error> {
@@ -118,7 +118,7 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            Type::from(MemRef::new(Type::float64(&context), &[42], None, None,)),
+            Type::from(MemRefType::new(Type::float64(&context), &[42], None, None,)),
             Type::parse(&context, "memref<42xf64>").unwrap()
         );
     }
@@ -128,7 +128,7 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            MemRef::new(Type::index(&context), &[42, 42], None, None,).layout(),
+            MemRefType::new(Type::index(&context), &[42, 42], None, None,).layout(),
             Attribute::parse(&context, "affine_map<(d0, d1) -> (d0, d1)>").unwrap(),
         );
     }
@@ -138,7 +138,7 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            MemRef::new(Type::index(&context), &[42, 42], None, None,)
+            MemRefType::new(Type::index(&context), &[42, 42], None, None,)
                 .affine_map()
                 .to_string(),
             "(d0, d1) -> (d0, d1)"
@@ -150,7 +150,7 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            MemRef::new(Type::index(&context), &[42, 42], None, None).memory_space(),
+            MemRefType::new(Type::index(&context), &[42, 42], None, None).memory_space(),
             None,
         );
     }
