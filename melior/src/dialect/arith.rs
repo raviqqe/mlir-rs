@@ -216,7 +216,7 @@ mod tests {
     #[test]
     fn compile_constant() {
         let context = create_context();
-        let i64_type = IntegerType::new(&context, 64).into();
+        let integer_type = IntegerType::new(&context, 64).into();
 
         compile_operation(
             &context,
@@ -227,8 +227,8 @@ mod tests {
                     Location::unknown(&context),
                 )
             },
-            &[i64_type],
-            FunctionType::new(&context, &[i64_type], &[i64_type]),
+            &[integer_type],
+            FunctionType::new(&context, &[integer_type], &[integer_type]),
         );
     }
 
