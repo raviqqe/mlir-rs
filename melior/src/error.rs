@@ -6,6 +6,7 @@ use std::{
 /// A Melior error.
 #[derive(Debug, Eq, PartialEq)]
 pub enum Error {
+    ArrayElementPosition(String, usize),
     AttributeExpected(&'static str, String),
     BlockArgumentExpected(String),
     BlockArgumentPosition(String, usize),
@@ -23,6 +24,12 @@ pub enum Error {
 impl Display for Error {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         match self {
+            Self::ArrayElementPosition(array, position) => {
+                write!(
+                    formatter,
+                    "array element position {position} out of bounds: {array}"
+                )
+            }
             Self::AttributeExpected(r#type, attribute) => {
                 write!(formatter, "{type} attribute expected: {attribute}")
             }
@@ -32,16 +39,16 @@ impl Display for Error {
             Self::BlockArgumentPosition(block, position) => {
                 write!(
                     formatter,
-                    "block argument position {position} out of range: {block}"
+                    "block argument position {position} out of bounds: {block}"
                 )
             }
             Self::FunctionInputPosition(r#type, position) => write!(
                 formatter,
-                "function input position {position} out of range: {type}"
+                "function input position {position} out of bounds: {type}"
             ),
             Self::FunctionResultPosition(r#type, position) => write!(
                 formatter,
-                "function result position {position} out of range: {type}"
+                "function result position {position} out of bounds: {type}"
             ),
             Self::InvokeFunction => write!(formatter, "failed to invoke JIT-compiled function"),
             Self::OperationResultExpected(value) => {
@@ -50,7 +57,7 @@ impl Display for Error {
             Self::OperationResultPosition(operation, position) => {
                 write!(
                     formatter,
-                    "operation result position {position} out of range: {operation}"
+                    "operation result position {position} out of bounds: {operation}"
                 )
             }
             Self::ParsePassPipeline(message) => {
@@ -60,7 +67,7 @@ impl Display for Error {
             Self::TupleFieldPosition(r#type, position) => {
                 write!(
                     formatter,
-                    "tuple field position {position} out of range: {type}"
+                    "tuple field position {position} out of bounds: {type}"
                 )
             }
             Self::TypeExpected(r#type, actual) => {
