@@ -1,3 +1,5 @@
+//! Dagnostics.
+
 mod handler_id;
 mod severity;
 
