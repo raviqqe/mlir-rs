@@ -15,6 +15,7 @@ pub enum Error {
     InvokeFunction,
     OperationResultExpected(String),
     OperationResultPosition(String, usize),
+    PositionOutOfBounds(&'static str, String, usize),
     ParsePassPipeline(String),
     RunPass,
     TupleFieldPosition(String, usize),
@@ -62,6 +63,12 @@ impl Display for Error {
             }
             Self::ParsePassPipeline(message) => {
                 write!(formatter, "failed to parse pass pipeline:\n{}", message)
+            }
+            Self::PositionOutOfBounds(name, display, position) => {
+                write!(
+                    formatter,
+                    "{name} position {position} out of bounds: {display}"
+                )
             }
             Self::RunPass => write!(formatter, "failed to run pass"),
             Self::TupleFieldPosition(r#type, position) => {

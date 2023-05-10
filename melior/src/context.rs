@@ -1,13 +1,15 @@
 use crate::{
     dialect::{Dialect, DialectRegistry},
     string_ref::StringRef,
+    Diagnostic, DiagnosticHandlerId,
 };
 use mlir_sys::{
-    mlirContextAppendDialectRegistry, mlirContextCreate, mlirContextDestroy,
-    mlirContextEnableMultithreading, mlirContextEqual, mlirContextGetAllowUnregisteredDialects,
-    mlirContextGetNumLoadedDialects, mlirContextGetNumRegisteredDialects,
-    mlirContextGetOrLoadDialect, mlirContextIsRegisteredOperation,
-    mlirContextLoadAllAvailableDialects, mlirContextSetAllowUnregisteredDialects, MlirContext,
+    mlirContextAppendDialectRegistry, mlirContextAttachDiagnosticHandler, mlirContextCreate,
+    mlirContextDestroy, mlirContextDetachDiagnosticHandler, mlirContextEnableMultithreading,
+    mlirContextEqual, mlirContextGetAllowUnregisteredDialects, mlirContextGetNumLoadedDialects,
+    mlirContextGetNumRegisteredDialects, mlirContextGetOrLoadDialect,
+    mlirContextIsRegisteredOperation, mlirContextLoadAllAvailableDialects,
+    mlirContextSetAllowUnregisteredDialects, MlirContext,
 };
 use std::{marker::PhantomData, mem::transmute, ops::Deref};
 
@@ -80,6 +82,33 @@ impl Context {
 
     pub(crate) unsafe fn to_raw(&self) -> MlirContext {
         self.raw
+    }
+
+    /// Attaches a diagnostic handler to the context.
+    pub fn attach_diagnostic_handler<F: FnMut(Diagnostic) -> bool>(
+        &self,
+        handler: F,
+    ) -> DiagnosticHandlerId {
+        let handler = Box::new(handler);
+        let handler = Box::into_raw(handler);
+
+        let handler = unsafe {
+            mlirContextAttachDiagnosticHandler(
+                self.to_raw(),
+                Some(_mlir_cb_invoke::<F>),
+                handler as *mut _,
+                Some(_mlir_cb_detach::<F>),
+            )
+        };
+
+        DiagnosticHandlerId { raw: handler }
+    }
+
+    /// Detaches a diagnostic handler to the context.
+    pub fn detach_diagnostic_handler<F>(&self, handler: DiagnosticHandlerId) {
+        unsafe {
+            mlirContextDetachDiagnosticHandler(self.to_raw(), handler.raw);
+        }
     }
 }
 

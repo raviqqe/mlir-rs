@@ -1,6 +1,5 @@
-use crate::{ir::Location, logical_result::LogicalResult, utility::print_callback, Context};
+use crate::{ir::Location, logical_result::LogicalResult, utility::print_callback, Error};
 use mlir_sys::{
-    mlirContextAttachDiagnosticHandler, mlirContextDetachDiagnosticHandler,
     mlirDiagnosticGetLocation, mlirDiagnosticGetNote, mlirDiagnosticGetNumNotes,
     mlirDiagnosticGetSeverity, mlirDiagnosticPrint, MlirDiagnostic, MlirDiagnosticHandlerID,
     MlirDiagnosticSeverity_MlirDiagnosticError, MlirDiagnosticSeverity_MlirDiagnosticNote,
@@ -9,12 +8,12 @@ use mlir_sys::{
 };
 use std::{ffi::c_void, fmt, marker::PhantomData};
 
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub enum DiagnosticSeverity {
     Error,
-    Warning,
     Note,
     Remark,
+    Warning,
 }
 
 #[derive(Debug)]
@@ -29,22 +28,28 @@ impl<'a> Diagnostic<'a> {
     }
 
     pub fn severity(&self) -> DiagnosticSeverity {
-        #[allow(non_upper_case_globals)]
         match unsafe { mlirDiagnosticGetSeverity(self.raw) } {
             MlirDiagnosticSeverity_MlirDiagnosticError => DiagnosticSeverity::Error,
-            MlirDiagnosticSeverity_MlirDiagnosticWarning => DiagnosticSeverity::Warning,
             MlirDiagnosticSeverity_MlirDiagnosticNote => DiagnosticSeverity::Note,
             MlirDiagnosticSeverity_MlirDiagnosticRemark => DiagnosticSeverity::Remark,
-            _ => unreachable!(),
+            MlirDiagnosticSeverity_MlirDiagnosticWarning => DiagnosticSeverity::Warning,
         }
     }
 
     pub fn note_count(&self) -> usize {
-        unsafe { mlirDiagnosticGetNumNotes(self.raw) as usize }
+        (unsafe { mlirDiagnosticGetNumNotes(self.raw) }) as usize
     }
 
-    pub fn note(&self, index: usize) -> Self {
-        unsafe { Self::from_raw(mlirDiagnosticGetNote(self.raw, index as isize)) }
+    pub fn note(&self, index: usize) -> Result<Self, Error> {
+        if index < self.note_count() {
+            Ok(unsafe { Self::from_raw(mlirDiagnosticGetNote(self.raw, index as isize)) })
+        } else {
+            Err(Error::PositionOutOfBounds(
+                "diagnostic note",
+                self.to_string(),
+                index,
+            ))
+        }
     }
 
     pub(crate) unsafe fn from_raw(raw: MlirDiagnostic) -> Self {
@@ -71,36 +76,14 @@ impl<'a> fmt::Display for Diagnostic<'a> {
     }
 }
 
-#[derive(Debug)]
-pub struct DiagnosticHandler {
+#[derive(Clone, Copy, Debug)]
+pub struct DiagnosticHandlerId {
     raw: MlirDiagnosticHandlerID,
 }
 
-impl Context {
-    /// Attach a diagnostic handler to the context.
-    pub fn attach_diagnostic_handler<F>(&self, handler: F) -> DiagnosticHandler
-    where
-        F: FnMut(Diagnostic) -> LogicalResult,
-    {
-        let handler = Box::new(handler);
-        let handler = Box::into_raw(handler);
-
-        let handler = unsafe {
-            mlirContextAttachDiagnosticHandler(
-                self.to_raw(),
-                Some(_mlir_cb_invoke::<F>),
-                handler as *mut c_void,
-                Some(_mlir_cb_detach::<F>),
-            )
-        };
-
-        DiagnosticHandler { raw: handler }
-    }
-
-    pub fn detach_diagnostic_handler<F>(&self, handler: DiagnosticHandler) {
-        unsafe {
-            mlirContextDetachDiagnosticHandler(self.to_raw(), handler.raw);
-        }
+impl DiagnosticHandlerId {
+    pub(crate) unsafe fn to_raw(&self) -> MlirDiagnosticHandlerID {
+        self.raw
     }
 }
 

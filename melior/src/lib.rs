@@ -97,7 +97,7 @@ pub mod utility;
 
 pub use self::{
     context::{Context, ContextRef},
-    diagnostic::{Diagnostic, DiagnosticHandler, DiagnosticSeverity},
+    diagnostic::{Diagnostic, DiagnosticHandlerId, DiagnosticSeverity},
     error::Error,
     execution_engine::ExecutionEngine,
     string_ref::StringRef,
