@@ -11,8 +11,8 @@ This crate is a wrapper of [the MLIR C API](https://mlir.llvm.org/docs/CAPI/).
 ```rust
 use melior::{
     Context,
-    dialect::{self, arith, DialectRegistry, func},
-    ir::*,
+    dialect::{arith, DialectRegistry, func},
+    ir::{*, attribute::{StringAttribute, TypeAttribute}, r#type::FunctionType},
     utility::register_all_dialects,
 };
 
@@ -44,8 +44,8 @@ let function = {
 
     func::func(
         &context,
-        Attribute::parse(&context, "\"add\"").unwrap(),
-        Attribute::parse(&context, "(index, index) -> index").unwrap(),
+        StringAttribute::new(&context, "add"),
+        TypeAttribute::new(FunctionType::new(&context, &[index_type, index_type], &[index_type]).into()),
         region,
         location,
     )
