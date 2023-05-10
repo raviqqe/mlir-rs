@@ -8,7 +8,6 @@ pub(crate) struct LogicalResult {
 
 impl LogicalResult {
     /// Creates a success result.
-    #[allow(dead_code)]
     pub fn success() -> Self {
         Self {
             raw: MlirLogicalResult { value: 1 },
@@ -16,7 +15,6 @@ impl LogicalResult {
     }
 
     /// Creates a failure result.
-    #[allow(dead_code)]
     pub fn failure() -> Self {
         Self {
             raw: MlirLogicalResult { value: 0 },
