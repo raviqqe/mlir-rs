@@ -31,14 +31,12 @@ pub fn r#for<'c>(
 /// Creates a `scf.if` operation.
 pub fn r#if<'c>(
     condition: Value<'c>,
-    values: &[Value<'c>],
     then_region: Region,
     else_region: Region,
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("scf.if", location)
         .add_operands(&[condition])
-        .add_operands(values)
         .add_regions(vec![then_region, else_region])
         .build()
 }
