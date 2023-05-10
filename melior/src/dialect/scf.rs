@@ -84,7 +84,7 @@ mod tests {
         dialect::{arith, func},
         ir::{
             attribute::{FloatAttribute, IntegerAttribute},
-            r#type::{self, IntegerType, Type},
+            r#type::{IntegerType, Type},
             Attribute, Block, Module,
         },
         test::load_all_dialects,
