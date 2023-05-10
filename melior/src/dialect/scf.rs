@@ -162,7 +162,8 @@ mod tests {
                 block.append_operation(r#if(
                     condition.result(0).unwrap().into(),
                     {
-                        let block = Block::new(&[(Type::index(&context), location)]);
+                        let block = Block::new(&[]);
+
                         block.append_operation(r#yield(&[], location));
 
                         let region = Region::new();
@@ -170,7 +171,14 @@ mod tests {
                         region
                     },
                     {
-                        let block = Block::new(&[(Type::index(&context), location)]);
+                        let block = Block::new(&[]);
+
+                        let condition = block.append_operation(arith::constant(
+                            &context,
+                            IntegerAttribute::new(0, Type::index(&context)).into(),
+                            location,
+                        ));
+
                         block.append_operation(r#yield(&[], location));
 
                         let region = Region::new();
