@@ -58,7 +58,8 @@ mod tests {
         dialect::func,
         ir::{
             attribute::{StringAttribute, TypeAttribute},
-            r#type::FunctionType, Block, Location, Module, Region, Type,
+            r#type::FunctionType,
+            Block, Location, Module, Region, Type,
         },
         test::load_all_dialects,
         Context,
