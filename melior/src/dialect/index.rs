@@ -57,57 +57,12 @@ pub fn cmp<'c>(
 melior_macro::binary_operations!(
     index,
     [
-        addf,
-        addi,
-        addui_extended,
-        andi,
-        ceildivsi,
-        ceildivui,
-        divf,
-        divsi,
-        divui,
-        floordivsi,
-        maxf,
-        maxsi,
-        maxui,
-        minf,
-        minsi,
-        minui,
-        mulf,
-        muli,
-        mulsi_extended,
-        mului_extended,
-        ori,
-        remf,
-        remsi,
-        remui,
-        shli,
-        shrsi,
-        shrui,
-        subf,
-        subi,
-        xori,
+        add, and, ceildivs, ceildivu, divs, divu, floordivs, maxs, maxu, mins, minu, mul, or, rems,
+        remu, shl, shrs, shrui, sub, xor,
     ]
 );
 
-melior_macro::unary_operations!(index, [negf, truncf]);
-
-melior_macro::typed_unary_operations!(
-    index,
-    [
-        bitcast,
-        extf,
-        extsi,
-        extui,
-        fptosi,
-        fptoui,
-        index_cast,
-        index_castui,
-        sitofp,
-        trunci,
-        uitofp
-    ]
-);
+melior_macro::typed_unary_operations!(index, [casts, castu]);
 
 #[cfg(test)]
 mod tests {
