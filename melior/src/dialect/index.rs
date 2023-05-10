@@ -87,16 +87,14 @@ mod tests {
     fn compile_operation<'c>(
         context: &'c Context,
         operation: impl Fn(&Block<'c>) -> Operation<'c>,
-        block_argument_types: &[Type<'c>],
         function_type: FunctionType<'c>,
     ) {
         let location = Location::unknown(context);
         let module = Module::new(location);
 
         let block = Block::new(
-            &block_argument_types
-                .iter()
-                .map(|&r#type| (r#type, location))
+            &(0..function_type.input_count())
+                .map(|index| (function_type.input(index).unwrap(), location))
                 .collect::<Vec<_>>(),
         );
 
@@ -140,26 +138,7 @@ mod tests {
                     Location::unknown(&context),
                 )
             },
-            &[integer_type],
             FunctionType::new(&context, &[integer_type], &[integer_type]),
-        );
-    }
-
-    #[test]
-    fn compile_negf() {
-        let context = create_context();
-        let f64_type = Type::float64(&context);
-
-        compile_operation(
-            &context,
-            |block| {
-                negf(
-                    block.argument(0).unwrap().into(),
-                    Location::unknown(&context),
-                )
-            },
-            &[Type::float64(&context)],
-            FunctionType::new(&context, &[f64_type], &[f64_type]),
         );
     }
 
@@ -179,7 +158,6 @@ mod tests {
                     Location::unknown(&context),
                 )
             },
-            &[integer_type, integer_type],
             FunctionType::new(
                 &context,
                 &[integer_type, integer_type],
@@ -192,43 +170,22 @@ mod tests {
         use super::*;
 
         #[test]
-        fn compile_bitcast() {
-            let context = create_context();
-            let integer_type = IntegerType::new(&context, 64).into();
-            let float_type = Type::float64(&context);
-
-            compile_operation(
-                &context,
-                |block| {
-                    bitcast(
-                        block.argument(0).unwrap().into(),
-                        float_type,
-                        Location::unknown(&context),
-                    )
-                },
-                &[integer_type],
-                FunctionType::new(&context, &[integer_type], &[float_type]),
-            );
-        }
-
-        #[test]
-        fn compile_extf() {
+        fn compile_casts() {
             let context = create_context();
 
             compile_operation(
                 &context,
                 |block| {
-                    extf(
+                    casts(
                         block.argument(0).unwrap().into(),
-                        Type::float64(&context),
+                        IntegerType::new(&context, 64).into(),
                         Location::unknown(&context),
                     )
                 },
-                &[Type::float32(&context)],
                 FunctionType::new(
                     &context,
                     &[Type::float32(&context)],
-                    &[Type::float64(&context)],
+                    &[IntegerType::new(&context, 64).into()],
                 ),
             );
         }
@@ -246,7 +203,6 @@ mod tests {
                         Location::unknown(&context),
                     )
                 },
-                &[IntegerType::new(&context, 32).into()],
                 FunctionType::new(
                     &context,
                     &[IntegerType::new(&context, 32).into()],
@@ -268,184 +224,29 @@ mod tests {
                         Location::unknown(&context),
                     )
                 },
-                &[IntegerType::new(&context, 32).into()],
                 FunctionType::new(
                     &context,
                     &[IntegerType::new(&context, 32).into()],
                     &[IntegerType::new(&context, 64).into()],
-                ),
-            );
-        }
-
-        #[test]
-        fn compile_fptosi() {
-            let context = create_context();
-
-            compile_operation(
-                &context,
-                |block| {
-                    fptosi(
-                        block.argument(0).unwrap().into(),
-                        IntegerType::new(&context, 64).into(),
-                        Location::unknown(&context),
-                    )
-                },
-                &[Type::float32(&context)],
-                FunctionType::new(
-                    &context,
-                    &[Type::float32(&context)],
-                    &[IntegerType::new(&context, 64).into()],
-                ),
-            );
-        }
-
-        #[test]
-        fn compile_fptoui() {
-            let context = create_context();
-
-            compile_operation(
-                &context,
-                |block| {
-                    fptoui(
-                        block.argument(0).unwrap().into(),
-                        IntegerType::new(&context, 64).into(),
-                        Location::unknown(&context),
-                    )
-                },
-                &[Type::float32(&context)],
-                FunctionType::new(
-                    &context,
-                    &[Type::float32(&context)],
-                    &[IntegerType::new(&context, 64).into()],
-                ),
-            );
-        }
-
-        #[test]
-        fn compile_index_cast() {
-            let context = create_context();
-
-            compile_operation(
-                &context,
-                |block| {
-                    index_cast(
-                        block.argument(0).unwrap().into(),
-                        IntegerType::new(&context, 64).into(),
-                        Location::unknown(&context),
-                    )
-                },
-                &[Type::index(&context)],
-                FunctionType::new(
-                    &context,
-                    &[Type::index(&context)],
-                    &[IntegerType::new(&context, 64).into()],
-                ),
-            );
-        }
-
-        #[test]
-        fn compile_index_castui() {
-            let context = create_context();
-
-            compile_operation(
-                &context,
-                |block| {
-                    index_castui(
-                        block.argument(0).unwrap().into(),
-                        IntegerType::new(&context, 64).into(),
-                        Location::unknown(&context),
-                    )
-                },
-                &[Type::index(&context)],
-                FunctionType::new(
-                    &context,
-                    &[Type::index(&context)],
-                    &[IntegerType::new(&context, 64).into()],
-                ),
-            );
-        }
-
-        #[test]
-        fn compile_sitofp() {
-            let context = create_context();
-
-            compile_operation(
-                &context,
-                |block| {
-                    sitofp(
-                        block.argument(0).unwrap().into(),
-                        Type::float64(&context),
-                        Location::unknown(&context),
-                    )
-                },
-                &[IntegerType::new(&context, 32).into()],
-                FunctionType::new(
-                    &context,
-                    &[IntegerType::new(&context, 32).into()],
-                    &[Type::float64(&context)],
-                ),
-            );
-        }
-
-        #[test]
-        fn compile_trunci() {
-            let context = create_context();
-
-            compile_operation(
-                &context,
-                |block| {
-                    trunci(
-                        block.argument(0).unwrap().into(),
-                        IntegerType::new(&context, 32).into(),
-                        Location::unknown(&context),
-                    )
-                },
-                &[IntegerType::new(&context, 64).into()],
-                FunctionType::new(
-                    &context,
-                    &[IntegerType::new(&context, 64).into()],
-                    &[IntegerType::new(&context, 32).into()],
-                ),
-            );
-        }
-
-        #[test]
-        fn compile_uitofp() {
-            let context = create_context();
-
-            compile_operation(
-                &context,
-                |block| {
-                    uitofp(
-                        block.argument(0).unwrap().into(),
-                        Type::float64(&context),
-                        Location::unknown(&context),
-                    )
-                },
-                &[IntegerType::new(&context, 32).into()],
-                FunctionType::new(
-                    &context,
-                    &[IntegerType::new(&context, 32).into()],
-                    &[Type::float64(&context)],
                 ),
             );
         }
     }
 
     #[test]
-    fn compile_addi() {
+    fn compile_add() {
         let context = Context::new();
         load_all_dialects(&context);
 
         let location = Location::unknown(&context);
         let module = Module::new(location);
 
-        let integer_type = IntegerType::new(&context, 64).into();
+        let integer_type = Type::index(&context);
 
         let function = {
             let block = Block::new(&[(integer_type, location), (integer_type, location)]);
 
-            let sum = block.append_operation(addi(
+            let sum = block.append_operation(add(
                 block.argument(0).unwrap().into(),
                 block.argument(1).unwrap().into(),
                 location,
