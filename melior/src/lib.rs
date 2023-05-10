@@ -69,7 +69,7 @@
 //!
 //!     func::func(
 //!         &context,
-//!         Attribute::parse(&context, "\"add\"").unwrap(),
+//!         StringAttribute::new(&context, "add"),
 //!         Attribute::parse(&context, "(index, index) -> index").unwrap(),  
 //!         region,
 //!         location,
@@ -108,7 +108,7 @@ mod tests {
         ir::{
             attribute::{IntegerAttribute, StringAttribute, TypeAttribute},
             operation::OperationBuilder,
-            r#type::{FunctionType, IntegerType},
+            r#type::{FunctionType, IntegerType, MemRefType},
             Attribute, Block, Location, Module, Region, Type,
         },
         test::load_all_dialects,
@@ -276,8 +276,10 @@ mod tests {
 
             func::func(
                 &context,
-                Attribute::parse(&context, "\"sum\"").unwrap(),
-                Attribute::parse(&context, "(memref<?xf32>, memref<?xf32>) -> ()").unwrap(),
+                StringAttribute::new(&context, "sum"),
+                TypeAttribute::new(
+                    FunctionType::new(&context, &[memref_type, memref_type], &[]).into(),
+                ),
                 function_region,
                 Location::unknown(&context),
             )

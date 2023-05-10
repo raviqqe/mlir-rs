@@ -156,7 +156,11 @@ mod tests {
     use super::*;
     use crate::{
         dialect::func,
-        ir::{Attribute, Block, Location, Module, Region, Type},
+        ir::{
+            attribute::{StringAttribute, TypeAttribute},
+            r#type::FunctionType,
+            Attribute, Block, Location, Module, Region, Type,
+        },
         test::load_all_dialects,
         Context,
     };
@@ -171,7 +175,7 @@ mod tests {
         context: &'c Context,
         operation: impl Fn(&Block<'c>) -> Operation<'c>,
         block_argument_types: &[Type<'c>],
-        function_type: &str,
+        function_type: FunctionType<'c>,
     ) {
         let location = Location::unknown(context);
         let module = Module::new(location);
@@ -197,8 +201,8 @@ mod tests {
 
         let function = func::func(
             context,
-            Attribute::parse(context, "\"foo\"").unwrap(),
-            Attribute::parse(context, function_type).unwrap(),
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(function_type.into()),
             region,
             Location::unknown(context),
         );
@@ -212,6 +216,7 @@ mod tests {
     #[test]
     fn compile_constant() {
         let context = create_context();
+        let i64_type = IntegerType::new(&context, 64).into();
 
         compile_operation(
             &context,
@@ -222,14 +227,15 @@ mod tests {
                     Location::unknown(&context),
                 )
             },
-            &[IntegerType::new(&context, 64).into()],
-            "(i64) -> i64",
+            &[i64_type],
+            FunctionType::new(&context, &[i64_type], &[i64_type]),
         );
     }
 
     #[test]
     fn compile_negf() {
         let context = create_context();
+        let f64_type = Type::float64(&context).into();
 
         compile_operation(
             &context,
@@ -240,7 +246,7 @@ mod tests {
                 )
             },
             &[Type::float64(&context)],
-            "(f64) -> f64",
+            FunctionType::new(&context, &[f64_type], &[f64_type]),
         );
     }
 
@@ -264,7 +270,11 @@ mod tests {
                     )
                 },
                 &[float_type, float_type],
-                "(f64, f64) -> i1",
+                FunctionType::new(
+                    &context,
+                    &[float_type, float_type],
+                    &[IntegerType::new(&context, 1).into()],
+                ),
             );
         }
 
@@ -285,7 +295,11 @@ mod tests {
                     )
                 },
                 &[integer_type, integer_type],
-                "(i64, i64) -> i1",
+                FunctionType::new(
+                    &context,
+                    &[integer_type, integer_type],
+                    &[IntegerType::new(&context, 1).into()],
+                ),
             );
         }
     }
@@ -296,18 +310,20 @@ mod tests {
         #[test]
         fn compile_bitcast() {
             let context = create_context();
+            let integer_type = IntegerType::new(&context, 64).into();
+            let float_type = Type::float64(&context);
 
             compile_operation(
                 &context,
                 |block| {
                     bitcast(
                         block.argument(0).unwrap().into(),
-                        Type::float64(&context),
+                        float_type,
                         Location::unknown(&context),
                     )
                 },
-                &[IntegerType::new(&context, 64).into()],
-                "(i64) -> f64",
+                &[integer_type],
+                FunctionType::new(&context, &[integer_type], &[float_type]),
             );
         }
 
@@ -325,7 +341,11 @@ mod tests {
                     )
                 },
                 &[Type::float32(&context)],
-                "(f32) -> f64",
+                FunctionType::new(
+                    &context,
+                    &[Type::float32(&context)],
+                    &[Type::float64(&context)],
+                ),
             );
         }
 
@@ -343,7 +363,11 @@ mod tests {
                     )
                 },
                 &[IntegerType::new(&context, 32).into()],
-                "(i32) -> i64",
+                FunctionType::new(
+                    &context,
+                    &[IntegerType::new(&context, 32).into()],
+                    &[IntegerType::new(&context, 64).into()],
+                ),
             );
         }
 
@@ -361,7 +385,11 @@ mod tests {
                     )
                 },
                 &[IntegerType::new(&context, 32).into()],
-                "(i32) -> i64",
+                FunctionType::new(
+                    &context,
+                    &[IntegerType::new(&context, 32).into()],
+                    &[IntegerType::new(&context, 64).into()],
+                ),
             );
         }
 
@@ -379,7 +407,11 @@ mod tests {
                     )
                 },
                 &[Type::float32(&context)],
-                "(f32) -> i64",
+                FunctionType::new(
+                    &context,
+                    &[Type::float32(&context).into()],
+                    &[IntegerType::new(&context, 64).into()],
+                ),
             );
         }
 
@@ -397,7 +429,11 @@ mod tests {
                     )
                 },
                 &[Type::float32(&context)],
-                "(f32) -> i64",
+                FunctionType::new(
+                    &context,
+                    &[Type::float32(&context).into()],
+                    &[IntegerType::new(&context, 64).into()],
+                ),
             );
         }
 
@@ -415,7 +451,11 @@ mod tests {
                     )
                 },
                 &[Type::index(&context)],
-                "(index) -> i64",
+                FunctionType::new(
+                    &context,
+                    &[Type::index(&context).into()],
+                    &[IntegerType::new(&context, 64).into()],
+                ),
             );
         }
 
@@ -433,7 +473,11 @@ mod tests {
                     )
                 },
                 &[Type::index(&context)],
-                "(index) -> i64",
+                FunctionType::new(
+                    &context,
+                    &[Type::index(&context).into()],
+                    &[IntegerType::new(&context, 64).into()],
+                ),
             );
         }
 
@@ -451,7 +495,11 @@ mod tests {
                     )
                 },
                 &[IntegerType::new(&context, 32).into()],
-                "(i32) -> f64",
+                FunctionType::new(
+                    &context,
+                    &[IntegerType::new(&context, 32).into()],
+                    &[Type::float64(&context).into()],
+                ),
             );
         }
 
@@ -469,7 +517,11 @@ mod tests {
                     )
                 },
                 &[IntegerType::new(&context, 64).into()],
-                "(i64) -> i32",
+                FunctionType::new(
+                    &context,
+                    &[IntegerType::new(&context, 64).into()],
+                    &[IntegerType::new(&context, 32).into()],
+                ),
             );
         }
 
@@ -487,7 +539,11 @@ mod tests {
                     )
                 },
                 &[IntegerType::new(&context, 32).into()],
-                "(i32) -> f64",
+                FunctionType::new(
+                    &context,
+                    &[IntegerType::new(&context, 32).into()],
+                    &[Type::float64(&context).into()],
+                ),
             );
         }
     }
@@ -518,8 +574,11 @@ mod tests {
 
             func::func(
                 &context,
-                Attribute::parse(&context, "\"foo\"").unwrap(),
-                Attribute::parse(&context, "(i64, i64) -> i64").unwrap(),
+                StringAttribute::new(&context, "foo"),
+                TypeAttribute::new(
+                    FunctionType::new(&context, &[integer_type, integer_type], &[integer_type])
+                        .into(),
+                ),
                 region,
                 Location::unknown(&context),
             )

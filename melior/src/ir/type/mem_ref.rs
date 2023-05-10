@@ -18,7 +18,7 @@ impl<'c> MemRefType<'c> {
     /// Creates a mem-ref type.
     pub fn new(
         r#type: Type<'c>,
-        dimensions: &[u64],
+        dimensions: &[i64],
         layout: Option<Attribute<'c>>,
         memory_space: Option<Attribute<'c>>,
     ) -> Self {

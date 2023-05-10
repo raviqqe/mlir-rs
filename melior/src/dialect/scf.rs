@@ -106,8 +106,8 @@ mod tests {
     use crate::{
         dialect::{arith, func},
         ir::{
-            attribute::{FloatAttribute, IntegerAttribute},
-            r#type::{IntegerType, Type},
+            attribute::{FloatAttribute, IntegerAttribute, StringAttribute, TypeAttribute},
+            r#type::{FunctionType, IntegerType, Type},
             Attribute, Block, Module,
         },
         test::load_all_dialects,
@@ -125,8 +125,8 @@ mod tests {
 
         module.body().append_operation(func::func(
             &context,
-            Attribute::parse(&context, "\"foo\"").unwrap(),
-            Attribute::parse(&context, "() -> ()").unwrap(),
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(FunctionType::new(&context, &[], &[]).into()),
             {
                 let block = Block::new(&[]);
 
@@ -176,8 +176,8 @@ mod tests {
 
         module.body().append_operation(func::func(
             &context,
-            Attribute::parse(&context, "\"foo\"").unwrap(),
-            Attribute::parse(&context, "() -> ()").unwrap(),
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(FunctionType::new(&context, &[], &[]).into()),
             {
                 let block = Block::new(&[]);
 
@@ -241,8 +241,8 @@ mod tests {
 
             module.body().append_operation(func::func(
                 &context,
-                Attribute::parse(&context, "\"foo\"").unwrap(),
-                Attribute::parse(&context, "() -> index").unwrap(),
+                StringAttribute::new(&context, "foo"),
+                TypeAttribute::new(FunctionType::new(&context, &[], &[index_type]).into()),
                 {
                     let block = Block::new(&[]);
 
@@ -320,8 +320,8 @@ mod tests {
 
             module.body().append_operation(func::func(
                 &context,
-                Attribute::parse(&context, "\"foo\"").unwrap(),
-                Attribute::parse(&context, "() -> ()").unwrap(),
+                StringAttribute::new(&context, "foo"),
+                TypeAttribute::new(FunctionType::new(&context, &[], &[]).into()),
                 {
                     let block = Block::new(&[]);
 
@@ -371,8 +371,8 @@ mod tests {
 
         module.body().append_operation(func::func(
             &context,
-            Attribute::parse(&context, "\"foo\"").unwrap(),
-            Attribute::parse(&context, "() -> ()").unwrap(),
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(FunctionType::new(&context, &[], &[]).into()),
             {
                 let block = Block::new(&[]);
 
@@ -433,6 +433,11 @@ mod tests {
     }
 
     mod r#while {
+        use crate::ir::{
+            attribute::{StringAttribute, TypeAttribute},
+            r#type::FunctionType,
+        };
+
         use super::*;
 
         #[test]
@@ -446,8 +451,8 @@ mod tests {
 
             module.body().append_operation(func::func(
                 &context,
-                Attribute::parse(&context, "\"foo\"").unwrap(),
-                Attribute::parse(&context, "() -> ()").unwrap(),
+                StringAttribute::new(&context, "foo"),
+                TypeAttribute::new(FunctionType::new(&context, &[], &[]).into()),
                 {
                     let block = Block::new(&[]);
 
@@ -532,8 +537,8 @@ mod tests {
 
             module.body().append_operation(func::func(
                 &context,
-                Attribute::parse(&context, "\"foo\"").unwrap(),
-                Attribute::parse(&context, "() -> ()").unwrap(),
+                StringAttribute::new(&context, "foo"),
+                TypeAttribute::new(FunctionType::new(&context, &[], &[]).into()),
                 {
                     let block = Block::new(&[]);
 
@@ -617,8 +622,8 @@ mod tests {
 
             module.body().append_operation(func::func(
                 &context,
-                Attribute::parse(&context, "\"foo\"").unwrap(),
-                Attribute::parse(&context, "() -> ()").unwrap(),
+                StringAttribute::new(&context, "foo"),
+                TypeAttribute::new(FunctionType::new(&context, &[], &[]).into()),
                 {
                     let block = Block::new(&[]);
 

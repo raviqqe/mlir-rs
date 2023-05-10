@@ -1,22 +1,26 @@
 //! `func` dialect.
 
 use crate::{
-    ir::{operation::OperationBuilder, Attribute, Identifier, Location, Operation, Region, Value},
+    ir::{
+        attribute::{StringAttribute, TypeAttribute},
+        operation::OperationBuilder,
+        Identifier, Location, Operation, Region, Value,
+    },
     Context,
 };
 
 /// Create a `func.func` operation.
 pub fn func<'c>(
     context: &'c Context,
-    name: Attribute<'c>,
-    r#type: Attribute<'c>,
+    name: StringAttribute<'c>,
+    r#type: TypeAttribute<'c>,
     region: Region,
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("func.func", location)
         .add_attributes(&[
-            (Identifier::new(context, "sym_name"), name),
-            (Identifier::new(context, "function_type"), r#type),
+            (Identifier::new(context, "sym_name"), name.into()),
+            (Identifier::new(context, "function_type"), r#type.into()),
         ])
         .add_regions(vec![region])
         .build()
@@ -33,7 +37,7 @@ pub fn r#return<'c>(operands: &[Value], location: Location<'c>) -> Operation<'c>
 mod tests {
     use super::*;
     use crate::{
-        ir::{Attribute, Block, Module, Type},
+        ir::{r#type::FunctionType, Attribute, Block, Module, Type},
         test::load_all_dialects,
         Context,
     };
@@ -58,8 +62,10 @@ mod tests {
 
             func(
                 &context,
-                Attribute::parse(&context, "\"add\"").unwrap(),
-                Attribute::parse(&context, "(index) -> index").unwrap(),
+                StringAttribute::new(&context, "add"),
+                TypeAttribute::new(
+                    FunctionType::new(&context, &[integer_type], &[integer_type]).into(),
+                ),
                 region,
                 Location::unknown(&context),
             )
