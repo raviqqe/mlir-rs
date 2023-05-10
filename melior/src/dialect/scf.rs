@@ -28,6 +28,18 @@ pub fn r#for<'c>(
         .build()
 }
 
+/// Creates a `scf.if` operation.
+pub fn r#if<'c>(
+    condition: Value<'c>,
+    values: &[Value<'c>],
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new("scf.condition", location)
+        .add_operands(&[condition])
+        .add_operands(values)
+        .build()
+}
+
 /// Creates a `scf.while` operation.
 pub fn r#while<'c>(
     initial_values: &[Value<'c>],
