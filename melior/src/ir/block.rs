@@ -323,14 +323,14 @@ mod tests {
 
     #[test]
     fn argument_error() {
-        assert!(matches!(
+        assert_eq!(
             Block::new(&[]).argument(0).unwrap_err(),
             Error::PositionOutOfBounds {
-                name: "<<UNLINKED BLOCK>>\n",
+                name: "block argument",
+                value: "<<UNLINKED BLOCK>>\n".into(),
                 index: 0,
-                ..
             }
-        ));
+        );
     }
 
     #[test]

@@ -49,15 +49,19 @@ impl<'c> Operation<'c> {
     }
 
     /// Gets a result at a position.
-    pub fn result(&self, position: usize) -> Result<result::ResultValue, Error> {
+    pub fn result(&self, index: usize) -> Result<result::ResultValue, Error> {
         unsafe {
-            if position < self.result_count() {
+            if index < self.result_count() {
                 Ok(result::ResultValue::from_raw(mlirOperationGetResult(
                     self.raw,
-                    position as isize,
+                    index as isize,
                 )))
             } else {
-                Err(Error::OperationResultPosition(self.to_string(), position))
+                Err(Error::PositionOutOfBounds {
+                    name: "operation result",
+                    value: self.to_string(),
+                    index,
+                })
             }
         }
     }

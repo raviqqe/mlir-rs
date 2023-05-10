@@ -122,7 +122,11 @@ mod tests {
 
         assert_eq!(
             function.input(42),
-            Err(Error::FunctionInputPosition(function.to_string(), 42))
+            Err(Error::PositionOutOfBounds {
+                name: "function input",
+                value: function.to_string(),
+                index: 42
+            })
         );
     }
 
@@ -145,7 +149,11 @@ mod tests {
 
         assert_eq!(
             function.result(42),
-            Err(Error::FunctionResultPosition(function.to_string(), 42))
+            Err(Error::PositionOutOfBounds {
+                name: "function result",
+                value: function.to_string(),
+                index: 42
+            })
         );
     }
 

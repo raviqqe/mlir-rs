@@ -17,7 +17,6 @@ pub enum Error {
     },
     ParsePassPipeline(String),
     RunPass,
-    TupleFieldPosition(String, usize),
     TypeExpected(&'static str, String),
     UnknownDiagnosticSeverity(u32),
 }

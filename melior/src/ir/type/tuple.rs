@@ -30,7 +30,11 @@ impl<'c> TupleType<'c> {
                 )))
             }
         } else {
-            Err(Error::TupleFieldPosition(self.to_string(), index))
+            Err(Error::PositionOutOfBounds {
+                name: "tuple field",
+                value: self.to_string(),
+                index,
+            })
         }
     }
 
@@ -93,7 +97,11 @@ mod tests {
 
         assert_eq!(
             tuple.r#type(42),
-            Err(Error::TupleFieldPosition(tuple.to_string(), 42))
+            Err(Error::PositionOutOfBounds {
+                name: "tuple field",
+                value: tuple.to_string(),
+                index: 42
+            })
         );
     }
 
