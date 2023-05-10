@@ -14,6 +14,18 @@ pub fn condition<'c>(
         .build()
 }
 
+/// Creates a `scf.execute_region` operation.
+pub fn execute_region<'c>(
+    result_types: &[Type<'c>],
+    region: Region,
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new("scf.execute_region", location)
+        .add_results(result_types)
+        .add_regions(vec![region])
+        .build()
+}
+
 /// Creates a `scf.for` operation.
 pub fn r#for<'c>(
     start: Value<'c>,
@@ -78,6 +90,58 @@ mod tests {
         test::load_all_dialects,
         Context,
     };
+
+    #[test]
+    fn compile_execute_region() {
+        let context = Context::new();
+        load_all_dialects(&context);
+
+        let location = Location::unknown(&context);
+        let module = Module::new(location);
+        let index_type = Type::index(&context);
+
+        module.body().append_operation(func::func(
+            &context,
+            Attribute::parse(&context, "\"foo\"").unwrap(),
+            Attribute::parse(&context, "() -> ()").unwrap(),
+            {
+                let block = Block::new(&[]);
+
+                block.append_operation(execute_region(
+                    &[index_type],
+                    {
+                        let block = Block::new(&[(Type::index(&context), location)]);
+
+                        let value = block.append_operation(arith::constant(
+                            &context,
+                            IntegerAttribute::new(0, index_type).into(),
+                            location,
+                        ));
+
+                        block.append_operation(r#yield(
+                            &[value.result(0).unwrap().into()],
+                            location,
+                        ));
+
+                        let region = Region::new();
+                        region.append_block(block);
+                        region
+                    },
+                    location,
+                ));
+
+                block.append_operation(func::r#return(&[], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            location,
+        ));
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
 
     #[test]
     fn compile_for() {
@@ -307,11 +371,8 @@ mod tests {
 
                             let condition = block.append_operation(arith::constant(
                                 &context,
-                                IntegerAttribute::new(
-                                    0,
-                                    r#type::IntegerType::new(&context, 1).into(),
-                                )
-                                .into(),
+                                IntegerAttribute::new(0, IntegerType::new(&context, 1).into())
+                                    .into(),
                                 location,
                             ));
 
@@ -396,11 +457,8 @@ mod tests {
 
                             let condition = block.append_operation(arith::constant(
                                 &context,
-                                IntegerAttribute::new(
-                                    0,
-                                    r#type::IntegerType::new(&context, 1).into(),
-                                )
-                                .into(),
+                                IntegerAttribute::new(0, IntegerType::new(&context, 1).into())
+                                    .into(),
                                 location,
                             ));
 
@@ -488,11 +546,8 @@ mod tests {
 
                             let condition = block.append_operation(arith::constant(
                                 &context,
-                                IntegerAttribute::new(
-                                    0,
-                                    r#type::IntegerType::new(&context, 1).into(),
-                                )
-                                .into(),
+                                IntegerAttribute::new(0, IntegerType::new(&context, 1).into())
+                                    .into(),
                                 location,
                             ));
 
