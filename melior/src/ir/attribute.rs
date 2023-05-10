@@ -1,10 +1,12 @@
 //! Attributes.
 
+#[macro_use]
+mod r#macro;
+
 mod attribute_like;
 mod dense_i64_array;
 mod float;
 mod integer;
-mod r#macro;
 
 pub use self::{
     attribute_like::AttributeLike, dense_i64_array::DenseI64ArrayAttribute, float::FloatAttribute,
