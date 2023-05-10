@@ -56,7 +56,7 @@ mod tests {
     use crate::{
         dialect::{arith, func},
         ir::{
-            attribute::{self, FloatAttribute, IntegerAttribute},
+            attribute::{FloatAttribute, IntegerAttribute},
             r#type::{self, Type},
             Attribute, Block, Module,
         },
