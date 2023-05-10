@@ -1,0 +1,13 @@
+---
+source: melior/src/dialect/index.rs
+assertion_line: 110
+expression: module.as_operation()
+---
+"builtin.module"() ({
+  "func.func"() ({
+  ^bb0(%arg0: index, %arg1: index):
+    %0 = "index.cmp"(%arg0, %arg1) {pred = 0 : i32} : (index, index) -> i1
+    "func.return"(%0) : (i1) -> ()
+  }) {function_type = (index, index) -> i1, sym_name = "foo"} : () -> ()
+}) : () -> ()
+

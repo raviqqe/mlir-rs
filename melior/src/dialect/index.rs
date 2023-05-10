@@ -1,9 +1,10 @@
 //! `index` dialect.
 
+use super::arith::CmpiPredicate;
 use crate::{
     ir::{
-        attribute::IntegerAttribute, operation::OperationBuilder, r#type::IntegerType, Attribute,
-        Identifier, Location, Operation, Value,
+        attribute::IntegerAttribute, operation::OperationBuilder, r#type::IntegerType, Identifier,
+        Location, Operation, Value,
     },
     Context,
 };
@@ -13,27 +14,13 @@ use crate::{
 /// Creates an `index.constant` operation.
 pub fn constant<'c>(
     context: &'c Context,
-    value: Attribute<'c>,
+    value: IntegerAttribute<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("index.constant", location)
-        .add_attributes(&[(Identifier::new(context, "value"), value)])
+        .add_attributes(&[(Identifier::new(context, "value"), value.into())])
         .enable_result_type_inference()
         .build()
-}
-
-/// `index.cmp` predicate
-pub enum CmpiPredicate {
-    Eq,
-    Ne,
-    Slt,
-    Sle,
-    Sgt,
-    Sge,
-    Ult,
-    Ule,
-    Ugt,
-    Uge,
 }
 
 /// Creates an `index.cmp` operation.
@@ -46,8 +33,8 @@ pub fn cmp<'c>(
 ) -> Operation<'c> {
     OperationBuilder::new("index.cmp", location)
         .add_attributes(&[(
-            Identifier::new(context, "predicate"),
-            IntegerAttribute::new(predicate as i64, IntegerType::new(context, 64).into()).into(),
+            Identifier::new(context, "pred"),
+            IntegerAttribute::new(predicate as i64, IntegerType::new(context, 32).into()).into(),
         )])
         .add_operands(&[lhs, rhs])
         .enable_result_type_inference()
@@ -127,25 +114,25 @@ mod tests {
     #[test]
     fn compile_constant() {
         let context = create_context();
-        let integer_type = IntegerType::new(&context, 64).into();
+        let index_type = Type::index(&context).into();
 
         compile_operation(
             &context,
             |_| {
                 constant(
                     &context,
-                    Attribute::parse(&context, "42 : i64").unwrap(),
+                    IntegerAttribute::new(42, index_type),
                     Location::unknown(&context),
                 )
             },
-            FunctionType::new(&context, &[integer_type], &[integer_type]),
+            FunctionType::new(&context, &[index_type], &[index_type]),
         );
     }
 
     #[test]
     fn compile_cmp() {
         let context = create_context();
-        let integer_type = IntegerType::new(&context, 64).into();
+        let index_type = Type::index(&context).into();
 
         compile_operation(
             &context,
@@ -160,7 +147,7 @@ mod tests {
             },
             FunctionType::new(
                 &context,
-                &[integer_type, integer_type],
+                &[index_type, index_type],
                 &[IntegerType::new(&context, 1).into()],
             ),
         );
@@ -184,7 +171,7 @@ mod tests {
                 },
                 FunctionType::new(
                     &context,
-                    &[Type::float32(&context)],
+                    &[Type::index(&context)],
                     &[IntegerType::new(&context, 64).into()],
                 ),
             );
