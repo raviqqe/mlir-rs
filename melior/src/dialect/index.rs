@@ -191,13 +191,13 @@ mod tests {
         }
 
         #[test]
-        fn compile_extsi() {
+        fn compile_castu() {
             let context = create_context();
 
             compile_operation(
                 &context,
                 |block| {
-                    extsi(
+                    castu(
                         block.argument(0).unwrap().into(),
                         IntegerType::new(&context, 64).into(),
                         Location::unknown(&context),
@@ -205,28 +205,7 @@ mod tests {
                 },
                 FunctionType::new(
                     &context,
-                    &[IntegerType::new(&context, 32).into()],
-                    &[IntegerType::new(&context, 64).into()],
-                ),
-            );
-        }
-
-        #[test]
-        fn compile_extui() {
-            let context = create_context();
-
-            compile_operation(
-                &context,
-                |block| {
-                    extui(
-                        block.argument(0).unwrap().into(),
-                        IntegerType::new(&context, 64).into(),
-                        Location::unknown(&context),
-                    )
-                },
-                FunctionType::new(
-                    &context,
-                    &[IntegerType::new(&context, 32).into()],
+                    &[Type::index(&context).into()],
                     &[IntegerType::new(&context, 64).into()],
                 ),
             );
