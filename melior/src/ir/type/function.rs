@@ -8,11 +8,11 @@ use std::fmt::{self, Display, Formatter};
 
 /// A function type.
 #[derive(Clone, Copy, Debug)]
-pub struct Function<'c> {
+pub struct FunctionType<'c> {
     r#type: Type<'c>,
 }
 
-impl<'c> Function<'c> {
+impl<'c> FunctionType<'c> {
     /// Creates a function type.
     pub fn new(context: &'c Context, inputs: &[Type<'c>], results: &[Type<'c>]) -> Self {
         Self {
@@ -67,19 +67,19 @@ impl<'c> Function<'c> {
     }
 }
 
-impl<'c> TypeLike<'c> for Function<'c> {
+impl<'c> TypeLike<'c> for FunctionType<'c> {
     fn to_raw(&self) -> MlirType {
         self.r#type.to_raw()
     }
 }
 
-impl<'c> Display for Function<'c> {
+impl<'c> Display for FunctionType<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Type::from(*self).fmt(formatter)
     }
 }
 
-impl<'c> TryFrom<Type<'c>> for Function<'c> {
+impl<'c> TryFrom<Type<'c>> for FunctionType<'c> {
     type Error = Error;
 
     fn try_from(r#type: Type<'c>) -> Result<Self, Self::Error> {
@@ -102,7 +102,7 @@ mod tests {
         let integer = Type::index(&context);
 
         assert_eq!(
-            Type::from(Function::new(&context, &[integer, integer], &[integer])),
+            Type::from(FunctionType::new(&context, &[integer, integer], &[integer])),
             Type::parse(&context, "(index, index) -> index").unwrap()
         );
     }
@@ -113,7 +113,7 @@ mod tests {
         let integer = Type::index(&context);
 
         assert_eq!(
-            Type::from(Function::new(&context, &[], &[integer, integer])),
+            Type::from(FunctionType::new(&context, &[], &[integer, integer])),
             Type::parse(&context, "() -> (index, index)").unwrap()
         );
     }
@@ -124,7 +124,7 @@ mod tests {
         let integer = Type::index(&context);
 
         assert_eq!(
-            Function::new(&context, &[integer], &[]).input(0),
+            FunctionType::new(&context, &[integer], &[]).input(0),
             Ok(integer)
         );
     }
@@ -133,7 +133,7 @@ mod tests {
     fn input_error() {
         let context = Context::new();
         let integer = Type::index(&context);
-        let function = Function::new(&context, &[integer], &[]);
+        let function = FunctionType::new(&context, &[integer], &[]);
 
         assert_eq!(
             function.input(42),
@@ -147,7 +147,7 @@ mod tests {
         let integer = Type::index(&context);
 
         assert_eq!(
-            Function::new(&context, &[], &[integer]).result(0),
+            FunctionType::new(&context, &[], &[integer]).result(0),
             Ok(integer)
         );
     }
@@ -156,7 +156,7 @@ mod tests {
     fn result_error() {
         let context = Context::new();
         let integer = Type::index(&context);
-        let function = Function::new(&context, &[], &[integer]);
+        let function = FunctionType::new(&context, &[], &[integer]);
 
         assert_eq!(
             function.result(42),
@@ -169,7 +169,10 @@ mod tests {
         let context = Context::new();
         let integer = Type::index(&context);
 
-        assert_eq!(Function::new(&context, &[integer], &[]).input_count(), 1);
+        assert_eq!(
+            FunctionType::new(&context, &[integer], &[]).input_count(),
+            1
+        );
     }
 
     #[test]
@@ -177,6 +180,9 @@ mod tests {
         let context = Context::new();
         let integer = Type::index(&context);
 
-        assert_eq!(Function::new(&context, &[], &[integer]).result_count(), 1);
+        assert_eq!(
+            FunctionType::new(&context, &[], &[integer]).result_count(),
+            1
+        );
     }
 }
