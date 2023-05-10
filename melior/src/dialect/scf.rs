@@ -70,7 +70,7 @@ mod tests {
         dialect::{arith, func},
         ir::{
             attribute::{FloatAttribute, IntegerAttribute},
-            r#type::{self, Type},
+            r#type::{self, IntegerType, Type},
             Attribute, Block, Module,
         },
         test::load_all_dialects,
@@ -114,6 +114,61 @@ mod tests {
                     start.result(0).unwrap().into(),
                     end.result(0).unwrap().into(),
                     step.result(0).unwrap().into(),
+                    {
+                        let block = Block::new(&[(Type::index(&context), location)]);
+                        block.append_operation(r#yield(&[], location));
+
+                        let region = Region::new();
+                        region.append_block(block);
+                        region
+                    },
+                    location,
+                ));
+
+                block.append_operation(func::r#return(&[], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            location,
+        ));
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
+    fn compile_if() {
+        let context = Context::new();
+        load_all_dialects(&context);
+
+        let location = Location::unknown(&context);
+        let module = Module::new(location);
+
+        module.body().append_operation(func::func(
+            &context,
+            Attribute::parse(&context, "\"foo\"").unwrap(),
+            Attribute::parse(&context, "() -> index").unwrap(),
+            {
+                let block = Block::new(&[]);
+
+                let condition = block.append_operation(arith::constant(
+                    &context,
+                    IntegerAttribute::new(0, IntegerType::new(&context, 0).into()).into(),
+                    location,
+                ));
+
+                block.append_operation(r#if(
+                    condition.result(0).unwrap().into(),
+                    {
+                        let block = Block::new(&[(Type::index(&context), location)]);
+                        block.append_operation(r#yield(&[], location));
+
+                        let region = Region::new();
+                        region.append_block(block);
+                        region
+                    },
                     {
                         let block = Block::new(&[(Type::index(&context), location)]);
                         block.append_operation(r#yield(&[], location));
