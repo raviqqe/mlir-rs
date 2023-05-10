@@ -17,7 +17,7 @@ impl<'c> TypeAttribute<'c> {
         unsafe { Self::from_raw(mlirTypeAttrGet(r#type.to_raw())) }
     }
 
-    /// gets a type value.
+    /// Gets a type value.
     pub fn value(&self) -> Type<'c> {
         unsafe { Type::from_raw(mlirTypeAttrGetValue(self.to_raw())) }
     }
