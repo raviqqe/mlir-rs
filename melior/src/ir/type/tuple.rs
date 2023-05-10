@@ -5,11 +5,11 @@ use std::fmt::{self, Display, Formatter};
 
 /// A tuple type.
 #[derive(Clone, Copy, Debug)]
-pub struct Tuple<'c> {
+pub struct TupleType<'c> {
     r#type: Type<'c>,
 }
 
-impl<'c> Tuple<'c> {
+impl<'c> TupleType<'c> {
     /// Creates a tuple type.
     pub fn new(context: &'c Context, types: &[Type<'c>]) -> Self {
         Self {
@@ -43,19 +43,19 @@ impl<'c> Tuple<'c> {
     }
 }
 
-impl<'c> TypeLike<'c> for Tuple<'c> {
+impl<'c> TypeLike<'c> for TupleType<'c> {
     fn to_raw(&self) -> MlirType {
         self.r#type.to_raw()
     }
 }
 
-impl<'c> Display for Tuple<'c> {
+impl<'c> Display for TupleType<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Type::from(*self).fmt(formatter)
     }
 }
 
-impl<'c> TryFrom<Type<'c>> for Tuple<'c> {
+impl<'c> TryFrom<Type<'c>> for TupleType<'c> {
     type Error = Error;
 
     fn try_from(r#type: Type<'c>) -> Result<Self, Self::Error> {
@@ -77,7 +77,7 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            Type::from(Tuple::new(&context, &[])),
+            Type::from(TupleType::new(&context, &[])),
             Type::parse(&context, "tuple<>").unwrap()
         );
     }
@@ -87,7 +87,7 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            Type::from(Tuple::new(&context, &[Type::index(&context)])),
+            Type::from(TupleType::new(&context, &[Type::index(&context)])),
             Type::parse(&context, "tuple<index>").unwrap()
         );
     }
@@ -98,7 +98,7 @@ mod tests {
         let r#type = Type::index(&context);
 
         assert_eq!(
-            Type::from(Tuple::new(&context, &[r#type, r#type])),
+            Type::from(TupleType::new(&context, &[r#type, r#type])),
             Type::parse(&context, "tuple<index,index>").unwrap()
         );
     }
@@ -108,13 +108,13 @@ mod tests {
         let context = Context::new();
         let r#type = Type::index(&context);
 
-        assert_eq!(Tuple::new(&context, &[r#type]).r#type(0), Ok(r#type));
+        assert_eq!(TupleType::new(&context, &[r#type]).r#type(0), Ok(r#type));
     }
 
     #[test]
     fn type_error() {
         let context = Context::new();
-        let tuple = Tuple::new(&context, &[]);
+        let tuple = TupleType::new(&context, &[]);
 
         assert_eq!(
             tuple.r#type(42),
@@ -124,6 +124,6 @@ mod tests {
 
     #[test]
     fn type_count() {
-        assert_eq!(Tuple::new(&Context::new(), &[]).type_count(), 0);
+        assert_eq!(TupleType::new(&Context::new(), &[]).type_count(), 0);
     }
 }

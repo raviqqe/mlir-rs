@@ -12,12 +12,12 @@ use std::{
 /// An integer attribute.
 // Attributes are always values but their internal storage is owned by contexts.
 #[derive(Clone, Copy)]
-pub struct Integer<'c> {
+pub struct IntegerAttribute<'c> {
     raw: MlirAttribute,
     _context: PhantomData<&'c Context>,
 }
 
-impl<'c> Integer<'c> {
+impl<'c> IntegerAttribute<'c> {
     /// Creates an integer.
     pub fn new(integer: i64, r#type: Type<'c>) -> Self {
         unsafe { Self::from_raw(mlirIntegerAttrGet(r#type.to_raw(), integer)) }
@@ -31,13 +31,13 @@ impl<'c> Integer<'c> {
     }
 }
 
-impl<'c> AttributeLike<'c> for Integer<'c> {
+impl<'c> AttributeLike<'c> for IntegerAttribute<'c> {
     fn to_raw(&self) -> MlirAttribute {
         self.raw
     }
 }
 
-impl<'c> TryFrom<Attribute<'c>> for Integer<'c> {
+impl<'c> TryFrom<Attribute<'c>> for IntegerAttribute<'c> {
     type Error = Error;
 
     fn try_from(attribute: Attribute<'c>) -> Result<Self, Self::Error> {
@@ -52,13 +52,13 @@ impl<'c> TryFrom<Attribute<'c>> for Integer<'c> {
     }
 }
 
-impl<'c> Display for Integer<'c> {
+impl<'c> Display for IntegerAttribute<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Display::fmt(&Attribute::from(*self), formatter)
     }
 }
 
-impl<'c> Debug for Integer<'c> {
+impl<'c> Debug for IntegerAttribute<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Display::fmt(self, formatter)
     }

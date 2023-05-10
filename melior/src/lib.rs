@@ -184,7 +184,7 @@ mod tests {
 
             let zero = function_block.append_operation(arith::constant(
                 &context,
-                attribute::Integer::new(0, Type::index(&context)).into(),
+                attribute::IntegerAttribute::new(0, Type::index(&context)).into(),
                 location,
             ));
 
@@ -202,7 +202,7 @@ mod tests {
 
             let one = function_block.append_operation(arith::constant(
                 &context,
-                attribute::Integer::new(1, Type::index(&context)).into(),
+                attribute::IntegerAttribute::new(1, Type::index(&context)).into(),
                 location,
             ));
 
