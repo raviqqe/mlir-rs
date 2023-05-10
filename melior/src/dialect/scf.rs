@@ -230,12 +230,11 @@ mod tests {
 
             let location = Location::unknown(&context);
             let module = Module::new(location);
-            let index_type = Type::index(&context);
 
             module.body().append_operation(func::func(
                 &context,
                 Attribute::parse(&context, "\"foo\"").unwrap(),
-                Attribute::parse(&context, "() -> index").unwrap(),
+                Attribute::parse(&context, "() -> ()").unwrap(),
                 {
                     let block = Block::new(&[]);
 
@@ -245,52 +244,23 @@ mod tests {
                         location,
                     ));
 
-                    let result = block.append_operation(r#if(
+                    block.append_operation(r#if(
                         condition.result(0).unwrap().into(),
-                        &[index_type],
+                        &[],
                         {
                             let block = Block::new(&[]);
 
-                            let result = block.append_operation(arith::constant(
-                                &context,
-                                IntegerAttribute::new(42, index_type).into(),
-                                location,
-                            ));
-
-                            block.append_operation(r#yield(
-                                &[result.result(0).unwrap().into()],
-                                location,
-                            ));
+                            block.append_operation(r#yield(&[], location));
 
                             let region = Region::new();
                             region.append_block(block);
                             region
                         },
-                        {
-                            let block = Block::new(&[]);
-
-                            let result = block.append_operation(arith::constant(
-                                &context,
-                                IntegerAttribute::new(13, index_type).into(),
-                                location,
-                            ));
-
-                            block.append_operation(r#yield(
-                                &[result.result(0).unwrap().into()],
-                                location,
-                            ));
-
-                            let region = Region::new();
-                            region.append_block(block);
-                            region
-                        },
+                        Region::new(),
                         location,
                     ));
 
-                    block.append_operation(func::r#return(
-                        &[result.result(0).unwrap().into()],
-                        location,
-                    ));
+                    block.append_operation(func::r#return(&[], location));
 
                     let region = Region::new();
                     region.append_block(block);

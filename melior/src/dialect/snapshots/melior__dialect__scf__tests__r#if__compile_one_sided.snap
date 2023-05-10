@@ -3,16 +3,11 @@ source: melior/src/dialect/scf.rs
 expression: module.as_operation()
 ---
 module {
-  func.func @foo() -> index {
+  func.func @foo() {
     %false = arith.constant false
-    %0 = scf.if %false -> (index) {
-      %c42 = arith.constant 42 : index
-      scf.yield %c42 : index
-    } else {
-      %c13 = arith.constant 13 : index
-      scf.yield %c13 : index
+    scf.if %false {
     }
-    return %0 : index
+    return
   }
 }
 
