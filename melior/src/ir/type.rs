@@ -1,5 +1,7 @@
 //! Types and type IDs.
 
+#[macro_use]
+mod r#macro;
 mod function;
 pub mod id;
 mod integer;
