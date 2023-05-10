@@ -433,11 +433,6 @@ mod tests {
     }
 
     mod r#while {
-        use crate::ir::{
-            attribute::{StringAttribute, TypeAttribute},
-            r#type::FunctionType,
-        };
-
         use super::*;
 
         #[test]
