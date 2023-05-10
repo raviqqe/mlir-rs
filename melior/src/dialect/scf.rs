@@ -56,7 +56,7 @@ mod tests {
     use crate::{
         dialect::{arith, func},
         ir::{
-            attribute,
+            attribute::{self, FloatAttribute, IntegerAttribute},
             r#type::{self, Type},
             Attribute, Block, Module,
         },
@@ -143,7 +143,7 @@ mod tests {
 
                 let initial = block.append_operation(arith::constant(
                     &context,
-                    attribute::IntegerAttribute::new(0, index_type).into(),
+                    IntegerAttribute::new(0, index_type).into(),
                     location,
                 ));
 
@@ -155,17 +155,14 @@ mod tests {
 
                         let condition = block.append_operation(arith::constant(
                             &context,
-                            attribute::IntegerAttribute::new(
-                                0,
-                                r#type::IntegerType::new(&context, 1).into(),
-                            )
-                            .into(),
+                            IntegerAttribute::new(0, r#type::IntegerType::new(&context, 1).into())
+                                .into(),
                             location,
                         ));
 
                         let result = block.append_operation(arith::constant(
                             &context,
-                            attribute::IntegerAttribute::new(42, Type::index(&context)).into(),
+                            IntegerAttribute::new(42, Type::index(&context)).into(),
                             location,
                         ));
 
@@ -184,7 +181,7 @@ mod tests {
 
                         let result = block.append_operation(arith::constant(
                             &context,
-                            attribute::IntegerAttribute::new(42, index_type).into(),
+                            IntegerAttribute::new(42, index_type).into(),
                             location,
                         ));
 
@@ -232,7 +229,7 @@ mod tests {
 
                 let initial = block.append_operation(arith::constant(
                     &context,
-                    attribute::IntegerAttribute::new(0, index_type).into(),
+                    IntegerAttribute::new(0, index_type).into(),
                     location,
                 ));
 
@@ -244,17 +241,14 @@ mod tests {
 
                         let condition = block.append_operation(arith::constant(
                             &context,
-                            attribute::IntegerAttribute::new(
-                                0,
-                                r#type::IntegerType::new(&context, 1).into(),
-                            )
-                            .into(),
+                            IntegerAttribute::new(0, r#type::IntegerType::new(&context, 1).into())
+                                .into(),
                             location,
                         ));
 
                         let result = block.append_operation(arith::constant(
                             &context,
-                            attribute::FloatAttribute::new(&context, 42.0, float_type).into(),
+                            FloatAttribute::new(&context, 42.0, float_type).into(),
                             location,
                         ));
 
@@ -273,7 +267,7 @@ mod tests {
 
                         let result = block.append_operation(arith::constant(
                             &context,
-                            attribute::IntegerAttribute::new(42, Type::index(&context)).into(),
+                            IntegerAttribute::new(42, Type::index(&context)).into(),
                             location,
                         ));
 
@@ -320,7 +314,7 @@ mod tests {
 
                 let initial = block.append_operation(arith::constant(
                     &context,
-                    attribute::IntegerAttribute::new(0, index_type).into(),
+                    IntegerAttribute::new(0, index_type).into(),
                     location,
                 ));
 
@@ -335,17 +329,14 @@ mod tests {
 
                         let condition = block.append_operation(arith::constant(
                             &context,
-                            attribute::IntegerAttribute::new(
-                                0,
-                                r#type::IntegerType::new(&context, 1).into(),
-                            )
-                            .into(),
+                            IntegerAttribute::new(0, r#type::IntegerType::new(&context, 1).into())
+                                .into(),
                             location,
                         ));
 
                         let result = block.append_operation(arith::constant(
                             &context,
-                            attribute::IntegerAttribute::new(42, Type::index(&context)).into(),
+                            IntegerAttribute::new(42, Type::index(&context)).into(),
                             location,
                         ));
 
@@ -367,7 +358,7 @@ mod tests {
 
                         let result = block.append_operation(arith::constant(
                             &context,
-                            attribute::IntegerAttribute::new(42, index_type).into(),
+                            IntegerAttribute::new(42, index_type).into(),
                             location,
                         ));
 
