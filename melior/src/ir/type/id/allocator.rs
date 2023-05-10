@@ -1,4 +1,4 @@
-use super::Id;
+use super::TypeId;
 use mlir_sys::{
     mlirTypeIDAllocatorAllocateTypeID, mlirTypeIDAllocatorCreate, mlirTypeIDAllocatorDestroy,
     MlirTypeIDAllocator,
@@ -17,8 +17,8 @@ impl Allocator {
         }
     }
 
-    pub fn allocate_type_id(&mut self) -> Id {
-        unsafe { Id::from_raw(mlirTypeIDAllocatorAllocateTypeID(self.raw)) }
+    pub fn allocate_type_id(&mut self) -> TypeId {
+        unsafe { TypeId::from_raw(mlirTypeIDAllocatorAllocateTypeID(self.raw)) }
     }
 }
 
