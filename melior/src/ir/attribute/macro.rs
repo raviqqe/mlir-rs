@@ -1,5 +1,13 @@
 macro_rules! attribute_traits {
     ($name: ident, $is_type: ident, $string: expr) => {
+        impl<'c> $name<'c> {
+            unsafe fn from_raw(raw: MlirAttribute) -> Self {
+                Self {
+                    attribute: Attribute::from_raw(raw),
+                }
+            }
+        }
+
         impl<'c> TryFrom<crate::ir::attribute::Attribute<'c>> for $name<'c> {
             type Error = crate::Error;
 

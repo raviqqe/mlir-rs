@@ -40,12 +40,6 @@ impl<'c> DenseI64ArrayAttribute<'c> {
             Err(Error::ArrayElementPosition(self.to_string(), index))
         }
     }
-
-    unsafe fn from_raw(raw: MlirAttribute) -> Self {
-        Self {
-            attribute: Attribute::from_raw(raw),
-        }
-    }
 }
 
 attribute_traits!(

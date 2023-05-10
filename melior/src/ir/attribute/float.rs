@@ -22,12 +22,6 @@ impl<'c> FloatAttribute<'c> {
             ))
         }
     }
-
-    unsafe fn from_raw(raw: MlirAttribute) -> Self {
-        Self {
-            attribute: Attribute::from_raw(raw),
-        }
-    }
 }
 
 attribute_traits!(FloatAttribute, is_float, "float");

@@ -16,12 +16,6 @@ impl<'c> IntegerAttribute<'c> {
     pub fn new(integer: i64, r#type: Type<'c>) -> Self {
         unsafe { Self::from_raw(mlirIntegerAttrGet(r#type.to_raw(), integer)) }
     }
-
-    unsafe fn from_raw(raw: MlirAttribute) -> Self {
-        Self {
-            attribute: Attribute::from_raw(raw),
-        }
-    }
 }
 
 attribute_traits!(IntegerAttribute, is_integer, "integer");
