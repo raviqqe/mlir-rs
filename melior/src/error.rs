@@ -20,6 +20,7 @@ pub enum Error {
     RunPass,
     TupleFieldPosition(String, usize),
     TypeExpected(&'static str, String),
+    UnknownDiagnosticSeverity(u32),
 }
 
 impl Display for Error {
@@ -79,6 +80,9 @@ impl Display for Error {
             }
             Self::TypeExpected(r#type, actual) => {
                 write!(formatter, "{type} type expected: {actual}")
+            }
+            Self::UnknownDiagnosticSeverity(severity) => {
+                write!(formatter, "unknown diagnostic severity: {severity}")
             }
         }
     }

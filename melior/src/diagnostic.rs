@@ -1,7 +1,11 @@
+mod handler_id;
+mod severity;
+
+pub use self::{handler_id::DiagnosticHandlerId, severity::DiagnosticSeverity};
 use crate::{ir::Location, utility::print_callback, Error};
 use mlir_sys::{
     mlirDiagnosticGetLocation, mlirDiagnosticGetNote, mlirDiagnosticGetNumNotes,
-    mlirDiagnosticGetSeverity, mlirDiagnosticPrint, MlirDiagnostic, MlirDiagnosticHandlerID,
+    mlirDiagnosticGetSeverity, mlirDiagnosticPrint, MlirDiagnostic,
     MlirDiagnosticSeverity_MlirDiagnosticError, MlirDiagnosticSeverity_MlirDiagnosticNote,
     MlirDiagnosticSeverity_MlirDiagnosticRemark, MlirDiagnosticSeverity_MlirDiagnosticWarning,
 };
@@ -10,14 +14,6 @@ use std::{
     fmt::{self, Display, Formatter},
     marker::PhantomData,
 };
-
-#[derive(Clone, Copy, Debug)]
-pub enum DiagnosticSeverity {
-    Error,
-    Note,
-    Remark,
-    Warning,
-}
 
 #[derive(Debug)]
 pub struct Diagnostic<'a> {
@@ -78,20 +74,5 @@ impl<'a> Display for Diagnostic<'a> {
         }
 
         data.1
-    }
-}
-
-#[derive(Clone, Copy, Debug)]
-pub struct DiagnosticHandlerId {
-    raw: MlirDiagnosticHandlerID,
-}
-
-impl DiagnosticHandlerId {
-    pub(crate) unsafe fn from_raw(raw: MlirDiagnosticHandlerID) -> Self {
-        Self { raw }
-    }
-
-    pub(crate) unsafe fn to_raw(self) -> MlirDiagnosticHandlerID {
-        self.raw
     }
 }
