@@ -105,7 +105,7 @@ mod tests {
     fn add_pass() {
         let context = Context::new();
 
-        PassManager::new(&context).add_pass(pass::conversion::func_to_llvm());
+        PassManager::new(&context).add_pass(pass::conversion::create_func_to_llvm());
     }
 
     #[test]
@@ -128,7 +128,7 @@ mod tests {
         let context = Context::new();
         let manager = PassManager::new(&context);
 
-        manager.add_pass(pass::conversion::func_to_llvm());
+        manager.add_pass(pass::conversion::create_func_to_llvm());
         manager
             .run(&mut Module::new(Location::unknown(&context)))
             .unwrap();
@@ -153,7 +153,7 @@ mod tests {
         .unwrap();
 
         let manager = PassManager::new(&context);
-        manager.add_pass(pass::transform::print_op_stats());
+        manager.add_pass(pass::transform::create_print_op_stats());
 
         assert_eq!(manager.run(&mut module), Ok(()));
     }
@@ -186,7 +186,7 @@ mod tests {
         let manager = PassManager::new(&context);
         manager
             .nested_under("func.func")
-            .add_pass(pass::transform::print_op_stats());
+            .add_pass(pass::transform::create_print_op_stats());
 
         assert_eq!(manager.run(&mut module), Ok(()));
 
@@ -194,7 +194,7 @@ mod tests {
         manager
             .nested_under("builtin.module")
             .nested_under("func.func")
-            .add_pass(pass::transform::print_op_stats());
+            .add_pass(pass::transform::create_print_op_stats());
 
         assert_eq!(manager.run(&mut module), Ok(()));
     }
@@ -205,7 +205,7 @@ mod tests {
         let manager = PassManager::new(&context);
         let function_manager = manager.nested_under("func.func");
 
-        function_manager.add_pass(pass::transform::print_op_stats());
+        function_manager.add_pass(pass::transform::create_print_op_stats());
 
         assert_eq!(
             manager.as_operation_pass_manager().to_string(),

@@ -97,11 +97,11 @@ mod tests {
         .unwrap();
 
         let pass_manager = pass::PassManager::new(&context);
-        pass_manager.add_pass(pass::conversion::func_to_llvm());
+        pass_manager.add_pass(pass::conversion::create_func_to_llvm());
 
         pass_manager
             .nested_under("func.func")
-            .add_pass(pass::conversion::arith_to_llvm());
+            .add_pass(pass::conversion::create_arith_to_llvm());
 
         assert_eq!(pass_manager.run(&mut module), Ok(()));
 
