@@ -1,8 +1,8 @@
 use crate::{
+    diagnostic::{Diagnostic, DiagnosticHandlerId},
     dialect::{Dialect, DialectRegistry},
     logical_result::LogicalResult,
     string_ref::StringRef,
-    Diagnostic, DiagnosticHandlerId,
 };
 use mlir_sys::{
     mlirContextAppendDialectRegistry, mlirContextAttachDiagnosticHandler, mlirContextCreate,
