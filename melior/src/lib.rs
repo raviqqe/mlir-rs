@@ -105,7 +105,10 @@ mod tests {
     use crate::{
         context::Context,
         dialect::{self, arith, func, scf},
-        ir::{attribute, operation, r#type, Attribute, Block, Location, Module, Region, Type},
+        ir::{
+            attribute::IntegerAttribute, operation, r#type::IntegerType, Attribute, Block,
+            Location, Module, Region, Type,
+        },
         test::load_all_dialects,
     };
 
@@ -137,7 +140,7 @@ mod tests {
         let location = Location::unknown(&context);
         let module = Module::new(location);
 
-        let integer_type = r#type::IntegerType::new(&context, 64).into();
+        let integer_type = IntegerType::new(&context, 64).into();
 
         let function = {
             let block = Block::new(&[(integer_type, location), (integer_type, location)]);
@@ -184,7 +187,7 @@ mod tests {
 
             let zero = function_block.append_operation(arith::constant(
                 &context,
-                attribute::IntegerAttribute::new(0, Type::index(&context)).into(),
+                IntegerAttribute::new(0, Type::index(&context)).into(),
                 location,
             ));
 
@@ -202,7 +205,7 @@ mod tests {
 
             let one = function_block.append_operation(arith::constant(
                 &context,
-                attribute::IntegerAttribute::new(1, Type::index(&context)).into(),
+                IntegerAttribute::new(1, Type::index(&context)).into(),
                 location,
             ));
 
