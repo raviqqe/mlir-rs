@@ -49,6 +49,7 @@ impl<'c> TryFrom<Attribute<'c>> for FloatAttribute<'c> {
     }
 }
 
+attribute_traits
 impl<'c> Display for FloatAttribute<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Display::fmt(&self.attribute, formatter)
