@@ -5,7 +5,11 @@ use mlir_sys::{
     MlirDiagnosticSeverity_MlirDiagnosticError, MlirDiagnosticSeverity_MlirDiagnosticNote,
     MlirDiagnosticSeverity_MlirDiagnosticRemark, MlirDiagnosticSeverity_MlirDiagnosticWarning,
 };
-use std::{ffi::c_void, fmt, marker::PhantomData};
+use std::{
+    ffi::c_void,
+    fmt::{self, Display, Formatter},
+    marker::PhantomData,
+};
 
 #[derive(Clone, Copy, Debug)]
 pub enum DiagnosticSeverity {
@@ -61,9 +65,9 @@ impl<'a> Diagnostic<'a> {
     }
 }
 
-impl<'a> fmt::Display for Diagnostic<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let mut data = (f, Ok(()));
+impl<'a> Display for Diagnostic<'a> {
+    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
+        let mut data = (formatter, Ok(()));
 
         unsafe {
             mlirDiagnosticPrint(
