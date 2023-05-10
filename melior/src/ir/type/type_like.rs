@@ -64,7 +64,7 @@ mod tests {
     use super::*;
     use crate::{
         ir::{
-            r#type::{Function, Integer},
+            r#type::{FunctionType, IntegerType},
             Type,
         },
         Context,
@@ -86,7 +86,7 @@ mod tests {
     fn is_integer() {
         let context = Context::new();
 
-        assert!(Integer::new(&context, 64).is_integer());
+        assert!(IntegerType::new(&context, 64).is_integer());
     }
 
     #[test]
@@ -100,14 +100,14 @@ mod tests {
     fn is_bfloat16() {
         let context = Context::new();
 
-        assert!(Function::new(&context, &[], &[]).is_function());
+        assert!(FunctionType::new(&context, &[], &[]).is_function());
     }
 
     #[test]
     fn is_function() {
         let context = Context::new();
 
-        assert!(Function::new(&context, &[], &[]).is_function());
+        assert!(FunctionType::new(&context, &[], &[]).is_function());
     }
 
     #[test]

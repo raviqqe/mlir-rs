@@ -8,7 +8,7 @@ mod tuple;
 mod type_like;
 
 pub use self::{
-    function::FunctionType, id::Id, integer::Integer, mem_ref::MemRefType, tuple::TupleType,
+    function::FunctionType, id::Id, integer::IntegerType, mem_ref::MemRefType, tuple::TupleType,
     type_like::TypeLike,
 };
 use super::Location;
@@ -160,8 +160,8 @@ impl<'c> From<FunctionType<'c>> for Type<'c> {
     }
 }
 
-impl<'c> From<Integer<'c>> for Type<'c> {
-    fn from(integer: Integer<'c>) -> Self {
+impl<'c> From<IntegerType<'c>> for Type<'c> {
+    fn from(integer: IntegerType<'c>) -> Self {
         unsafe { Self::from_raw(integer.to_raw()) }
     }
 }
@@ -192,7 +192,7 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            Type::from(Integer::new(&context, 42)),
+            Type::from(IntegerType::new(&context, 42)),
             Type::parse(&context, "i42").unwrap()
         );
     }
@@ -222,7 +222,7 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            Type::vector(&[0], Integer::new(&context, 32).into()).to_string(),
+            Type::vector(&[0], IntegerType::new(&context, 32).into()).to_string(),
             "vector<0xi32>"
         );
     }
@@ -235,7 +235,7 @@ mod tests {
             Type::vector_checked(
                 Location::unknown(&context),
                 &[42],
-                Integer::new(&context, 32).into()
+                IntegerType::new(&context, 32).into()
             ),
             Type::parse(&context, "vector<42xi32>")
         );

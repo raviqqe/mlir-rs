@@ -12,12 +12,12 @@ use std::{
 /// An float attribute.
 // Attributes are always values but their internal storage is owned by contexts.
 #[derive(Clone, Copy)]
-pub struct Float<'c> {
+pub struct FloatAttribute<'c> {
     raw: MlirAttribute,
     _context: PhantomData<&'c Context>,
 }
 
-impl<'c> Float<'c> {
+impl<'c> FloatAttribute<'c> {
     /// Creates an float.
     pub fn new(context: &'c Context, number: f64, r#type: Type<'c>) -> Self {
         unsafe {
@@ -37,13 +37,13 @@ impl<'c> Float<'c> {
     }
 }
 
-impl<'c> AttributeLike<'c> for Float<'c> {
+impl<'c> AttributeLike<'c> for FloatAttribute<'c> {
     fn to_raw(&self) -> MlirAttribute {
         self.raw
     }
 }
 
-impl<'c> TryFrom<Attribute<'c>> for Float<'c> {
+impl<'c> TryFrom<Attribute<'c>> for FloatAttribute<'c> {
     type Error = Error;
 
     fn try_from(attribute: Attribute<'c>) -> Result<Self, Self::Error> {
@@ -55,13 +55,13 @@ impl<'c> TryFrom<Attribute<'c>> for Float<'c> {
     }
 }
 
-impl<'c> Display for Float<'c> {
+impl<'c> Display for FloatAttribute<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Display::fmt(&Attribute::from(*self), formatter)
     }
 }
 
-impl<'c> Debug for Float<'c> {
+impl<'c> Debug for FloatAttribute<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Display::fmt(self, formatter)
     }

@@ -63,7 +63,10 @@ pub fn void(context: &Context) -> Type {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{dialect, ir::r#type};
+    use crate::{
+        dialect,
+        ir::r#type::{self, IntegerType},
+    };
 
     fn create_context() -> Context {
         let context = Context::new();
@@ -87,7 +90,7 @@ mod tests {
     #[test]
     fn pointer() {
         let context = create_context();
-        let i32 = r#type::Integer::new(&context, 32).into();
+        let i32 = IntegerType::new(&context, 32).into();
 
         assert_eq!(
             super::pointer(i32, 0),
@@ -98,7 +101,7 @@ mod tests {
     #[test]
     fn pointer_with_address_space() {
         let context = create_context();
-        let i32 = r#type::Integer::new(&context, 32).into();
+        let i32 = IntegerType::new(&context, 32).into();
 
         assert_eq!(
             super::pointer(i32, 4),
@@ -119,7 +122,7 @@ mod tests {
     #[test]
     fn array() {
         let context = create_context();
-        let i32 = r#type::Integer::new(&context, 32).into();
+        let i32 = IntegerType::new(&context, 32).into();
 
         assert_eq!(
             super::array(i32, 4),
@@ -130,9 +133,9 @@ mod tests {
     #[test]
     fn function() {
         let context = create_context();
-        let i8 = r#type::Integer::new(&context, 8).into();
-        let i32 = r#type::Integer::new(&context, 32).into();
-        let i64 = r#type::Integer::new(&context, 64).into();
+        let i8 = IntegerType::new(&context, 8).into();
+        let i32 = IntegerType::new(&context, 32).into();
+        let i64 = IntegerType::new(&context, 64).into();
 
         assert_eq!(
             super::function(i8, &[i32, i64], false),
@@ -143,8 +146,8 @@ mod tests {
     #[test]
     fn r#struct() {
         let context = create_context();
-        let i32 = r#type::Integer::new(&context, 32).into();
-        let i64 = r#type::Integer::new(&context, 64).into();
+        let i32 = IntegerType::new(&context, 32).into();
+        let i64 = IntegerType::new(&context, 64).into();
 
         assert_eq!(
             super::r#struct(&context, &[i32, i64], false),
@@ -155,8 +158,8 @@ mod tests {
     #[test]
     fn packed_struct() {
         let context = create_context();
-        let i32 = r#type::Integer::new(&context, 32).into();
-        let i64 = r#type::Integer::new(&context, 64).into();
+        let i32 = IntegerType::new(&context, 32).into();
+        let i64 = IntegerType::new(&context, 64).into();
 
         assert_eq!(
             super::r#struct(&context, &[i32, i64], true),

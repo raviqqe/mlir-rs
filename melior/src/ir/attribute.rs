@@ -4,7 +4,7 @@ mod attribute_like;
 mod float;
 mod integer;
 
-pub use self::{attribute_like::AttributeLike, float::Float, integer::IntegerAttribute};
+pub use self::{attribute_like::AttributeLike, float::FloatAttribute, integer::IntegerAttribute};
 use super::{r#type, Type};
 use crate::{context::Context, string_ref::StringRef, utility::print_callback};
 use mlir_sys::{
@@ -97,8 +97,8 @@ impl<'c> Debug for Attribute<'c> {
     }
 }
 
-impl<'c> From<Float<'c>> for Attribute<'c> {
-    fn from(attribute: Float<'c>) -> Self {
+impl<'c> From<FloatAttribute<'c>> for Attribute<'c> {
+    fn from(attribute: FloatAttribute<'c>) -> Self {
         unsafe { Self::from_raw(attribute.to_raw()) }
     }
 }
