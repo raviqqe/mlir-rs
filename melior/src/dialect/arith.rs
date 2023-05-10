@@ -22,7 +22,7 @@ pub fn constant<'c>(
         .build()
 }
 
-// `arith.cmpf` predicate
+/// `arith.cmpf` predicate
 pub enum CmpfPredicate {
     False,
     Oeq,
@@ -53,7 +53,7 @@ pub fn cmpf<'c>(
     cmp(context, "arith.cmpf", predicate as i64, lhs, rhs, location)
 }
 
-// `arith.cmpi` predicate
+/// `arith.cmpi` predicate
 pub enum CmpiPredicate {
     Eq,
     Ne,
