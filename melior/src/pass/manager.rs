@@ -80,7 +80,7 @@ impl<'c> Drop for Manager<'c> {
 mod tests {
     use super::*;
     use crate::{
-        dialect,
+        dialect::DialectRegistry,
         ir::{Location, Module},
         pass::{self, transform::register_print_op_stats},
         utility::{parse_pass_pipeline, register_all_dialects},
@@ -89,7 +89,7 @@ mod tests {
     use pretty_assertions::assert_eq;
 
     fn register_all_upstream_dialects(context: &Context) {
-        let registry = dialect::DialectRegistry::new();
+        let registry = DialectRegistry::new();
         register_all_dialects(&registry);
         context.append_dialect_registry(&registry);
     }
