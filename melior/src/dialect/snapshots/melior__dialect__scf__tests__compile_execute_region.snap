@@ -1,0 +1,14 @@
+---
+source: melior/src/dialect/scf.rs
+expression: module.as_operation()
+---
+module {
+  func.func @foo() {
+    %0 = scf.execute_region -> index {
+      %c0 = arith.constant 0 : index
+      scf.yield %c0 : index
+    }
+    return
+  }
+}
+

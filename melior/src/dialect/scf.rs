@@ -110,7 +110,7 @@ mod tests {
                 block.append_operation(execute_region(
                     &[index_type],
                     {
-                        let block = Block::new(&[(Type::index(&context), location)]);
+                        let block = Block::new(&[]);
 
                         let value = block.append_operation(arith::constant(
                             &context,
