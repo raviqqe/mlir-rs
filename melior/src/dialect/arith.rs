@@ -2,8 +2,8 @@
 
 use crate::{
     ir::{
-        attribute::IntegerAttribute, operation, r#type::IntegerType, Attribute, Identifier,
-        Location, Operation, Value,
+        attribute::IntegerAttribute, operation::OperationBuilder, r#type::IntegerType, Attribute,
+        Identifier, Location, Operation, Value,
     },
     Context,
 };
@@ -16,7 +16,7 @@ pub fn constant<'c>(
     value: Attribute<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    operation::Builder::new("arith.constant", location)
+    OperationBuilder::new("arith.constant", location)
         .add_attributes(&[(Identifier::new(context, "value"), value)])
         .enable_result_type_inference()
         .build()
@@ -86,7 +86,7 @@ fn cmp<'c>(
     rhs: Value,
     location: Location<'c>,
 ) -> Operation<'c> {
-    operation::Builder::new(name, location)
+    OperationBuilder::new(name, location)
         .add_attributes(&[(
             Identifier::new(context, "predicate"),
             IntegerAttribute::new(predicate, IntegerType::new(context, 64).into()).into(),

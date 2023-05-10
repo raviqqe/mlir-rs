@@ -293,7 +293,7 @@ impl<'a> Debug for BlockRef<'a> {
 mod tests {
     use super::*;
     use crate::{
-        ir::{operation, r#type::IntegerType, Module, Region, ValueLike},
+        ir::{operation::OperationBuilder, r#type::IntegerType, Module, Region, ValueLike},
         test::load_all_dialects,
     };
     use pretty_assertions::assert_eq;
@@ -371,7 +371,7 @@ mod tests {
         let block = Block::new(&[]);
 
         let operation = block.append_operation(
-            operation::Builder::new("func.return", Location::unknown(&context)).build(),
+            OperationBuilder::new("func.return", Location::unknown(&context)).build(),
         );
 
         assert_eq!(block.terminator(), Some(operation));
@@ -388,7 +388,7 @@ mod tests {
         let block = Block::new(&[]);
 
         let operation = block
-            .append_operation(operation::Builder::new("foo", Location::unknown(&context)).build());
+            .append_operation(OperationBuilder::new("foo", Location::unknown(&context)).build());
 
         assert_eq!(block.first_operation(), Some(operation));
     }
@@ -405,7 +405,7 @@ mod tests {
         let context = Context::new();
         let block = Block::new(&[]);
 
-        block.append_operation(operation::Builder::new("foo", Location::unknown(&context)).build());
+        block.append_operation(OperationBuilder::new("foo", Location::unknown(&context)).build());
     }
 
     #[test]
@@ -415,7 +415,7 @@ mod tests {
 
         block.insert_operation(
             0,
-            operation::Builder::new("foo", Location::unknown(&context)).build(),
+            OperationBuilder::new("foo", Location::unknown(&context)).build(),
         );
     }
 
@@ -425,10 +425,10 @@ mod tests {
         let block = Block::new(&[]);
 
         let first_operation = block
-            .append_operation(operation::Builder::new("foo", Location::unknown(&context)).build());
+            .append_operation(OperationBuilder::new("foo", Location::unknown(&context)).build());
         let second_operation = block.insert_operation_after(
             first_operation,
-            operation::Builder::new("foo", Location::unknown(&context)).build(),
+            OperationBuilder::new("foo", Location::unknown(&context)).build(),
         );
 
         assert_eq!(block.first_operation(), Some(first_operation));
@@ -444,10 +444,10 @@ mod tests {
         let block = Block::new(&[]);
 
         let second_operation = block
-            .append_operation(operation::Builder::new("foo", Location::unknown(&context)).build());
+            .append_operation(OperationBuilder::new("foo", Location::unknown(&context)).build());
         let first_operation = block.insert_operation_before(
             second_operation,
-            operation::Builder::new("foo", Location::unknown(&context)).build(),
+            OperationBuilder::new("foo", Location::unknown(&context)).build(),
         );
 
         assert_eq!(block.first_operation(), Some(first_operation));

@@ -18,12 +18,12 @@ use std::marker::PhantomData;
 use super::Operation;
 
 /// An operation builder.
-pub struct Builder<'c> {
+pub struct OperationBuilder<'c> {
     raw: MlirOperationState,
     _context: PhantomData<&'c Context>,
 }
 
-impl<'c> Builder<'c> {
+impl<'c> OperationBuilder<'c> {
     /// Creates an operation builder.
     pub fn new(name: &str, location: Location<'c>) -> Self {
         Self {
@@ -133,14 +133,14 @@ mod tests {
 
     #[test]
     fn new() {
-        Builder::new("foo", Location::unknown(&Context::new())).build();
+        OperationBuilder::new("foo", Location::unknown(&Context::new())).build();
     }
 
     #[test]
     fn add_results() {
         let context = Context::new();
 
-        Builder::new("foo", Location::unknown(&context))
+        OperationBuilder::new("foo", Location::unknown(&context))
             .add_results(&[Type::parse(&context, "i1").unwrap()])
             .build();
     }
@@ -149,7 +149,7 @@ mod tests {
     fn add_regions() {
         let context = Context::new();
 
-        Builder::new("foo", Location::unknown(&context))
+        OperationBuilder::new("foo", Location::unknown(&context))
             .add_regions(vec![Region::new()])
             .build();
     }
@@ -158,7 +158,7 @@ mod tests {
     fn add_successors() {
         let context = Context::new();
 
-        Builder::new("foo", Location::unknown(&context))
+        OperationBuilder::new("foo", Location::unknown(&context))
             .add_successors(&[&Block::new(&[])])
             .build();
     }
@@ -167,7 +167,7 @@ mod tests {
     fn add_attributes() {
         let context = Context::new();
 
-        Builder::new("foo", Location::unknown(&context))
+        OperationBuilder::new("foo", Location::unknown(&context))
             .add_attributes(&[(
                 Identifier::new(&context, "foo"),
                 Attribute::parse(&context, "unit").unwrap(),
@@ -186,7 +186,7 @@ mod tests {
         let argument = block.argument(0).unwrap().into();
 
         assert_eq!(
-            Builder::new("arith.addi", location)
+            OperationBuilder::new("arith.addi", location)
                 .add_operands(&[argument, argument])
                 .enable_result_type_inference()
                 .build()

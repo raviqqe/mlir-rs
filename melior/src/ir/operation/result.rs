@@ -56,14 +56,14 @@ impl<'a> TryFrom<Value<'a>> for ResultValue<'a> {
 mod tests {
     use crate::{
         context::Context,
-        ir::{operation, Block, Location, Type},
+        ir::{operation::OperationBuilder, Block, Location, Type},
     };
 
     #[test]
     fn result_number() {
         let context = Context::new();
         let r#type = Type::parse(&context, "index").unwrap();
-        let operation = operation::Builder::new("foo", Location::unknown(&context))
+        let operation = OperationBuilder::new("foo", Location::unknown(&context))
             .add_results(&[r#type])
             .build();
 

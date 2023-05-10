@@ -1,6 +1,6 @@
 //! `scf` dialect.
 
-use crate::ir::{operation::Builder, Location, Operation, Region, Type, Value};
+use crate::ir::{operation::OperationBuilder, Location, Operation, Region, Type, Value};
 
 /// Creates a `scf.condition` operation.
 pub fn condition<'c>(
@@ -8,7 +8,7 @@ pub fn condition<'c>(
     values: &[Value<'c>],
     location: Location<'c>,
 ) -> Operation<'c> {
-    Builder::new("scf.condition", location)
+    OperationBuilder::new("scf.condition", location)
         .add_operands(&[condition])
         .add_operands(values)
         .build()
@@ -22,7 +22,7 @@ pub fn r#for<'c>(
     region: Region,
     location: Location<'c>,
 ) -> Operation<'c> {
-    Builder::new("scf.for", location)
+    OperationBuilder::new("scf.for", location)
         .add_operands(&[start, end, step])
         .add_regions(vec![region])
         .build()
@@ -36,7 +36,7 @@ pub fn r#while<'c>(
     after_region: Region,
     location: Location<'c>,
 ) -> Operation<'c> {
-    Builder::new("scf.while", location)
+    OperationBuilder::new("scf.while", location)
         .add_operands(initial_values)
         .add_results(result_types)
         .add_regions(vec![before_region, after_region])
@@ -45,7 +45,7 @@ pub fn r#while<'c>(
 
 /// Creates a `scf.yield` operation.
 pub fn r#yield<'c>(values: &[Value<'c>], location: Location<'c>) -> Operation<'c> {
-    Builder::new("scf.yield", location)
+    OperationBuilder::new("scf.yield", location)
         .add_operands(values)
         .build()
 }

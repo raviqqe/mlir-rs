@@ -83,7 +83,7 @@ mod tests {
     use super::*;
     use crate::{
         context::Context,
-        ir::{operation, Attribute, Block, Identifier, Location},
+        ir::{operation::OperationBuilder, Attribute, Block, Identifier, Location},
         test::load_all_dialects,
     };
 
@@ -93,7 +93,7 @@ mod tests {
         let location = Location::unknown(&context);
         let index_type = Type::index(&context);
 
-        let operation = operation::Builder::new("arith.constant", location)
+        let operation = OperationBuilder::new("arith.constant", location)
             .add_results(&[index_type])
             .add_attributes(&[(
                 Identifier::new(&context, "value"),
@@ -110,7 +110,7 @@ mod tests {
         let location = Location::unknown(&context);
         let r#type = Type::index(&context);
 
-        let operation = operation::Builder::new("arith.constant", location)
+        let operation = OperationBuilder::new("arith.constant", location)
             .add_results(&[r#type])
             .add_attributes(&[(
                 Identifier::new(&context, "value"),
@@ -136,7 +136,7 @@ mod tests {
         let location = Location::unknown(&context);
         let index_type = Type::index(&context);
 
-        let value = operation::Builder::new("arith.constant", location)
+        let value = OperationBuilder::new("arith.constant", location)
             .add_results(&[index_type])
             .add_attributes(&[(
                 Identifier::new(&context, "value"),
@@ -153,7 +153,7 @@ mod tests {
         let location = Location::unknown(&context);
         let index_type = Type::index(&context);
 
-        let operation = operation::Builder::new("arith.constant", location)
+        let operation = OperationBuilder::new("arith.constant", location)
             .add_results(&[index_type])
             .add_attributes(&[(
                 Identifier::new(&context, "value"),
@@ -172,7 +172,7 @@ mod tests {
         let index_type = Type::index(&context);
 
         let operation = || {
-            operation::Builder::new("arith.constant", location)
+            OperationBuilder::new("arith.constant", location)
                 .add_results(&[index_type])
                 .add_attributes(&[(
                     Identifier::new(&context, "value"),
@@ -194,7 +194,7 @@ mod tests {
         let location = Location::unknown(&context);
         let index_type = Type::index(&context);
 
-        let operation = operation::Builder::new("arith.constant", location)
+        let operation = OperationBuilder::new("arith.constant", location)
             .add_results(&[index_type])
             .add_attributes(&[(
                 Identifier::new(&context, "value"),
@@ -216,7 +216,7 @@ mod tests {
         let location = Location::unknown(&context);
         let index_type = Type::index(&context);
 
-        let operation = operation::Builder::new("arith.constant", location)
+        let operation = OperationBuilder::new("arith.constant", location)
             .add_results(&[index_type])
             .add_attributes(&[(
                 Identifier::new(&context, "value"),
@@ -238,7 +238,7 @@ mod tests {
         let location = Location::unknown(&context);
         let index_type = Type::index(&context);
 
-        let operation = operation::Builder::new("arith.constant", location)
+        let operation = OperationBuilder::new("arith.constant", location)
             .add_results(&[index_type])
             .add_attributes(&[(
                 Identifier::new(&context, "value"),

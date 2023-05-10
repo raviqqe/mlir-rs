@@ -1,7 +1,7 @@
 //! `func` dialect.
 
 use crate::{
-    ir::{operation::Builder, Attribute, Identifier, Location, Operation, Region, Value},
+    ir::{operation::OperationBuilder, Attribute, Identifier, Location, Operation, Region, Value},
     Context,
 };
 
@@ -13,7 +13,7 @@ pub fn func<'c>(
     region: Region,
     location: Location<'c>,
 ) -> Operation<'c> {
-    Builder::new("func.func", location)
+    OperationBuilder::new("func.func", location)
         .add_attributes(&[
             (Identifier::new(context, "sym_name"), name),
             (Identifier::new(context, "function_type"), r#type),
@@ -24,7 +24,7 @@ pub fn func<'c>(
 
 /// Create a `func.return` operation.
 pub fn r#return<'c>(operands: &[Value], location: Location<'c>) -> Operation<'c> {
-    Builder::new("func.return", location)
+    OperationBuilder::new("func.return", location)
         .add_operands(operands)
         .build()
 }
