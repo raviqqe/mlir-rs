@@ -242,4 +242,16 @@ mod tests {
 
         assert!(context.allow_unregistered_dialects());
     }
+
+    #[test]
+    fn attach_and_detach_diagnostic_handler() {
+        let context = Context::new();
+
+        let id = context.attach_diagnostic_handler(|diagnostic| {
+            println!("{}", diagnostic);
+            true
+        });
+
+        context.detach_diagnostic_handler(id);
+    }
 }
