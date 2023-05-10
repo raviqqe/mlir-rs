@@ -4,7 +4,6 @@ use crate::{
     Context, Error,
 };
 use mlir_sys::{mlirFloatAttrDoubleGet, MlirAttribute};
-use std::fmt::{self, Debug, Display, Formatter};
 
 /// A float attribute.
 #[derive(Clone, Copy)]
@@ -23,40 +22,6 @@ impl<'c> FloatAttribute<'c> {
             ))
         }
     }
-
-    unsafe fn from_raw(raw: MlirAttribute) -> Self {
-        Self {
-            attribute: Attribute::from_raw(raw),
-        }
-    }
 }
 
-impl<'c> AttributeLike<'c> for FloatAttribute<'c> {
-    fn to_raw(&self) -> MlirAttribute {
-        self.attribute.to_raw()
-    }
-}
-
-impl<'c> TryFrom<Attribute<'c>> for FloatAttribute<'c> {
-    type Error = Error;
-
-    fn try_from(attribute: Attribute<'c>) -> Result<Self, Self::Error> {
-        if attribute.is_float() {
-            Ok(unsafe { Self::from_raw(attribute.to_raw()) })
-        } else {
-            Err(Error::AttributeExpected("float", format!("{}", attribute)))
-        }
-    }
-}
-
-impl<'c> Display for FloatAttribute<'c> {
-    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
-        Display::fmt(&self.attribute, formatter)
-    }
-}
-
-impl<'c> Debug for FloatAttribute<'c> {
-    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
-        Display::fmt(self, formatter)
-    }
-}
+attribute_traits!(FloatAttribute, is_float, "float");
