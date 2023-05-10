@@ -11,12 +11,12 @@ This crate is a wrapper of [the MLIR C API](https://mlir.llvm.org/docs/CAPI/).
 ```rust
 use melior::{
     Context,
-    dialect::{self, arith, func},
+    dialect::{self, arith, DialectRegistry, func},
     ir::*,
     utility::register_all_dialects,
 };
 
-let registry = dialect::Registry::new();
+let registry = DialectRegistry::new();
 register_all_dialects(&registry);
 
 let context = Context::new();
