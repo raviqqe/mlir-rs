@@ -28,30 +28,38 @@ impl<'c> FunctionType<'c> {
     }
 
     /// Gets an input at a position.
-    pub fn input(&self, position: usize) -> Result<Type<'c>, Error> {
-        if position < self.input_count() {
+    pub fn input(&self, index: usize) -> Result<Type<'c>, Error> {
+        if index < self.input_count() {
             unsafe {
                 Ok(Type::from_raw(mlirFunctionTypeGetInput(
                     self.r#type.to_raw(),
-                    position as isize,
+                    index as isize,
                 )))
             }
         } else {
-            Err(Error::FunctionInputPosition(self.to_string(), position))
+            Err(Error::PositionOutOfBounds {
+                name: "function input",
+                value: self.to_string(),
+                index,
+            })
         }
     }
 
     /// Gets a result at a position.
-    pub fn result(&self, position: usize) -> Result<Type<'c>, Error> {
-        if position < self.result_count() {
+    pub fn result(&self, index: usize) -> Result<Type<'c>, Error> {
+        if index < self.result_count() {
             unsafe {
                 Ok(Type::from_raw(mlirFunctionTypeGetResult(
                     self.r#type.to_raw(),
-                    position as isize,
+                    index as isize,
                 )))
             }
         } else {
-            Err(Error::FunctionResultPosition(self.to_string(), position))
+            Err(Error::PositionOutOfBounds {
+                name: "function result",
+                value: self.to_string(),
+                index,
+            })
         }
     }
 
