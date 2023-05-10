@@ -33,7 +33,7 @@ pub fn register_all_passes() {
 }
 
 /// Parses a pass pipeline.
-pub fn parse_pass_pipeline(manager: pass::OperationManager, source: &str) -> Result<(), Error> {
+pub fn parse_pass_pipeline(manager: pass::OperationPassManager, source: &str) -> Result<(), Error> {
     let mut error_message = None;
 
     let result = LogicalResult::from_raw(unsafe {

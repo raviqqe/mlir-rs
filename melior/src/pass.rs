@@ -9,7 +9,7 @@ mod operation_manager;
 pub mod sparse_tensor;
 pub mod transform;
 
-pub use self::{manager::Manager, operation_manager::OperationManager};
+pub use self::{manager::PassManager, operation_manager::OperationPassManager};
 use mlir_sys::MlirPass;
 
 /// A pass.
