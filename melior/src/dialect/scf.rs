@@ -162,7 +162,7 @@ mod tests {
 
                         let result = block.append_operation(arith::constant(
                             &context,
-                            attribute::Integer::new(42, Type::index(&context).into()).into(),
+                            attribute::Integer::new(42, Type::index(&context)).into(),
                             location,
                         ));
 
@@ -267,7 +267,7 @@ mod tests {
 
                         let result = block.append_operation(arith::constant(
                             &context,
-                            attribute::Integer::new(42, Type::index(&context).into()).into(),
+                            attribute::Integer::new(42, Type::index(&context)).into(),
                             location,
                         ));
 
@@ -336,7 +336,7 @@ mod tests {
 
                         let result = block.append_operation(arith::constant(
                             &context,
-                            attribute::Integer::new(42, Type::index(&context).into()).into(),
+                            attribute::Integer::new(42, Type::index(&context)).into(),
                             location,
                         ));
 
