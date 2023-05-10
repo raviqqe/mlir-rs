@@ -30,12 +30,6 @@ impl<'c> FloatAttribute<'c> {
     }
 }
 
-impl<'c> AttributeLike<'c> for FloatAttribute<'c> {
-    fn to_raw(&self) -> MlirAttribute {
-        self.attribute.to_raw()
-    }
-}
-
 impl<'c> TryFrom<Attribute<'c>> for FloatAttribute<'c> {
     type Error = Error;
 
