@@ -1,19 +1,15 @@
 use super::{Attribute, AttributeLike};
 use crate::{
     ir::{Type, TypeLike},
-    Context, Error,
+    Error,
 };
 use mlir_sys::{mlirIntegerAttrGet, MlirAttribute};
-use std::{
-    fmt::{self, Debug, Display, Formatter},
-    marker::PhantomData,
-};
+use std::fmt::{self, Debug, Display, Formatter};
 
 /// An integer attribute.
 #[derive(Clone, Copy)]
 pub struct IntegerAttribute<'c> {
-    raw: MlirAttribute,
-    _context: PhantomData<&'c Context>,
+    attribute: Attribute<'c>,
 }
 
 impl<'c> IntegerAttribute<'c> {
@@ -24,15 +20,14 @@ impl<'c> IntegerAttribute<'c> {
 
     unsafe fn from_raw(raw: MlirAttribute) -> Self {
         Self {
-            raw,
-            _context: Default::default(),
+            attribute: Attribute::from_raw(raw),
         }
     }
 }
 
 impl<'c> AttributeLike<'c> for IntegerAttribute<'c> {
     fn to_raw(&self) -> MlirAttribute {
-        self.raw
+        self.attribute.to_raw()
     }
 }
 
@@ -53,7 +48,7 @@ impl<'c> TryFrom<Attribute<'c>> for IntegerAttribute<'c> {
 
 impl<'c> Display for IntegerAttribute<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
-        Display::fmt(&Attribute::from(*self), formatter)
+        Display::fmt(&self.attribute, formatter)
     }
 }
 

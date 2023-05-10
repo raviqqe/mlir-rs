@@ -73,7 +73,7 @@ pub fn index_switch<'c>(
     OperationBuilder::new("scf.index_switch", location)
         .add_operands(&[condition])
         .add_results(result_types)
-        .add_attributes(&[(Identifier::new(&context, "cases"), cases.into())])
+        .add_attributes(&[(Identifier::new(context, "cases"), cases.into())])
         .add_regions(regions)
         .build()
 }

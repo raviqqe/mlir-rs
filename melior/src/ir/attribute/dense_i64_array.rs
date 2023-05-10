@@ -28,6 +28,11 @@ impl<'c> DenseI64ArrayAttribute<'c> {
         (unsafe { mlirArrayAttrGetNumElements(self.attribute.to_raw()) }) as usize
     }
 
+    /// Checks if an array is empty.
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
     /// Gets an element.
     pub fn element(&self, index: usize) -> Result<i64, Error> {
         if index < self.len() {
