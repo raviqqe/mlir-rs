@@ -280,7 +280,11 @@ mod tests {
                 .build()
                 .result(0)
                 .unwrap_err(),
-            Error::OperationResultPosition("\"foo\"() : () -> ()\n".into(), 0)
+            Error::PositionOutOfBounds {
+                name: "operation result",
+                value: "\"foo\"() : () -> ()\n".into(),
+                index: 0
+            }
         );
     }
 

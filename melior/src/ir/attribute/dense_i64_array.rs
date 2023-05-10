@@ -37,7 +37,11 @@ impl<'c> DenseI64ArrayAttribute<'c> {
         if index < self.len() {
             Ok(unsafe { mlirDenseI64ArrayGetElement(self.attribute.to_raw(), index as isize) })
         } else {
-            Err(Error::ArrayElementPosition(self.to_string(), index))
+            Err(Error::PositionOutOfBounds {
+                name: "array element",
+                value: self.to_string(),
+                index,
+            })
         }
     }
 }
@@ -62,7 +66,7 @@ mod tests {
         assert_eq!(attribute.element(2).unwrap(), 3);
         assert!(matches!(
             attribute.element(3),
-            Err(Error::ArrayElementPosition(..))
+            Err(Error::PositionOutOfBounds { .. })
         ));
     }
 

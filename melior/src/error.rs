@@ -6,15 +6,10 @@ use std::{
 /// A Melior error.
 #[derive(Debug, Eq, PartialEq)]
 pub enum Error {
-    ArrayElementPosition(String, usize),
     AttributeExpected(&'static str, String),
     BlockArgumentExpected(String),
-    BlockArgumentPosition(String, usize),
-    FunctionInputPosition(String, usize),
-    FunctionResultPosition(String, usize),
     InvokeFunction,
     OperationResultExpected(String),
-    OperationResultPosition(String, usize),
     PositionOutOfBounds {
         name: &'static str,
         value: String,
@@ -30,12 +25,6 @@ pub enum Error {
 impl Display for Error {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         match self {
-            Self::ArrayElementPosition(array, position) => {
-                write!(
-                    formatter,
-                    "array element position {position} out of bounds: {array}"
-                )
-            }
             Self::AttributeExpected(r#type, attribute) => {
                 write!(formatter, "{type} attribute expected: {attribute}")
             }
