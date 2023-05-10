@@ -4,21 +4,16 @@ use crate::{
     Context, Error,
 };
 use mlir_sys::{mlirFloatAttrDoubleGet, MlirAttribute};
-use std::{
-    fmt::{self, Debug, Display, Formatter},
-    marker::PhantomData,
-};
+use std::fmt::{self, Debug, Display, Formatter};
 
-/// An float attribute.
-// Attributes are always values but their internal storage is owned by contexts.
+/// A float attribute.
 #[derive(Clone, Copy)]
 pub struct FloatAttribute<'c> {
-    raw: MlirAttribute,
-    _context: PhantomData<&'c Context>,
+    attribute: Attribute<'c>,
 }
 
 impl<'c> FloatAttribute<'c> {
-    /// Creates an float.
+    /// Creates a float attribute.
     pub fn new(context: &'c Context, number: f64, r#type: Type<'c>) -> Self {
         unsafe {
             Self::from_raw(mlirFloatAttrDoubleGet(
@@ -31,15 +26,14 @@ impl<'c> FloatAttribute<'c> {
 
     unsafe fn from_raw(raw: MlirAttribute) -> Self {
         Self {
-            raw,
-            _context: Default::default(),
+            attribute: Attribute::from_raw(raw),
         }
     }
 }
 
 impl<'c> AttributeLike<'c> for FloatAttribute<'c> {
     fn to_raw(&self) -> MlirAttribute {
-        self.raw
+        self.attribute.to_raw()
     }
 }
 
@@ -57,7 +51,7 @@ impl<'c> TryFrom<Attribute<'c>> for FloatAttribute<'c> {
 
 impl<'c> Display for FloatAttribute<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
-        Display::fmt(&Attribute::from(*self), formatter)
+        Display::fmt(&self.attribute, formatter)
     }
 }
 

@@ -6,14 +6,13 @@ use mlir_sys::{
 use std::fmt::{self, Debug, Display, Formatter};
 
 /// An dense i64 array attribute.
-// Attributes are always values but their internal storage is owned by contexts.
 #[derive(Clone, Copy)]
 pub struct DenseI64ArrayAttribute<'c> {
     attribute: Attribute<'c>,
 }
 
 impl<'c> DenseI64ArrayAttribute<'c> {
-    /// Creates an dense i64 array.
+    /// Creates a dense i64 array attribute.
     pub fn new(context: &'c Context, values: &[i64]) -> Self {
         unsafe {
             Self::from_raw(mlirDenseI64ArrayGet(

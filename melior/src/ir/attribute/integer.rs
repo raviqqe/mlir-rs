@@ -10,7 +10,6 @@ use std::{
 };
 
 /// An integer attribute.
-// Attributes are always values but their internal storage is owned by contexts.
 #[derive(Clone, Copy)]
 pub struct IntegerAttribute<'c> {
     raw: MlirAttribute,
@@ -18,7 +17,7 @@ pub struct IntegerAttribute<'c> {
 }
 
 impl<'c> IntegerAttribute<'c> {
-    /// Creates an integer.
+    /// Creates an integer attribute.
     pub fn new(integer: i64, r#type: Type<'c>) -> Self {
         unsafe { Self::from_raw(mlirIntegerAttrGet(r#type.to_raw(), integer)) }
     }
