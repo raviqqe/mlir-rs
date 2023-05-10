@@ -43,6 +43,16 @@ impl LogicalResult {
     }
 }
 
+impl From<bool> for LogicalResult {
+    fn from(ok: bool) -> Self {
+        if ok {
+            Self::success()
+        } else {
+            Self::failure()
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

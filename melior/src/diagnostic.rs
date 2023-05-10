@@ -1,10 +1,9 @@
-use crate::{ir::Location, logical_result::LogicalResult, utility::print_callback, Error};
+use crate::{ir::Location, utility::print_callback, Error};
 use mlir_sys::{
     mlirDiagnosticGetLocation, mlirDiagnosticGetNote, mlirDiagnosticGetNumNotes,
     mlirDiagnosticGetSeverity, mlirDiagnosticPrint, MlirDiagnostic, MlirDiagnosticHandlerID,
     MlirDiagnosticSeverity_MlirDiagnosticError, MlirDiagnosticSeverity_MlirDiagnosticNote,
     MlirDiagnosticSeverity_MlirDiagnosticRemark, MlirDiagnosticSeverity_MlirDiagnosticWarning,
-    MlirLogicalResult,
 };
 use std::{ffi::c_void, fmt, marker::PhantomData};
 
@@ -28,11 +27,13 @@ impl<'a> Diagnostic<'a> {
     }
 
     pub fn severity(&self) -> DiagnosticSeverity {
+        #[allow(non_upper_case_globals)]
         match unsafe { mlirDiagnosticGetSeverity(self.raw) } {
             MlirDiagnosticSeverity_MlirDiagnosticError => DiagnosticSeverity::Error,
             MlirDiagnosticSeverity_MlirDiagnosticNote => DiagnosticSeverity::Note,
             MlirDiagnosticSeverity_MlirDiagnosticRemark => DiagnosticSeverity::Remark,
             MlirDiagnosticSeverity_MlirDiagnosticWarning => DiagnosticSeverity::Warning,
+            _ => unreachable!("unexpected diagnostic severity"),
         }
     }
 
@@ -82,27 +83,11 @@ pub struct DiagnosticHandlerId {
 }
 
 impl DiagnosticHandlerId {
-    pub(crate) unsafe fn to_raw(&self) -> MlirDiagnosticHandlerID {
+    pub(crate) unsafe fn from_raw(raw: MlirDiagnosticHandlerID) -> Self {
+        Self { raw }
+    }
+
+    pub(crate) unsafe fn to_raw(self) -> MlirDiagnosticHandlerID {
         self.raw
     }
-}
-
-unsafe extern "C" fn _mlir_cb_invoke<F>(
-    diagnostic: MlirDiagnostic,
-    user_data: *mut c_void,
-) -> MlirLogicalResult
-where
-    F: FnMut(Diagnostic) -> LogicalResult,
-{
-    let diagnostic = Diagnostic::from_raw(diagnostic);
-
-    let handler: &mut F = &mut *(user_data as *mut F);
-    handler(diagnostic).to_raw()
-}
-
-unsafe extern "C" fn _mlir_cb_detach<F>(user_data: *mut c_void)
-where
-    F: FnMut(Diagnostic) -> LogicalResult,
-{
-    drop(Box::from_raw(user_data as *mut F));
 }
