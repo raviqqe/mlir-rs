@@ -1,4 +1,4 @@
-use super::Id;
+use super::TypeId;
 use crate::context::ContextRef;
 use mlir_sys::{mlirTypeDump, mlirTypeGetContext, mlirTypeGetTypeID, MlirType};
 
@@ -13,8 +13,8 @@ pub trait TypeLike<'c> {
     }
 
     /// Gets an ID.
-    fn id(&self) -> Id {
-        unsafe { Id::from_raw(mlirTypeGetTypeID(self.to_raw())) }
+    fn id(&self) -> TypeId {
+        unsafe { TypeId::from_raw(mlirTypeGetTypeID(self.to_raw())) }
     }
 
     /// Dumps a type.

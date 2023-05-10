@@ -10,8 +10,8 @@ mod tuple;
 mod type_like;
 
 pub use self::{
-    function::FunctionType, id::Id, integer::IntegerType, mem_ref::MemRefType, tuple::TupleType,
-    type_like::TypeLike,
+    function::FunctionType, id::TypeId, integer::IntegerType, mem_ref::MemRefType,
+    tuple::TupleType, type_like::TypeLike,
 };
 use super::Location;
 use crate::{context::Context, string_ref::StringRef, utility::print_callback};
