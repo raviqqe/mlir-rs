@@ -3,8 +3,8 @@
 use super::arith::CmpiPredicate;
 use crate::{
     ir::{
-        attribute::IntegerAttribute, operation::OperationBuilder, r#type::IntegerType, Identifier,
-        Location, Operation, Value,
+        attribute::IntegerAttribute, operation::OperationBuilder, Attribute, Identifier, Location,
+        Operation, Value,
     },
     Context,
 };
@@ -34,7 +34,22 @@ pub fn cmp<'c>(
     OperationBuilder::new("index.cmp", location)
         .add_attributes(&[(
             Identifier::new(context, "pred"),
-            IntegerAttribute::new(predicate as i64, IntegerType::new(context, 32).into()).into(),
+            Attribute::parse(
+                &context,
+                match predicate {
+                    CmpiPredicate::Eq => "#index<cmp_predicate eq>",
+                    CmpiPredicate::Ne => "#index<cmp_predicate ne>",
+                    CmpiPredicate::Slt => "#index<cmp_predicate slt>",
+                    CmpiPredicate::Sle => "#index<cmp_predicate sle>",
+                    CmpiPredicate::Sgt => "#index<cmp_predicate sgt>",
+                    CmpiPredicate::Sge => "#index<cmp_predicate sge>",
+                    CmpiPredicate::Ult => "#index<cmp_predicate ult>",
+                    CmpiPredicate::Ule => "#index<cmp_predicate ule>",
+                    CmpiPredicate::Ugt => "#index<cmp_predicate ugt>",
+                    CmpiPredicate::Uge => "#index<cmp_predicate uge>",
+                },
+            )
+            .unwrap(),
         )])
         .add_operands(&[lhs, rhs])
         .enable_result_type_inference()
@@ -58,7 +73,7 @@ mod tests {
         dialect::func,
         ir::{
             attribute::{StringAttribute, TypeAttribute},
-            r#type::FunctionType,
+            r#type::{FunctionType, IntegerType},
             Block, Location, Module, Region, Type,
         },
         test::load_all_dialects,
