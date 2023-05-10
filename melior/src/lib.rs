@@ -83,6 +83,7 @@
 //! ```
 
 mod context;
+mod diagnostic;
 pub mod dialect;
 mod error;
 mod execution_engine;
@@ -96,6 +97,7 @@ pub mod utility;
 
 pub use self::{
     context::{Context, ContextRef},
+    diagnostic::{Diagnostic, DiagnosticHandler, DiagnosticSeverity},
     error::Error,
     execution_engine::ExecutionEngine,
     string_ref::StringRef,
