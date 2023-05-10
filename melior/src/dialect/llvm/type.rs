@@ -63,15 +63,12 @@ pub fn void(context: &Context) -> Type {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        dialect,
-        ir::r#type::{self, IntegerType},
-    };
+    use crate::{dialect, ir::r#type::IntegerType};
 
     fn create_context() -> Context {
         let context = Context::new();
 
-        dialect::Handle::llvm().register_dialect(&context);
+        dialect::DialectHandle::llvm().register_dialect(&context);
         context.get_or_load_dialect("llvm");
 
         context

@@ -75,7 +75,7 @@ mod tests {
 
     #[test]
     fn invoke_packed() {
-        let registry = dialect::Registry::new();
+        let registry = dialect::DialectRegistry::new();
         register_all_dialects(&registry);
 
         let context = Context::new();

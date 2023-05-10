@@ -1,7 +1,8 @@
 //! Utility functions.
 
 use crate::{
-    context::Context, dialect, logical_result::LogicalResult, pass, string_ref::StringRef, Error,
+    context::Context, dialect::DialectRegistry, logical_result::LogicalResult, pass,
+    string_ref::StringRef, Error,
 };
 use mlir_sys::{
     mlirParsePassPipeline, mlirRegisterAllDialects, mlirRegisterAllLLVMTranslations,
@@ -14,7 +15,7 @@ use std::{
 };
 
 /// Registers all dialects to a dialect registry.
-pub fn register_all_dialects(registry: &dialect::Registry) {
+pub fn register_all_dialects(registry: &DialectRegistry) {
     unsafe { mlirRegisterAllDialects(registry.to_raw()) }
 }
 
@@ -93,14 +94,14 @@ mod tests {
 
     #[test]
     fn register_dialects() {
-        let registry = dialect::Registry::new();
+        let registry = DialectRegistry::new();
 
         register_all_dialects(&registry);
     }
 
     #[test]
     fn register_dialects_twice() {
-        let registry = dialect::Registry::new();
+        let registry = DialectRegistry::new();
 
         register_all_dialects(&registry);
         register_all_dialects(&registry);

@@ -36,12 +36,12 @@
 //! ```rust
 //! use melior::{
 //!     Context,
-//!     dialect::{self, arith, func},
+//!     dialect::{self, arith, DialectRegistry, func},
 //!     ir::*,
 //!     utility::register_all_dialects,
 //! };
 //!
-//! let registry = dialect::Registry::new();
+//! let registry = DialectRegistry::new();
 //! register_all_dialects(&registry);
 //!
 //! let context = Context::new();
@@ -120,7 +120,7 @@ mod tests {
 
     #[test]
     fn build_module_with_dialect() {
-        let registry = dialect::Registry::new();
+        let registry = dialect::DialectRegistry::new();
         let context = Context::new();
         context.append_dialect_registry(&registry);
         let module = Module::new(Location::unknown(&context));

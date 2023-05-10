@@ -89,7 +89,7 @@ mod tests {
     use pretty_assertions::assert_eq;
 
     fn register_all_upstream_dialects(context: &Context) {
-        let registry = dialect::Registry::new();
+        let registry = dialect::DialectRegistry::new();
         register_all_dialects(&registry);
         context.append_dialect_registry(&registry);
     }

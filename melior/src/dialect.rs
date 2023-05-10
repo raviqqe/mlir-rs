@@ -7,7 +7,7 @@ pub mod llvm;
 mod registry;
 pub mod scf;
 
-pub use self::{handle::Handle, registry::Registry};
+pub use self::{handle::DialectHandle, registry::DialectRegistry};
 use crate::{
     context::{Context, ContextRef},
     string_ref::StringRef,
@@ -59,8 +59,8 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            Handle::func().load_dialect(&context),
-            Handle::func().load_dialect(&context)
+            DialectHandle::func().load_dialect(&context),
+            DialectHandle::func().load_dialect(&context)
         );
     }
 
@@ -69,8 +69,8 @@ mod tests {
         let context = Context::new();
 
         assert_ne!(
-            Handle::func().load_dialect(&context),
-            Handle::llvm().load_dialect(&context)
+            DialectHandle::func().load_dialect(&context),
+            DialectHandle::llvm().load_dialect(&context)
         );
     }
 }

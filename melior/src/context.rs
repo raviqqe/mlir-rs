@@ -1,5 +1,5 @@
 use crate::{
-    dialect::{self, Dialect},
+    dialect::{Dialect, DialectRegistry},
     string_ref::StringRef,
 };
 use mlir_sys::{
@@ -49,7 +49,7 @@ impl Context {
     }
 
     /// Appends a dialect registry.
-    pub fn append_dialect_registry(&self, registry: &dialect::Registry) {
+    pub fn append_dialect_registry(&self, registry: &DialectRegistry) {
         unsafe { mlirContextAppendDialectRegistry(self.raw, registry.to_raw()) }
     }
 
@@ -162,7 +162,7 @@ mod tests {
     fn append_dialect_registry() {
         let context = Context::new();
 
-        context.append_dialect_registry(&dialect::Registry::new());
+        context.append_dialect_registry(&DialectRegistry::new());
     }
 
     #[test]
