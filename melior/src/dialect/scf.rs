@@ -1,6 +1,12 @@
 //! `scf` dialect.
 
-use crate::ir::{operation::OperationBuilder, Location, Operation, Region, Type, Value};
+use crate::{
+    ir::{
+        attribute::DenseI64ArrayAttribute, operation::OperationBuilder, Identifier, Location,
+        Operation, Region, Type, Value,
+    },
+    Context,
+};
 
 /// Creates a `scf.condition` operation.
 pub fn condition<'c>(
@@ -52,6 +58,23 @@ pub fn r#if<'c>(
         .add_operands(&[condition])
         .add_results(result_types)
         .add_regions(vec![then_region, else_region])
+        .build()
+}
+
+/// Creates a `scf.index_switch` operation.
+pub fn index_switch<'c>(
+    context: &'c Context,
+    condition: Value<'c>,
+    result_types: &[Type<'c>],
+    cases: DenseI64ArrayAttribute<'c>,
+    regions: Vec<Region>,
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new("scf.index_switch", location)
+        .add_operands(&[condition])
+        .add_results(result_types)
+        .add_attributes(&[(Identifier::new(&context, "cases"), cases.into())])
+        .add_regions(regions)
         .build()
 }
 
@@ -336,6 +359,77 @@ mod tests {
             assert!(module.as_operation().verify());
             insta::assert_display_snapshot!(module.as_operation());
         }
+    }
+
+    #[test]
+    fn compile_index_switch() {
+        let context = Context::new();
+        load_all_dialects(&context);
+
+        let location = Location::unknown(&context);
+        let module = Module::new(location);
+
+        module.body().append_operation(func::func(
+            &context,
+            Attribute::parse(&context, "\"foo\"").unwrap(),
+            Attribute::parse(&context, "() -> ()").unwrap(),
+            {
+                let block = Block::new(&[]);
+
+                let condition = block.append_operation(arith::constant(
+                    &context,
+                    IntegerAttribute::new(0, Type::index(&context)).into(),
+                    location,
+                ));
+
+                block.append_operation(index_switch(
+                    &context,
+                    condition.result(0).unwrap().into(),
+                    &[],
+                    DenseI64ArrayAttribute::new(&context, &[0, 1]),
+                    vec![
+                        {
+                            let block = Block::new(&[]);
+
+                            block.append_operation(r#yield(&[], location));
+
+                            let region = Region::new();
+                            region.append_block(block);
+                            region
+                        },
+                        {
+                            let block = Block::new(&[]);
+
+                            block.append_operation(r#yield(&[], location));
+
+                            let region = Region::new();
+                            region.append_block(block);
+                            region
+                        },
+                        {
+                            let block = Block::new(&[]);
+
+                            block.append_operation(r#yield(&[], location));
+
+                            let region = Region::new();
+                            region.append_block(block);
+                            region
+                        },
+                    ],
+                    location,
+                ));
+
+                block.append_operation(func::r#return(&[], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            location,
+        ));
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
     }
 
     mod r#while {
