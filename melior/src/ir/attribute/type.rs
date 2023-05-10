@@ -34,8 +34,7 @@ mod tests {
     fn value() {
         let context = Context::new();
         let r#type = Type::index(&context);
-        let attribute = TypeAttribute::new(r#type);
 
-        assert_eq!(attribute.value(), r#type);
+        assert_eq!(TypeAttribute::new(r#type).value(), r#type);
     }
 }
