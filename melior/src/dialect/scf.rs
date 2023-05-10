@@ -147,6 +147,7 @@ mod tests {
 
         let location = Location::unknown(&context);
         let module = Module::new(location);
+        let index_type = Type::index(&context);
 
         module.body().append_operation(func::func(
             &context,
@@ -157,19 +158,19 @@ mod tests {
 
                 let condition = block.append_operation(arith::constant(
                     &context,
-                    IntegerAttribute::new(0, IntegerType::new(&context, 0).into()).into(),
+                    IntegerAttribute::new(0, IntegerType::new(&context, 1).into()).into(),
                     location,
                 ));
 
                 let result = block.append_operation(r#if(
                     condition.result(0).unwrap().into(),
-                    &[Type::index(&context)],
+                    &[index_type],
                     {
                         let block = Block::new(&[]);
 
                         let result = block.append_operation(arith::constant(
                             &context,
-                            IntegerAttribute::new(42, Type::index(&context)).into(),
+                            IntegerAttribute::new(42, index_type).into(),
                             location,
                         ));
 
@@ -187,7 +188,7 @@ mod tests {
 
                         let result = block.append_operation(arith::constant(
                             &context,
-                            IntegerAttribute::new(13, Type::index(&context)).into(),
+                            IntegerAttribute::new(13, index_type).into(),
                             location,
                         ));
 
