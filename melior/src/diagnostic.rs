@@ -16,12 +16,12 @@ use std::{
 };
 
 #[derive(Debug)]
-pub struct Diagnostic<'a> {
+pub struct Diagnostic<'c> {
     raw: MlirDiagnostic,
-    phantom: PhantomData<&'a ()>,
+    phantom: PhantomData<&'c ()>,
 }
 
-impl<'a> Diagnostic<'a> {
+impl<'c> Diagnostic<'c> {
     pub fn location(&self) -> Location {
         unsafe { Location::from_raw(mlirDiagnosticGetLocation(self.raw)) }
     }
