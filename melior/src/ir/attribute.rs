@@ -112,6 +112,12 @@ impl<'c> From<DenseI64ArrayAttribute<'c>> for Attribute<'c> {
     }
 }
 
+impl<'c> From<FlatSymbolRefAttribute<'c>> for Attribute<'c> {
+    fn from(attribute: FlatSymbolRefAttribute<'c>) -> Self {
+        unsafe { Self::from_raw(attribute.to_raw()) }
+    }
+}
+
 impl<'c> From<FloatAttribute<'c>> for Attribute<'c> {
     fn from(attribute: FloatAttribute<'c>) -> Self {
         unsafe { Self::from_raw(attribute.to_raw()) }
