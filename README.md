@@ -4,9 +4,32 @@
 [![Crate](https://img.shields.io/crates/v/melior.svg?style=flat-square)](https://crates.io/crates/melior)
 [![License](https://img.shields.io/github/license/raviqqe/melior.svg?style=flat-square)](LICENSE)
 
-The rustic MLIR bindings for Rust
+Melior is the MLIR bindings for Rust. It aims to provide a simple,
+safe, and complete API for MLIR with a reasonably sane ownership model
+represented by the type system in Rust.
 
 This crate is a wrapper of [the MLIR C API](https://mlir.llvm.org/docs/CAPI/).
+
+## Safety
+
+Although Melior aims to be completely safe, some part of the current API is
+not.
+
+- Access to operations, types, or attributes that belong to dialects not
+  loaded in contexts can lead to runtime errors or segmentation faults in
+  the worst case.
+  - Fix plan: Load all dialects by default on creation of contexts, and
+    provide unsafe constructors of contexts for advanced users.
+- IR object references returned from functions that move ownership of
+  arguments might get invalidated later.
+  - This is because we need to borrow `&self` rather than `&mut self` to
+    return such references.
+  - e.g. `Region::append_block()`
+  - Fix plan: Use dynamic check, such as `RefCell`, for the objects.
+
+## Examples
+
+## Building a function to add integers
 
 ```rust
 use melior::{
@@ -55,10 +78,6 @@ module.body().append_operation(function);
 
 assert!(module.as_operation().verify());
 ```
-
-## Goals
-
-Melior aims to provide a simple, safe, and complete API for MLIR with a reasonably sane ownership model represented by the type system in Rust.
 
 ## Install
 
