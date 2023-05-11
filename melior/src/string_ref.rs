@@ -85,6 +85,11 @@ mod tests {
     }
 
     #[test]
+    fn equal_str() {
+        assert_eq!(StringRef::from("foo").as_str().unwrap(), "foo");
+    }
+
+    #[test]
     fn not_equal() {
         assert_ne!(StringRef::from("foo"), StringRef::from("bar"));
     }
