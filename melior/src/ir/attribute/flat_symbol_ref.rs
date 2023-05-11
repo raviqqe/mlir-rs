@@ -9,7 +9,7 @@ pub struct FlatSymbolRefAttribute<'c> {
 }
 
 impl<'c> FlatSymbolRefAttribute<'c> {
-    /// Creates an flat symbol ref attribute.
+    /// Creates a flat symbol ref attribute.
     pub fn new(context: &'c Context, symbol: &str) -> Self {
         unsafe {
             Self::from_raw(mlirFlatSymbolRefAttrGet(
