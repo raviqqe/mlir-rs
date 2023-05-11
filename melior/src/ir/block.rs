@@ -2,7 +2,7 @@
 
 mod argument;
 
-pub use self::argument::Argument;
+pub use self::argument::BlockArgument;
 use super::{Location, Operation, OperationRef, RegionRef, Type, TypeLike, Value};
 use crate::{
     context::Context,
@@ -54,10 +54,10 @@ impl<'c> Block<'c> {
     }
 
     /// Gets an argument at a position.
-    pub fn argument(&self, index: usize) -> Result<Argument, Error> {
+    pub fn argument(&self, index: usize) -> Result<BlockArgument, Error> {
         unsafe {
             if index < self.argument_count() {
-                Ok(Argument::from_raw(mlirBlockGetArgument(
+                Ok(BlockArgument::from_raw(mlirBlockGetArgument(
                     self.raw,
                     index as isize,
                 )))

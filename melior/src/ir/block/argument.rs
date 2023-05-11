@@ -10,11 +10,11 @@ use std::fmt::{self, Display, Formatter};
 
 /// A block argument.
 #[derive(Clone, Copy, Debug)]
-pub struct Argument<'a> {
+pub struct BlockArgument<'a> {
     value: Value<'a>,
 }
 
-impl<'a> Argument<'a> {
+impl<'a> BlockArgument<'a> {
     pub fn argument_number(&self) -> usize {
         unsafe { mlirBlockArgumentGetArgNumber(self.value.to_raw()) as usize }
     }
@@ -34,19 +34,19 @@ impl<'a> Argument<'a> {
     }
 }
 
-impl<'a> ValueLike for Argument<'a> {
+impl<'a> ValueLike for BlockArgument<'a> {
     fn to_raw(&self) -> MlirValue {
         self.value.to_raw()
     }
 }
 
-impl<'a> Display for Argument<'a> {
+impl<'a> Display for BlockArgument<'a> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Value::from(*self).fmt(formatter)
     }
 }
 
-impl<'a> TryFrom<Value<'a>> for Argument<'a> {
+impl<'a> TryFrom<Value<'a>> for BlockArgument<'a> {
     type Error = Error;
 
     fn try_from(value: Value<'a>) -> Result<Self, Self::Error> {

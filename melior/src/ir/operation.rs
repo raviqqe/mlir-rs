@@ -3,7 +3,7 @@
 mod builder;
 mod result;
 
-pub use self::{builder::OperationBuilder, result::ResultValue};
+pub use self::{builder::OperationBuilder, result::OperationResult};
 use super::{BlockRef, Identifier, RegionRef, Value};
 use crate::{
     context::{Context, ContextRef},
@@ -49,10 +49,10 @@ impl<'c> Operation<'c> {
     }
 
     /// Gets a result at a position.
-    pub fn result(&self, index: usize) -> Result<ResultValue, Error> {
+    pub fn result(&self, index: usize) -> Result<OperationResult, Error> {
         unsafe {
             if index < self.result_count() {
-                Ok(ResultValue::from_raw(mlirOperationGetResult(
+                Ok(OperationResult::from_raw(mlirOperationGetResult(
                     self.raw,
                     index as isize,
                 )))
