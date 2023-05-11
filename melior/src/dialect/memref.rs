@@ -2,7 +2,10 @@
 
 use crate::{
     ir::{
-        attribute::{DenseI32ArrayAttribute, IntegerAttribute, StringAttribute, TypeAttribute},
+        attribute::{
+            DenseI32ArrayAttribute, FlatSymbolRefAttribute, IntegerAttribute, StringAttribute,
+            TypeAttribute,
+        },
         operation::OperationBuilder,
         r#type::MemRefType,
         Attribute, Identifier, Location, Operation, Value,
@@ -92,9 +95,12 @@ pub fn dim<'c>(value: Value, index: Value, location: Location<'c>) -> Operation<
 }
 
 /// Create a `memref.get_global` operation.
-pub fn get_global<'c>(value: Value, index: Value, location: Location<'c>) -> Operation<'c> {
+pub fn get_global<'c>(context: &'c Context, name: &str, location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("memref.get_global", location)
-        .add_operands(&[value, index])
+        .add_attributes(&[(
+            Identifier::new(&context, "name"),
+            FlatSymbolRefAttribute::new(&context, name).into(),
+        )])
         .enable_result_type_inference()
         .build()
 }
