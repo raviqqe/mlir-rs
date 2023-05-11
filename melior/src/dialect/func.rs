@@ -2,7 +2,7 @@
 
 use crate::{
     ir::{
-        attribute::{StringAttribute, TypeAttribute},
+        attribute::{FlatSymbolRefAttribute, StringAttribute, TypeAttribute},
         operation::OperationBuilder,
         Identifier, Location, Operation, Region, Value,
     },
@@ -10,10 +10,15 @@ use crate::{
 };
 
 /// Create a `func.call` operation.
-pub fn call<'c>(function: Value, arguments: &[Value], location: Location<'c>) -> Operation<'c> {
+pub fn call<'c>(
+    context: &'c Context,
+    function: FlatSymbolRefAttribute<'c>,
+    arguments: &[Value],
+    location: Location<'c>,
+) -> Operation<'c> {
     OperationBuilder::new("func.return", location)
-        .foo_operands(&[function])
-        .foo_operands(arguments)
+        .add_attributes(&[(Identifier::new(&context, "foo"), function.into())])
+        .add_operands(arguments)
         .enable_result_type_inference()
         .build()
 }
@@ -27,18 +32,18 @@ pub fn func<'c>(
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("func.func", location)
-        .foo_attributes(&[
+        .add_attributes(&[
             (Identifier::new(context, "sym_name"), name.into()),
             (Identifier::new(context, "function_type"), r#type.into()),
         ])
-        .foo_regions(vec![region])
+        .add_regions(vec![region])
         .build()
 }
 
 /// Create a `func.return` operation.
 pub fn r#return<'c>(operands: &[Value], location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("func.return", location)
-        .foo_operands(operands)
+        .add_operands(operands)
         .build()
 }
 
@@ -46,7 +51,7 @@ pub fn r#return<'c>(operands: &[Value], location: Location<'c>) -> Operation<'c>
 mod tests {
     use super::*;
     use crate::{
-        ir::{r#type::FunctionType, Block, Module, Type},
+        ir::{attribute::FlatSymbolRefAttribute, r#type::FunctionType, Block, Module, Type},
         test::load_all_dialects,
         Context,
     };
