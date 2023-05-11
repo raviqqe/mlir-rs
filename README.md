@@ -119,4 +119,4 @@ Contribution is welcome! But, Melior is still in the alpha stage as well as the 
 
 ## License
 
-[Apache 2.0](LICENSE)
+[Apache 2.0](https://github.com/raviqqe/melior/blob/main/LICENSE)
