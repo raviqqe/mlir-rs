@@ -92,9 +92,10 @@ pub fn dim<'c>(value: Value, index: Value, location: Location<'c>) -> Operation<
 }
 
 /// Create a `memref.load` operation.
-pub fn load<'c>(memref: Value, location: Location<'c>) -> Operation<'c> {
+pub fn load<'c>(memref: Value, indices: &[Value], location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("memref.load", location)
         .add_operands(&[memref])
+        .add_operands(indices)
         .enable_result_type_inference()
         .build()
 }
@@ -108,9 +109,15 @@ pub fn rank<'c>(value: Value, location: Location<'c>) -> Operation<'c> {
 }
 
 /// Create a `memref.store` operation.
-pub fn store<'c>(value: Value, memref: Value, location: Location<'c>) -> Operation<'c> {
+pub fn store<'c>(
+    value: Value,
+    memref: Value,
+    indices: &[Value],
+    location: Location<'c>,
+) -> Operation<'c> {
     OperationBuilder::new("memref.store", location)
         .add_operands(&[value, memref])
+        .add_operands(indices)
         .build()
 }
 
@@ -283,7 +290,7 @@ mod tests {
                 None,
                 location,
             ));
-            block.append_operation(load(mremref.result(0).unwrap().into(), location));
+            block.append_operation(load(mremref.result(0).unwrap().into(), &[], location));
         })
     }
 
@@ -329,6 +336,7 @@ mod tests {
             block.append_operation(store(
                 value.result(0).unwrap().into(),
                 mremref.result(0).unwrap().into(),
+                &[],
                 location,
             ));
         })
