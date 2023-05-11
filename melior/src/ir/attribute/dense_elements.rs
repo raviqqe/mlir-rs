@@ -4,8 +4,8 @@ use crate::{
     Error,
 };
 use mlir_sys::{
-    mlirDenseElementsAttrGet, mlirDenseElementsAttrGetInt64Value, mlirElementsAttrGetNumElements,
-    MlirAttribute,
+    mlirDenseElementsAttrGet, mlirDenseElementsAttrGetInt32Value,
+    mlirDenseElementsAttrGetInt64Value, mlirElementsAttrGetNumElements, MlirAttribute,
 };
 
 /// A dense elements attribute.
@@ -36,9 +36,34 @@ impl<'c> DenseElementsAttribute<'c> {
         self.len() == 0
     }
 
+    /// Gets an i32 element.
+    pub fn i32_element(&self, index: usize) -> Result<i32, Error> {
+        if !self.is_dense_int_elements() {
+            Err(Error::ElementExpected {
+                r#type: "integer",
+                value: self.to_string(),
+            })
+        } else if index < self.len() {
+            Ok(unsafe {
+                mlirDenseElementsAttrGetInt32Value(self.attribute.to_raw(), index as isize)
+            })
+        } else {
+            Err(Error::PositionOutOfBounds {
+                name: "dense element",
+                value: self.to_string(),
+                index,
+            })
+        }
+    }
+
     /// Gets an i64 element.
     pub fn i64_element(&self, index: usize) -> Result<i64, Error> {
-        if index < self.len() {
+        if !self.is_dense_int_elements() {
+            Err(Error::ElementExpected {
+                r#type: "integer",
+                value: self.to_string(),
+            })
+        } else if index < self.len() {
             Ok(unsafe {
                 mlirDenseElementsAttrGetInt64Value(self.attribute.to_raw(), index as isize)
             })
@@ -66,11 +91,53 @@ mod tests {
     };
 
     #[test]
+    fn i32_element() {
+        let context = Context::new();
+        let attribute = DenseElementsAttribute::new(
+            MemRefType::new(Type::index(&context), &[3], None, None).into(),
+            &[IntegerAttribute::new(42, IntegerType::new(&context, 32).into()).into()],
+        );
+
+        assert_eq!(attribute.i32_element(0), Ok(42));
+        assert_eq!(attribute.i32_element(1), Ok(42));
+        assert_eq!(attribute.i32_element(2), Ok(42));
+        assert_eq!(
+            attribute.i32_element(3),
+            Err(Error::PositionOutOfBounds {
+                name: "dense element",
+                value: attribute.to_string(),
+                index: 3,
+            })
+        );
+    }
+
+    #[test]
     fn i64_element() {
         let context = Context::new();
         let attribute = DenseElementsAttribute::new(
             MemRefType::new(Type::index(&context), &[3], None, None).into(),
             &[IntegerAttribute::new(42, IntegerType::new(&context, 64).into()).into()],
+        );
+
+        assert_eq!(attribute.i64_element(0), Ok(42));
+        assert_eq!(attribute.i64_element(1), Ok(42));
+        assert_eq!(attribute.i64_element(2), Ok(42));
+        assert_eq!(
+            attribute.i64_element(3),
+            Err(Error::PositionOutOfBounds {
+                name: "dense element",
+                value: attribute.to_string(),
+                index: 3,
+            })
+        );
+    }
+
+    #[test]
+    fn i64_element_from_i32_elements() {
+        let context = Context::new();
+        let attribute = DenseElementsAttribute::new(
+            MemRefType::new(Type::index(&context), &[3], None, None).into(),
+            &[IntegerAttribute::new(42, IntegerType::new(&context, 32).into()).into()],
         );
 
         assert_eq!(attribute.i64_element(0), Ok(42));

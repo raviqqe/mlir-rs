@@ -8,6 +8,10 @@ use std::{
 pub enum Error {
     AttributeExpected(&'static str, String),
     BlockArgumentExpected(String),
+    ElementExpected {
+        r#type: &'static str,
+        value: String,
+    },
     InvokeFunction,
     OperationResultExpected(String),
     PositionOutOfBounds {
@@ -29,6 +33,9 @@ impl Display for Error {
             }
             Self::BlockArgumentExpected(value) => {
                 write!(formatter, "block argument expected: {value}")
+            }
+            Self::ElementExpected { r#type, value } => {
+                write!(formatter, "element of {type} type expected: {value}")
             }
             Self::InvokeFunction => write!(formatter, "failed to invoke JIT-compiled function"),
             Self::OperationResultExpected(value) => {
