@@ -18,7 +18,7 @@ pub fn call<'c>(
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("func.call", location)
-        .add_attributes(&[(Identifier::new(&context, "callee"), function.into())])
+        .add_attributes(&[(Identifier::new(context, "callee"), function.into())])
         .add_operands(arguments)
         .build()
 }
@@ -43,7 +43,7 @@ pub fn constant<'c>(
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("func.constant", location)
-        .add_attributes(&[(Identifier::new(&context, "value"), function.into())])
+        .add_attributes(&[(Identifier::new(context, "value"), function.into())])
         .add_results(&[r#type.into()])
         .build()
 }
@@ -76,9 +76,8 @@ pub fn r#return<'c>(operands: &[Value], location: Location<'c>) -> Operation<'c>
 mod tests {
     use super::*;
     use crate::{
-        ir::{attribute::FlatSymbolRefAttribute, r#type::FunctionType, Block, Module, Type},
+        ir::{Block, Module, Type},
         test::load_all_dialects,
-        Context,
     };
 
     #[test]
