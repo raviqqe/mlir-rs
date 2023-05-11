@@ -5,7 +5,7 @@ use crate::{
         attribute::{DenseI32ArrayAttribute, IntegerAttribute},
         operation::OperationBuilder,
         r#type::MemRefType,
-        Identifier, Location, Operation, Value,
+        Identifier, Location, Operation, Type, Value,
     },
     Context,
 };
@@ -83,6 +83,14 @@ fn allocate<'c>(
 pub fn dealloc<'c>(value: Value, location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("memref.dealloc", location)
         .add_operands(&[value])
+        .build()
+}
+
+/// Create a `memref.rank` operation.
+pub fn rank<'c>(context: &'c Context, value: Value, location: Location<'c>) -> Operation<'c> {
+    OperationBuilder::new("memref.rank", location)
+        .add_operands(&[value])
+        .add_results(&[Type::index(&context)])
         .build()
 }
 
@@ -209,6 +217,24 @@ mod tests {
                 None,
                 location,
             ));
+        })
+    }
+
+    #[test]
+    fn compile_rank() {
+        let context = create_test_context();
+        let location = Location::unknown(&context);
+
+        compile_operation("rank", &context, |block| {
+            let pointer = block.append_operation(alloca(
+                &context,
+                MemRefType::new(Type::index(&context), &[1], None, None),
+                &[],
+                &[],
+                None,
+                location,
+            ));
+            block.append_operation(rank(&context, pointer.result(0).unwrap().into(), location));
         })
     }
 }
