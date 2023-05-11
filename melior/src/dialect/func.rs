@@ -16,8 +16,8 @@ pub fn call<'c>(
     arguments: &[Value],
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("func.return", location)
-        .add_attributes(&[(Identifier::new(&context, "foo"), function.into())])
+    OperationBuilder::new("func.call", location)
+        .add_attributes(&[(Identifier::new(&context, "callee"), function.into())])
         .add_operands(arguments)
         .enable_result_type_inference()
         .build()
