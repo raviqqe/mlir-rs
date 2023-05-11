@@ -1,4 +1,4 @@
-use mlir_sys::{mlirStringRefCreate, mlirStringRefEqual, MlirStringRef};
+use mlir_sys::{mlirStringRefEqual, MlirStringRef};
 use once_cell::sync::Lazy;
 use std::{
     collections::HashSet,
@@ -66,7 +66,12 @@ impl From<&str> for StringRef<'static> {
         let lock = STRING_CACHE.read().unwrap();
         let string = lock.get(string).unwrap();
 
-        unsafe { Self::from_raw(mlirStringRefCreate(string.as_ptr(), string.len())) }
+        unsafe {
+            Self::from_raw(MlirStringRef {
+                data: string.as_ptr() as *const i8,
+                length: string.len(),
+            })
+        }
     }
 }
 
