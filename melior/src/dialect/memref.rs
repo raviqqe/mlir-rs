@@ -2,7 +2,7 @@
 
 use crate::{
     ir::{
-        attribute::{DenseI32ArrayAttribute, IntegerAttribute},
+        attribute::{DenseI32ArrayAttribute, IntegerAttribute, StringAttribute},
         operation::OperationBuilder,
         r#type::MemRefType,
         Identifier, Location, Operation, Value,
@@ -94,16 +94,26 @@ pub fn dim<'c>(value: Value, index: Value, location: Location<'c>) -> Operation<
 /// Create a `memref.global` operation.
 pub fn global<'c>(
     context: &'c Context,
+    name: &str,
     r#type: MemRefType<'c>,
-    dynamic_sizes: &[Value],
-    symbols: &[Value],
+    visibility: Option<&str>,
     alignment: Option<IntegerAttribute<'c>>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("memref.global", location)
-        .add_operands(&[value, index])
-        .enable_result_type_inference()
-        .build()
+    let mut builder = OperationBuilder::new("memref.global", location).add_attributes(&[
+        (
+            Identifier::new(context, "sym_name"),
+            StringAttribute::new(&context, name).into(),
+        ),
+        (Identifier::new(context, "type"), alignment.into()),
+    ]);
+
+    if let Some(alignment) = alignment {
+        builder =
+            builder.add_attributes(&[(Identifier::new(context, "alignment"), alignment.into())]);
+    }
+
+    builder.build()
 }
 
 /// Create a `memref.load` operation.
