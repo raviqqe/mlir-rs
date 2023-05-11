@@ -79,6 +79,14 @@ fn allocate<'c>(
     builder.add_results(&[r#type.into()]).build()
 }
 
+/// Create a `memref.cast` operation.
+pub fn cast<'c>(value: Value, r#type: MemRefType<'c>, location: Location<'c>) -> Operation<'c> {
+    OperationBuilder::new("memref.cast", location)
+        .add_operands(&[value])
+        .add_results(&[r#type.into()])
+        .build()
+}
+
 /// Create a `memref.dealloc` operation.
 pub fn dealloc<'c>(value: Value, location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("memref.dealloc", location)
