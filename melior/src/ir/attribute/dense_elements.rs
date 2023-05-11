@@ -16,13 +16,17 @@ pub struct DenseElementsAttribute<'c> {
 
 impl<'c> DenseElementsAttribute<'c> {
     /// Creates a dense elements attribute.
-    pub fn new(r#type: Type<'c>, values: &[Attribute<'c>]) -> Self {
-        unsafe {
-            Self::from_raw(mlirDenseElementsAttrGet(
-                r#type.to_raw(),
-                values.len() as isize,
-                values.as_ptr() as *const _ as *const _,
-            ))
+    pub fn new(r#type: Type<'c>, values: &[Attribute<'c>]) -> Result<Self, Error> {
+        if r#type.is_shaped() {
+            Ok(unsafe {
+                Self::from_raw(mlirDenseElementsAttrGet(
+                    r#type.to_raw(),
+                    values.len() as isize,
+                    values.as_ptr() as *const _ as *const _,
+                ))
+            })
+        } else {
+            Err(Error::TypeExpected("shaped", r#type.to_string()))
         }
     }
 
@@ -96,7 +100,8 @@ mod tests {
         let attribute = DenseElementsAttribute::new(
             MemRefType::new(Type::index(&context), &[3], None, None).into(),
             &[IntegerAttribute::new(42, IntegerType::new(&context, 32).into()).into()],
-        );
+        )
+        .unwrap();
 
         assert_eq!(attribute.i32_element(0), Ok(42));
         assert_eq!(attribute.i32_element(1), Ok(42));
@@ -117,7 +122,8 @@ mod tests {
         let attribute = DenseElementsAttribute::new(
             MemRefType::new(Type::index(&context), &[3], None, None).into(),
             &[IntegerAttribute::new(42, IntegerType::new(&context, 64).into()).into()],
-        );
+        )
+        .unwrap();
 
         assert_eq!(attribute.i64_element(0), Ok(42));
         assert_eq!(attribute.i64_element(1), Ok(42));
@@ -138,7 +144,8 @@ mod tests {
         let attribute = DenseElementsAttribute::new(
             MemRefType::new(Type::index(&context), &[3], None, None).into(),
             &[IntegerAttribute::new(42, IntegerType::new(&context, 32).into()).into()],
-        );
+        )
+        .unwrap();
 
         assert_eq!(attribute.i64_element(0), Ok(42));
         assert_eq!(attribute.i64_element(1), Ok(42));
@@ -159,7 +166,8 @@ mod tests {
         let attribute = DenseElementsAttribute::new(
             MemRefType::new(Type::index(&context), &[3], None, None).into(),
             &[IntegerAttribute::new(0, IntegerType::new(&context, 64).into()).into()],
-        );
+        )
+        .unwrap();
 
         assert_eq!(attribute.len(), 3);
     }

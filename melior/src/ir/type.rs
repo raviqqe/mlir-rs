@@ -6,12 +6,13 @@ mod function;
 pub mod id;
 mod integer;
 mod mem_ref;
+mod ranked_tensor;
 mod tuple;
 mod type_like;
 
 pub use self::{
     function::FunctionType, id::TypeId, integer::IntegerType, mem_ref::MemRefType,
-    tuple::TupleType, type_like::TypeLike,
+    ranked_tensor::RankedTensorType, tuple::TupleType, type_like::TypeLike,
 };
 use super::Location;
 use crate::{context::Context, string_ref::StringRef, utility::print_callback};
@@ -171,6 +172,12 @@ impl<'c> From<IntegerType<'c>> for Type<'c> {
 impl<'c> From<MemRefType<'c>> for Type<'c> {
     fn from(mem_ref: MemRefType<'c>) -> Self {
         unsafe { Self::from_raw(mem_ref.to_raw()) }
+    }
+}
+
+impl<'c> From<RankedTensorType<'c>> for Type<'c> {
+    fn from(tensor: RankedTensorType<'c>) -> Self {
+        unsafe { Self::from_raw(tensor.to_raw()) }
     }
 }
 

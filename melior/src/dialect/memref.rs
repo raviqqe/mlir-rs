@@ -202,7 +202,7 @@ mod tests {
         dialect::{func, index},
         ir::{
             attribute::{DenseElementsAttribute, StringAttribute, TypeAttribute},
-            r#type::{FunctionType, IntegerType},
+            r#type::{FunctionType, IntegerType, RankedTensorType},
             Block, Module, Region, Type,
         },
         test::create_test_context,
@@ -352,16 +352,20 @@ mod tests {
         let location = Location::unknown(&context);
         let module = Module::new(location);
         let r#type = IntegerType::new(&context, 64).into();
-        let attrs: [_; 1] = [IntegerAttribute::new(42, r#type)];
 
         module.body().append_operation(global(
             &context,
             "foo",
             Some("private"),
             MemRefType::new(r#type, &[], None, None),
-            // TODO
-            // Some(DenseElementsAttribute::new(r#type, &attrs).into()),
-            Some(Attribute::parse(&context, "dense<42> : tensor<i64>").unwrap()),
+            Some(
+                DenseElementsAttribute::new(
+                    RankedTensorType::new(&[], r#type, None).into(),
+                    &[IntegerAttribute::new(42, r#type).into()],
+                )
+                .unwrap()
+                .into(),
+            ),
             true,
             Some(IntegerAttribute::new(
                 8,
