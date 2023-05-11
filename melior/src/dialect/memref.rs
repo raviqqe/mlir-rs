@@ -113,6 +113,13 @@ pub fn global<'c>(
         (Identifier::new(context, "initial_value"), value.into()),
     ]);
 
+    if let Some(visibility) = visibility {
+        builder = builder.add_attributes(&[(
+            Identifier::new(context, "sym_visibility"),
+            StringAttribute::new(&context, visibility).into(),
+        )]);
+    }
+
     if let Some(alignment) = alignment {
         builder =
             builder.add_attributes(&[(Identifier::new(context, "alignment"), alignment.into())]);
