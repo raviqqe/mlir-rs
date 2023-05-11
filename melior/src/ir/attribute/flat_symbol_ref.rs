@@ -26,7 +26,11 @@ impl<'c> FlatSymbolRefAttribute<'c> {
     }
 }
 
-attribute_traits!(FlatSymbolRefAttribute, is_integer, "flat symbol ref");
+attribute_traits!(
+    FlatSymbolRefAttribute,
+    is_flat_symbol_ref,
+    "flat symbol ref"
+);
 
 #[cfg(test)]
 mod tests {
