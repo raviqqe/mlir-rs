@@ -91,6 +91,14 @@ pub fn dim<'c>(value: Value, index: Value, location: Location<'c>) -> Operation<
         .build()
 }
 
+/// Create a `memref.get_global` operation.
+pub fn get_global<'c>(value: Value, index: Value, location: Location<'c>) -> Operation<'c> {
+    OperationBuilder::new("memref.get_global", location)
+        .add_operands(&[value, index])
+        .enable_result_type_inference()
+        .build()
+}
+
 /// Create a `memref.global` operation.
 #[allow(clippy::too_many_arguments)]
 pub fn global<'c>(
