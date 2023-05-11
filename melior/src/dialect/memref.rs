@@ -201,7 +201,7 @@ mod tests {
     use crate::{
         dialect::{func, index},
         ir::{
-            attribute::{StringAttribute, TypeAttribute},
+            attribute::{DenseElementsAttribute, StringAttribute, TypeAttribute},
             r#type::{FunctionType, IntegerType},
             Block, Module, Region, Type,
         },
@@ -351,13 +351,17 @@ mod tests {
         let context = create_test_context();
         let location = Location::unknown(&context);
         let module = Module::new(location);
+        let r#type = IntegerType::new(&context, 64).into();
+        let attrs: [_; 1] = [IntegerAttribute::new(42, r#type)];
 
         module.body().append_operation(global(
             &context,
             "foo",
             Some("private"),
-            MemRefType::new(Type::index(&context), &[], None, None),
-            None,
+            MemRefType::new(r#type, &[], None, None),
+            // TODO
+            // Some(DenseElementsAttribute::new(r#type, &attrs).into()),
+            Some(Attribute::parse(&context, "dense<42> : tensor<i64>").unwrap()),
             true,
             Some(IntegerAttribute::new(
                 8,
