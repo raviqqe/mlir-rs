@@ -5,7 +5,7 @@ use crate::{
         attribute::{DenseI32ArrayAttribute, IntegerAttribute},
         operation::OperationBuilder,
         r#type::MemRefType,
-        Identifier, Location, Operation, Type, Value,
+        Identifier, Location, Operation, Value,
     },
     Context,
 };
@@ -63,11 +63,8 @@ fn allocate<'c>(
 
     builder = builder.add_attributes(&[(
         Identifier::new(context, "operand_segment_sizes"),
-        DenseI32ArrayAttribute::new(
-            &context,
-            &[dynamic_sizes.len() as i32, symbols.len() as i32],
-        )
-        .into(),
+        DenseI32ArrayAttribute::new(context, &[dynamic_sizes.len() as i32, symbols.len() as i32])
+            .into(),
     )]);
     builder = builder.add_operands(dynamic_sizes).add_operands(symbols);
 
@@ -86,11 +83,19 @@ pub fn dealloc<'c>(value: Value, location: Location<'c>) -> Operation<'c> {
         .build()
 }
 
+/// Create a `memref.dim` operation.
+pub fn dim<'c>(value: Value, index: Value, location: Location<'c>) -> Operation<'c> {
+    OperationBuilder::new("memref.dim", location)
+        .add_operands(&[value, index])
+        .enable_result_type_inference()
+        .build()
+}
+
 /// Create a `memref.rank` operation.
-pub fn rank<'c>(context: &'c Context, value: Value, location: Location<'c>) -> Operation<'c> {
+pub fn rank<'c>(value: Value, location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("memref.rank", location)
         .add_operands(&[value])
-        .add_results(&[Type::index(&context)])
+        .enable_result_type_inference()
         .build()
 }
 
@@ -123,7 +128,7 @@ pub fn realloc<'c>(
 mod tests {
     use super::*;
     use crate::{
-        dialect::func,
+        dialect::{func, index},
         ir::{
             attribute::{StringAttribute, TypeAttribute},
             r#type::FunctionType,
@@ -133,7 +138,7 @@ mod tests {
     };
 
     fn compile_operation(name: &str, context: &Context, build_block: impl Fn(&Block)) {
-        let location = Location::unknown(&context);
+        let location = Location::unknown(context);
         let module = Module::new(location);
 
         let function = {
@@ -146,11 +151,11 @@ mod tests {
             region.append_block(block);
 
             func::func(
-                &context,
-                StringAttribute::new(&context, "foo"),
-                TypeAttribute::new(FunctionType::new(&context, &[], &[]).into()),
+                context,
+                StringAttribute::new(context, "foo"),
+                TypeAttribute::new(FunctionType::new(context, &[], &[]).into()),
                 region,
-                Location::unknown(&context),
+                Location::unknown(context),
             )
         };
 
@@ -221,6 +226,35 @@ mod tests {
     }
 
     #[test]
+    fn compile_dim() {
+        let context = create_test_context();
+        let location = Location::unknown(&context);
+
+        compile_operation("dim", &context, |block| {
+            let pointer = block.append_operation(alloca(
+                &context,
+                MemRefType::new(Type::index(&context), &[1], None, None),
+                &[],
+                &[],
+                None,
+                location,
+            ));
+
+            let index = block.append_operation(index::constant(
+                &context,
+                IntegerAttribute::new(0, Type::index(&context)),
+                location,
+            ));
+
+            block.append_operation(dim(
+                pointer.result(0).unwrap().into(),
+                index.result(0).unwrap().into(),
+                location,
+            ));
+        })
+    }
+
+    #[test]
     fn compile_rank() {
         let context = create_test_context();
         let location = Location::unknown(&context);
@@ -234,7 +268,7 @@ mod tests {
                 None,
                 location,
             ));
-            block.append_operation(rank(&context, pointer.result(0).unwrap().into(), location));
+            block.append_operation(rank(pointer.result(0).unwrap().into(), location));
         })
     }
 }
