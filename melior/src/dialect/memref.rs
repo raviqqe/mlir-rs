@@ -328,7 +328,7 @@ mod tests {
         let context = create_test_context();
         let location = Location::unknown(&context);
 
-        compile_operation("dim", &context, |block| {
+        compile_operation("cast", &context, |block| {
             let memref = block.append_operation(alloca(
                 &context,
                 MemRefType::new(Type::index(&context), &[6], None, None),
