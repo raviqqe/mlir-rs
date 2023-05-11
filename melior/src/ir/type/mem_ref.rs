@@ -25,8 +25,8 @@ impl<'c> MemRefType<'c> {
         unsafe {
             Self::from_raw(mlirMemRefTypeGet(
                 r#type.to_raw(),
-                dimensions.len() as isize,
-                dimensions.as_ptr() as *const i64,
+                dimensions.len() as _,
+                dimensions.as_ptr() as *const _,
                 layout.unwrap_or_else(|| Attribute::null()).to_raw(),
                 memory_space.unwrap_or_else(|| Attribute::null()).to_raw(),
             ))

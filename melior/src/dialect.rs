@@ -5,6 +5,7 @@ pub mod func;
 mod handle;
 pub mod index;
 pub mod llvm;
+pub mod memref;
 mod registry;
 pub mod scf;
 

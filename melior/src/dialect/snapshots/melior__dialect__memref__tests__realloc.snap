@@ -1,0 +1,12 @@
+---
+source: melior/src/dialect/memref.rs
+expression: module.as_operation()
+---
+module {
+  func.func @foo() {
+    %alloc = memref.alloc() : memref<8xindex>
+    %0 = memref.realloc %alloc : memref<8xindex> to memref<42xindex>
+    return
+  }
+}
+
