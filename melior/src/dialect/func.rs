@@ -12,7 +12,9 @@ use crate::{
 /// Create a `func.call` operation.
 pub fn call<'c>(function: Value, arguments: &[Value], location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("func.return", location)
-        .add_operands(operands)
+        .add_operands(&[function])
+        .add_operands(arguments)
+        .enable_result_type_inference()
         .build()
 }
 
