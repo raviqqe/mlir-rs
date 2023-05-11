@@ -64,18 +64,16 @@ mod tests {
         let location = Location::unknown(&context);
         let module = Module::new(location);
 
-        let integer_type = Type::index(&context);
-
         let function = {
-            let block = Block::new(&[(integer_type, location)]);
+            let block = Block::new(&[]);
 
             block.append_operation(call(
                 &context,
                 FlatSymbolRefAttribute::new(&context, "foo"),
-                &[block.argument(0).unwrap().into()],
+                &[],
                 location,
             ));
-            block.append_operation(r#return(&[block.argument(0).unwrap().into()], location));
+            block.append_operation(r#return(&[], location));
 
             let region = Region::new();
             region.append_block(block);
@@ -83,9 +81,7 @@ mod tests {
             func(
                 &context,
                 StringAttribute::new(&context, "foo"),
-                TypeAttribute::new(
-                    FunctionType::new(&context, &[integer_type], &[integer_type]).into(),
-                ),
+                TypeAttribute::new(FunctionType::new(&context, &[], &[]).into()),
                 region,
                 Location::unknown(&context),
             )
