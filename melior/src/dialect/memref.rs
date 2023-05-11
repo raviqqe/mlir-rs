@@ -324,6 +324,29 @@ mod tests {
     }
 
     #[test]
+    fn compile_cast() {
+        let context = create_test_context();
+        let location = Location::unknown(&context);
+
+        compile_operation("dim", &context, |block| {
+            let memref = block.append_operation(alloca(
+                &context,
+                MemRefType::new(Type::index(&context), &[6], None, None),
+                &[],
+                &[],
+                None,
+                location,
+            ));
+
+            block.append_operation(cast(
+                memref.result(0).unwrap().into(),
+                MemRefType::new(Type::index(&context), &[2, 3], None, None),
+                location,
+            ));
+        })
+    }
+
+    #[test]
     fn compile_dim() {
         let context = create_test_context();
         let location = Location::unknown(&context);
