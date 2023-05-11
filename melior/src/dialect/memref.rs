@@ -91,11 +91,26 @@ pub fn dim<'c>(value: Value, index: Value, location: Location<'c>) -> Operation<
         .build()
 }
 
+/// Create a `memref.load` operation.
+pub fn load<'c>(memref: Value, location: Location<'c>) -> Operation<'c> {
+    OperationBuilder::new("memref.load", location)
+        .add_operands(&[memref])
+        .enable_result_type_inference()
+        .build()
+}
+
 /// Create a `memref.rank` operation.
 pub fn rank<'c>(value: Value, location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("memref.rank", location)
         .add_operands(&[value])
         .enable_result_type_inference()
+        .build()
+}
+
+/// Create a `memref.store` operation.
+pub fn store<'c>(value: Value, memref: Value, location: Location<'c>) -> Operation<'c> {
+    OperationBuilder::new("memref.store", location)
+        .add_operands(&[value, memref])
         .build()
 }
 
@@ -171,7 +186,7 @@ mod tests {
         let location = Location::unknown(&context);
 
         compile_operation("alloc", &context, |block| {
-            let pointer = block.append_operation(alloc(
+            let mremref = block.append_operation(alloc(
                 &context,
                 MemRefType::new(Type::index(&context), &[], None, None),
                 &[],
@@ -179,7 +194,7 @@ mod tests {
                 None,
                 location,
             ));
-            block.append_operation(dealloc(pointer.result(0).unwrap().into(), location));
+            block.append_operation(dealloc(mremref.result(0).unwrap().into(), location));
         })
     }
 
@@ -189,7 +204,7 @@ mod tests {
         let location = Location::unknown(&context);
 
         compile_operation("realloc", &context, |block| {
-            let pointer = block.append_operation(alloc(
+            let mremref = block.append_operation(alloc(
                 &context,
                 MemRefType::new(Type::index(&context), &[8], None, None),
                 &[],
@@ -199,7 +214,7 @@ mod tests {
             ));
             block.append_operation(realloc(
                 &context,
-                pointer.result(0).unwrap().into(),
+                mremref.result(0).unwrap().into(),
                 None,
                 MemRefType::new(Type::index(&context), &[42], None, None),
                 None,
@@ -231,7 +246,7 @@ mod tests {
         let location = Location::unknown(&context);
 
         compile_operation("dim", &context, |block| {
-            let pointer = block.append_operation(alloca(
+            let mremref = block.append_operation(alloca(
                 &context,
                 MemRefType::new(Type::index(&context), &[1], None, None),
                 &[],
@@ -247,10 +262,28 @@ mod tests {
             ));
 
             block.append_operation(dim(
-                pointer.result(0).unwrap().into(),
+                mremref.result(0).unwrap().into(),
                 index.result(0).unwrap().into(),
                 location,
             ));
+        })
+    }
+
+    #[test]
+    fn compile_load() {
+        let context = create_test_context();
+        let location = Location::unknown(&context);
+
+        compile_operation("load", &context, |block| {
+            let mremref = block.append_operation(alloca(
+                &context,
+                MemRefType::new(Type::index(&context), &[], None, None),
+                &[],
+                &[],
+                None,
+                location,
+            ));
+            block.append_operation(load(mremref.result(0).unwrap().into(), location));
         })
     }
 
@@ -260,7 +293,7 @@ mod tests {
         let location = Location::unknown(&context);
 
         compile_operation("rank", &context, |block| {
-            let pointer = block.append_operation(alloca(
+            let mremref = block.append_operation(alloca(
                 &context,
                 MemRefType::new(Type::index(&context), &[1], None, None),
                 &[],
@@ -268,7 +301,36 @@ mod tests {
                 None,
                 location,
             ));
-            block.append_operation(rank(pointer.result(0).unwrap().into(), location));
+            block.append_operation(rank(mremref.result(0).unwrap().into(), location));
+        })
+    }
+
+    #[test]
+    fn compile_store() {
+        let context = create_test_context();
+        let location = Location::unknown(&context);
+
+        compile_operation("store", &context, |block| {
+            let mremref = block.append_operation(alloca(
+                &context,
+                MemRefType::new(Type::index(&context), &[], None, None),
+                &[],
+                &[],
+                None,
+                location,
+            ));
+
+            let value = block.append_operation(index::constant(
+                &context,
+                IntegerAttribute::new(42, Type::index(&context)),
+                location,
+            ));
+
+            block.append_operation(store(
+                value.result(0).unwrap().into(),
+                mremref.result(0).unwrap().into(),
+                location,
+            ));
         })
     }
 }
