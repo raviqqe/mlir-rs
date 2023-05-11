@@ -9,6 +9,13 @@ use crate::{
     Context,
 };
 
+/// Create a `func.call` operation.
+pub fn call<'c>(function: Value, arguments: &[Value], location: Location<'c>) -> Operation<'c> {
+    OperationBuilder::new("func.return", location)
+        .add_operands(operands)
+        .build()
+}
+
 /// Create a `func.func` operation.
 pub fn func<'c>(
     context: &'c Context,
