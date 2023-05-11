@@ -295,6 +295,35 @@ mod tests {
     }
 
     #[test]
+    fn compile_load_with_index() {
+        let context = create_test_context();
+        let location = Location::unknown(&context);
+
+        compile_operation("load_with_index", &context, |block| {
+            let mremref = block.append_operation(alloca(
+                &context,
+                MemRefType::new(Type::index(&context), &[1], None, None),
+                &[],
+                &[],
+                None,
+                location,
+            ));
+
+            let index = block.append_operation(index::constant(
+                &context,
+                IntegerAttribute::new(0, Type::index(&context)),
+                location,
+            ));
+
+            block.append_operation(load(
+                mremref.result(0).unwrap().into(),
+                &[index.result(0).unwrap().into()],
+                location,
+            ));
+        })
+    }
+
+    #[test]
     fn compile_rank() {
         let context = create_test_context();
         let location = Location::unknown(&context);
@@ -337,6 +366,42 @@ mod tests {
                 value.result(0).unwrap().into(),
                 mremref.result(0).unwrap().into(),
                 &[],
+                location,
+            ));
+        })
+    }
+
+    #[test]
+    fn compile_store_with_index() {
+        let context = create_test_context();
+        let location = Location::unknown(&context);
+
+        compile_operation("store_with_index", &context, |block| {
+            let mremref = block.append_operation(alloca(
+                &context,
+                MemRefType::new(Type::index(&context), &[1], None, None),
+                &[],
+                &[],
+                None,
+                location,
+            ));
+
+            let value = block.append_operation(index::constant(
+                &context,
+                IntegerAttribute::new(42, Type::index(&context)),
+                location,
+            ));
+
+            let index = block.append_operation(index::constant(
+                &context,
+                IntegerAttribute::new(0, Type::index(&context)),
+                location,
+            ));
+
+            block.append_operation(store(
+                value.result(0).unwrap().into(),
+                mremref.result(0).unwrap().into(),
+                &[index.result(0).unwrap().into()],
                 location,
             ));
         })
