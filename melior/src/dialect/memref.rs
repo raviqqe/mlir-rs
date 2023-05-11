@@ -2,10 +2,8 @@
 
 use crate::{
     ir::{
-        attribute::{FlatSymbolRefAttribute, StringAttribute, TypeAttribute},
-        operation::OperationBuilder,
-        r#type::FunctionType,
-        Identifier, Location, Operation, Region, Value,
+        attribute::FlatSymbolRefAttribute, operation::OperationBuilder, Identifier, Location,
+        Operation, Value,
     },
     Context,
 };
