@@ -27,3 +27,11 @@ jobs:
       - uses: Homebrew/actions/setup-homebrew@master
       - run: tools/setup.sh
       - run: cargo test
+  bench:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: Swatinem/rust-cache@v2
+      - uses: Homebrew/actions/setup-homebrew@master
+      - run: tools/setup.sh
+      - run: cargo bench
