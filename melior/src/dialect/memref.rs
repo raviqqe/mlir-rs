@@ -331,7 +331,7 @@ mod tests {
         compile_operation("cast", &context, |block| {
             let memref = block.append_operation(alloca(
                 &context,
-                MemRefType::new(Type::index(&context), &[6], None, None),
+                MemRefType::new(Type::index(&context), &[42], None, None),
                 &[],
                 &[],
                 None,
@@ -340,7 +340,10 @@ mod tests {
 
             block.append_operation(cast(
                 memref.result(0).unwrap().into(),
-                MemRefType::new(Type::index(&context), &[2, 3], None, None),
+                Type::parse(&context, "memref<?xindex>")
+                    .unwrap()
+                    .try_into()
+                    .unwrap(),
                 location,
             ));
         })

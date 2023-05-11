@@ -1,0 +1,12 @@
+---
+source: melior/src/dialect/memref.rs
+expression: module.as_operation()
+---
+module {
+  func.func @foo() {
+    %alloca = memref.alloca() : memref<42xindex>
+    %cast = memref.cast %alloca : memref<42xindex> to memref<?xindex>
+    return
+  }
+}
+
