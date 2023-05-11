@@ -27,3 +27,16 @@ impl<'c> FlatSymbolRefAttribute<'c> {
 }
 
 attribute_traits!(FlatSymbolRefAttribute, is_integer, "flat symbol ref");
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new() {
+        let context = Context::new();
+        let attribute = FlatSymbolRefAttribute::new(&context, "foo");
+
+        assert_eq!(attribute.value(), "foo");
+    }
+}
