@@ -8,7 +8,7 @@ use crate::{
         },
         operation::OperationBuilder,
         r#type::MemRefType,
-        Attribute, Identifier, Location, Operation, Value,
+        Attribute, Identifier, Location, Operation, Type, Value,
     },
     Context,
 };
@@ -95,13 +95,18 @@ pub fn dim<'c>(value: Value, index: Value, location: Location<'c>) -> Operation<
 }
 
 /// Create a `memref.get_global` operation.
-pub fn get_global<'c>(context: &'c Context, name: &str, location: Location<'c>) -> Operation<'c> {
+pub fn get_global<'c>(
+    context: &'c Context,
+    name: &str,
+    r#type: MemRefType<'c>,
+    location: Location<'c>,
+) -> Operation<'c> {
     OperationBuilder::new("memref.get_global", location)
         .add_attributes(&[(
             Identifier::new(&context, "name"),
             FlatSymbolRefAttribute::new(&context, name).into(),
         )])
-        .enable_result_type_inference()
+        .add_results(&[r#type.into()])
         .build()
 }
 
@@ -344,12 +349,13 @@ mod tests {
         let context = create_test_context();
         let location = Location::unknown(&context);
         let module = Module::new(location);
+        let mem_ref_type = MemRefType::new(Type::index(&context), &[], None, None);
 
         module.body().append_operation(global(
             &context,
             "foo",
             None,
-            MemRefType::new(Type::index(&context), &[], None, None),
+            mem_ref_type,
             None,
             false,
             None,
@@ -358,12 +364,12 @@ mod tests {
 
         module.body().append_operation(func::func(
             &context,
-            StringAttribute::new(&context, "foo"),
+            StringAttribute::new(&context, "bar"),
             TypeAttribute::new(FunctionType::new(&context, &[], &[]).into()),
             {
                 let block = Block::new(&[]);
 
-                block.append_operation(get_global(&context, "foo", location));
+                block.append_operation(get_global(&context, "foo", mem_ref_type, location));
                 block.append_operation(func::r#return(&[], location));
 
                 let region = Region::new();
