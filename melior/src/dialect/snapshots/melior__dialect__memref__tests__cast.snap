@@ -4,8 +4,8 @@ expression: module.as_operation()
 ---
 module {
   func.func @foo() {
-    %alloca = memref.alloca() : memref<42xindex>
-    %cast = memref.cast %alloca : memref<42xindex> to memref<?xindex>
+    %alloca = memref.alloca() : memref<42xf64>
+    %cast = memref.cast %alloca : memref<42xf64> to memref<?xf64>
     return
   }
 }

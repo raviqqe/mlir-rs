@@ -331,7 +331,7 @@ mod tests {
         compile_operation("cast", &context, |block| {
             let memref = block.append_operation(alloca(
                 &context,
-                MemRefType::new(Type::index(&context), &[42], None, None),
+                MemRefType::new(Type::float64(&context), &[42], None, None),
                 &[],
                 &[],
                 None,
@@ -340,7 +340,7 @@ mod tests {
 
             block.append_operation(cast(
                 memref.result(0).unwrap().into(),
-                Type::parse(&context, "memref<?xindex>")
+                Type::parse(&context, "memref<?xf64>")
                     .unwrap()
                     .try_into()
                     .unwrap(),
