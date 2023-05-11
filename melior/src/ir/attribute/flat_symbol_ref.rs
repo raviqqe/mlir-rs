@@ -26,4 +26,4 @@ impl<'c> FlatSymbolRefAttribute<'c> {
     }
 }
 
-attribute_traits!(FlatSymbolRefAttribute, is_integer, "integer");
+attribute_traits!(FlatSymbolRefAttribute, is_integer, "flat symbol ref");
