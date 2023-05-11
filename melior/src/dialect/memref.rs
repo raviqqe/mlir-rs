@@ -95,9 +95,10 @@ pub fn dim<'c>(value: Value, index: Value, location: Location<'c>) -> Operation<
 pub fn global<'c>(
     context: &'c Context,
     name: &str,
+    visibility: Option<&str>,
     r#type: MemRefType<'c>,
     value: Attribute<'c>,
-    visibility: Option<&str>,
+    constant: bool,
     alignment: Option<IntegerAttribute<'c>>,
     location: Location<'c>,
 ) -> Operation<'c> {
@@ -117,6 +118,13 @@ pub fn global<'c>(
         builder = builder.add_attributes(&[(
             Identifier::new(context, "sym_visibility"),
             StringAttribute::new(&context, visibility).into(),
+        )]);
+    }
+
+    if constant {
+        builder = builder.add_attributes(&[(
+            Identifier::new(context, "constant"),
+            Attribute::unit(&context).into(),
         )]);
     }
 
