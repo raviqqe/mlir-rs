@@ -97,7 +97,7 @@ pub fn global<'c>(
     name: &str,
     visibility: Option<&str>,
     r#type: MemRefType<'c>,
-    value: Attribute<'c>,
+    value: Option<Attribute<'c>>,
     constant: bool,
     alignment: Option<IntegerAttribute<'c>>,
     location: Location<'c>,
@@ -111,7 +111,10 @@ pub fn global<'c>(
             Identifier::new(context, "type"),
             TypeAttribute::new(r#type.into()).into(),
         ),
-        (Identifier::new(context, "initial_value"), value.into()),
+        (
+            Identifier::new(context, "initial_value"),
+            value.unwrap_or_else(|| Attribute::unit(&context)).into(),
+        ),
     ]);
 
     if let Some(visibility) = visibility {
@@ -319,6 +322,27 @@ mod tests {
                 location,
             ));
         })
+    }
+
+    #[test]
+    fn compile_global() {
+        let context = create_test_context();
+        let location = Location::unknown(&context);
+        let module = Module::new(location);
+
+        module.body().append_operation(global(
+            &context,
+            "foo",
+            None,
+            MemRefType::new(Type::index(&context), &[], None, None),
+            None,
+            false,
+            None,
+            location,
+        ));
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
     }
 
     #[test]
