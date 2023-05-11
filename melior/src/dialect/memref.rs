@@ -39,6 +39,13 @@ pub fn alloc<'c>(
     builder.add_results(&[r#type.into()]).build()
 }
 
+/// Create a `memref.dealloc` operation.
+pub fn dealloc<'c>(value: Value, location: Location<'c>) -> Operation<'c> {
+    OperationBuilder::new("memref.dealloc", location)
+        .add_operands(&[value])
+        .build()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -53,7 +60,7 @@ mod tests {
     };
 
     #[test]
-    fn compile_alloc() {
+    fn compile_alloc_and_dealloc() {
         let context = create_test_context();
 
         let location = Location::unknown(&context);
@@ -62,7 +69,7 @@ mod tests {
         let function = {
             let block = Block::new(&[]);
 
-            block.append_operation(alloc(
+            let pointer = block.append_operation(alloc(
                 &context,
                 MemRefType::new(Type::index(&context), &[], None, None),
                 &[],
@@ -70,6 +77,7 @@ mod tests {
                 None,
                 location,
             ));
+            block.append_operation(dealloc(pointer.result(0).unwrap().into(), location));
             block.append_operation(func::r#return(&[], location));
 
             let region = Region::new();
