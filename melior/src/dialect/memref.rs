@@ -86,6 +86,31 @@ pub fn dealloc<'c>(value: Value, location: Location<'c>) -> Operation<'c> {
         .build()
 }
 
+/// Create a `memref.realloc` operation.
+pub fn realloc<'c>(
+    context: &'c Context,
+    value: Value,
+    size: Option<Value>,
+    r#type: MemRefType<'c>,
+    alignment: Option<IntegerAttribute<'c>>,
+    location: Location<'c>,
+) -> Operation<'c> {
+    let mut builder = OperationBuilder::new("memref.realloc", location)
+        .add_operands(&[value])
+        .add_results(&[r#type.into()]);
+
+    if let Some(size) = size {
+        builder = builder.add_operands(&[size]);
+    }
+
+    if let Some(alignment) = alignment {
+        builder =
+            builder.add_attributes(&[(Identifier::new(context, "alignment"), alignment.into())]);
+    }
+
+    builder.build()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -118,6 +143,52 @@ mod tests {
                 location,
             ));
             block.append_operation(dealloc(pointer.result(0).unwrap().into(), location));
+            block.append_operation(func::r#return(&[], location));
+
+            let region = Region::new();
+            region.append_block(block);
+
+            func::func(
+                &context,
+                StringAttribute::new(&context, "foo"),
+                TypeAttribute::new(FunctionType::new(&context, &[], &[]).into()),
+                region,
+                Location::unknown(&context),
+            )
+        };
+
+        module.body().append_operation(function);
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
+    fn compile_alloc_and_realloc() {
+        let context = create_test_context();
+
+        let location = Location::unknown(&context);
+        let module = Module::new(location);
+
+        let function = {
+            let block = Block::new(&[]);
+
+            let pointer = block.append_operation(alloc(
+                &context,
+                MemRefType::new(Type::index(&context), &[8], None, None),
+                &[],
+                &[],
+                None,
+                location,
+            ));
+            block.append_operation(realloc(
+                &context,
+                pointer.result(0).unwrap().into(),
+                None,
+                MemRefType::new(Type::index(&context), &[42], None, None),
+                None,
+                location,
+            ));
             block.append_operation(func::r#return(&[], location));
 
             let region = Region::new();
