@@ -193,7 +193,7 @@ mod tests {
         let location = Location::unknown(&context);
 
         compile_operation("alloc", &context, |block| {
-            let mremref = block.append_operation(alloc(
+            let memref = block.append_operation(alloc(
                 &context,
                 MemRefType::new(Type::index(&context), &[], None, None),
                 &[],
@@ -201,7 +201,7 @@ mod tests {
                 None,
                 location,
             ));
-            block.append_operation(dealloc(mremref.result(0).unwrap().into(), location));
+            block.append_operation(dealloc(memref.result(0).unwrap().into(), location));
         })
     }
 
@@ -211,7 +211,7 @@ mod tests {
         let location = Location::unknown(&context);
 
         compile_operation("realloc", &context, |block| {
-            let mremref = block.append_operation(alloc(
+            let memref = block.append_operation(alloc(
                 &context,
                 MemRefType::new(Type::index(&context), &[8], None, None),
                 &[],
@@ -221,7 +221,7 @@ mod tests {
             ));
             block.append_operation(realloc(
                 &context,
-                mremref.result(0).unwrap().into(),
+                memref.result(0).unwrap().into(),
                 None,
                 MemRefType::new(Type::index(&context), &[42], None, None),
                 None,
@@ -253,7 +253,7 @@ mod tests {
         let location = Location::unknown(&context);
 
         compile_operation("dim", &context, |block| {
-            let mremref = block.append_operation(alloca(
+            let memref = block.append_operation(alloca(
                 &context,
                 MemRefType::new(Type::index(&context), &[1], None, None),
                 &[],
@@ -269,7 +269,7 @@ mod tests {
             ));
 
             block.append_operation(dim(
-                mremref.result(0).unwrap().into(),
+                memref.result(0).unwrap().into(),
                 index.result(0).unwrap().into(),
                 location,
             ));
@@ -282,7 +282,7 @@ mod tests {
         let location = Location::unknown(&context);
 
         compile_operation("load", &context, |block| {
-            let mremref = block.append_operation(alloca(
+            let memref = block.append_operation(alloca(
                 &context,
                 MemRefType::new(Type::index(&context), &[], None, None),
                 &[],
@@ -290,7 +290,7 @@ mod tests {
                 None,
                 location,
             ));
-            block.append_operation(load(mremref.result(0).unwrap().into(), &[], location));
+            block.append_operation(load(memref.result(0).unwrap().into(), &[], location));
         })
     }
 
@@ -300,7 +300,7 @@ mod tests {
         let location = Location::unknown(&context);
 
         compile_operation("load_with_index", &context, |block| {
-            let mremref = block.append_operation(alloca(
+            let memref = block.append_operation(alloca(
                 &context,
                 MemRefType::new(Type::index(&context), &[1], None, None),
                 &[],
@@ -316,7 +316,7 @@ mod tests {
             ));
 
             block.append_operation(load(
-                mremref.result(0).unwrap().into(),
+                memref.result(0).unwrap().into(),
                 &[index.result(0).unwrap().into()],
                 location,
             ));
@@ -329,7 +329,7 @@ mod tests {
         let location = Location::unknown(&context);
 
         compile_operation("rank", &context, |block| {
-            let mremref = block.append_operation(alloca(
+            let memref = block.append_operation(alloca(
                 &context,
                 MemRefType::new(Type::index(&context), &[1], None, None),
                 &[],
@@ -337,7 +337,7 @@ mod tests {
                 None,
                 location,
             ));
-            block.append_operation(rank(mremref.result(0).unwrap().into(), location));
+            block.append_operation(rank(memref.result(0).unwrap().into(), location));
         })
     }
 
@@ -347,7 +347,7 @@ mod tests {
         let location = Location::unknown(&context);
 
         compile_operation("store", &context, |block| {
-            let mremref = block.append_operation(alloca(
+            let memref = block.append_operation(alloca(
                 &context,
                 MemRefType::new(Type::index(&context), &[], None, None),
                 &[],
@@ -364,7 +364,7 @@ mod tests {
 
             block.append_operation(store(
                 value.result(0).unwrap().into(),
-                mremref.result(0).unwrap().into(),
+                memref.result(0).unwrap().into(),
                 &[],
                 location,
             ));
@@ -377,7 +377,7 @@ mod tests {
         let location = Location::unknown(&context);
 
         compile_operation("store_with_index", &context, |block| {
-            let mremref = block.append_operation(alloca(
+            let memref = block.append_operation(alloca(
                 &context,
                 MemRefType::new(Type::index(&context), &[1], None, None),
                 &[],
@@ -400,7 +400,7 @@ mod tests {
 
             block.append_operation(store(
                 value.result(0).unwrap().into(),
-                mremref.result(0).unwrap().into(),
+                memref.result(0).unwrap().into(),
                 &[index.result(0).unwrap().into()],
                 location,
             ));

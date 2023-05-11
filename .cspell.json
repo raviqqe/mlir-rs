@@ -2,6 +2,7 @@
   "words": [
     "addf",
     "addi",
+    "alloca",
     "amdgpu",
     "apdl",
     "bfloat",
@@ -11,6 +12,7 @@
     "canonicalizer",
     "cmpi",
     "codegen",
+    "dalloc",
     "detensorize",
     "elementwise",
     "femtomc",
