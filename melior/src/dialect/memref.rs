@@ -124,25 +124,14 @@ mod tests {
         test::create_test_context,
     };
 
-    #[test]
-    fn compile_alloc_and_dealloc() {
-        let context = create_test_context();
-
+    fn compile_operation(name: &str, context: &Context, build_block: impl Fn(&Block)) {
         let location = Location::unknown(&context);
         let module = Module::new(location);
 
         let function = {
             let block = Block::new(&[]);
 
-            let pointer = block.append_operation(alloc(
-                &context,
-                MemRefType::new(Type::index(&context), &[], None, None),
-                &[],
-                &[],
-                None,
-                location,
-            ));
-            block.append_operation(dealloc(pointer.result(0).unwrap().into(), location));
+            build_block(&block);
             block.append_operation(func::r#return(&[], location));
 
             let region = Region::new();
@@ -160,19 +149,33 @@ mod tests {
         module.body().append_operation(function);
 
         assert!(module.as_operation().verify());
-        insta::assert_display_snapshot!(module.as_operation());
+        insta::assert_display_snapshot!(name, module.as_operation());
+    }
+
+    #[test]
+    fn compile_alloc_and_dealloc() {
+        let context = create_test_context();
+        let location = Location::unknown(&context);
+
+        compile_operation("alloc", &context, |block| {
+            let pointer = block.append_operation(alloc(
+                &context,
+                MemRefType::new(Type::index(&context), &[], None, None),
+                &[],
+                &[],
+                None,
+                location,
+            ));
+            block.append_operation(dealloc(pointer.result(0).unwrap().into(), location));
+        })
     }
 
     #[test]
     fn compile_alloc_and_realloc() {
         let context = create_test_context();
-
         let location = Location::unknown(&context);
-        let module = Module::new(location);
 
-        let function = {
-            let block = Block::new(&[]);
-
+        compile_operation("realloc", &context, |block| {
             let pointer = block.append_operation(alloc(
                 &context,
                 MemRefType::new(Type::index(&context), &[8], None, None),
@@ -189,36 +192,15 @@ mod tests {
                 None,
                 location,
             ));
-            block.append_operation(func::r#return(&[], location));
-
-            let region = Region::new();
-            region.append_block(block);
-
-            func::func(
-                &context,
-                StringAttribute::new(&context, "foo"),
-                TypeAttribute::new(FunctionType::new(&context, &[], &[]).into()),
-                region,
-                Location::unknown(&context),
-            )
-        };
-
-        module.body().append_operation(function);
-
-        assert!(module.as_operation().verify());
-        insta::assert_display_snapshot!(module.as_operation());
+        })
     }
 
     #[test]
     fn compile_alloca() {
         let context = create_test_context();
-
         let location = Location::unknown(&context);
-        let module = Module::new(location);
 
-        let function = {
-            let block = Block::new(&[]);
-
+        compile_operation("alloca", &context, |block| {
             block.append_operation(alloca(
                 &context,
                 MemRefType::new(Type::index(&context), &[], None, None),
@@ -227,23 +209,6 @@ mod tests {
                 None,
                 location,
             ));
-            block.append_operation(func::r#return(&[], location));
-
-            let region = Region::new();
-            region.append_block(block);
-
-            func::func(
-                &context,
-                StringAttribute::new(&context, "foo"),
-                TypeAttribute::new(FunctionType::new(&context, &[], &[]).into()),
-                region,
-                Location::unknown(&context),
-            )
-        };
-
-        module.body().append_operation(function);
-
-        assert!(module.as_operation().verify());
-        insta::assert_display_snapshot!(module.as_operation());
+        })
     }
 }
