@@ -91,6 +91,21 @@ pub fn dim<'c>(value: Value, index: Value, location: Location<'c>) -> Operation<
         .build()
 }
 
+/// Create a `memref.global` operation.
+pub fn global<'c>(
+    context: &'c Context,
+    r#type: MemRefType<'c>,
+    dynamic_sizes: &[Value],
+    symbols: &[Value],
+    alignment: Option<IntegerAttribute<'c>>,
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new("memref.global", location)
+        .add_operands(&[value, index])
+        .enable_result_type_inference()
+        .build()
+}
+
 /// Create a `memref.load` operation.
 pub fn load<'c>(memref: Value, indices: &[Value], location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("memref.load", location)
