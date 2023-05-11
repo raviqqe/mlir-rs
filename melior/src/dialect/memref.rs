@@ -92,6 +92,7 @@ pub fn dim<'c>(value: Value, index: Value, location: Location<'c>) -> Operation<
 }
 
 /// Create a `memref.global` operation.
+#[allow(clippy::too_many_arguments)]
 pub fn global<'c>(
     context: &'c Context,
     name: &str,
@@ -105,7 +106,7 @@ pub fn global<'c>(
     let mut builder = OperationBuilder::new("memref.global", location).add_attributes(&[
         (
             Identifier::new(context, "sym_name"),
-            StringAttribute::new(&context, name).into(),
+            StringAttribute::new(context, name).into(),
         ),
         (
             Identifier::new(context, "type"),
@@ -113,21 +114,21 @@ pub fn global<'c>(
         ),
         (
             Identifier::new(context, "initial_value"),
-            value.unwrap_or_else(|| Attribute::unit(&context)).into(),
+            value.unwrap_or_else(|| Attribute::unit(context)),
         ),
     ]);
 
     if let Some(visibility) = visibility {
         builder = builder.add_attributes(&[(
             Identifier::new(context, "sym_visibility"),
-            StringAttribute::new(&context, visibility).into(),
+            StringAttribute::new(context, visibility).into(),
         )]);
     }
 
     if constant {
         builder = builder.add_attributes(&[(
             Identifier::new(context, "constant"),
-            Attribute::unit(&context).into(),
+            Attribute::unit(context),
         )]);
     }
 
