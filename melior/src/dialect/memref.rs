@@ -202,7 +202,7 @@ mod tests {
         dialect::{func, index},
         ir::{
             attribute::{StringAttribute, TypeAttribute},
-            r#type::FunctionType,
+            r#type::{FunctionType, IntegerType},
             Block, Module, Region, Type,
         },
         test::create_test_context,
@@ -339,6 +339,30 @@ mod tests {
             None,
             false,
             None,
+            location,
+        ));
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
+    fn compile_global_with_options() {
+        let context = create_test_context();
+        let location = Location::unknown(&context);
+        let module = Module::new(location);
+
+        module.body().append_operation(global(
+            &context,
+            "foo",
+            Some("private"),
+            MemRefType::new(Type::index(&context), &[], None, None),
+            None,
+            true,
+            Some(IntegerAttribute::new(
+                8,
+                IntegerType::new(&context, 64).into(),
+            )),
             location,
         ));
 
