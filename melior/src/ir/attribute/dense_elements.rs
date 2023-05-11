@@ -41,6 +41,7 @@ impl<'c> DenseElementsAttribute<'c> {
     }
 
     /// Gets an i32 element.
+    // TODO Prevent calling these type specific methods on other types.
     pub fn i32_element(&self, index: usize) -> Result<i32, Error> {
         if !self.is_dense_int_elements() {
             Err(Error::ElementExpected {
@@ -121,29 +122,6 @@ mod tests {
     fn i64_element() {
         let context = Context::new();
         let integer_type = IntegerType::new(&context, 64).into();
-        let attribute = DenseElementsAttribute::new(
-            MemRefType::new(integer_type, &[3], None, None).into(),
-            &[IntegerAttribute::new(42, integer_type).into()],
-        )
-        .unwrap();
-
-        assert_eq!(attribute.i64_element(0), Ok(42));
-        assert_eq!(attribute.i64_element(1), Ok(42));
-        assert_eq!(attribute.i64_element(2), Ok(42));
-        assert_eq!(
-            attribute.i64_element(3),
-            Err(Error::PositionOutOfBounds {
-                name: "dense element",
-                value: attribute.to_string(),
-                index: 3,
-            })
-        );
-    }
-
-    #[test]
-    fn i64_element_from_i32_elements() {
-        let context = Context::new();
-        let integer_type = IntegerType::new(&context, 32).into();
         let attribute = DenseElementsAttribute::new(
             MemRefType::new(integer_type, &[3], None, None).into(),
             &[IntegerAttribute::new(42, integer_type).into()],
