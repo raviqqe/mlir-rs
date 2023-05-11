@@ -27,6 +27,7 @@ pub fn call<'c>(
 mod tests {
     use super::*;
     use crate::{
+        dialect::func,
         ir::{Block, Module, Type},
         test::load_all_dialects,
     };
@@ -44,12 +45,15 @@ mod tests {
         let function = {
             let block = Block::new(&[(integer_type, location)]);
 
-            block.append_operation(r#return(&[block.argument(0).unwrap().into()], location));
+            block.append_operation(func::r#return(
+                &[block.argument(0).unwrap().into()],
+                location,
+            ));
 
             let region = Region::new();
             region.append_block(block);
 
-            func(
+            func::func(
                 &context,
                 StringAttribute::new(&context, "foo"),
                 TypeAttribute::new(
