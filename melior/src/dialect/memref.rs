@@ -5,7 +5,7 @@ use crate::{
         attribute::{DenseI32ArrayAttribute, IntegerAttribute},
         operation::OperationBuilder,
         r#type::MemRefType,
-        Identifier, Location, Operation,
+        Identifier, Location, Operation, Value,
     },
     Context,
 };
@@ -14,6 +14,8 @@ use crate::{
 pub fn alloc<'c>(
     context: &'c Context,
     r#type: MemRefType<'c>,
+    dynamic_sizes: &[Value],
+    symbols: &[Value],
     alignment: Option<IntegerAttribute<'c>>,
     location: Location<'c>,
 ) -> Operation<'c> {
@@ -21,8 +23,13 @@ pub fn alloc<'c>(
 
     builder = builder.add_attributes(&[(
         Identifier::new(context, "operand_segment_sizes"),
-        DenseI32ArrayAttribute::new(&context, &[0, 0]).into(),
+        DenseI32ArrayAttribute::new(
+            &context,
+            &[dynamic_sizes.len() as i32, symbols.len() as i32],
+        )
+        .into(),
     )]);
+    builder = builder.add_operands(dynamic_sizes).add_operands(symbols);
 
     if let Some(alignment) = alignment {
         builder =
@@ -58,6 +65,8 @@ mod tests {
             block.append_operation(alloc(
                 &context,
                 MemRefType::new(Type::index(&context), &[], None, None),
+                &[],
+                &[],
                 None,
                 location,
             ));
