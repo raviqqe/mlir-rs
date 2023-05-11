@@ -10,8 +10,8 @@ pub fn load_all_dialects(context: &Context) {
 pub fn create_test_context() -> Context {
     let context = Context::new();
 
-    context.attach_diagnostic_handler(|d| {
-        eprintln!("{}", d);
+    context.attach_diagnostic_handler(|diagnostic| {
+        eprintln!("{}", diagnostic);
         true
     });
 
