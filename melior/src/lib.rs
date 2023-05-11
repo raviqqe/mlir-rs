@@ -81,6 +81,8 @@
 //! assert!(module.as_operation().verify());
 //! ```
 
+#[macro_use]
+mod r#macro;
 mod context;
 pub mod diagnostic;
 pub mod dialect;

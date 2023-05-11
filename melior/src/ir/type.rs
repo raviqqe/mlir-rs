@@ -157,35 +157,14 @@ impl<'c> Debug for Type<'c> {
     }
 }
 
-impl<'c> From<FunctionType<'c>> for Type<'c> {
-    fn from(function: FunctionType<'c>) -> Self {
-        unsafe { Self::from_raw(function.to_raw()) }
-    }
-}
-
-impl<'c> From<IntegerType<'c>> for Type<'c> {
-    fn from(integer: IntegerType<'c>) -> Self {
-        unsafe { Self::from_raw(integer.to_raw()) }
-    }
-}
-
-impl<'c> From<MemRefType<'c>> for Type<'c> {
-    fn from(mem_ref: MemRefType<'c>) -> Self {
-        unsafe { Self::from_raw(mem_ref.to_raw()) }
-    }
-}
-
-impl<'c> From<RankedTensorType<'c>> for Type<'c> {
-    fn from(tensor: RankedTensorType<'c>) -> Self {
-        unsafe { Self::from_raw(tensor.to_raw()) }
-    }
-}
-
-impl<'c> From<TupleType<'c>> for Type<'c> {
-    fn from(tuple: TupleType<'c>) -> Self {
-        unsafe { Self::from_raw(tuple.to_raw()) }
-    }
-}
+from_raw_subtypes!(
+    Type,
+    FunctionType,
+    IntegerType,
+    MemRefType,
+    RankedTensorType,
+    TupleType
+);
 
 #[cfg(test)]
 mod tests {

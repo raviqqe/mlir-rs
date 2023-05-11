@@ -1,7 +1,7 @@
 mod value_like;
 
 pub use self::value_like::ValueLike;
-use super::{block, operation, Type};
+use super::{block::Argument, operation::ResultValue, Type};
 use crate::utility::print_callback;
 use mlir_sys::{mlirValueEqual, mlirValuePrint, MlirValue};
 use std::{
@@ -66,17 +66,7 @@ impl<'a> Debug for Value<'a> {
     }
 }
 
-impl<'a> From<block::Argument<'a>> for Value<'a> {
-    fn from(argument: block::Argument<'a>) -> Self {
-        unsafe { Self::from_raw(argument.to_raw()) }
-    }
-}
-
-impl<'a> From<operation::ResultValue<'a>> for Value<'a> {
-    fn from(result: operation::ResultValue<'a>) -> Self {
-        unsafe { Self::from_raw(result.to_raw()) }
-    }
-}
+from_raw_subtypes!(Value, Argument, ResultValue);
 
 #[cfg(test)]
 mod tests {

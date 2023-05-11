@@ -109,53 +109,17 @@ impl<'c> Debug for Attribute<'c> {
     }
 }
 
-impl<'c> From<DenseElementsAttribute<'c>> for Attribute<'c> {
-    fn from(attribute: DenseElementsAttribute<'c>) -> Self {
-        unsafe { Self::from_raw(attribute.to_raw()) }
-    }
-}
-
-impl<'c> From<DenseI32ArrayAttribute<'c>> for Attribute<'c> {
-    fn from(attribute: DenseI32ArrayAttribute<'c>) -> Self {
-        unsafe { Self::from_raw(attribute.to_raw()) }
-    }
-}
-
-impl<'c> From<DenseI64ArrayAttribute<'c>> for Attribute<'c> {
-    fn from(attribute: DenseI64ArrayAttribute<'c>) -> Self {
-        unsafe { Self::from_raw(attribute.to_raw()) }
-    }
-}
-
-impl<'c> From<FlatSymbolRefAttribute<'c>> for Attribute<'c> {
-    fn from(attribute: FlatSymbolRefAttribute<'c>) -> Self {
-        unsafe { Self::from_raw(attribute.to_raw()) }
-    }
-}
-
-impl<'c> From<FloatAttribute<'c>> for Attribute<'c> {
-    fn from(attribute: FloatAttribute<'c>) -> Self {
-        unsafe { Self::from_raw(attribute.to_raw()) }
-    }
-}
-
-impl<'c> From<IntegerAttribute<'c>> for Attribute<'c> {
-    fn from(attribute: IntegerAttribute<'c>) -> Self {
-        unsafe { Self::from_raw(attribute.to_raw()) }
-    }
-}
-
-impl<'c> From<StringAttribute<'c>> for Attribute<'c> {
-    fn from(attribute: StringAttribute<'c>) -> Self {
-        unsafe { Self::from_raw(attribute.to_raw()) }
-    }
-}
-
-impl<'c> From<TypeAttribute<'c>> for Attribute<'c> {
-    fn from(attribute: TypeAttribute<'c>) -> Self {
-        unsafe { Self::from_raw(attribute.to_raw()) }
-    }
-}
+from_raw_subtypes!(
+    Attribute,
+    DenseElementsAttribute,
+    DenseI32ArrayAttribute,
+    DenseI64ArrayAttribute,
+    FlatSymbolRefAttribute,
+    FloatAttribute,
+    IntegerAttribute,
+    StringAttribute,
+    TypeAttribute,
+);
 
 #[cfg(test)]
 mod tests {
