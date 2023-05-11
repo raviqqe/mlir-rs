@@ -340,6 +340,44 @@ mod tests {
     }
 
     #[test]
+    fn compile_get_global() {
+        let context = create_test_context();
+        let location = Location::unknown(&context);
+        let module = Module::new(location);
+
+        module.body().append_operation(global(
+            &context,
+            "foo",
+            None,
+            MemRefType::new(Type::index(&context), &[], None, None),
+            None,
+            false,
+            None,
+            location,
+        ));
+
+        module.body().append_operation(func::func(
+            &context,
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(FunctionType::new(&context, &[], &[]).into()),
+            {
+                let block = Block::new(&[]);
+
+                block.append_operation(get_global(&context, "foo", location));
+                block.append_operation(func::r#return(&[], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            location,
+        ));
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
     fn compile_global() {
         let context = create_test_context();
         let location = Location::unknown(&context);
