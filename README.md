@@ -12,7 +12,7 @@ This crate is a wrapper of [the MLIR C API](https://mlir.llvm.org/docs/CAPI/).
 
 ## Safety
 
-Although Melior aims to be completely safe, some part of the current API is
+Although Melior aims to be completely type safe, some part of the current API is
 not.
 
 - Access to operations, types, or attributes that belong to dialects not
