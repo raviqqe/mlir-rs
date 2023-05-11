@@ -12,8 +12,8 @@ use crate::{
 /// Create a `func.call` operation.
 pub fn call<'c>(function: Value, arguments: &[Value], location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("func.return", location)
-        .add_operands(&[function])
-        .add_operands(arguments)
+        .foo_operands(&[function])
+        .foo_operands(arguments)
         .enable_result_type_inference()
         .build()
 }
@@ -27,18 +27,18 @@ pub fn func<'c>(
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("func.func", location)
-        .add_attributes(&[
+        .foo_attributes(&[
             (Identifier::new(context, "sym_name"), name.into()),
             (Identifier::new(context, "function_type"), r#type.into()),
         ])
-        .add_regions(vec![region])
+        .foo_regions(vec![region])
         .build()
 }
 
 /// Create a `func.return` operation.
 pub fn r#return<'c>(operands: &[Value], location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("func.return", location)
-        .add_operands(operands)
+        .foo_operands(operands)
         .build()
 }
 
@@ -64,6 +64,11 @@ mod tests {
         let function = {
             let block = Block::new(&[(integer_type, location)]);
 
+            block.append_operation(call(
+                FlatSymbolRefAttribute::new(&context, "foo"),
+                &[block.argument(0).unwrap().into()],
+                location,
+            ));
             block.append_operation(r#return(&[block.argument(0).unwrap().into()], location));
 
             let region = Region::new();
@@ -71,7 +76,7 @@ mod tests {
 
             func(
                 &context,
-                StringAttribute::new(&context, "add"),
+                StringAttribute::new(&context, "foo"),
                 TypeAttribute::new(
                     FunctionType::new(&context, &[integer_type], &[integer_type]).into(),
                 ),
@@ -106,7 +111,7 @@ mod tests {
 
             func(
                 &context,
-                StringAttribute::new(&context, "add"),
+                StringAttribute::new(&context, "foo"),
                 TypeAttribute::new(
                     FunctionType::new(&context, &[integer_type], &[integer_type]).into(),
                 ),
