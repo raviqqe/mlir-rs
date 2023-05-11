@@ -2,7 +2,7 @@ use criterion::{criterion_group, criterion_main, Bencher, Criterion};
 use melior::StringRef;
 
 fn generate_strings() -> Vec<String> {
-    (0..10000).map(|number| number.to_string()).collect()
+    (0..100000).map(|number| number.to_string()).collect()
 }
 
 fn string_ref_create(bencher: &mut Bencher) {
