@@ -4,14 +4,16 @@
 mod r#macro;
 mod attribute_like;
 mod dense_i64_array;
+mod flat_symbol_ref;
 mod float;
 mod integer;
 mod string;
 mod r#type;
 
 pub use self::{
-    attribute_like::AttributeLike, dense_i64_array::DenseI64ArrayAttribute, float::FloatAttribute,
-    integer::IntegerAttribute, r#type::TypeAttribute, string::StringAttribute,
+    attribute_like::AttributeLike, dense_i64_array::DenseI64ArrayAttribute,
+    flat_symbol_ref::FlatSymbolRefAttribute, float::FloatAttribute, integer::IntegerAttribute,
+    r#type::TypeAttribute, string::StringAttribute,
 };
 use crate::{context::Context, string_ref::StringRef, utility::print_callback};
 use mlir_sys::{
