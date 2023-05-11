@@ -34,9 +34,9 @@ mod tests {
 
     #[test]
     fn new() {
-        let context = Context::new();
-        let attribute = FlatSymbolRefAttribute::new(&context, "foo");
-
-        assert_eq!(attribute.value(), "foo");
+        assert_eq!(
+            FlatSymbolRefAttribute::new(&Context::new(), "foo").value(),
+            "foo"
+        );
     }
 }
