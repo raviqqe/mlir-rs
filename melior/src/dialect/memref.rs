@@ -8,7 +8,7 @@ use crate::{
         },
         operation::OperationBuilder,
         r#type::MemRefType,
-        Attribute, Identifier, Location, Operation, Type, Value,
+        Attribute, Identifier, Location, Operation, Value,
     },
     Context,
 };
@@ -103,8 +103,8 @@ pub fn get_global<'c>(
 ) -> Operation<'c> {
     OperationBuilder::new("memref.get_global", location)
         .add_attributes(&[(
-            Identifier::new(&context, "name"),
-            FlatSymbolRefAttribute::new(&context, name).into(),
+            Identifier::new(context, "name"),
+            FlatSymbolRefAttribute::new(context, name).into(),
         )])
         .add_results(&[r#type.into()])
         .build()
