@@ -97,9 +97,10 @@ mod tests {
     #[test]
     fn i32_element() {
         let context = Context::new();
+        let integer_type = IntegerType::new(&context, 32).into();
         let attribute = DenseElementsAttribute::new(
-            MemRefType::new(Type::index(&context), &[3], None, None).into(),
-            &[IntegerAttribute::new(42, IntegerType::new(&context, 32).into()).into()],
+            MemRefType::new(integer_type, &[3], None, None).into(),
+            &[IntegerAttribute::new(42, integer_type).into()],
         )
         .unwrap();
 
@@ -119,9 +120,10 @@ mod tests {
     #[test]
     fn i64_element() {
         let context = Context::new();
+        let integer_type = IntegerType::new(&context, 64).into();
         let attribute = DenseElementsAttribute::new(
-            MemRefType::new(Type::index(&context), &[3], None, None).into(),
-            &[IntegerAttribute::new(42, IntegerType::new(&context, 64).into()).into()],
+            MemRefType::new(integer_type, &[3], None, None).into(),
+            &[IntegerAttribute::new(42, integer_type).into()],
         )
         .unwrap();
 
@@ -141,9 +143,10 @@ mod tests {
     #[test]
     fn i64_element_from_i32_elements() {
         let context = Context::new();
+        let integer_type = IntegerType::new(&context, 32).into();
         let attribute = DenseElementsAttribute::new(
-            MemRefType::new(Type::index(&context), &[3], None, None).into(),
-            &[IntegerAttribute::new(42, IntegerType::new(&context, 32).into()).into()],
+            MemRefType::new(integer_type, &[3], None, None).into(),
+            &[IntegerAttribute::new(42, integer_type).into()],
         )
         .unwrap();
 
