@@ -2,23 +2,34 @@
 
 use crate::{
     ir::{
-        attribute::FlatSymbolRefAttribute, operation::OperationBuilder, Identifier, Location,
-        Operation, Value,
+        attribute::{DenseI32ArrayAttribute, IntegerAttribute},
+        operation::OperationBuilder,
+        r#type::MemRefType,
+        Identifier, Location, Operation,
     },
     Context,
 };
 
-/// Create a `func.call` operation.
-pub fn call<'c>(
+/// Create a `memref.alloc` operation.
+pub fn alloc<'c>(
     context: &'c Context,
-    function: FlatSymbolRefAttribute<'c>,
-    arguments: &[Value],
+    r#type: MemRefType<'c>,
+    alignment: Option<IntegerAttribute<'c>>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("func.call", location)
-        .add_attributes(&[(Identifier::new(context, "callee"), function.into())])
-        .add_operands(arguments)
-        .build()
+    let mut builder = OperationBuilder::new("memref.alloc", location);
+
+    builder = builder.add_attributes(&[(
+        Identifier::new(context, "operand_segment_sizes"),
+        DenseI32ArrayAttribute::new(&context, &[0, 0]).into(),
+    )]);
+
+    if let Some(alignment) = alignment {
+        builder =
+            builder.add_attributes(&[(Identifier::new(context, "alignment"), alignment.into())]);
+    }
+
+    builder.add_results(&[r#type.into()]).build()
 }
 
 #[cfg(test)]
@@ -26,27 +37,31 @@ mod tests {
     use super::*;
     use crate::{
         dialect::func,
-        ir::{Block, Module, Type},
-        test::load_all_dialects,
+        ir::{
+            attribute::{StringAttribute, TypeAttribute},
+            r#type::FunctionType,
+            Block, Module, Region, Type,
+        },
+        test::create_test_context,
     };
 
     #[test]
-    fn compile_function() {
-        let context = Context::new();
-        load_all_dialects(&context);
+    fn compile_alloc() {
+        let context = create_test_context();
 
         let location = Location::unknown(&context);
         let module = Module::new(location);
 
-        let integer_type = Type::index(&context);
-
         let function = {
-            let block = Block::new(&[(integer_type, location)]);
+            let block = Block::new(&[]);
 
-            block.append_operation(func::r#return(
-                &[block.argument(0).unwrap().into()],
+            block.append_operation(alloc(
+                &context,
+                MemRefType::new(Type::index(&context), &[], None, None),
+                None,
                 location,
             ));
+            block.append_operation(func::r#return(&[], location));
 
             let region = Region::new();
             region.append_block(block);
@@ -54,9 +69,7 @@ mod tests {
             func::func(
                 &context,
                 StringAttribute::new(&context, "foo"),
-                TypeAttribute::new(
-                    FunctionType::new(&context, &[integer_type], &[integer_type]).into(),
-                ),
+                TypeAttribute::new(FunctionType::new(&context, &[], &[]).into()),
                 region,
                 Location::unknown(&context),
             )
