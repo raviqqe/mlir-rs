@@ -2,10 +2,10 @@
 
 use crate::{
     ir::{
-        attribute::{DenseI32ArrayAttribute, IntegerAttribute, StringAttribute},
+        attribute::{DenseI32ArrayAttribute, IntegerAttribute, StringAttribute, TypeAttribute},
         operation::OperationBuilder,
         r#type::MemRefType,
-        Identifier, Location, Operation, Value,
+        Attribute, Identifier, Location, Operation, Value,
     },
     Context,
 };
@@ -96,6 +96,7 @@ pub fn global<'c>(
     context: &'c Context,
     name: &str,
     r#type: MemRefType<'c>,
+    value: Attribute<'c>,
     visibility: Option<&str>,
     alignment: Option<IntegerAttribute<'c>>,
     location: Location<'c>,
@@ -105,7 +106,11 @@ pub fn global<'c>(
             Identifier::new(context, "sym_name"),
             StringAttribute::new(&context, name).into(),
         ),
-        (Identifier::new(context, "type"), alignment.into()),
+        (
+            Identifier::new(context, "type"),
+            TypeAttribute::new(r#type.into()).into(),
+        ),
+        (Identifier::new(context, "initial_value"), value.into()),
     ]);
 
     if let Some(alignment) = alignment {
