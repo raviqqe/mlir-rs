@@ -70,6 +70,7 @@ mod tests {
             let block = Block::new(&[(integer_type, location)]);
 
             block.append_operation(call(
+                &context,
                 FlatSymbolRefAttribute::new(&context, "foo"),
                 &[block.argument(0).unwrap().into()],
                 location,
