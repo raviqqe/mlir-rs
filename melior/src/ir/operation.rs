@@ -11,6 +11,7 @@ use crate::{
     Error,
 };
 use core::fmt;
+use core::mem::{forget, transmute};
 use mlir_sys::{
     mlirOperationClone, mlirOperationDestroy, mlirOperationDump, mlirOperationEqual,
     mlirOperationGetBlock, mlirOperationGetContext, mlirOperationGetName,
@@ -22,7 +23,6 @@ use std::{
     ffi::c_void,
     fmt::{Debug, Display, Formatter},
     marker::PhantomData,
-    mem::{forget, transmute},
     ops::Deref,
 };
 
@@ -187,6 +187,11 @@ pub struct OperationRef<'a> {
 }
 
 impl<'a> OperationRef<'a> {
+    /// Gets a result at a position.
+    pub fn result(self, index: usize) -> Result<OperationResult<'a>, Error> {
+        unsafe { transmute(self.deref().result(index)) }
+    }
+
     pub(crate) unsafe fn to_raw(self) -> MlirOperation {
         self.raw
     }
