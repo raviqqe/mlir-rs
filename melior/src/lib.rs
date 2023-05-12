@@ -244,13 +244,15 @@ mod tests {
             {
                 let block = Block::new(&[(integer_type, location), (integer_type, location)]);
 
-                let sum = block.append_operation(arith::addi(
-                    block.argument(0).unwrap().into(),
-                    block.argument(1).unwrap().into(),
+                block.append_operation(func::r#return(
+                    &[compile_add(
+                        &context,
+                        &block,
+                        block.argument(0).unwrap().into(),
+                        block.argument(1).unwrap().into(),
+                    )],
                     location,
                 ));
-
-                block.append_operation(func::r#return(&[sum.result(0).unwrap().into()], location));
 
                 let region = Region::new();
                 region.append_block(block);
