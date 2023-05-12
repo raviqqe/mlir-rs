@@ -189,6 +189,8 @@ pub struct OperationRef<'a> {
 impl<'a> OperationRef<'a> {
     /// Gets a result at a position.
     pub fn result(self, index: usize) -> Result<OperationResult<'a>, Error> {
+        // As we can't deref OperationRef<'a> into `&'a Operation`, we forcibly cast its
+        // lifetime here to extend it from the lifetime of `ObjectRef<'a>` itself into `'a`.
         unsafe { transmute(self.deref().result(index)) }
     }
 
