@@ -211,4 +211,42 @@ mod tests {
         assert!(module.as_operation().verify());
         insta::assert_display_snapshot!(module.as_operation());
     }
+
+    #[test]
+    fn return_value_from_function() {
+        let context = Context::new();
+        load_all_dialects(&context);
+
+        let location = Location::unknown(&context);
+        let module = Module::new(location);
+
+        let integer_type = IntegerType::new(&context, 64).into();
+
+        module.body().append_operation(func::func(
+            &context,
+            StringAttribute::new(&context, "add"),
+            TypeAttribute::new(
+                FunctionType::new(&context, &[integer_type, integer_type], &[integer_type]).into(),
+            ),
+            {
+                let block = Block::new(&[(integer_type, location), (integer_type, location)]);
+
+                let sum = block.append_operation(arith::addi(
+                    block.argument(0).unwrap().into(),
+                    block.argument(1).unwrap().into(),
+                    location,
+                ));
+
+                block.append_operation(func::r#return(&[sum.result(0).unwrap().into()], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            Location::unknown(&context),
+        ));
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
 }
