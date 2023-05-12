@@ -31,7 +31,7 @@ mod tests {
             attribute::{IntegerAttribute, StringAttribute, TypeAttribute},
             operation::OperationBuilder,
             r#type::{FunctionType, IntegerType},
-            Block, Location, Module, Region, Type,
+            Block, Location, Module, Region, Type, Value,
         },
         test::load_all_dialects,
     };
@@ -221,6 +221,19 @@ mod tests {
         let module = Module::new(location);
 
         let integer_type = IntegerType::new(&context, 64).into();
+
+        fn compile_add<'a>(
+            context: &Context,
+            block: &'a Block,
+            lhs: Value<'a>,
+            rhs: Value<'a>,
+        ) -> Value<'a> {
+            block
+                .append_operation(arith::addi(lhs, rhs, Location::unknown(context)))
+                .result(0)
+                .unwrap()
+                .into()
+        }
 
         module.body().append_operation(func::func(
             &context,

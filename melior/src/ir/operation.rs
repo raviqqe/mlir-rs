@@ -298,11 +298,15 @@ mod tests {
 
     #[test]
     fn region_none() {
-        assert!(
+        assert_eq!(
             OperationBuilder::new("foo", Location::unknown(&Context::new()),)
                 .build()
-                .region(0)
-                .is_none()
+                .region(0),
+            Err(Error::PositionOutOfBounds {
+                name: "region",
+                value: "\"foo\"() : () -> ()\n".into(),
+                index: 0
+            })
         );
     }
 
