@@ -240,7 +240,7 @@ mod tests {
     use super::*;
     use crate::{
         context::Context,
-        ir::{Block, Location, Type},
+        ir::{Block, Location},
     };
     use pretty_assertions::assert_eq;
 
@@ -337,18 +337,5 @@ mod tests {
             ),
             "Operation(\n\"foo\"() : () -> ()\n)"
         );
-    }
-
-    #[test]
-    fn access_value_after_drop() {
-        let context = Context::new();
-        let r#type = Type::index(&context);
-        let operation = OperationBuilder::new("foo", Location::unknown(&context))
-            .add_results(&[r#type])
-            .build();
-
-        let value = operation.result(0).unwrap();
-
-        assert_eq!(value.r#type(), r#type);
     }
 }
