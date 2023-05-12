@@ -72,15 +72,19 @@ impl<'c> Operation<'c> {
     }
 
     /// Gets a region at a position.
-    pub fn region(&self, index: usize) -> Option<RegionRef> {
+    pub fn region(&self, index: usize) -> Result<RegionRef, Error> {
         unsafe {
             if index < self.region_count() {
-                Some(RegionRef::from_raw(mlirOperationGetRegion(
+                Ok(RegionRef::from_raw(mlirOperationGetRegion(
                     self.raw,
                     index as isize,
                 )))
             } else {
-                None
+                Err(Error::PositionOutOfBounds {
+                    name: "region",
+                    value: self.to_string(),
+                    index,
+                })
             }
         }
     }
