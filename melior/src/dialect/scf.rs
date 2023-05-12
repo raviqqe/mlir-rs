@@ -94,7 +94,7 @@ pub fn r#while<'c>(
 }
 
 /// Creates a `scf.yield` operation.
-pub fn r#yield<'c>(values: &[Value<'c>], location: Location<'c>) -> Operation<'c> {
+pub fn r#yield<'c>(values: &[Value], location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("scf.yield", location)
         .add_operands(values)
         .build()
