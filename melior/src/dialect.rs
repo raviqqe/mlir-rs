@@ -36,7 +36,7 @@ impl<'c> Dialect<'c> {
         unsafe { StringRef::from_raw(mlirDialectGetNamespace(self.raw)) }
     }
 
-    pub(crate) unsafe fn from_raw(dialect: MlirDialect) -> Self {
+    pub unsafe fn from_raw(dialect: MlirDialect) -> Self {
         Self {
             raw: dialect,
             _context: Default::default(),

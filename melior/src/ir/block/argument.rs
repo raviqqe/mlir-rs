@@ -27,7 +27,7 @@ impl<'a> BlockArgument<'a> {
         unsafe { mlirBlockArgumentSetType(self.value.to_raw(), r#type.to_raw()) }
     }
 
-    pub(crate) unsafe fn from_raw(value: MlirValue) -> Self {
+    pub unsafe fn from_raw(value: MlirValue) -> Self {
         Self {
             value: Value::from_raw(value),
         }

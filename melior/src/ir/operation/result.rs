@@ -21,7 +21,7 @@ impl<'a> OperationResult<'a> {
         unsafe { OperationRef::from_raw(mlirOpResultGetOwner(self.value.to_raw())) }
     }
 
-    pub(crate) unsafe fn from_raw(value: MlirValue) -> Self {
+    pub unsafe fn from_raw(value: MlirValue) -> Self {
         Self {
             value: Value::from_raw(value),
         }

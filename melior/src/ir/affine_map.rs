@@ -30,7 +30,7 @@ impl<'c> AffineMap<'c> {
         unsafe { mlirAffineMapDump(self.raw) }
     }
 
-    pub(crate) unsafe fn from_raw(raw: MlirAffineMap) -> Self {
+    pub unsafe fn from_raw(raw: MlirAffineMap) -> Self {
         Self {
             raw,
             _context: Default::default(),

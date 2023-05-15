@@ -47,7 +47,7 @@ impl<'c> Diagnostic<'c> {
         }
     }
 
-    pub(crate) unsafe fn from_raw(raw: MlirDiagnostic) -> Self {
+    pub unsafe fn from_raw(raw: MlirDiagnostic) -> Self {
         Self {
             raw,
             phantom: Default::default(),

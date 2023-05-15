@@ -145,7 +145,7 @@ pub struct ContextRef<'a> {
 }
 
 impl<'a> ContextRef<'a> {
-    pub(crate) unsafe fn from_raw(raw: MlirContext) -> Self {
+    pub unsafe fn from_raw(raw: MlirContext) -> Self {
         Self {
             raw,
             _reference: Default::default(),

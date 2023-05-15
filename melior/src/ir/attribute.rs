@@ -57,7 +57,7 @@ impl<'c> Attribute<'c> {
         unsafe { Self::from_raw(mlirAttributeGetNull()) }
     }
 
-    pub(crate) unsafe fn from_raw(raw: MlirAttribute) -> Self {
+    pub unsafe fn from_raw(raw: MlirAttribute) -> Self {
         Self {
             raw,
             _context: Default::default(),

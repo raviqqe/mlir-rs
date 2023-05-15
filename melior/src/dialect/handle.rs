@@ -96,7 +96,7 @@ impl DialectHandle {
         unsafe { mlirDialectHandleRegisterDialect(self.raw, context.to_raw()) }
     }
 
-    pub(crate) unsafe fn from_raw(handle: MlirDialectHandle) -> Self {
+    pub unsafe fn from_raw(handle: MlirDialectHandle) -> Self {
         Self { raw: handle }
     }
 }

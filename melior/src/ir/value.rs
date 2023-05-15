@@ -20,7 +20,7 @@ pub struct Value<'a> {
 }
 
 impl<'a> Value<'a> {
-    pub(crate) unsafe fn from_raw(value: MlirValue) -> Self {
+    pub unsafe fn from_raw(value: MlirValue) -> Self {
         Self {
             raw: value,
             _parent: Default::default(),

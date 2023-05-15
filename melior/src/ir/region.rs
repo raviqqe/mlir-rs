@@ -107,7 +107,7 @@ pub struct RegionRef<'a> {
 }
 
 impl<'a> RegionRef<'a> {
-    pub(crate) unsafe fn from_raw(raw: MlirRegion) -> Self {
+    pub unsafe fn from_raw(raw: MlirRegion) -> Self {
         Self {
             raw,
             _region: Default::default(),
