@@ -20,6 +20,11 @@ pub struct Value<'a> {
 }
 
 impl<'a> Value<'a> {
+    /// Creates a value from a raw object.
+    ///
+    /// # Safety
+    ///
+    /// A raw object must be valid.
     pub unsafe fn from_raw(value: MlirValue) -> Self {
         Self {
             raw: value,

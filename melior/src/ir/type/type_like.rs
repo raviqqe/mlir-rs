@@ -4,7 +4,7 @@ use mlir_sys::{mlirTypeDump, mlirTypeGetContext, mlirTypeGetTypeID, MlirType};
 
 /// Trait for type-like types.
 pub trait TypeLike<'c> {
-    /// Converts a type into a raw type.
+    /// Converts a type into a raw object.
     fn to_raw(&self) -> MlirType;
 
     /// Gets a context.

@@ -70,7 +70,8 @@ impl Region {
         }
     }
 
-    pub(crate) unsafe fn into_raw(self) -> mlir_sys::MlirRegion {
+    /// Converts a region into a raw object.
+    pub fn into_raw(self) -> mlir_sys::MlirRegion {
         let region = self.raw;
 
         forget(self);
@@ -107,6 +108,11 @@ pub struct RegionRef<'a> {
 }
 
 impl<'a> RegionRef<'a> {
+    /// Creates a region from a raw object.
+    ///
+    /// # Safety
+    ///
+    /// A raw object must be valid.
     pub unsafe fn from_raw(raw: MlirRegion) -> Self {
         Self {
             raw,
@@ -114,6 +120,11 @@ impl<'a> RegionRef<'a> {
         }
     }
 
+    /// Creates an optional region from a raw object.
+    ///
+    /// # Safety
+    ///
+    /// A raw object must be valid.
     pub unsafe fn from_option_raw(raw: MlirRegion) -> Option<Self> {
         if raw.ptr.is_null() {
             None

@@ -194,10 +194,16 @@ impl<'a> OperationRef<'a> {
         unsafe { transmute(self.deref().result(index)) }
     }
 
+    /// Converts an operation reference into a raw object.
     pub fn to_raw(self) -> MlirOperation {
         self.raw
     }
 
+    /// Creates an operation reference from a raw object.
+    ///
+    /// # Safety
+    ///
+    /// A raw object must be valid.
     pub unsafe fn from_raw(raw: MlirOperation) -> Self {
         Self {
             raw,
@@ -205,6 +211,11 @@ impl<'a> OperationRef<'a> {
         }
     }
 
+    /// Creates an optional operation reference from a raw object.
+    ///
+    /// # Safety
+    ///
+    /// A raw object must be valid.
     pub unsafe fn from_option_raw(raw: MlirOperation) -> Option<Self> {
         if raw.ptr.is_null() {
             None

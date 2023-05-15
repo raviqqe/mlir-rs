@@ -38,10 +38,16 @@ impl<'a> StringRef<'a> {
         }
     }
 
+    /// Converts a string reference into a raw object.
     pub fn to_raw(self) -> MlirStringRef {
         self.raw
     }
 
+    /// Creates a string reference from a raw object.
+    ///
+    /// # Safety
+    ///
+    /// A raw object must be valid.
     pub unsafe fn from_raw(string: MlirStringRef) -> Self {
         Self {
             raw: string,
