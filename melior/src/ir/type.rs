@@ -119,7 +119,7 @@ impl<'c> Type<'c> {
     ///
     /// # Safety
     ///
-    /// A raw object must be valid or null.
+    /// A raw object must be valid.
     pub unsafe fn from_option_raw(raw: MlirType) -> Option<Self> {
         if raw.ptr.is_null() {
             None
