@@ -10,7 +10,7 @@ use mlir_sys::{
 
 /// Trait for attribute-like types.
 pub trait AttributeLike<'c> {
-    /// Converts a attribute into a raw attribute.
+    /// Converts a attribute into a raw object.
     fn to_raw(&self) -> MlirAttribute;
 
     /// Gets a context.
