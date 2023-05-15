@@ -33,9 +33,14 @@ impl<'c> ArrayAttribute<'c> {
     }
 
     /// Gets an element.
-    pub fn element(&self, index: usize) -> Result<i64, Error> {
+    pub fn element(&self, index: usize) -> Result<Attribute<'c>, Error> {
         if index < self.len() {
-            Ok(unsafe { mlirArrayGetElement(self.attribute.to_raw(), index as isize) })
+            Ok(unsafe {
+                Attribute::from_raw(mlirArrayAttrGetElement(
+                    self.attribute.to_raw(),
+                    index as isize,
+                ))
+            })
         } else {
             Err(Error::PositionOutOfBounds {
                 name: "array element",
