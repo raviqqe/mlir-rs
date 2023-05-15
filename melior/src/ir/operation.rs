@@ -10,8 +10,10 @@ use crate::{
     utility::print_callback,
     Error,
 };
-use core::fmt;
-use core::mem::{forget, transmute};
+use core::{
+    fmt,
+    mem::{forget, transmute},
+};
 use mlir_sys::{
     mlirOperationClone, mlirOperationDestroy, mlirOperationDump, mlirOperationEqual,
     mlirOperationGetBlock, mlirOperationGetContext, mlirOperationGetName,
@@ -196,7 +198,8 @@ impl<'a> OperationRef<'a> {
     /// Gets a result at a position.
     pub fn result(self, index: usize) -> Result<OperationResult<'a>, Error> {
         // As we can't deref OperationRef<'a> into `&'a Operation`, we forcibly cast its
-        // lifetime here to extend it from the lifetime of `ObjectRef<'a>` itself into `'a`.
+        // lifetime here to extend it from the lifetime of `ObjectRef<'a>` itself into
+        // `'a`.
         unsafe { transmute(self.deref().result(index)) }
     }
 

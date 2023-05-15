@@ -11,7 +11,7 @@ pub struct ArrayAttribute<'c> {
 }
 
 impl<'c> ArrayAttribute<'c> {
-    /// Creates a dense i64 array attribute.
+    /// Creates an array attribute.
     pub fn new(context: &'c Context, values: &[Attribute<'c>]) -> Self {
         unsafe {
             Self::from_raw(mlirArrayAttrGet(
