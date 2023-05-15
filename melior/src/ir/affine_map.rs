@@ -30,6 +30,11 @@ impl<'c> AffineMap<'c> {
         unsafe { mlirAffineMapDump(self.raw) }
     }
 
+    /// Creates an affine map from a raw object.
+    ///
+    /// # Safety
+    ///
+    /// A raw object must be valid.
     pub unsafe fn from_raw(raw: MlirAffineMap) -> Self {
         Self {
             raw,
