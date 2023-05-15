@@ -81,6 +81,7 @@ impl Context {
         unsafe { mlirContextIsRegisteredOperation(self.raw, StringRef::from(name).to_raw()) }
     }
 
+    /// Converts a context into a raw object.
     pub fn to_raw(&self) -> MlirContext {
         self.raw
     }
