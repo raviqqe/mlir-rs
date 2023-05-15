@@ -23,7 +23,7 @@ pub fn generate(
         stream.extend(TokenStream::from(quote! {
             #[doc = #document]
             pub fn #function_name() -> crate::pass::Pass {
-                crate::pass::Pass::__private_from_raw_fn(mlir_sys::#name)
+                unsafe { crate::pass::Pass::__private_from_raw_fn(mlir_sys::#name) }
             }
         }));
 
