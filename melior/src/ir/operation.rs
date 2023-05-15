@@ -129,7 +129,8 @@ impl<'c> Operation<'c> {
         }
     }
 
-    pub(crate) unsafe fn into_raw(self) -> MlirOperation {
+    /// Converts an operation into a raw object.
+    pub fn into_raw(self) -> MlirOperation {
         let operation = self.raw;
 
         forget(self);
