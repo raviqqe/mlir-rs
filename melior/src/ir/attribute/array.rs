@@ -55,16 +55,25 @@ attribute_traits!(ArrayAttribute, is_dense_i64_array, "dense i64 array");
 
 #[cfg(test)]
 mod tests {
+    use crate::ir::{attribute::IntegerAttribute, r#type::IntegerType};
+
     use super::*;
 
     #[test]
     fn element() {
         let context = Context::new();
-        let attribute = ArrayAttribute::new(&context, &[1, 2, 3]);
+        let r#type = IntegerType::new(&context, 64).into();
+        let attributes = [
+            IntegerAttribute::new(1, r#type).into(),
+            IntegerAttribute::new(2, r#type).into(),
+            IntegerAttribute::new(3, r#type).into(),
+        ];
 
-        assert_eq!(attribute.element(0).unwrap(), 1);
-        assert_eq!(attribute.element(1).unwrap(), 2);
-        assert_eq!(attribute.element(2).unwrap(), 3);
+        let attribute = ArrayAttribute::new(&context, &attributes);
+
+        assert_eq!(attribute.element(0).unwrap(), attributes[0]);
+        assert_eq!(attribute.element(1).unwrap(), attributes[1]);
+        assert_eq!(attribute.element(2).unwrap(), attributes[2]);
         assert!(matches!(
             attribute.element(3),
             Err(Error::PositionOutOfBounds { .. })
@@ -74,8 +83,8 @@ mod tests {
     #[test]
     fn len() {
         let context = Context::new();
-        let attribute = ArrayAttribute::new(&context, &[1, 2, 3]);
+        let attribute = ArrayAttribute::new(&context, &[IntegerAttribute::new(1, r#type).into()]);
 
-        assert_eq!(attribute.len(), 3);
+        assert_eq!(attribute.len(), 1);
     }
 }
