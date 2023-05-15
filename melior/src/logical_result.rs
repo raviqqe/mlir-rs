@@ -32,10 +32,12 @@ impl LogicalResult {
         self.raw.value == 0
     }
 
+    /// Creates a logical result from a raw object.
     pub fn from_raw(result: MlirLogicalResult) -> Self {
         Self { raw: result }
     }
 
+    /// Converts a logical result into a raw object.
     pub fn to_raw(self) -> MlirLogicalResult {
         self.raw
     }
