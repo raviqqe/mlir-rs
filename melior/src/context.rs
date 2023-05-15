@@ -71,7 +71,7 @@ impl Context {
         unsafe { mlirContextGetAllowUnregisteredDialects(self.raw) }
     }
 
-    /// Set if unregistered dialects are allowed.
+    /// Sets if unregistered dialects are allowed.
     pub fn set_allow_unregistered_dialects(&self, allowed: bool) {
         unsafe { mlirContextSetAllowUnregisteredDialects(self.raw, allowed) }
     }
