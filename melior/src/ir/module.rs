@@ -57,7 +57,7 @@ impl<'c> Module<'c> {
     ///
     /// # Safety
     ///
-    /// A raw objecta must be valid.
+    /// A raw object must be valid.
     pub unsafe fn from_raw(raw: MlirModule) -> Self {
         Self {
             raw,
@@ -69,7 +69,7 @@ impl<'c> Module<'c> {
     ///
     /// # Safety
     ///
-    /// A raw objecta must be valid.
+    /// A raw object must be valid.
     pub unsafe fn from_option_raw(raw: MlirModule) -> Option<Self> {
         if raw.ptr.is_null() {
             None
