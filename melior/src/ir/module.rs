@@ -53,14 +53,24 @@ impl<'c> Module<'c> {
         unsafe { Self::from_option_raw(mlirModuleFromOperation(operation.into_raw())) }
     }
 
-    unsafe fn from_raw(raw: MlirModule) -> Self {
+    /// Creates a module from a raw object.
+    ///
+    /// # Safety
+    ///
+    /// A raw objecta must be valid.
+    pub unsafe fn from_raw(raw: MlirModule) -> Self {
         Self {
             raw,
             _context: Default::default(),
         }
     }
 
-    unsafe fn from_option_raw(raw: MlirModule) -> Option<Self> {
+    /// Creates an optional module from a raw object.
+    ///
+    /// # Safety
+    ///
+    /// A raw objecta must be valid.
+    pub unsafe fn from_option_raw(raw: MlirModule) -> Option<Self> {
         if raw.ptr.is_null() {
             None
         } else {
@@ -68,6 +78,7 @@ impl<'c> Module<'c> {
         }
     }
 
+    /// Converts a module into a raw object.
     pub fn to_raw(&self) -> MlirModule {
         self.raw
     }
