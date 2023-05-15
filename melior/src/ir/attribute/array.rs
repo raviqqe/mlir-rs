@@ -55,7 +55,7 @@ attribute_traits!(ArrayAttribute, is_dense_i64_array, "dense i64 array");
 
 #[cfg(test)]
 mod tests {
-    use crate::ir::{attribute::IntegerAttribute, r#type::IntegerType};
+    use crate::ir::{attribute::IntegerAttribute, r#type::IntegerType, Type};
 
     use super::*;
 
@@ -83,7 +83,10 @@ mod tests {
     #[test]
     fn len() {
         let context = Context::new();
-        let attribute = ArrayAttribute::new(&context, &[IntegerAttribute::new(1, r#type).into()]);
+        let attribute = ArrayAttribute::new(
+            &context,
+            &[IntegerAttribute::new(1, Type::index(&context)).into()],
+        );
 
         assert_eq!(attribute.len(), 1);
     }
