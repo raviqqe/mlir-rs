@@ -146,6 +146,11 @@ pub struct ContextRef<'a> {
 }
 
 impl<'a> ContextRef<'a> {
+    /// Creates a context reference from a raw object.
+    ///
+    /// # Safety
+    ///
+    /// A raw object must be valid.
     pub unsafe fn from_raw(raw: MlirContext) -> Self {
         Self {
             raw,
