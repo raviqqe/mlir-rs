@@ -4,7 +4,7 @@ use mlir_sys::{
     mlirArrayAttrGetNumElements, mlirDenseI32ArrayGet, mlirDenseI32ArrayGetElement, MlirAttribute,
 };
 
-/// An dense i32 array attribute.
+/// A dense i32 array attribute.
 #[derive(Clone, Copy)]
 pub struct DenseI32ArrayAttribute<'c> {
     attribute: Attribute<'c>,

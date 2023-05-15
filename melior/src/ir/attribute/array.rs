@@ -4,7 +4,7 @@ use mlir_sys::{
     mlirArrayAttrGet, mlirArrayAttrGetElement, mlirArrayAttrGetNumElements, MlirAttribute,
 };
 
-/// An dense i64 array attribute.
+/// An array attribute.
 #[derive(Clone, Copy)]
 pub struct ArrayAttribute<'c> {
     attribute: Attribute<'c>,
