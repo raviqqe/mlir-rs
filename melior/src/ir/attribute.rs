@@ -2,6 +2,7 @@
 
 #[macro_use]
 mod r#macro;
+mod array;
 mod attribute_like;
 mod dense_elements;
 mod dense_i32_array;
@@ -13,7 +14,7 @@ mod string;
 mod r#type;
 
 pub use self::{
-    attribute_like::AttributeLike, dense_elements::DenseElementsAttribute,
+    array::ArrayAttribute, attribute_like::AttributeLike, dense_elements::DenseElementsAttribute,
     dense_i32_array::DenseI32ArrayAttribute, dense_i64_array::DenseI64ArrayAttribute,
     flat_symbol_ref::FlatSymbolRefAttribute, float::FloatAttribute, integer::IntegerAttribute,
     r#type::TypeAttribute, string::StringAttribute,
@@ -121,6 +122,7 @@ impl<'c> Debug for Attribute<'c> {
 
 from_raw_subtypes!(
     Attribute,
+    ArrayAttribute,
     DenseElementsAttribute,
     DenseI32ArrayAttribute,
     DenseI64ArrayAttribute,
