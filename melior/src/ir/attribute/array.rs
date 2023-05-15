@@ -1,6 +1,8 @@
 use super::{Attribute, AttributeLike};
 use crate::{Context, Error};
-use mlir_sys::{mlirArrayAttrGetNumElements, mlirArrayGet, mlirArrayGetElement, MlirAttribute};
+use mlir_sys::{
+    mlirArrayAttrGet, mlirArrayAttrGetElement, mlirArrayAttrGetNumElements, MlirAttribute,
+};
 
 /// An dense i64 array attribute.
 #[derive(Clone, Copy)]
@@ -10,12 +12,12 @@ pub struct ArrayAttribute<'c> {
 
 impl<'c> ArrayAttribute<'c> {
     /// Creates a dense i64 array attribute.
-    pub fn new(context: &'c Context, values: &[i64]) -> Self {
+    pub fn new(context: &'c Context, values: &[Attribute<'c>]) -> Self {
         unsafe {
-            Self::from_raw(mlirArrayGet(
+            Self::from_raw(mlirArrayAttrGet(
                 context.to_raw(),
                 values.len() as isize,
-                values.as_ptr(),
+                values.as_ptr() as *const _ as *const _,
             ))
         }
     }
