@@ -117,6 +117,11 @@ impl<'c> Operation<'c> {
         unsafe { mlirOperationDump(self.raw) }
     }
 
+    /// Creates an operation from a raw object.
+    ///
+    /// # Safety
+    ///
+    /// A raw object must be valid.
     pub unsafe fn from_raw(raw: MlirOperation) -> Self {
         Self {
             raw,
@@ -135,7 +140,7 @@ impl<'c> Operation<'c> {
 
 impl<'c> Clone for Operation<'c> {
     fn clone(&self) -> Self {
-        unsafe { Operation::from_raw(mlirOperationClone(self.raw)) }
+        unsafe { Self::from_raw(mlirOperationClone(self.raw)) }
     }
 }
 
