@@ -64,7 +64,7 @@ impl<'c> Attribute<'c> {
         }
     }
 
-    pub(crate) unsafe fn from_option_raw(raw: MlirAttribute) -> Option<Self> {
+    pub unsafe fn from_option_raw(raw: MlirAttribute) -> Option<Self> {
         if raw.ptr.is_null() {
             None
         } else {

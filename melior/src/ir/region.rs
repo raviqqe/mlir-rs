@@ -114,7 +114,7 @@ impl<'a> RegionRef<'a> {
         }
     }
 
-    pub(crate) unsafe fn from_option_raw(raw: MlirRegion) -> Option<Self> {
+    pub unsafe fn from_option_raw(raw: MlirRegion) -> Option<Self> {
         if raw.ptr.is_null() {
             None
         } else {

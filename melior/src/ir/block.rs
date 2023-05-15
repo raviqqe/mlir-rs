@@ -256,7 +256,7 @@ impl<'c> BlockRef<'c> {
         }
     }
 
-    pub(crate) unsafe fn from_option_raw(raw: MlirBlock) -> Option<Self> {
+    pub unsafe fn from_option_raw(raw: MlirBlock) -> Option<Self> {
         if raw.ptr.is_null() {
             None
         } else {

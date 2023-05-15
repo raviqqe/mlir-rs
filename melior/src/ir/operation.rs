@@ -205,7 +205,7 @@ impl<'a> OperationRef<'a> {
         }
     }
 
-    pub(crate) unsafe fn from_option_raw(raw: MlirOperation) -> Option<Self> {
+    pub unsafe fn from_option_raw(raw: MlirOperation) -> Option<Self> {
         if raw.ptr.is_null() {
             None
         } else {
