@@ -43,7 +43,7 @@ impl<'c> Identifier<'c> {
         }
     }
 
-    pub(crate) unsafe fn to_raw(self) -> MlirIdentifier {
+    pub fn to_raw(self) -> MlirIdentifier {
         self.raw
     }
 }

@@ -194,7 +194,7 @@ impl<'a> OperationRef<'a> {
         unsafe { transmute(self.deref().result(index)) }
     }
 
-    pub(crate) unsafe fn to_raw(self) -> MlirOperation {
+    pub fn to_raw(self) -> MlirOperation {
         self.raw
     }
 

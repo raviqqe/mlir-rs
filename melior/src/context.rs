@@ -81,7 +81,7 @@ impl Context {
         unsafe { mlirContextIsRegisteredOperation(self.raw, StringRef::from(name).to_raw()) }
     }
 
-    pub(crate) unsafe fn to_raw(&self) -> MlirContext {
+    pub fn to_raw(&self) -> MlirContext {
         self.raw
     }
 

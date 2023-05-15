@@ -38,7 +38,7 @@ impl<'a> StringRef<'a> {
         }
     }
 
-    pub(crate) unsafe fn to_raw(self) -> MlirStringRef {
+    pub fn to_raw(self) -> MlirStringRef {
         self.raw
     }
 

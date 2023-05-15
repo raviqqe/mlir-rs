@@ -74,7 +74,7 @@ impl<'c> Location<'c> {
         }
     }
 
-    pub(crate) unsafe fn to_raw(self) -> MlirLocation {
+    pub fn to_raw(self) -> MlirLocation {
         self.raw
     }
 }

@@ -198,7 +198,7 @@ impl<'c> Block<'c> {
         block
     }
 
-    pub(crate) unsafe fn to_raw(&self) -> MlirBlock {
+    pub fn to_raw(&self) -> MlirBlock {
         self.raw
     }
 }

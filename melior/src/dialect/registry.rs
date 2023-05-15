@@ -14,7 +14,7 @@ impl DialectRegistry {
         }
     }
 
-    pub(crate) unsafe fn to_raw(&self) -> MlirDialectRegistry {
+    pub fn to_raw(&self) -> MlirDialectRegistry {
         self.raw
     }
 }

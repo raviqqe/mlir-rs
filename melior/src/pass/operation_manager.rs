@@ -34,7 +34,7 @@ impl<'a> OperationPassManager<'a> {
         unsafe { mlirOpPassManagerAddOwnedPass(self.raw, pass.to_raw()) }
     }
 
-    pub(crate) unsafe fn to_raw(self) -> MlirOpPassManager {
+    pub fn to_raw(self) -> MlirOpPassManager {
         self.raw
     }
 

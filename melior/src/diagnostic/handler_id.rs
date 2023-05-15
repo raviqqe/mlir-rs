@@ -11,7 +11,7 @@ impl DiagnosticHandlerId {
         Self { raw }
     }
 
-    pub(crate) unsafe fn to_raw(self) -> MlirDiagnosticHandlerID {
+    pub fn to_raw(self) -> MlirDiagnosticHandlerID {
         self.raw
     }
 }

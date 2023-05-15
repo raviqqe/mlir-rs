@@ -24,7 +24,7 @@ impl Pass {
         }
     }
 
-    pub(crate) unsafe fn to_raw(&self) -> MlirPass {
+    pub fn to_raw(&self) -> MlirPass {
         self.raw
     }
 
