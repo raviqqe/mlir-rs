@@ -1,7 +1,5 @@
 //! `cf` dialect.
 
-use std::dbg;
-
 use crate::{
     ir::{
         attribute::{
@@ -125,7 +123,7 @@ pub fn switch<'c>(
                     .into(),
             ),
         ])
-        .add_operands(&dbg!(operands))
+        .add_operands(&operands)
         .add_successors(&dests)
         .build())
 }
