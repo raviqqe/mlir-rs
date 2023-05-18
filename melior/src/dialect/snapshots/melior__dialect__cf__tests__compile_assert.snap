@@ -1,0 +1,12 @@
+---
+source: melior/src/dialect/cf.rs
+expression: module.as_operation()
+---
+module {
+  func.func @foo() {
+    %true = arith.constant true
+    cf.assert %true, "assert message"
+    return
+  }
+}
+

@@ -1,0 +1,13 @@
+---
+source: melior/src/dialect/cf.rs
+expression: module.as_operation()
+---
+module {
+  func.func @foo() {
+    %idx1 = index.constant 1
+    cf.br ^bb1(%idx1 : index)
+  ^bb1(%0: index):  // pred: ^bb0
+    return
+  }
+}
+

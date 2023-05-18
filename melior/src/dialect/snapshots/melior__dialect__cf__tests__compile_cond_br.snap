@@ -1,0 +1,16 @@
+---
+source: melior/src/dialect/cf.rs
+expression: module.as_operation()
+---
+module {
+  func.func @foo() {
+    %idx1 = index.constant 1
+    %0 = index.cmp eq(%idx1, %idx1)
+    cf.cond_br %0, ^bb1(%idx1 : index), ^bb2(%idx1 : index)
+  ^bb1(%1: index):  // pred: ^bb0
+    return
+  ^bb2(%2: index):  // pred: ^bb0
+    return
+  }
+}
+

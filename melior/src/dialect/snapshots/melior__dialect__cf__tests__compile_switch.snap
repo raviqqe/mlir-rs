@@ -1,0 +1,21 @@
+---
+source: melior/src/dialect/cf.rs
+expression: module.as_operation()
+---
+module {
+  func.func @foo() {
+    %c1_i32 = arith.constant 1 : i32
+    cf.switch %c1_i32 : i32, [
+      default: ^bb1(%c1_i32 : i32),
+      0: ^bb2(%c1_i32 : i32),
+      1: ^bb3(%c1_i32 : i32)
+    ]
+  ^bb1(%0: i32):  // pred: ^bb0
+    return
+  ^bb2(%1: i32):  // pred: ^bb0
+    return
+  ^bb3(%2: i32):  // pred: ^bb0
+    return
+  }
+}
+
