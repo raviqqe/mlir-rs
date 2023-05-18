@@ -144,9 +144,10 @@ mod tests {
     #[test]
     fn len() {
         let context = Context::new();
+        let integer_type = IntegerType::new(&context, 64).into();
         let attribute = DenseElementsAttribute::new(
-            MemRefType::new(Type::index(&context), &[3], None, None).into(),
-            &[IntegerAttribute::new(0, IntegerType::new(&context, 64).into()).into()],
+            MemRefType::new(integer_type, &[3], None, None).into(),
+            &[IntegerAttribute::new(0, integer_type).into()],
         )
         .unwrap();
 
