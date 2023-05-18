@@ -1,4 +1,4 @@
-//! `scf` dialect.
+//! `cf` dialect.
 
 use std::dbg;
 
