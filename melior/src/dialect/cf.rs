@@ -84,10 +84,9 @@ pub fn switch<'c>(
     case_destinations: &[(&Block<'c>, &[Value])],
     location: Location<'c>,
 ) -> Result<Operation<'c>, Error> {
-    let (destinations, operands): (Vec<_>, Vec<_>) = [&default_destination]
+    let (destinations, operands): (Vec<_>, Vec<_>) = [default_destination]
         .into_iter()
-        .chain(case_destinations.iter())
-        .cloned()
+        .chain(case_destinations.iter().cloned())
         .unzip();
 
     Ok(OperationBuilder::new("cf.switch", location)
