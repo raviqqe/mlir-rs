@@ -7,7 +7,7 @@ use crate::{
         },
         operation::OperationBuilder,
         r#type::RankedTensorType,
-        Attribute, Block, Identifier, Location, Operation, Type, Value,
+        Block, Identifier, Location, Operation, Type, Value,
     },
     Context, Error,
 };
@@ -15,27 +15,27 @@ use crate::{
 /// Creates a `cf.assert` operation.
 pub fn assert<'c>(
     context: &'c Context,
-    arg: Value<'c>,
-    msg: &str,
+    argument: Value<'c>,
+    message: &str,
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("cf.assert", location)
         .add_attributes(&[(
             Identifier::new(context, "msg"),
-            StringAttribute::new(context, msg).into(),
+            StringAttribute::new(context, message).into(),
         )])
-        .add_operands(&[arg])
+        .add_operands(&[argument])
         .build()
 }
 
 /// Creates a `cf.br` operation.
 pub fn br<'c>(
     successor: &Block<'c>,
-    dest_operands: &[Value<'c>],
+    destination_operands: &[Value<'c>],
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("cf.br", location)
-        .add_operands(dest_operands)
+        .add_operands(destination_operands)
         .add_successors(&[successor])
         .build()
 }
@@ -50,10 +50,6 @@ pub fn cond_br<'c>(
     false_successor_operands: &[Value],
     location: Location<'c>,
 ) -> Operation<'c> {
-    let mut operands = vec![condition];
-    operands.extend(true_successor_operands);
-    operands.extend(false_successor_operands);
-
     OperationBuilder::new("cf.cond_br", location)
         .add_attributes(&[(
             Identifier::new(context, "operand_segment_sizes"),
@@ -67,7 +63,13 @@ pub fn cond_br<'c>(
             )
             .into(),
         )])
-        .add_operands(&operands)
+        .add_operands(
+            &[condition]
+                .into_iter()
+                .chain(true_successor_operands.iter().copied())
+                .chain(false_successor_operands.iter().copied())
+                .collect::<Vec<_>>(),
+        )
         .add_successors(&[true_successor, false_successor])
         .build()
 }
@@ -82,26 +84,11 @@ pub fn switch<'c>(
     case_destinations: &[(&Block<'c>, &[Value])],
     location: Location<'c>,
 ) -> Result<Operation<'c>, Error> {
-    let case_segment_sizes: Vec<i32> = case_destinations.iter().map(|x| x.1.len() as i32).collect();
-
-    let default_op_segments = default_destination.1.len() as i32;
-    let case_op_segments: i32 = case_destinations.iter().map(|x| x.1.len() as i32).sum();
-
-    let (dests, operands): (Vec<_>, Vec<_>) = std::iter::once(&default_destination)
+    let (destinations, operands): (Vec<_>, Vec<_>) = [&default_destination]
+        .into_iter()
         .chain(case_destinations.iter())
         .cloned()
         .unzip();
-
-    let attr_case_values: Vec<Attribute> = case_values
-        .iter()
-        .map(|x| IntegerAttribute::new(*x, flag_type).into())
-        .collect();
-
-    let operands: Vec<Value> = std::iter::once([flag].as_slice())
-        .chain(operands.into_iter())
-        .flatten()
-        .cloned()
-        .collect();
 
     Ok(OperationBuilder::new("cf.switch", location)
         .add_attributes(&[
@@ -109,22 +96,49 @@ pub fn switch<'c>(
                 Identifier::new(context, "case_values"),
                 DenseElementsAttribute::new(
                     RankedTensorType::new(&[case_values.len() as u64], flag_type, None).into(),
-                    &attr_case_values,
+                    &case_values
+                        .iter()
+                        .map(|value| IntegerAttribute::new(*value, flag_type).into())
+                        .collect::<Vec<_>>(),
                 )?
                 .into(),
             ),
             (
                 Identifier::new(context, "case_operand_segments"),
-                DenseI32ArrayAttribute::new(context, &case_segment_sizes).into(),
+                DenseI32ArrayAttribute::new(
+                    context,
+                    &case_destinations
+                        .iter()
+                        .map(|(_, operands)| operands.len() as i32)
+                        .collect::<Vec<_>>(),
+                )
+                .into(),
             ),
             (
                 Identifier::new(context, "operand_segment_sizes"),
-                DenseI32ArrayAttribute::new(context, &[1, default_op_segments, case_op_segments])
-                    .into(),
+                DenseI32ArrayAttribute::new(
+                    context,
+                    &[
+                        1,
+                        default_destination.1.len() as i32,
+                        case_destinations
+                            .iter()
+                            .map(|(_, operands)| operands.len() as i32)
+                            .sum(),
+                    ],
+                )
+                .into(),
             ),
         ])
-        .add_operands(&operands)
-        .add_successors(&dests)
+        .add_operands(
+            &[[flag].as_slice()]
+                .into_iter()
+                .chain(operands.into_iter())
+                .flatten()
+                .cloned()
+                .collect::<Vec<_>>(),
+        )
+        .add_successors(&destinations)
         .build())
 }
 
