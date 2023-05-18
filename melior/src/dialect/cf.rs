@@ -86,7 +86,7 @@ pub fn switch<'c>(
 ) -> Result<Operation<'c>, Error> {
     let (destinations, operands): (Vec<_>, Vec<_>) = [default_destination]
         .into_iter()
-        .chain(case_destinations.iter().cloned())
+        .chain(case_destinations.iter().copied())
         .unzip();
 
     Ok(OperationBuilder::new("cf.switch", location)
@@ -130,11 +130,9 @@ pub fn switch<'c>(
             ),
         ])
         .add_operands(
-            &[[flag].as_slice()]
+            &[flag]
                 .into_iter()
-                .chain(operands)
-                .flatten()
-                .cloned()
+                .chain(operands.into_iter().flatten().copied())
                 .collect::<Vec<_>>(),
         )
         .add_successors(&destinations)
