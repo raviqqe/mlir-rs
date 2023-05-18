@@ -132,7 +132,7 @@ pub fn switch<'c>(
         .add_operands(
             &[[flag].as_slice()]
                 .into_iter()
-                .chain(operands.into_iter())
+                .chain(operands)
                 .flatten()
                 .cloned()
                 .collect::<Vec<_>>(),
