@@ -119,7 +119,11 @@ impl<'c> Operation<'c> {
         unsafe { mlirOperationDump(self.raw) }
     }
 
-    pub fn fmt_options(&self, formatter: &mut Formatter, Flags) -> Result<String, Error> {
+    pub fn fmt_options(
+        &self,
+        formatter: &mut Formatter,
+        flags: OperationPrintingFlags,
+    ) -> Result<String, Error> {
         let mut data = (formatter, Ok(()));
 
         unsafe {
