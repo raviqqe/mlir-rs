@@ -95,7 +95,7 @@ pub(crate) unsafe extern "C" fn print_string_callback(string: MlirStringRef, dat
         return;
     }
 
-    *result = (|| -> Result<(), Error> {
+    *result = (|| {
         writer.push_str(StringRef::from_raw(string).as_str()?);
 
         Ok(())
