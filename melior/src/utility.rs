@@ -77,7 +77,7 @@ pub(crate) unsafe extern "C" fn print_callback(string: MlirStringRef, data: *mut
         return;
     }
 
-    *result = (|| -> fmt::Result {
+    *result = (|| {
         write!(
             formatter,
             "{}",
