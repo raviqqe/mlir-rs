@@ -18,8 +18,8 @@ use mlir_sys::{
     mlirOperationClone, mlirOperationDestroy, mlirOperationDump, mlirOperationEqual,
     mlirOperationGetBlock, mlirOperationGetContext, mlirOperationGetName,
     mlirOperationGetNextInBlock, mlirOperationGetNumRegions, mlirOperationGetNumResults,
-    mlirOperationGetRegion, mlirOperationGetResult, mlirOperationPrint, mlirOperationVerify,
-    MlirOperation,
+    mlirOperationGetRegion, mlirOperationGetResult, mlirOperationPrint,
+    mlirOperationPrintWithFlags, mlirOperationVerify, MlirOperation,
 };
 use std::{
     ffi::c_void,
@@ -117,6 +117,23 @@ impl<'c> Operation<'c> {
     /// Dumps an operation.
     pub fn dump(&self) {
         unsafe { mlirOperationDump(self.raw) }
+    }
+
+    pub fn fmt_options(&self, formatter: &mut Formatter, Flags) -> Result<String, Error> {
+        let mut data = (formatter, Ok(()));
+
+        unsafe {
+            mlirOperationPrintWithFlags(
+                self.raw,
+                flags,
+                Some(print_callback),
+                &mut data as *mut _ as *mut c_void,
+            );
+        }
+
+        data.1?;
+
+        Ok()
     }
 
     /// Creates an operation from a raw object.
