@@ -72,10 +72,7 @@ impl Drop for ExecutionEngine {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        pass,
-        test::create_test_context,
-    };
+    use crate::{pass, test::create_test_context};
 
     #[test]
     fn invoke_packed() {
