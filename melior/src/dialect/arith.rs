@@ -204,6 +204,7 @@ mod tests {
             StringAttribute::new(context, "foo"),
             TypeAttribute::new(function_type.into()),
             region,
+            &[],
             Location::unknown(context),
         );
 
@@ -580,6 +581,7 @@ mod tests {
                         .into(),
                 ),
                 region,
+                &[],
                 Location::unknown(&context),
             )
         };

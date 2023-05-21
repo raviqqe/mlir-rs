@@ -189,6 +189,7 @@ mod tests {
                 region.append_block(block);
                 region
             },
+            &[],
             location,
         ));
 
@@ -230,6 +231,7 @@ mod tests {
                 region.append_block(dest_block);
                 region
             },
+            &[],
             location,
         ));
 
@@ -296,6 +298,7 @@ mod tests {
                 region.append_block(false_block);
                 region
             },
+            &[],
             location,
         ));
 
@@ -356,6 +359,7 @@ mod tests {
                 region.append_block(second_block);
                 region
             },
+            &[],
             location,
         ));
 

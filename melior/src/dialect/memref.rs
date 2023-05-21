@@ -253,6 +253,7 @@ mod tests {
                 StringAttribute::new(context, "foo"),
                 TypeAttribute::new(FunctionType::new(context, &[], &[]).into()),
                 region,
+                &[],
                 Location::unknown(context),
             )
         };
@@ -410,6 +411,7 @@ mod tests {
                 region.append_block(block);
                 region
             },
+            &[],
             location,
         ));
 

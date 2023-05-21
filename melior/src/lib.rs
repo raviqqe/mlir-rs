@@ -88,6 +88,7 @@ mod tests {
                         .into(),
                 ),
                 region,
+                &[],
                 Location::unknown(&context),
             )
         };

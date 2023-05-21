@@ -159,6 +159,7 @@ mod tests {
                 region.append_block(block);
                 region
             },
+            &[],
             location,
         ));
 
@@ -220,6 +221,7 @@ mod tests {
                 region.append_block(block);
                 region
             },
+            &[],
             location,
         ));
 
@@ -303,6 +305,7 @@ mod tests {
                     region.append_block(block);
                     region
                 },
+                &[],
                 location,
             ));
 
@@ -353,6 +356,7 @@ mod tests {
                     region.append_block(block);
                     region
                 },
+                &[],
                 location,
             ));
 
@@ -425,6 +429,7 @@ mod tests {
                 region.append_block(block);
                 region
             },
+            &[],
             location,
         ));
 
@@ -513,6 +518,7 @@ mod tests {
                     region.append_block(block);
                     region
                 },
+                &[],
                 location,
             ));
 
@@ -599,6 +605,7 @@ mod tests {
                     region.append_block(block);
                     region
                 },
+                &[],
                 location,
             ));
 
@@ -695,6 +702,7 @@ mod tests {
                     region.append_block(block);
                     region
                 },
+                &[],
                 location,
             ));
 
