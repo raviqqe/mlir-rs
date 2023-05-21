@@ -132,7 +132,7 @@ impl<'c> Operation<'c> {
         unsafe {
             mlirOperationPrintWithFlags(
                 self.raw,
-                flags,
+                flags.to_raw(),
                 Some(print_callback),
                 &mut data as *mut _ as *mut c_void,
             );

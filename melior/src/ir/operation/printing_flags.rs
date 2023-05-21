@@ -40,6 +40,10 @@ impl OperationPrintingFlags {
 
         self
     }
+
+    pub fn to_raw(&self) -> MlirOpPrintingFlags {
+        self.0
+    }
 }
 
 impl Drop for OperationPrintingFlags {
