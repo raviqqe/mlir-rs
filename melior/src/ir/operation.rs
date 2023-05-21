@@ -124,7 +124,7 @@ impl<'c> Operation<'c> {
 
     /// Prints an operation with flags.
     pub fn to_string_with_flags(&self, flags: OperationPrintingFlags) -> Result<String, Error> {
-        let mut data = (String::new(), Ok(()));
+        let mut data = (String::new(), Ok::<_, Error>(()));
 
         unsafe {
             mlirOperationPrintWithFlags(
@@ -405,7 +405,7 @@ mod tests {
                         .print_generic_operation_form()
                         .use_local_scope()
                 ),
-            Ok("\"foo\"() : () -> ()\n".into())
+            Ok("\"foo\"() : () -> () [unknown]".into())
         );
     }
 }

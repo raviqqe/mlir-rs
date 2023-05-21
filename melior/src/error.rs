@@ -1,6 +1,7 @@
 use std::{
     error,
     fmt::{self, Display, Formatter},
+    str::Utf8Error,
 };
 
 /// A Melior error.
@@ -23,6 +24,7 @@ pub enum Error {
     RunPass,
     TypeExpected(&'static str, String),
     UnknownDiagnosticSeverity(u32),
+    Utf8(Utf8Error),
 }
 
 impl Display for Error {
@@ -54,8 +56,17 @@ impl Display for Error {
             Self::UnknownDiagnosticSeverity(severity) => {
                 write!(formatter, "unknown diagnostic severity: {severity}")
             }
+            Self::Utf8(error) => {
+                write!(formatter, "{}", error)
+            }
         }
     }
 }
 
 impl error::Error for Error {}
+
+impl From<Utf8Error> for Error {
+    fn from(error: Utf8Error) -> Self {
+        Self::Utf8(error)
+    }
+}

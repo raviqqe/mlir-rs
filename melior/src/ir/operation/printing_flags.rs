@@ -53,3 +53,9 @@ impl Drop for OperationPrintingFlags {
         unsafe { mlirOpPrintingFlagsDestroy(self.0) }
     }
 }
+
+impl Default for OperationPrintingFlags {
+    fn default() -> Self {
+        Self::new()
+    }
+}
