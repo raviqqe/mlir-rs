@@ -73,11 +73,8 @@ impl Drop for ExecutionEngine {
 mod tests {
     use super::*;
     use crate::{
-        context::Context,
-        dialect::DialectRegistry,
         pass,
         test::create_test_context,
-        utility::{register_all_dialects, register_all_llvm_translations},
     };
 
     #[test]
@@ -144,6 +141,13 @@ mod tests {
             "#,
         )
         .unwrap();
+
+        let pass_manager = pass::PassManager::new(&context);
+        pass_manager.add_pass(pass::conversion::create_func_to_llvm());
+
+        pass_manager
+            .nested_under("func.func")
+            .add_pass(pass::conversion::create_arith_to_llvm());
 
         ExecutionEngine::new(&module, 2, &[], false).dump_to_object_file("foo.o");
     }
