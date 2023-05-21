@@ -41,6 +41,7 @@ impl OperationPrintingFlags {
         self
     }
 
+    /// Converts a printing flags into a raw object.
     pub fn to_raw(&self) -> MlirOpPrintingFlags {
         self.0
     }
