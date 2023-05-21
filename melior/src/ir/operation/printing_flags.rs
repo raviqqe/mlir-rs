@@ -1,4 +1,7 @@
-use mlir_sys::{mlirOpPrintingFlagsCreate, mlirOpPrintingFlagsDestroy, MlirOpPrintingFlags};
+use mlir_sys::{
+    mlirOpPrintingFlagsCreate, mlirOpPrintingFlagsDestroy,
+    mlirOpPrintingFlagsElideLargeElementsAttrs, MlirOpPrintingFlags,
+};
 
 #[derive(Debug)]
 pub struct OperationPrintingFlags(MlirOpPrintingFlags);
@@ -8,7 +11,10 @@ impl OperationPrintingFlags {
         Self(unsafe { mlirOpPrintingFlagsCreate() })
     }
 
-    pub fn foo() -> foo {}
+    pub fn elide_large_elements_attributes(self, limit: usize) -> Self {
+        unsafe { mlirOpPrintingFlagsElideLargeElementsAttrs(self.0, limit) }
+        self
+    }
 }
 
 impl Drop for OperationPrintingFlags {
