@@ -76,17 +76,13 @@ mod tests {
         context::Context,
         dialect::DialectRegistry,
         pass,
+        test::create_test_context,
         utility::{register_all_dialects, register_all_llvm_translations},
     };
 
     #[test]
     fn invoke_packed() {
-        let registry = DialectRegistry::new();
-        register_all_dialects(&registry);
-
-        let context = Context::new();
-        context.append_dialect_registry(&registry);
-        register_all_llvm_translations(&context);
+        let context = create_test_context();
 
         let mut module = Module::parse(
             &context,
@@ -134,12 +130,7 @@ mod tests {
 
     #[test]
     fn dump_to_object_file() {
-        let registry = DialectRegistry::new();
-        register_all_dialects(&registry);
-
-        let context = Context::new();
-        context.append_dialect_registry(&registry);
-        register_all_llvm_translations(&context);
+        let context = create_test_context();
 
         let module = Module::parse(
             &context,

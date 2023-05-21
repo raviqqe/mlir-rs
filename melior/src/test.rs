@@ -1,4 +1,8 @@
-use crate::{dialect::DialectRegistry, utility::register_all_dialects, Context};
+use crate::{
+    dialect::DialectRegistry,
+    utility::{register_all_dialects, register_all_llvm_translations},
+    Context,
+};
 
 pub fn load_all_dialects(context: &Context) {
     let registry = DialectRegistry::new();
@@ -16,6 +20,7 @@ pub fn create_test_context() -> Context {
     });
 
     load_all_dialects(&context);
+    register_all_llvm_translations(&context);
 
     context
 }
