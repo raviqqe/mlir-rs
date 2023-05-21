@@ -126,11 +126,11 @@ mod tests {
     fn dump_to_object_file() {
         let context = create_test_context();
 
-        let module = Module::parse(
+        let mut module = Module::parse(
             &context,
             r#"
             module {
-                func.func @add(%arg0 : i32) -> i32 attributes { llvm.emit_c_interface } {
+                func.func @add(%arg0 : i32) -> i32 {
                     %res = arith.addi %arg0, %arg0 : i32
                     return %res : i32
                 }
@@ -146,6 +146,8 @@ mod tests {
             .nested_under("func.func")
             .add_pass(pass::conversion::create_arith_to_llvm());
 
-        ExecutionEngine::new(&module, 2, &[], false).dump_to_object_file("foo.o");
+        assert_eq!(pass_manager.run(&mut module), Ok(()));
+
+        ExecutionEngine::new(&module, 2, &[], false).dump_to_object_file("/tmp/melior/test.o");
     }
 }
