@@ -131,4 +131,29 @@ mod tests {
         assert_eq!(argument, 42);
         assert_eq!(result, 84);
     }
+
+    #[test]
+    fn dump_to_object_file() {
+        let registry = DialectRegistry::new();
+        register_all_dialects(&registry);
+
+        let context = Context::new();
+        context.append_dialect_registry(&registry);
+        register_all_llvm_translations(&context);
+
+        let module = Module::parse(
+            &context,
+            r#"
+            module {
+                func.func @add(%arg0 : i32) -> i32 attributes { llvm.emit_c_interface } {
+                    %res = arith.addi %arg0, %arg0 : i32
+                    return %res : i32
+                }
+            }
+            "#,
+        )
+        .unwrap();
+
+        ExecutionEngine::new(&module, 2, &[], false).dump_to_object_file("foo.o");
+    }
 }
