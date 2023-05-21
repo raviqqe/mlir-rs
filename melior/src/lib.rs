@@ -202,6 +202,7 @@ mod tests {
                     FunctionType::new(&context, &[memref_type, memref_type], &[]).into(),
                 ),
                 function_region,
+                &[],
                 Location::unknown(&context),
             )
         };
@@ -258,6 +259,7 @@ mod tests {
                 region.append_block(block);
                 region
             },
+            &[],
             Location::unknown(&context),
         ));
 
