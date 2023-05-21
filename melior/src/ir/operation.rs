@@ -131,7 +131,7 @@ impl<'c> Operation<'c> {
                 self.raw,
                 flags.to_raw(),
                 Some(print_string_callback),
-                &mut data as *mut _ as *mut c_void,
+                &mut data as *mut _ as *mut _,
             );
         }
 
