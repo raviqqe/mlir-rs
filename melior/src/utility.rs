@@ -88,6 +88,24 @@ pub(crate) unsafe extern "C" fn print_callback(string: MlirStringRef, data: *mut
     })();
 }
 
+pub(crate) unsafe extern "C" fn print_string_callback(string: MlirStringRef, data: *mut c_void) {
+    let (writer, result) = &mut *(data as *mut (String, fmt::Result));
+
+    if result.is_err() {
+        return;
+    }
+
+    *result = (|| -> fmt::Result {
+        writer.push_str(
+            StringRef::from_raw(string)
+                .as_str()
+                .map_err(|_| fmt::Error)?,
+        );
+
+        Ok(())
+    })();
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

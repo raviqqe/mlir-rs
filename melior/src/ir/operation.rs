@@ -10,7 +10,7 @@ pub use self::{
 use super::{BlockRef, Identifier, RegionRef, Value};
 use crate::{
     context::{Context, ContextRef},
-    utility::print_callback,
+    utility::{print_callback, print_string_callback},
     Error,
 };
 use core::{
@@ -122,25 +122,22 @@ impl<'c> Operation<'c> {
         unsafe { mlirOperationDump(self.raw) }
     }
 
-    pub fn fmt_options(
-        &self,
-        formatter: &mut Formatter,
-        flags: OperationPrintingFlags,
-    ) -> Result<String, Error> {
-        let mut data = (formatter, Ok(()));
+    /// Prints an operation with flags.
+    pub fn to_string_with_flags(&self, flags: OperationPrintingFlags) -> Result<String, Error> {
+        let mut data = (String::new(), Ok(()));
 
         unsafe {
             mlirOperationPrintWithFlags(
                 self.raw,
                 flags.to_raw(),
-                Some(print_callback),
+                Some(print_string_callback),
                 &mut data as *mut _ as *mut c_void,
             );
         }
 
         data.1?;
 
-        Ok()
+        Ok(data.0)
     }
 
     /// Creates an operation from a raw object.
@@ -391,6 +388,24 @@ mod tests {
                 OperationBuilder::new("foo", Location::unknown(&context)).build()
             ),
             "Operation(\n\"foo\"() : () -> ()\n)"
+        );
+    }
+
+    #[test]
+    fn to_string_with_flags() {
+        let context = Context::new();
+
+        assert_eq!(
+            OperationBuilder::new("foo", Location::unknown(&context))
+                .build()
+                .to_string_with_flags(
+                    OperationPrintingFlags::new()
+                        .elide_large_elements_attributes(100)
+                        .enable_debug_info(true, true)
+                        .print_generic_operation_form()
+                        .use_local_scope()
+                ),
+            Ok("\"foo\"() : () -> ()\n".into())
         );
     }
 }
