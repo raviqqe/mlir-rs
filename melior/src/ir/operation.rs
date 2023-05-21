@@ -1,9 +1,12 @@
 //! Operations and operation builders.
 
 mod builder;
+mod printing_flags;
 mod result;
 
-pub use self::{builder::OperationBuilder, result::OperationResult};
+pub use self::{
+    builder::OperationBuilder, printing_flags::OperationPrintingFlags, result::OperationResult,
+};
 use super::{BlockRef, Identifier, RegionRef, Value};
 use crate::{
     context::{Context, ContextRef},
