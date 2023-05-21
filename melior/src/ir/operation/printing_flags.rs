@@ -9,6 +9,7 @@ use mlir_sys::{
 pub struct OperationPrintingFlags(MlirOpPrintingFlags);
 
 impl OperationPrintingFlags {
+    /// Creates operation printing flags.
     pub fn new() -> Self {
         Self(unsafe { mlirOpPrintingFlagsCreate() })
     }
