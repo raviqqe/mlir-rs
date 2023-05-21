@@ -70,6 +70,7 @@ module.body().append_operation(func::func(
         region.append_block(block);
         region
     },
+    &[],
     location,
 ));
 
