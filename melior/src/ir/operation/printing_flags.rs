@@ -1,8 +1,10 @@
 use mlir_sys::{
     mlirOpPrintingFlagsCreate, mlirOpPrintingFlagsDestroy,
-    mlirOpPrintingFlagsElideLargeElementsAttrs, MlirOpPrintingFlags,
+    mlirOpPrintingFlagsElideLargeElementsAttrs, mlirOpPrintingFlagsEnableDebugInfo,
+    mlirOpPrintingFlagsPrintGenericOpForm, mlirOpPrintingFlagsUseLocalScope, MlirOpPrintingFlags,
 };
 
+/// Operation printing flags.
 #[derive(Debug)]
 pub struct OperationPrintingFlags(MlirOpPrintingFlags);
 
@@ -11,8 +13,31 @@ impl OperationPrintingFlags {
         Self(unsafe { mlirOpPrintingFlagsCreate() })
     }
 
+    /// Elides large elements attributes.
     pub fn elide_large_elements_attributes(self, limit: usize) -> Self {
-        unsafe { mlirOpPrintingFlagsElideLargeElementsAttrs(self.0, limit) }
+        unsafe { mlirOpPrintingFlagsElideLargeElementsAttrs(self.0, limit as isize) }
+
+        self
+    }
+
+    /// Enables debug info.
+    pub fn enable_debug_info(self, enabled: bool, pretty_form: bool) -> Self {
+        unsafe { mlirOpPrintingFlagsEnableDebugInfo(self.0, enabled, pretty_form) }
+
+        self
+    }
+
+    /// Prints operations in a generic form.
+    pub fn print_generic_operation_form(self) -> Self {
+        unsafe { mlirOpPrintingFlagsPrintGenericOpForm(self.0) }
+
+        self
+    }
+
+    /// Uses local scope.
+    pub fn use_local_scope(self) -> Self {
+        unsafe { mlirOpPrintingFlagsUseLocalScope(self.0) }
+
         self
     }
 }
