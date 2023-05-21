@@ -5,7 +5,7 @@ use crate::{
         attribute::{FlatSymbolRefAttribute, StringAttribute, TypeAttribute},
         operation::OperationBuilder,
         r#type::FunctionType,
-        Identifier, Location, Operation, Region, Value,
+        Attribute, Identifier, Location, Operation, Region, Value,
     },
     Context,
 };
@@ -54,6 +54,7 @@ pub fn func<'c>(
     name: StringAttribute<'c>,
     r#type: TypeAttribute<'c>,
     region: Region,
+    attributes: &[(Identifier<'c>, Attribute<'c>)],
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("func.func", location)
@@ -107,6 +108,7 @@ mod tests {
                 StringAttribute::new(&context, "foo"),
                 TypeAttribute::new(FunctionType::new(&context, &[], &[]).into()),
                 region,
+                &[],
                 Location::unknown(&context),
             )
         };
@@ -149,6 +151,7 @@ mod tests {
                 StringAttribute::new(&context, "foo"),
                 TypeAttribute::new(FunctionType::new(&context, &[], &[]).into()),
                 region,
+                &[],
                 Location::unknown(&context),
             )
         };
@@ -184,6 +187,7 @@ mod tests {
                     FunctionType::new(&context, &[integer_type], &[integer_type]).into(),
                 ),
                 region,
+                &[],
                 Location::unknown(&context),
             )
         };
