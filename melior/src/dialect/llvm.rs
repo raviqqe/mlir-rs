@@ -40,7 +40,7 @@ mod tests {
     };
 
     #[test]
-    fn compile_assert() {
+    fn compile_insert_value() {
         let context = Context::new();
         load_all_dialects(&context);
 
