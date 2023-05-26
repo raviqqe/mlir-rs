@@ -33,7 +33,7 @@ mod tests {
         ir::{
             attribute::{IntegerAttribute, StringAttribute, TypeAttribute},
             r#type::FunctionType,
-            Block, Module, Region,
+            Block, Module, Region, Type,
         },
         test::load_all_dialects,
         Context,
@@ -46,25 +46,32 @@ mod tests {
 
         let location = Location::unknown(&context);
         let module = Module::new(location);
-        let struct_type = r#type::r#struct(&context, &[], false).into();
+        let index_type = Type::index(&context);
+        let struct_type = r#type::r#struct(&context, &[index_type], false).into();
 
         module.body().append_operation(func::func(
             &context,
             StringAttribute::new(&context, "foo"),
-            TypeAttribute::new(FunctionType::new(&context, &[], &[]).into()),
+            TypeAttribute::new(FunctionType::new(&context, &[struct_type], &[]).into()),
             {
-                let block = Block::new(&[]);
-                let operand = block
+                let block = Block::new(&[(struct_type, location)]);
+                let value = block
                     .append_operation(arith::constant(
                         &context,
-                        IntegerAttribute::new(1, bool_type).into(),
+                        IntegerAttribute::new(42, index_type).into(),
                         location,
                     ))
                     .result(0)
                     .unwrap()
                     .into();
 
-                block.append_operation(insert_value(&context, operand, "assert message", location));
+                block.append_operation(insert_value(
+                    &context,
+                    block.argument(0).unwrap().into(),
+                    DenseI64ArrayAttribute::new(&context, &[0]),
+                    value,
+                    location,
+                ));
 
                 block.append_operation(func::r#return(&[], location));
 
