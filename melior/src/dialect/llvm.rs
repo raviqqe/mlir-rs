@@ -66,7 +66,7 @@ pub fn get_element_ptr_dynamic<'c, const N: usize>(
         .add_attributes(&[
             (
                 Identifier::new(context, "rawConstantIndices"),
-                DenseI32ArrayAttribute::new(&context, &[i32::MIN; N]).into(),
+                DenseI32ArrayAttribute::new(context, &[i32::MIN; N]).into(),
             ),
             (
                 Identifier::new(context, "elem_type"),
