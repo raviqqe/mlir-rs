@@ -10,14 +10,14 @@ use crate::{
 
 pub mod r#type;
 
-/// Creates a `cf.assert` operation.
+/// Creates a `llvm.insertvalue` operation.
 pub fn insert_value<'c>(
     context: &'c Context,
-    argument: Value<'c>,
-    message: &str,
+    r#struct: Value<'c>,
+    value: Value<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("cf.assert", location)
+    OperationBuilder::new("llvm.insertvalue", location)
         .add_attributes(&[(
             Identifier::new(context, "msg"),
             StringAttribute::new(context, message).into(),
