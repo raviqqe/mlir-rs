@@ -2,8 +2,9 @@
 
 use crate::{
     ir::{
-        attribute::DenseI64ArrayAttribute, operation::OperationBuilder, Identifier, Location,
-        Operation, Type, Value,
+        attribute::{DenseI32ArrayAttribute, DenseI64ArrayAttribute, TypeAttribute},
+        operation::OperationBuilder,
+        Identifier, Location, Operation, Type, Value,
     },
     Context,
 };
@@ -21,6 +22,31 @@ pub fn extract_value<'c>(
     OperationBuilder::new("llvm.extractvalue", location)
         .add_attributes(&[(Identifier::new(context, "position"), position.into())])
         .add_operands(&[container])
+        .add_results(&[result_type])
+        .build()
+}
+
+/// Creates a `llvm.getelementptr` operation.
+pub fn get_element_ptr<'c>(
+    context: &'c Context,
+    ptr: Value,
+    indices: DenseI32ArrayAttribute<'c>,
+    element_type: Type<'c>,
+    result_type: Type<'c>,
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new("llvm.getelementptr", location)
+        .add_attributes(&[
+            (
+                Identifier::new(context, "rawConstantIndices"),
+                indices.into(),
+            ),
+            (
+                Identifier::new(context, "elem_type"),
+                TypeAttribute::new(element_type).into(),
+            ),
+        ])
+        .add_operands(&[ptr])
         .add_results(&[result_type])
         .build()
 }
@@ -100,6 +126,47 @@ mod tests {
                     block.argument(0).unwrap().into(),
                     DenseI64ArrayAttribute::new(&context, &[0]),
                     integer_type,
+                    location,
+                ));
+
+                block.append_operation(func::r#return(&[], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            &[],
+            location,
+        ));
+
+        convert_module(&context, &mut module);
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
+    fn compile_get_element_ptr() {
+        let context = create_test_context();
+
+        let location = Location::unknown(&context);
+        let mut module = Module::new(location);
+        let integer_type = IntegerType::new(&context, 64).into();
+        let ptr_type = r#type::opaque_pointer(&context);
+
+        module.body().append_operation(func::func(
+            &context,
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(FunctionType::new(&context, &[ptr_type], &[]).into()),
+            {
+                let block = Block::new(&[(ptr_type, location)]);
+
+                block.append_operation(get_element_ptr(
+                    &context,
+                    block.argument(0).unwrap().into(),
+                    DenseI32ArrayAttribute::new(&context, &[42]),
+                    integer_type,
+                    ptr_type,
                     location,
                 ));
 
