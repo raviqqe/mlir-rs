@@ -11,6 +11,8 @@ use crate::{
 
 pub mod r#type;
 
+// spell-checker: disable
+
 /// Creates a `llvm.extractvalue` operation.
 pub fn extract_value<'c>(
     context: &'c Context,
