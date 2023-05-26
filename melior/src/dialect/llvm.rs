@@ -32,8 +32,8 @@ mod tests {
         dialect::{arith, func},
         ir::{
             attribute::{IntegerAttribute, StringAttribute, TypeAttribute},
-            r#type::FunctionType,
-            Block, Module, Region, Type,
+            r#type::{FunctionType, IntegerType},
+            Block, Module, Region,
         },
         pass::{self, PassManager},
         test::create_test_context,
@@ -53,7 +53,6 @@ mod tests {
         pass_manager.add_pass(pass::conversion::create_control_flow_to_llvm());
         pass_manager.add_pass(pass::conversion::create_mem_ref_to_llvm());
 
-        module.as_operation().dump();
         assert_eq!(pass_manager.run(module), Ok(()));
         assert!(module.as_operation().verify());
     }
@@ -64,8 +63,8 @@ mod tests {
 
         let location = Location::unknown(&context);
         let mut module = Module::new(location);
-        let index_type = Type::index(&context);
-        let struct_type = r#type::r#struct(&context, &[index_type], false).into();
+        let integer_type = IntegerType::new(&context, 64).into();
+        let struct_type = r#type::r#struct(&context, &[integer_type], false).into();
 
         module.body().append_operation(func::func(
             &context,
@@ -76,7 +75,7 @@ mod tests {
                 let value = block
                     .append_operation(arith::constant(
                         &context,
-                        IntegerAttribute::new(42, index_type).into(),
+                        IntegerAttribute::new(42, integer_type).into(),
                         location,
                     ))
                     .result(0)
