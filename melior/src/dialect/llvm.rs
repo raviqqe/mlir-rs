@@ -2,9 +2,8 @@
 
 use crate::{
     ir::{
-        attribute::{DenseI64ArrayAttribute, StringAttribute},
-        operation::OperationBuilder,
-        Identifier, Location, Operation, Value,
+        attribute::DenseI64ArrayAttribute, operation::OperationBuilder, Identifier, Location,
+        Operation, Value,
     },
     Context,
 };
@@ -14,17 +13,15 @@ pub mod r#type;
 /// Creates a `llvm.insertvalue` operation.
 pub fn insert_value<'c>(
     context: &'c Context,
-    r#struct: Value,
+    container: Value,
     position: DenseI64ArrayAttribute<'c>,
     value: Value,
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("llvm.insertvalue", location)
-        .add_attributes(&[(
-            Identifier::new(context, "msg"),
-            StringAttribute::new(context, message).into(),
-        )])
-        .add_operands(&[argument])
+        .add_attributes(&[(Identifier::new(context, "position"), position.into())])
+        .add_operands(&[container, value])
+        .enable_result_type_inference()
         .build()
 }
 
