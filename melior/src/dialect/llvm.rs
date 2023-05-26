@@ -54,11 +54,10 @@ pub fn get_element_ptr<'c>(
 }
 
 /// Creates a `llvm.getelementptr` operation with dynamic indices.
-pub fn get_element_ptr_dynamic<'c>(
+pub fn get_element_ptr_dynamic<'c, const N: usize>(
     context: &'c Context,
     ptr: Value,
-    constant_indices: DenseI32ArrayAttribute<'c>,
-    indices: Value<'c>,
+    indices: &[Value<'c>; N],
     element_type: Type<'c>,
     result_type: Type<'c>,
     location: Location<'c>,
@@ -67,14 +66,15 @@ pub fn get_element_ptr_dynamic<'c>(
         .add_attributes(&[
             (
                 Identifier::new(context, "rawConstantIndices"),
-                constant_indices.into(),
+                DenseI32ArrayAttribute::new(&context, &[i32::MIN; N]).into(),
             ),
             (
                 Identifier::new(context, "elem_type"),
                 TypeAttribute::new(element_type).into(),
             ),
         ])
-        .add_operands(&[ptr, indices])
+        .add_operands(&[ptr])
+        .add_operands(indices)
         .add_results(&[result_type])
         .build()
 }
@@ -243,8 +243,7 @@ mod tests {
                 block.append_operation(get_element_ptr_dynamic(
                     &context,
                     block.argument(0).unwrap().into(),
-                    DenseI32ArrayAttribute::new(&context, &[1 << 31]),
-                    index,
+                    &[index],
                     integer_type,
                     ptr_type,
                     location,
