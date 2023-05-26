@@ -2,8 +2,9 @@
 
 use crate::{
     ir::{
-        attribute::StringAttribute, operation::OperationBuilder, Identifier, Location, Operation,
-        Value,
+        attribute::{DenseI64ArrayAttribute, StringAttribute},
+        operation::OperationBuilder,
+        Identifier, Location, Operation, Value,
     },
     Context,
 };
@@ -13,8 +14,9 @@ pub mod r#type;
 /// Creates a `llvm.insertvalue` operation.
 pub fn insert_value<'c>(
     context: &'c Context,
-    r#struct: Value<'c>,
-    value: Value<'c>,
+    r#struct: Value,
+    position: DenseI64ArrayAttribute<'c>,
+    value: Value,
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("llvm.insertvalue", location)
