@@ -40,6 +40,13 @@ pub fn insert_value<'c>(
         .build()
 }
 
+/// Creates a `llvm.undef` operation.
+pub fn undef<'c>(result_type: Type<'c>, location: Location<'c>) -> Operation<'c> {
+    OperationBuilder::new("llvm.undef", location)
+        .add_results(&[result_type])
+        .build()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -144,6 +151,40 @@ mod tests {
                     value,
                     location,
                 ));
+
+                block.append_operation(func::r#return(&[], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            &[],
+            location,
+        ));
+
+        convert_module(&context, &mut module);
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
+    fn compile_undefined() {
+        let context = create_test_context();
+
+        let location = Location::unknown(&context);
+        let mut module = Module::new(location);
+        let struct_type =
+            r#type::r#struct(&context, &[IntegerType::new(&context, 64).into()], false);
+
+        module.body().append_operation(func::func(
+            &context,
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(FunctionType::new(&context, &[struct_type], &[]).into()),
+            {
+                let block = Block::new(&[(struct_type, location)]);
+
+                block.append_operation(undef(struct_type, location));
 
                 block.append_operation(func::r#return(&[], location));
 
