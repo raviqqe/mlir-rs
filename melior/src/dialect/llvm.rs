@@ -32,7 +32,7 @@ mod tests {
         dialect::{arith, func},
         ir::{
             attribute::{IntegerAttribute, StringAttribute, TypeAttribute},
-            r#type::{FunctionType, IntegerType, Type},
+            r#type::FunctionType,
             Block, Module, Region,
         },
         test::load_all_dialects,
@@ -46,7 +46,7 @@ mod tests {
 
         let location = Location::unknown(&context);
         let module = Module::new(location);
-        let bool_type: Type = IntegerType::new(&context, 1).into();
+        let struct_type = r#type::r#struct(&context, &[], false).into();
 
         module.body().append_operation(func::func(
             &context,
@@ -64,7 +64,7 @@ mod tests {
                     .unwrap()
                     .into();
 
-                block.append_operation(assert(&context, operand, "assert message", location));
+                block.append_operation(insert_value(&context, operand, "assert message", location));
 
                 block.append_operation(func::r#return(&[], location));
 
