@@ -40,7 +40,7 @@ mod tests {
     };
 
     fn convert_module<'c>(context: &'c Context, module: &mut Module<'c>) {
-        let pass_manager = PassManager::new(&context);
+        let pass_manager = PassManager::new(context);
 
         pass_manager.add_pass(pass::conversion::create_func_to_llvm());
         pass_manager
@@ -64,7 +64,7 @@ mod tests {
         let location = Location::unknown(&context);
         let mut module = Module::new(location);
         let integer_type = IntegerType::new(&context, 64).into();
-        let struct_type = r#type::r#struct(&context, &[integer_type], false).into();
+        let struct_type = r#type::r#struct(&context, &[integer_type], false);
 
         module.body().append_operation(func::func(
             &context,
