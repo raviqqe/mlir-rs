@@ -35,14 +35,12 @@ mod tests {
             r#type::FunctionType,
             Block, Module, Region, Type,
         },
-        test::load_all_dialects,
-        Context,
+        test::create_test_context,
     };
 
     #[test]
     fn compile_insert_value() {
-        let context = Context::new();
-        load_all_dialects(&context);
+        let context = create_test_context();
 
         let location = Location::unknown(&context);
         let module = Module::new(location);
