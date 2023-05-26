@@ -1,0 +1,12 @@
+---
+source: melior/src/dialect/llvm.rs
+expression: module.as_operation()
+---
+module attributes {llvm.data_layout = ""} {
+  llvm.func @foo(%arg0: !llvm.ptr) {
+    %0 = llvm.mlir.constant(42 : i64) : i64
+    %1 = llvm.getelementptr %arg0[%0] : (!llvm.ptr, i64) -> !llvm.ptr, i64
+    llvm.return
+  }
+}
+

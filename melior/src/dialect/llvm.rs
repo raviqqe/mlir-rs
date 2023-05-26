@@ -51,6 +51,32 @@ pub fn get_element_ptr<'c>(
         .build()
 }
 
+/// Creates a `llvm.getelementptr` operation with dynamic indices.
+pub fn get_element_ptr_dynamic<'c>(
+    context: &'c Context,
+    ptr: Value,
+    constant_indices: DenseI32ArrayAttribute<'c>,
+    indices: Value<'c>,
+    element_type: Type<'c>,
+    result_type: Type<'c>,
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new("llvm.getelementptr", location)
+        .add_attributes(&[
+            (
+                Identifier::new(context, "rawConstantIndices"),
+                constant_indices.into(),
+            ),
+            (
+                Identifier::new(context, "elem_type"),
+                TypeAttribute::new(element_type).into(),
+            ),
+        ])
+        .add_operands(&[ptr, indices])
+        .add_results(&[result_type])
+        .build()
+}
+
 /// Creates a `llvm.insertvalue` operation.
 pub fn insert_value<'c>(
     context: &'c Context,
@@ -165,6 +191,58 @@ mod tests {
                     &context,
                     block.argument(0).unwrap().into(),
                     DenseI32ArrayAttribute::new(&context, &[42]),
+                    integer_type,
+                    ptr_type,
+                    location,
+                ));
+
+                block.append_operation(func::r#return(&[], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            &[],
+            location,
+        ));
+
+        convert_module(&context, &mut module);
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
+    fn compile_get_element_ptr_dynamic() {
+        let context = create_test_context();
+
+        let location = Location::unknown(&context);
+        let mut module = Module::new(location);
+        let integer_type = IntegerType::new(&context, 64).into();
+        let ptr_type = r#type::opaque_pointer(&context);
+
+        module.body().append_operation(func::func(
+            &context,
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(FunctionType::new(&context, &[ptr_type], &[]).into()),
+            {
+                let block = Block::new(&[(ptr_type, location)]);
+
+                let index = block
+                    .append_operation(arith::constant(
+                        &context,
+                        IntegerAttribute::new(42, integer_type).into(),
+                        location,
+                    ))
+                    .result(0)
+                    .unwrap()
+                    .into();
+
+                block.append_operation(get_element_ptr_dynamic(
+                    &context,
+                    block.argument(0).unwrap().into(),
+                    DenseI32ArrayAttribute::new(&context, &[1 << 31]),
+                    index,
                     integer_type,
                     ptr_type,
                     location,
