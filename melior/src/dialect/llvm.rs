@@ -3,12 +3,27 @@
 use crate::{
     ir::{
         attribute::DenseI64ArrayAttribute, operation::OperationBuilder, Identifier, Location,
-        Operation, Value,
+        Operation, Type, Value,
     },
     Context,
 };
 
 pub mod r#type;
+
+/// Creates a `llvm.extractvalue` operation.
+pub fn extract_value<'c>(
+    context: &'c Context,
+    container: Value,
+    position: DenseI64ArrayAttribute<'c>,
+    result_type: Type<'c>,
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new("llvm.extractvalue", location)
+        .add_attributes(&[(Identifier::new(context, "position"), position.into())])
+        .add_operands(&[container])
+        .add_results(&[result_type])
+        .build()
+}
 
 /// Creates a `llvm.insertvalue` operation.
 pub fn insert_value<'c>(
@@ -55,6 +70,46 @@ mod tests {
 
         assert_eq!(pass_manager.run(module), Ok(()));
         assert!(module.as_operation().verify());
+    }
+
+    #[test]
+    fn compile_extract_value() {
+        let context = create_test_context();
+
+        let location = Location::unknown(&context);
+        let mut module = Module::new(location);
+        let integer_type = IntegerType::new(&context, 64).into();
+        let struct_type = r#type::r#struct(&context, &[integer_type], false);
+
+        module.body().append_operation(func::func(
+            &context,
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(FunctionType::new(&context, &[struct_type], &[]).into()),
+            {
+                let block = Block::new(&[(struct_type, location)]);
+
+                block.append_operation(extract_value(
+                    &context,
+                    block.argument(0).unwrap().into(),
+                    DenseI64ArrayAttribute::new(&context, &[0]),
+                    integer_type,
+                    location,
+                ));
+
+                block.append_operation(func::r#return(&[], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            &[],
+            location,
+        ));
+
+        convert_module(&context, &mut module);
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
     }
 
     #[test]
