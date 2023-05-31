@@ -67,7 +67,7 @@ impl From<&str> for StringRef<'static> {
     fn from(string: &str) -> Self {
         let entry = STRING_CACHE
             .entry(CString::new(string).unwrap())
-            .or_insert_with(|| ());
+            .or_insert_with(Default::default);
 
         unsafe {
             Self::from_raw(MlirStringRef {
