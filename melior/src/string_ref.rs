@@ -1,8 +1,7 @@
-use dashmap::DashSet;
-use mlir_sys::{mlirStringRefCreateFromCString, mlirStringRefEqual, MlirStringRef};
+use dashmap::DashMap;
+use mlir_sys::{mlirStringRefEqual, MlirStringRef};
 use once_cell::sync::Lazy;
 use std::{
-    ffi::CString,
     marker::PhantomData,
     slice,
     str::{self, Utf8Error},
@@ -10,7 +9,7 @@ use std::{
 
 // We need to pass null-terminated strings to functions in the MLIR API although
 // Rust's strings are not.
-static STRING_CACHE: Lazy<DashSet<String>> = Lazy::new(Default::default);
+static STRING_CACHE: Lazy<DashMap<String, String>> = Lazy::new(Default::default);
 
 /// A string reference.
 // https://mlir.llvm.org/docs/CAPI/#stringref
@@ -65,21 +64,15 @@ impl<'a> Eq for StringRef<'a> {}
 
 impl From<&str> for StringRef<'static> {
     fn from(string: &str) -> Self {
-        if STRING_CACHE.contains(string) {
-            let string = STRING_CACHE.get(string).unwrap();
-
-            return unsafe {
-                Self::from_raw(MlirStringRef {
-                    data: string.as_ptr() as *const i8,
-                    length: string.len(),
-                })
-            };
-        }
-
         let entry = STRING_CACHE
-            .get(string)
-            .or_insert_with(|| CString::new(string).unwrap());
-        unsafe { Self::from_raw(mlirStringRefCreateFromCString(entry.as_ptr())) }
+            .entry(string.to_owned())
+            .or_insert_with(|| string.to_owned());
+        unsafe {
+            Self::from_raw(MlirStringRef {
+                data: entry.as_ptr() as *const i8,
+                length: entry.len(),
+            })
+        }
     }
 }
 
