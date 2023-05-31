@@ -62,13 +62,15 @@ impl<'a> TryFrom<Value<'a>> for OperationResult<'a> {
 #[cfg(test)]
 mod tests {
     use crate::{
-        context::Context,
         ir::{operation::OperationBuilder, Block, Location, Type},
+        test::create_test_context,
     };
 
     #[test]
     fn result_number() {
-        let context = Context::new();
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
+
         let r#type = Type::parse(&context, "index").unwrap();
         let operation = OperationBuilder::new("foo", Location::unknown(&context))
             .add_results(&[r#type])
@@ -79,7 +81,7 @@ mod tests {
 
     #[test]
     fn owner() {
-        let context = Context::new();
+        let context = create_test_context();
         let r#type = Type::parse(&context, "index").unwrap();
         let block = Block::new(&[(r#type, Location::unknown(&context))]);
 

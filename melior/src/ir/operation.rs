@@ -289,17 +289,21 @@ mod tests {
     use crate::{
         context::Context,
         ir::{Block, Location},
+        test::create_test_context,
     };
     use pretty_assertions::assert_eq;
 
     #[test]
     fn new() {
-        OperationBuilder::new("foo", Location::unknown(&Context::new())).build();
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
+        OperationBuilder::new("foo", Location::unknown(&context)).build();
     }
 
     #[test]
     fn name() {
         let context = Context::new();
+        context.set_allow_unregistered_dialects(true);
 
         assert_eq!(
             OperationBuilder::new("foo", Location::unknown(&context),)
@@ -311,18 +315,21 @@ mod tests {
 
     #[test]
     fn block() {
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
         let block = Block::new(&[]);
-        let operation = block.append_operation(
-            OperationBuilder::new("foo", Location::unknown(&Context::new())).build(),
-        );
+        let operation = block
+            .append_operation(OperationBuilder::new("foo", Location::unknown(&context)).build());
 
         assert_eq!(operation.block().as_deref(), Some(&block));
     }
 
     #[test]
     fn block_none() {
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
         assert_eq!(
-            OperationBuilder::new("foo", Location::unknown(&Context::new()))
+            OperationBuilder::new("foo", Location::unknown(&context))
                 .build()
                 .block(),
             None
@@ -331,8 +338,10 @@ mod tests {
 
     #[test]
     fn result_error() {
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
         assert_eq!(
-            OperationBuilder::new("foo", Location::unknown(&Context::new()))
+            OperationBuilder::new("foo", Location::unknown(&context))
                 .build()
                 .result(0)
                 .unwrap_err(),
@@ -346,8 +355,10 @@ mod tests {
 
     #[test]
     fn region_none() {
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
         assert_eq!(
-            OperationBuilder::new("foo", Location::unknown(&Context::new()),)
+            OperationBuilder::new("foo", Location::unknown(&context),)
                 .build()
                 .region(0),
             Err(Error::PositionOutOfBounds {
@@ -360,7 +371,8 @@ mod tests {
 
     #[test]
     fn clone() {
-        let context = Context::new();
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
         let operation = OperationBuilder::new("foo", Location::unknown(&context)).build();
 
         let _ = operation.clone();
@@ -368,7 +380,8 @@ mod tests {
 
     #[test]
     fn display() {
-        let context = Context::new();
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
 
         assert_eq!(
             OperationBuilder::new("foo", Location::unknown(&context),)
@@ -380,7 +393,8 @@ mod tests {
 
     #[test]
     fn debug() {
-        let context = Context::new();
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
 
         assert_eq!(
             format!(
@@ -393,7 +407,8 @@ mod tests {
 
     #[test]
     fn to_string_with_flags() {
-        let context = Context::new();
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
 
         assert_eq!(
             OperationBuilder::new("foo", Location::unknown(&context))

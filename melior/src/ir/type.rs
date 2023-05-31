@@ -178,16 +178,19 @@ from_raw_subtypes!(
 
 #[cfg(test)]
 mod tests {
+    use crate::test::create_test_context;
+
     use super::*;
 
     #[test]
     fn new() {
-        Type::parse(&Context::new(), "f32");
+        let context = create_test_context();
+        Type::parse(&context, "f32");
     }
 
     #[test]
     fn integer() {
-        let context = Context::new();
+        let context = create_test_context();
 
         assert_eq!(
             Type::from(IntegerType::new(&context, 42)),
@@ -197,7 +200,7 @@ mod tests {
 
     #[test]
     fn index() {
-        let context = Context::new();
+        let context = create_test_context();
 
         assert_eq!(
             Type::index(&context),
@@ -207,7 +210,7 @@ mod tests {
 
     #[test]
     fn vector() {
-        let context = Context::new();
+        let context = create_test_context();
 
         assert_eq!(
             Type::vector(&[42], Type::float64(&context)),
@@ -216,8 +219,9 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "SIGABRT on llvm with assertions on"]
     fn vector_with_invalid_dimension() {
-        let context = Context::new();
+        let context = create_test_context();
 
         assert_eq!(
             Type::vector(&[0], IntegerType::new(&context, 32).into()).to_string(),
@@ -227,7 +231,7 @@ mod tests {
 
     #[test]
     fn vector_checked() {
-        let context = Context::new();
+        let context = create_test_context();
 
         assert_eq!(
             Type::vector_checked(
@@ -241,7 +245,7 @@ mod tests {
 
     #[test]
     fn vector_checked_fail() {
-        let context = Context::new();
+        let context = create_test_context();
 
         assert_eq!(
             Type::vector_checked(Location::unknown(&context), &[0], Type::index(&context)),
@@ -251,28 +255,28 @@ mod tests {
 
     #[test]
     fn equal() {
-        let context = Context::new();
+        let context = create_test_context();
 
         assert_eq!(Type::index(&context), Type::index(&context));
     }
 
     #[test]
     fn not_equal() {
-        let context = Context::new();
+        let context = create_test_context();
 
         assert_ne!(Type::index(&context), Type::float64(&context));
     }
 
     #[test]
     fn display() {
-        let context = Context::new();
+        let context = create_test_context();
 
         assert_eq!(Type::index(&context).to_string(), "index");
     }
 
     #[test]
     fn debug() {
-        let context = Context::new();
+        let context = create_test_context();
 
         assert_eq!(format!("{:?}", Type::index(&context)), "Type(index)");
     }

@@ -93,7 +93,10 @@ impl<'c> Drop for Module<'c> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ir::{operation::OperationBuilder, Block, Region};
+    use crate::{
+        ir::{operation::OperationBuilder, Block, Region},
+        test::create_test_context,
+    };
 
     #[test]
     fn new() {
@@ -117,7 +120,7 @@ mod tests {
 
     #[test]
     fn from_operation() {
-        let context = Context::new();
+        let context = create_test_context();
 
         let region = Region::new();
         region.append_block(Block::new(&[]));
@@ -135,7 +138,7 @@ mod tests {
 
     #[test]
     fn from_operation_fail() {
-        let context = Context::new();
+        let context = create_test_context();
 
         assert!(Module::from_operation(
             OperationBuilder::new("func.func", Location::unknown(&context),).build()

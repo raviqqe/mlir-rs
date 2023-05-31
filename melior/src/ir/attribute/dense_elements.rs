@@ -92,12 +92,12 @@ mod tests {
             attribute::IntegerAttribute,
             r#type::{IntegerType, MemRefType},
         },
-        Context,
+        test::create_test_context,
     };
 
     #[test]
     fn i32_element() {
-        let context = Context::new();
+        let context = create_test_context();
         let integer_type = IntegerType::new(&context, 32).into();
         let attribute = DenseElementsAttribute::new(
             MemRefType::new(integer_type, &[3], None, None).into(),
@@ -120,7 +120,7 @@ mod tests {
 
     #[test]
     fn i64_element() {
-        let context = Context::new();
+        let context = create_test_context();
         let integer_type = IntegerType::new(&context, 64).into();
         let attribute = DenseElementsAttribute::new(
             MemRefType::new(integer_type, &[3], None, None).into(),
@@ -143,7 +143,7 @@ mod tests {
 
     #[test]
     fn len() {
-        let context = Context::new();
+        let context = create_test_context();
         let integer_type = IntegerType::new(&context, 64).into();
         let attribute = DenseElementsAttribute::new(
             MemRefType::new(integer_type, &[3], None, None).into(),
