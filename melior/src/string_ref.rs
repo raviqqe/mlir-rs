@@ -1,5 +1,5 @@
 use dashmap::DashMap;
-use mlir_sys::{mlirStringRefEqual, MlirStringRef};
+use mlir_sys::{mlirStringRefCreateFromCString, mlirStringRefEqual, MlirStringRef};
 use once_cell::sync::Lazy;
 use std::{
     ffi::CString,
@@ -69,12 +69,7 @@ impl From<&str> for StringRef<'static> {
             .entry(CString::new(string).unwrap())
             .or_insert_with(Default::default);
 
-        unsafe {
-            Self::from_raw(MlirStringRef {
-                data: entry.key().as_ptr() as *const i8,
-                length: entry.key().to_bytes().len(),
-            })
-        }
+        unsafe { Self::from_raw(mlirStringRefCreateFromCString(entry.key().as_ptr())) }
     }
 }
 
