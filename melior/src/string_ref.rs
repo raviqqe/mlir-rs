@@ -2,6 +2,7 @@ use dashmap::DashMap;
 use mlir_sys::{mlirStringRefEqual, MlirStringRef};
 use once_cell::sync::Lazy;
 use std::{
+    ffi::CString,
     marker::PhantomData,
     slice,
     str::{self, Utf8Error},
@@ -9,7 +10,7 @@ use std::{
 
 // We need to pass null-terminated strings to functions in the MLIR API although
 // Rust's strings are not.
-static STRING_CACHE: Lazy<DashMap<String, ()>> = Lazy::new(Default::default);
+static STRING_CACHE: Lazy<DashMap<CString, ()>> = Lazy::new(Default::default);
 
 /// A string reference.
 // https://mlir.llvm.org/docs/CAPI/#stringref
@@ -64,12 +65,14 @@ impl<'a> Eq for StringRef<'a> {}
 
 impl From<&str> for StringRef<'static> {
     fn from(string: &str) -> Self {
-        let entry = STRING_CACHE.entry(string.to_owned()).or_insert_with(|| ());
+        let entry = STRING_CACHE
+            .entry(CString::new(string).unwrap())
+            .or_insert_with(|| ());
 
         unsafe {
             Self::from_raw(MlirStringRef {
                 data: entry.key().as_ptr() as *const i8,
-                length: entry.key().len(),
+                length: entry.key().to_bytes().len(),
             })
         }
     }
