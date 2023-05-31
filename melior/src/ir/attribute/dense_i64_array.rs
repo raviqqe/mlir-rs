@@ -1,7 +1,7 @@
 use super::{Attribute, AttributeLike};
 use crate::{Context, Error};
 use mlir_sys::{
-    mlirArrayAttrGetNumElements, mlirDenseI64ArrayGet, mlirDenseI64ArrayGetElement, MlirAttribute,
+    mlirDenseArrayGetNumElements, mlirDenseI64ArrayGet, mlirDenseI64ArrayGetElement, MlirAttribute,
 };
 
 /// A dense i64 array attribute.
@@ -24,7 +24,7 @@ impl<'c> DenseI64ArrayAttribute<'c> {
 
     /// Gets a length.
     pub fn len(&self) -> usize {
-        (unsafe { mlirArrayAttrGetNumElements(self.attribute.to_raw()) }) as usize
+        (unsafe { mlirDenseArrayGetNumElements(self.attribute.to_raw()) }) as usize
     }
 
     /// Checks if an array is empty.
