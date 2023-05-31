@@ -2,9 +2,12 @@
 
 use crate::{
     ir::{
-        attribute::{DenseI32ArrayAttribute, DenseI64ArrayAttribute, TypeAttribute},
+        attribute::{
+            ArrayAttribute, DenseI32ArrayAttribute, DenseI64ArrayAttribute, IntegerAttribute,
+            TypeAttribute,
+        },
         operation::OperationBuilder,
-        Identifier, Location, Operation, Type, Value,
+        Attribute, Identifier, Location, Operation, Type, Value,
     },
     Context,
 };
@@ -98,6 +101,102 @@ pub fn insert_value<'c>(
 pub fn undef<'c>(result_type: Type<'c>, location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("llvm.undef", location)
         .add_results(&[result_type])
+        .build()
+}
+
+#[derive(Debug, Default)]
+pub struct LoadStoreOptions<'c> {
+    pub align: Option<IntegerAttribute<'c>>,
+    pub volatile: bool,
+    pub nontemporal: bool,
+    pub access_groups: Option<ArrayAttribute<'c>>,
+    pub alias_scopes: Option<ArrayAttribute<'c>>,
+    pub noalias_scopes: Option<ArrayAttribute<'c>>,
+    pub tbaa: Option<ArrayAttribute<'c>>,
+}
+
+impl<'c> LoadStoreOptions<'c> {
+    pub fn fill_attributes(
+        &self,
+        context: &'c Context,
+        attributes: &mut Vec<(Identifier<'c>, Attribute<'c>)>,
+    ) {
+        if let Some(align) = self.align {
+            attributes.push((Identifier::new(context, "alignment"), align.into()));
+        }
+
+        if self.volatile {
+            attributes.push((
+                Identifier::new(context, "volatile_"),
+                Attribute::unit(context),
+            ));
+        }
+
+        if self.nontemporal {
+            attributes.push((
+                Identifier::new(context, "nontemporal"),
+                Attribute::unit(context),
+            ));
+        }
+
+        if let Some(alias_scopes) = self.alias_scopes {
+            attributes.push((
+                Identifier::new(context, "alias_scopes"),
+                alias_scopes.into(),
+            ));
+        }
+
+        if let Some(noalias_scopes) = self.noalias_scopes {
+            attributes.push((
+                Identifier::new(context, "noalias_scopes"),
+                noalias_scopes.into(),
+            ));
+        }
+
+        if let Some(tbaa) = self.tbaa {
+            attributes.push((Identifier::new(context, "tbaa"), tbaa.into()));
+        }
+    }
+}
+
+/// Creates a `llvm.store` operation.
+pub fn store<'c>(
+    context: &'c Context,
+    value: Value,
+    addr: Value,
+    location: Location<'c>,
+    extra_options: Option<LoadStoreOptions<'c>>,
+) -> Operation<'c> {
+    let mut attributes = vec![];
+
+    if let Some(extra_options) = extra_options {
+        extra_options.fill_attributes(context, &mut attributes);
+    }
+
+    OperationBuilder::new("llvm.store", location)
+        .add_operands(&[value, addr])
+        .add_attributes(&attributes)
+        .build()
+}
+
+// Creates a `llvm.load` operation.
+pub fn load<'c>(
+    context: &'c Context,
+    addr: Value,
+    r#type: Type<'c>,
+    location: Location<'c>,
+    extra_options: Option<LoadStoreOptions<'c>>,
+) -> Operation<'c> {
+    let mut attributes = vec![];
+
+    if let Some(extra_options) = extra_options {
+        extra_options.fill_attributes(context, &mut attributes);
+    }
+
+    OperationBuilder::new("llvm.load", location)
+        .add_operands(&[addr])
+        .add_attributes(&attributes)
+        .add_results(&[r#type])
         .build()
 }
 
@@ -331,6 +430,134 @@ mod tests {
                 let block = Block::new(&[(struct_type, location)]);
 
                 block.append_operation(undef(struct_type, location));
+
+                block.append_operation(func::r#return(&[], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            &[],
+            location,
+        ));
+
+        convert_module(&context, &mut module);
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
+    fn compile_store() {
+        let context = create_test_context();
+
+        let location = Location::unknown(&context);
+        let mut module = Module::new(location);
+        let integer_type = IntegerType::new(&context, 64).into();
+        let ptr_type = r#type::opaque_pointer(&context);
+
+        module.body().append_operation(func::func(
+            &context,
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(FunctionType::new(&context, &[ptr_type, integer_type], &[]).into()),
+            {
+                let block = Block::new(&[(ptr_type, location), (integer_type, location)]);
+
+                block.append_operation(store(
+                    &context,
+                    block.argument(1).unwrap().into(),
+                    block.argument(0).unwrap().into(),
+                    location,
+                    None,
+                ));
+
+                block.append_operation(func::r#return(&[], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            &[],
+            location,
+        ));
+
+        convert_module(&context, &mut module);
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
+    fn compile_load() {
+        let context = create_test_context();
+
+        let location = Location::unknown(&context);
+        let mut module = Module::new(location);
+        let integer_type = IntegerType::new(&context, 64).into();
+        let ptr_type = r#type::opaque_pointer(&context);
+
+        module.body().append_operation(func::func(
+            &context,
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(FunctionType::new(&context, &[ptr_type], &[]).into()),
+            {
+                let block = Block::new(&[(ptr_type, location)]);
+
+                block.append_operation(load(
+                    &context,
+                    block.argument(0).unwrap().into(),
+                    integer_type,
+                    location,
+                    None,
+                ));
+
+                block.append_operation(func::r#return(&[], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            &[],
+            location,
+        ));
+
+        convert_module(&context, &mut module);
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
+    fn compile_store_extra() {
+        let context = create_test_context();
+
+        let location = Location::unknown(&context);
+        let mut module = Module::new(location);
+        let integer_type = IntegerType::new(&context, 64).into();
+        let ptr_type = r#type::opaque_pointer(&context);
+
+        module.body().append_operation(func::func(
+            &context,
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(FunctionType::new(&context, &[ptr_type, integer_type], &[]).into()),
+            {
+                let block = Block::new(&[(ptr_type, location), (integer_type, location)]);
+
+                block.append_operation(store(
+                    &context,
+                    block.argument(1).unwrap().into(),
+                    block.argument(0).unwrap().into(),
+                    location,
+                    Some(LoadStoreOptions {
+                        align: Some(IntegerAttribute::new(4, integer_type)),
+                        volatile: true,
+                        nontemporal: true,
+                        access_groups: None,
+                        alias_scopes: None,
+                        noalias_scopes: None,
+                        tbaa: None,
+                    }),
+                ));
 
                 block.append_operation(func::r#return(&[], location));
 
