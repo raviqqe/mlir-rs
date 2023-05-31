@@ -9,7 +9,7 @@ use std::{
 
 // We need to pass null-terminated strings to functions in the MLIR API although
 // Rust's strings are not.
-static STRING_CACHE: Lazy<DashMap<String, String>> = Lazy::new(Default::default);
+static STRING_CACHE: Lazy<DashMap<String, ()>> = Lazy::new(Default::default);
 
 /// A string reference.
 // https://mlir.llvm.org/docs/CAPI/#stringref
@@ -64,13 +64,12 @@ impl<'a> Eq for StringRef<'a> {}
 
 impl From<&str> for StringRef<'static> {
     fn from(string: &str) -> Self {
-        let entry = STRING_CACHE
-            .entry(string.to_owned())
-            .or_insert_with(|| string.to_owned());
+        let entry = STRING_CACHE.entry(string.to_owned()).or_insert_with(|| ());
+
         unsafe {
             Self::from_raw(MlirStringRef {
-                data: entry.as_ptr() as *const i8,
-                length: entry.len(),
+                data: entry.key().as_ptr() as *const i8,
+                length: entry.key().len(),
             })
         }
     }
