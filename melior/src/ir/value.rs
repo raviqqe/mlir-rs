@@ -185,6 +185,7 @@ mod tests {
     #[test]
     fn display_with_unregistered_dialect() {
         let context = Context::new();
+        context.set_allow_unregistered_dialects(true);
 
         let location = Location::unknown(&context);
         let index_type = Type::index(&context);
