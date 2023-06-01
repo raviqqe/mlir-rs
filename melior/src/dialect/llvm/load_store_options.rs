@@ -24,6 +24,8 @@ impl<'c> LoadStoreOptions<'c> {
         Self::default()
     }
 
+    // spell-checker: disable
+
     /// Sets an alignment.
     pub fn align(mut self, align: Option<IntegerAttribute<'c>>) -> Self {
         self.align = align;
