@@ -561,9 +561,9 @@ mod tests {
                     block.argument(0).unwrap().into(),
                     location,
                     LoadStoreOptions::new()
-                        .set_align(IntegerAttribute::new(4, integer_type))
-                        .set_volatile()
-                        .set_nontemporal(),
+                        .align(Some(IntegerAttribute::new(4, integer_type)))
+                        .volatile(true)
+                        .nontemporal(true),
                 ));
 
                 block.append_operation(func::r#return(&[], location));

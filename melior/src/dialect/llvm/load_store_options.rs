@@ -25,38 +25,38 @@ impl<'c> LoadStoreOptions<'c> {
     }
 
     /// Sets an alignment.
-    pub fn align(mut self, align: IntegerAttribute<'c>) -> Self {
-        self.align = Some(align);
+    pub fn align(mut self, align: Option<IntegerAttribute<'c>>) -> Self {
+        self.align = align;
         self
     }
 
     /// Sets a volatile flag.
-    pub fn volatile(mut self) -> Self {
-        self.volatile = true;
+    pub fn volatile(mut self, volatile: bool) -> Self {
+        self.volatile = volatile;
         self
     }
 
     /// Sets a nontemporal flag.
-    pub fn nontemporal(mut self) -> Self {
-        self.nontemporal = true;
+    pub fn nontemporal(mut self, nontemporal: bool) -> Self {
+        self.nontemporal = nontemporal;
         self
     }
 
     /// Sets access groups.
-    pub fn access_groups(mut self, access_groups: ArrayAttribute<'c>) -> Self {
-        self.access_groups = Some(access_groups);
+    pub fn access_groups(mut self, access_groups: Option<ArrayAttribute<'c>>) -> Self {
+        self.access_groups = access_groups;
         self
     }
 
     /// Sets alias scopes.
-    pub fn alias_scopes(mut self, alias_scopes: ArrayAttribute<'c>) -> Self {
-        self.alias_scopes = Some(alias_scopes);
+    pub fn alias_scopes(mut self, alias_scopes: Option<ArrayAttribute<'c>>) -> Self {
+        self.alias_scopes = alias_scopes;
         self
     }
 
     /// Sets noalias scopes.
-    pub fn nonalias_scopes(mut self, noalias_scopes: ArrayAttribute<'c>) -> Self {
-        self.noalias_scopes = Some(noalias_scopes);
+    pub fn nonalias_scopes(mut self, noalias_scopes: Option<ArrayAttribute<'c>>) -> Self {
+        self.noalias_scopes = noalias_scopes;
         self
     }
 
