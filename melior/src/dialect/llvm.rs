@@ -456,7 +456,7 @@ mod tests {
                     block.argument(1).unwrap().into(),
                     block.argument(0).unwrap().into(),
                     location,
-                    None,
+                    Default::default(),
                 ));
 
                 block.append_operation(func::r#return(&[], location));
@@ -496,7 +496,7 @@ mod tests {
                     block.argument(0).unwrap().into(),
                     integer_type,
                     location,
-                    None,
+                    Default::default(),
                 ));
 
                 block.append_operation(func::r#return(&[], location));
@@ -536,7 +536,7 @@ mod tests {
                     block.argument(1).unwrap().into(),
                     block.argument(0).unwrap().into(),
                     location,
-                    Some(LoadStoreOptions {
+                    LoadStoreOptions {
                         align: Some(IntegerAttribute::new(4, integer_type)),
                         volatile: true,
                         nontemporal: true,
@@ -544,7 +544,7 @@ mod tests {
                         alias_scopes: None,
                         noalias_scopes: None,
                         tbaa: None,
-                    }),
+                    },
                 ));
 
                 block.append_operation(func::r#return(&[], location));
