@@ -6,6 +6,7 @@ use crate::{
     Context,
 };
 
+/// Load/store operation options.
 #[derive(Debug, Default)]
 pub struct LoadStoreOptions<'c> {
     align: Option<IntegerAttribute<'c>>,
@@ -18,40 +19,48 @@ pub struct LoadStoreOptions<'c> {
 }
 
 impl<'c> LoadStoreOptions<'c> {
+    /// Creates load/store options.
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// Sets an alignment.
     pub fn align(mut self, align: IntegerAttribute<'c>) -> Self {
         self.align = Some(align);
         self
     }
 
+    /// Sets a volatile flag.
     pub fn volatile(mut self) -> Self {
         self.volatile = true;
         self
     }
 
+    /// Sets a nontemporal flag.
     pub fn nontemporal(mut self) -> Self {
         self.nontemporal = true;
         self
     }
 
+    /// Sets access groups.
     pub fn access_groups(mut self, access_groups: ArrayAttribute<'c>) -> Self {
         self.access_groups = Some(access_groups);
         self
     }
 
+    /// Sets alias scopes.
     pub fn alias_scopes(mut self, alias_scopes: ArrayAttribute<'c>) -> Self {
         self.alias_scopes = Some(alias_scopes);
         self
     }
 
+    /// Sets noalias scopes.
     pub fn nonalias_scopes(mut self, noalias_scopes: ArrayAttribute<'c>) -> Self {
         self.noalias_scopes = Some(noalias_scopes);
         self
     }
 
+    /// Sets tbaa.
     pub fn tbaa(mut self, tbaa: ArrayAttribute<'c>) -> Self {
         self.tbaa = Some(tbaa);
         self
