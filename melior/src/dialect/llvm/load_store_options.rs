@@ -6,7 +6,7 @@ use crate::{
     Context,
 };
 
-/// Load/store operation options.
+/// Load/store options.
 #[derive(Debug, Default)]
 pub struct LoadStoreOptions<'c> {
     align: Option<IntegerAttribute<'c>>,
@@ -87,6 +87,13 @@ impl<'c> LoadStoreOptions<'c> {
             attributes.push((
                 Identifier::new(context, "nontemporal"),
                 Attribute::unit(context),
+            ));
+        }
+
+        if let Some(access_groups) = self.access_groups {
+            attributes.push((
+                Identifier::new(context, "access_groups"),
+                access_groups.into(),
             ));
         }
 
