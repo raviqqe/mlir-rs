@@ -80,7 +80,7 @@ impl<'c> Location<'c> {
     }
 
     /// Converts a location into a raw object.
-    pub fn to_raw(self) -> MlirLocation {
+    pub const fn to_raw(self) -> MlirLocation {
         self.raw
     }
 }

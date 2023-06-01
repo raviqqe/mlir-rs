@@ -15,7 +15,7 @@ impl DialectRegistry {
     }
 
     /// Converts a dialect registry into a raw object.
-    pub fn to_raw(&self) -> MlirDialectRegistry {
+    pub const fn to_raw(&self) -> MlirDialectRegistry {
         self.raw
     }
 }

@@ -18,7 +18,7 @@ impl TypeId {
     /// # Safety
     ///
     /// A raw object must be valid.
-    pub unsafe fn from_raw(raw: MlirTypeID) -> Self {
+    pub const unsafe fn from_raw(raw: MlirTypeID) -> Self {
         Self { raw }
     }
 }

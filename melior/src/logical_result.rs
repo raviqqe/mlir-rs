@@ -2,43 +2,43 @@ use mlir_sys::MlirLogicalResult;
 
 /// A logical result of success or failure.
 #[derive(Clone, Copy, Debug)]
-pub(crate) struct LogicalResult {
+pub struct LogicalResult {
     raw: MlirLogicalResult,
 }
 
 impl LogicalResult {
     /// Creates a success result.
-    pub fn success() -> Self {
+    pub const fn success() -> Self {
         Self {
             raw: MlirLogicalResult { value: 1 },
         }
     }
 
     /// Creates a failure result.
-    pub fn failure() -> Self {
+    pub const fn failure() -> Self {
         Self {
             raw: MlirLogicalResult { value: 0 },
         }
     }
 
     /// Returns `true` if a result is success.
-    pub fn is_success(&self) -> bool {
+    pub const fn is_success(&self) -> bool {
         self.raw.value != 0
     }
 
     /// Returns `true` if a result is failure.
     #[allow(dead_code)]
-    pub fn is_failure(&self) -> bool {
+    pub const fn is_failure(&self) -> bool {
         self.raw.value == 0
     }
 
     /// Creates a logical result from a raw object.
-    pub fn from_raw(result: MlirLogicalResult) -> Self {
+    pub const fn from_raw(result: MlirLogicalResult) -> Self {
         Self { raw: result }
     }
 
     /// Converts a logical result into a raw object.
-    pub fn to_raw(self) -> MlirLogicalResult {
+    pub const fn to_raw(self) -> MlirLogicalResult {
         self.raw
     }
 }

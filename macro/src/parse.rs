@@ -32,7 +32,7 @@ pub struct DialectOperationSet {
 }
 
 impl DialectOperationSet {
-    pub fn dialect(&self) -> &Ident {
+    pub const fn dialect(&self) -> &Ident {
         &self.dialect
     }
 

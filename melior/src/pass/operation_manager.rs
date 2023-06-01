@@ -35,7 +35,7 @@ impl<'a> OperationPassManager<'a> {
     }
 
     /// Converts an operation pass manager into a raw object.
-    pub fn to_raw(self) -> MlirOpPassManager {
+    pub const fn to_raw(self) -> MlirOpPassManager {
         self.raw
     }
 

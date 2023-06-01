@@ -38,7 +38,7 @@ impl<'a> StringRef<'a> {
     }
 
     /// Converts a string reference into a raw object.
-    pub fn to_raw(self) -> MlirStringRef {
+    pub const fn to_raw(self) -> MlirStringRef {
         self.raw
     }
 

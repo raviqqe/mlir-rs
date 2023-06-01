@@ -49,7 +49,7 @@ impl<'c> Identifier<'c> {
     }
 
     /// Converts a location into a raw object.
-    pub fn to_raw(self) -> MlirIdentifier {
+    pub const fn to_raw(self) -> MlirIdentifier {
         self.raw
     }
 }

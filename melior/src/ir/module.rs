@@ -79,7 +79,7 @@ impl<'c> Module<'c> {
     }
 
     /// Converts a module into a raw object.
-    pub fn to_raw(&self) -> MlirModule {
+    pub const fn to_raw(&self) -> MlirModule {
         self.raw
     }
 }

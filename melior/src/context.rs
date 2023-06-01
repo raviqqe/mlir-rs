@@ -82,7 +82,7 @@ impl Context {
     }
 
     /// Converts a context into a raw object.
-    pub fn to_raw(&self) -> MlirContext {
+    pub const fn to_raw(&self) -> MlirContext {
         self.raw
     }
 

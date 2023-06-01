@@ -225,7 +225,7 @@ impl<'a> OperationRef<'a> {
     }
 
     /// Converts an operation reference into a raw object.
-    pub fn to_raw(self) -> MlirOperation {
+    pub const fn to_raw(self) -> MlirOperation {
         self.raw
     }
 

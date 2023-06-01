@@ -30,7 +30,7 @@ impl Pass {
     }
 
     /// Converts a pass into a raw object.
-    pub fn to_raw(&self) -> MlirPass {
+    pub const fn to_raw(&self) -> MlirPass {
         self.raw
     }
 
