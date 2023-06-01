@@ -560,15 +560,10 @@ mod tests {
                     block.argument(1).unwrap().into(),
                     block.argument(0).unwrap().into(),
                     location,
-                    LoadStoreOptions {
-                        align: Some(IntegerAttribute::new(4, integer_type)),
-                        volatile: true,
-                        nontemporal: true,
-                        access_groups: None,
-                        alias_scopes: None,
-                        noalias_scopes: None,
-                        tbaa: None,
-                    },
+                    LoadStoreOptions::new()
+                        .set_align(IntegerAttribute::new(4, integer_type))
+                        .set_volatile()
+                        .set_nontemporal(),
                 ));
 
                 block.append_operation(func::r#return(&[], location));
