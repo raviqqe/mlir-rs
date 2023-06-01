@@ -97,9 +97,16 @@ pub fn insert_value<'c>(
         .build()
 }
 
-/// Creates a `llvm.undef` operation.
+/// Creates a `llvm.mlir.undef` operation.
 pub fn undef<'c>(result_type: Type<'c>, location: Location<'c>) -> Operation<'c> {
-    OperationBuilder::new("llvm.undef", location)
+    OperationBuilder::new("llvm.mlir.undef", location)
+        .add_results(&[result_type])
+        .build()
+}
+
+/// Creates a `llvm.mlir.poison` operation.
+pub fn poison<'c>(result_type: Type<'c>, location: Location<'c>) -> Operation<'c> {
+    OperationBuilder::new("llvm.mlir.poison", location)
         .add_results(&[result_type])
         .build()
 }
@@ -173,7 +180,7 @@ pub fn store<'c>(
         .build()
 }
 
-// Creates a `llvm.load` operation.
+/// Creates a `llvm.load` operation.
 pub fn load<'c>(
     context: &'c Context,
     addr: Value,
@@ -418,6 +425,40 @@ mod tests {
                 let block = Block::new(&[(struct_type, location)]);
 
                 block.append_operation(undef(struct_type, location));
+
+                block.append_operation(func::r#return(&[], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            &[],
+            location,
+        ));
+
+        convert_module(&context, &mut module);
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
+    fn compile_poison() {
+        let context = create_test_context();
+
+        let location = Location::unknown(&context);
+        let mut module = Module::new(location);
+        let struct_type =
+            r#type::r#struct(&context, &[IntegerType::new(&context, 64).into()], false);
+
+        module.body().append_operation(func::func(
+            &context,
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(FunctionType::new(&context, &[struct_type], &[]).into()),
+            {
+                let block = Block::new(&[(struct_type, location)]);
+
+                block.append_operation(poison(struct_type, location));
 
                 block.append_operation(func::r#return(&[], location));
 
