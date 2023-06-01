@@ -477,7 +477,7 @@ dependencies = [
 
 [[package]]
 name = "melior"
-version = "0.8.5"
+version = "0.8.7"
 dependencies = [
  "criterion",
  "dashmap",
@@ -491,7 +491,7 @@ dependencies = [
 
 [[package]]
 name = "melior-macro"
-version = "0.3.3"
+version = "0.3.5"
 dependencies = [
  "convert_case",
  "melior",
