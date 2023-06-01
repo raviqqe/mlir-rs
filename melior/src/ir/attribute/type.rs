@@ -28,11 +28,11 @@ attribute_traits!(TypeAttribute, is_type, "type");
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::Context;
+    use crate::test::create_test_context;
 
     #[test]
     fn value() {
-        let context = Context::new();
+        let context = create_test_context();
         let r#type = Type::index(&context);
 
         assert_eq!(TypeAttribute::new(r#type).value(), r#type);

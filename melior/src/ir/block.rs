@@ -315,7 +315,7 @@ mod tests {
     use super::*;
     use crate::{
         ir::{operation::OperationBuilder, r#type::IntegerType, Module, Region, ValueLike},
-        test::load_all_dialects,
+        test::create_test_context,
     };
     use pretty_assertions::assert_eq;
 
@@ -326,7 +326,7 @@ mod tests {
 
     #[test]
     fn argument() {
-        let context = Context::new();
+        let context = create_test_context();
         let r#type = IntegerType::new(&context, 64).into();
 
         assert_eq!(
@@ -372,7 +372,7 @@ mod tests {
 
     #[test]
     fn parent_operation() {
-        let context = Context::new();
+        let context = create_test_context();
         let module = Module::new(Location::unknown(&context));
 
         assert_eq!(
@@ -390,8 +390,7 @@ mod tests {
 
     #[test]
     fn terminator() {
-        let context = Context::new();
-        load_all_dialects(&context);
+        let context = create_test_context();
 
         let block = Block::new(&[]);
 
@@ -409,7 +408,8 @@ mod tests {
 
     #[test]
     fn first_operation() {
-        let context = Context::new();
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
         let block = Block::new(&[]);
 
         let operation = block
@@ -427,7 +427,8 @@ mod tests {
 
     #[test]
     fn append_operation() {
-        let context = Context::new();
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
         let block = Block::new(&[]);
 
         block.append_operation(OperationBuilder::new("foo", Location::unknown(&context)).build());
@@ -435,7 +436,8 @@ mod tests {
 
     #[test]
     fn insert_operation() {
-        let context = Context::new();
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
         let block = Block::new(&[]);
 
         block.insert_operation(
@@ -446,7 +448,8 @@ mod tests {
 
     #[test]
     fn insert_operation_after() {
-        let context = Context::new();
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
         let block = Block::new(&[]);
 
         let first_operation = block
@@ -465,7 +468,8 @@ mod tests {
 
     #[test]
     fn insert_operation_before() {
-        let context = Context::new();
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
         let block = Block::new(&[]);
 
         let second_operation = block

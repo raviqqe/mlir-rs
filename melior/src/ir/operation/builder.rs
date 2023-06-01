@@ -129,16 +129,20 @@ impl<'c> OperationBuilder<'c> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{context::Context, ir::Block, test::load_all_dialects};
+    use crate::{ir::Block, test::create_test_context};
 
     #[test]
     fn new() {
-        OperationBuilder::new("foo", Location::unknown(&Context::new())).build();
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
+
+        OperationBuilder::new("foo", Location::unknown(&context)).build();
     }
 
     #[test]
     fn add_results() {
-        let context = Context::new();
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
 
         OperationBuilder::new("foo", Location::unknown(&context))
             .add_results(&[Type::parse(&context, "i1").unwrap()])
@@ -147,7 +151,8 @@ mod tests {
 
     #[test]
     fn add_regions() {
-        let context = Context::new();
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
 
         OperationBuilder::new("foo", Location::unknown(&context))
             .add_regions(vec![Region::new()])
@@ -156,7 +161,8 @@ mod tests {
 
     #[test]
     fn add_successors() {
-        let context = Context::new();
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
 
         OperationBuilder::new("foo", Location::unknown(&context))
             .add_successors(&[&Block::new(&[])])
@@ -165,7 +171,8 @@ mod tests {
 
     #[test]
     fn add_attributes() {
-        let context = Context::new();
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
 
         OperationBuilder::new("foo", Location::unknown(&context))
             .add_attributes(&[(
@@ -177,8 +184,8 @@ mod tests {
 
     #[test]
     fn enable_result_type_inference() {
-        let context = Context::new();
-        load_all_dialects(&context);
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
 
         let location = Location::unknown(&context);
         let r#type = Type::index(&context);

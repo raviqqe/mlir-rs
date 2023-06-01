@@ -1,7 +1,7 @@
 use super::{Attribute, AttributeLike};
 use crate::{Context, Error};
 use mlir_sys::{
-    mlirArrayAttrGetNumElements, mlirDenseI64ArrayGet, mlirDenseI64ArrayGetElement, MlirAttribute,
+    mlirDenseArrayGetNumElements, mlirDenseI64ArrayGet, mlirDenseI64ArrayGetElement, MlirAttribute,
 };
 
 /// A dense i64 array attribute.
@@ -24,7 +24,7 @@ impl<'c> DenseI64ArrayAttribute<'c> {
 
     /// Gets a length.
     pub fn len(&self) -> usize {
-        (unsafe { mlirArrayAttrGetNumElements(self.attribute.to_raw()) }) as usize
+        (unsafe { mlirDenseArrayGetNumElements(self.attribute.to_raw()) }) as usize
     }
 
     /// Checks if an array is empty.
@@ -54,11 +54,13 @@ attribute_traits!(
 
 #[cfg(test)]
 mod tests {
+    use crate::test::create_test_context;
+
     use super::*;
 
     #[test]
     fn element() {
-        let context = Context::new();
+        let context = create_test_context();
         let attribute = DenseI64ArrayAttribute::new(&context, &[1, 2, 3]);
 
         assert_eq!(attribute.element(0).unwrap(), 1);
@@ -72,7 +74,7 @@ mod tests {
 
     #[test]
     fn len() {
-        let context = Context::new();
+        let context = create_test_context();
         let attribute = DenseI64ArrayAttribute::new(&context, &[1, 2, 3]);
 
         assert_eq!(attribute.len(), 3);

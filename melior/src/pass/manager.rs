@@ -80,37 +80,31 @@ impl<'c> Drop for PassManager<'c> {
 mod tests {
     use super::*;
     use crate::{
-        dialect::DialectRegistry,
         ir::{Location, Module},
         pass::{self, transform::register_print_op_stats},
-        utility::{parse_pass_pipeline, register_all_dialects},
+        test::create_test_context,
+        utility::parse_pass_pipeline,
     };
     use indoc::indoc;
     use pretty_assertions::assert_eq;
 
-    fn register_all_upstream_dialects(context: &Context) {
-        let registry = DialectRegistry::new();
-        register_all_dialects(&registry);
-        context.append_dialect_registry(&registry);
-    }
-
     #[test]
     fn new() {
-        let context = Context::new();
+        let context = create_test_context();
 
         PassManager::new(&context);
     }
 
     #[test]
     fn add_pass() {
-        let context = Context::new();
+        let context = create_test_context();
 
         PassManager::new(&context).add_pass(pass::conversion::create_func_to_llvm());
     }
 
     #[test]
     fn enable_verifier() {
-        let context = Context::new();
+        let context = create_test_context();
 
         PassManager::new(&context).enable_verifier(true);
     }
@@ -125,7 +119,7 @@ mod tests {
 
     #[test]
     fn run() {
-        let context = Context::new();
+        let context = create_test_context();
         let manager = PassManager::new(&context);
 
         manager.add_pass(pass::conversion::create_func_to_llvm());
@@ -136,8 +130,7 @@ mod tests {
 
     #[test]
     fn run_on_function() {
-        let context = Context::new();
-        register_all_upstream_dialects(&context);
+        let context = create_test_context();
 
         let mut module = Module::parse(
             &context,
@@ -160,8 +153,7 @@ mod tests {
 
     #[test]
     fn run_on_function_in_nested_module() {
-        let context = Context::new();
-        register_all_upstream_dialects(&context);
+        let context = create_test_context();
 
         let mut module = Module::parse(
             &context,
@@ -201,7 +193,7 @@ mod tests {
 
     #[test]
     fn print_pass_pipeline() {
-        let context = Context::new();
+        let context = create_test_context();
         let manager = PassManager::new(&context);
         let function_manager = manager.nested_under("func.func");
 

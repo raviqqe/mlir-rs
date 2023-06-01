@@ -79,13 +79,12 @@ mod tests {
     use super::*;
     use crate::{
         ir::{Block, Module, Type},
-        test::load_all_dialects,
+        test::create_test_context,
     };
 
     #[test]
     fn compile_call() {
-        let context = Context::new();
-        load_all_dialects(&context);
+        let context = create_test_context();
 
         let location = Location::unknown(&context);
         let module = Module::new(location);
@@ -122,8 +121,7 @@ mod tests {
 
     #[test]
     fn compile_call_indirect() {
-        let context = Context::new();
-        load_all_dialects(&context);
+        let context = create_test_context();
 
         let location = Location::unknown(&context);
         let module = Module::new(location);
@@ -165,8 +163,7 @@ mod tests {
 
     #[test]
     fn compile_function() {
-        let context = Context::new();
-        load_all_dialects(&context);
+        let context = create_test_context();
 
         let location = Location::unknown(&context);
         let module = Module::new(location);

@@ -77,14 +77,13 @@ from_raw_subtypes!(Value, BlockArgument, OperationResult);
 mod tests {
     use super::*;
     use crate::{
-        context::Context,
         ir::{operation::OperationBuilder, Attribute, Block, Identifier, Location},
-        test::load_all_dialects,
+        test::create_test_context,
     };
 
     #[test]
     fn r#type() {
-        let context = Context::new();
+        let context = create_test_context();
         let location = Location::unknown(&context);
         let index_type = Type::index(&context);
 
@@ -101,7 +100,7 @@ mod tests {
 
     #[test]
     fn is_operation_result() {
-        let context = Context::new();
+        let context = create_test_context();
         let location = Location::unknown(&context);
         let r#type = Type::index(&context);
 
@@ -118,7 +117,7 @@ mod tests {
 
     #[test]
     fn is_block_argument() {
-        let context = Context::new();
+        let context = create_test_context();
         let r#type = Type::index(&context);
         let block = Block::new(&[(r#type, Location::unknown(&context))]);
 
@@ -127,7 +126,7 @@ mod tests {
 
     #[test]
     fn dump() {
-        let context = Context::new();
+        let context = create_test_context();
         let location = Location::unknown(&context);
         let index_type = Type::index(&context);
 
@@ -144,7 +143,7 @@ mod tests {
 
     #[test]
     fn equal() {
-        let context = Context::new();
+        let context = create_test_context();
         let location = Location::unknown(&context);
         let index_type = Type::index(&context);
 
@@ -162,7 +161,7 @@ mod tests {
 
     #[test]
     fn not_equal() {
-        let context = Context::new();
+        let context = create_test_context();
         let location = Location::unknown(&context);
         let index_type = Type::index(&context);
 
@@ -184,7 +183,7 @@ mod tests {
 
     #[test]
     fn display() {
-        let context = Context::new();
+        let context = create_test_context();
 
         let location = Location::unknown(&context);
         let index_type = Type::index(&context);
@@ -199,14 +198,13 @@ mod tests {
 
         assert_eq!(
             operation.result(0).unwrap().to_string(),
-            "%0 = \"arith.constant\"() {value = 0 : index} : () -> index\n"
+            "%c0 = arith.constant 0 : index\n"
         );
     }
 
     #[test]
     fn display_with_dialect_loaded() {
-        let context = Context::new();
-        load_all_dialects(&context);
+        let context = create_test_context();
 
         let location = Location::unknown(&context);
         let index_type = Type::index(&context);
@@ -227,8 +225,7 @@ mod tests {
 
     #[test]
     fn debug() {
-        let context = Context::new();
-        load_all_dialects(&context);
+        let context = create_test_context();
 
         let location = Location::unknown(&context);
         let index_type = Type::index(&context);
