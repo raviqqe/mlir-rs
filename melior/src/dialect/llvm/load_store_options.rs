@@ -60,7 +60,7 @@ impl<'c> LoadStoreOptions<'c> {
         self
     }
 
-    /// Sets tbaa.
+    /// Sets TBAA metadata.
     pub fn tbaa(mut self, tbaa: ArrayAttribute<'c>) -> Self {
         self.tbaa = Some(tbaa);
         self
