@@ -22,7 +22,10 @@ pub struct LoadStoreOptions<'c> {
 }
 
 impl<'c> LoadStoreOptions<'c> {
-    fn into_attributes(self, context: &'c Context) -> Vec<(Identifier<'c>, Attribute<'c>)> {
+    pub(super) fn into_attributes(
+        self,
+        context: &'c Context,
+    ) -> Vec<(Identifier<'c>, Attribute<'c>)> {
         let mut attributes = Vec::with_capacity(7);
 
         if let Some(align) = self.align {
