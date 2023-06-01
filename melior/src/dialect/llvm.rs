@@ -3,8 +3,7 @@
 use crate::{
     ir::{
         attribute::{
-            ArrayAttribute, DenseI32ArrayAttribute, DenseI64ArrayAttribute, IntegerAttribute,
-            StringAttribute, TypeAttribute,
+            DenseI32ArrayAttribute, DenseI64ArrayAttribute, StringAttribute, TypeAttribute,
         },
         operation::OperationBuilder,
         Attribute, Identifier, Location, Operation, Region, Type, Value,
