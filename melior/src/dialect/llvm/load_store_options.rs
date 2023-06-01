@@ -8,16 +8,55 @@ use crate::{
 
 #[derive(Debug, Default)]
 pub struct LoadStoreOptions<'c> {
-    pub align: Option<IntegerAttribute<'c>>,
-    pub volatile: bool,
-    pub nontemporal: bool,
-    pub access_groups: Option<ArrayAttribute<'c>>,
-    pub alias_scopes: Option<ArrayAttribute<'c>>,
-    pub noalias_scopes: Option<ArrayAttribute<'c>>,
-    pub tbaa: Option<ArrayAttribute<'c>>,
+    align: Option<IntegerAttribute<'c>>,
+    volatile: bool,
+    nontemporal: bool,
+    access_groups: Option<ArrayAttribute<'c>>,
+    alias_scopes: Option<ArrayAttribute<'c>>,
+    noalias_scopes: Option<ArrayAttribute<'c>>,
+    tbaa: Option<ArrayAttribute<'c>>,
 }
 
 impl<'c> LoadStoreOptions<'c> {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn align(mut self, align: IntegerAttribute<'c>) -> Self {
+        self.align = Some(align);
+        self
+    }
+
+    pub fn volatile(mut self) -> Self {
+        self.volatile = true;
+        self
+    }
+
+    pub fn nontemporal(mut self) -> Self {
+        self.nontemporal = true;
+        self
+    }
+
+    pub fn access_groups(mut self, access_groups: ArrayAttribute<'c>) -> Self {
+        self.access_groups = Some(access_groups);
+        self
+    }
+
+    pub fn alias_scopes(mut self, alias_scopes: ArrayAttribute<'c>) -> Self {
+        self.alias_scopes = Some(alias_scopes);
+        self
+    }
+
+    pub fn nonalias_scopes(mut self, noalias_scopes: ArrayAttribute<'c>) -> Self {
+        self.noalias_scopes = Some(noalias_scopes);
+        self
+    }
+
+    pub fn tbaa(mut self, tbaa: ArrayAttribute<'c>) -> Self {
+        self.tbaa = Some(tbaa);
+        self
+    }
+
     pub(super) fn into_attributes(
         self,
         context: &'c Context,
