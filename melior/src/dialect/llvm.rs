@@ -116,11 +116,9 @@ pub struct LoadStoreOptions<'c> {
 }
 
 impl<'c> LoadStoreOptions<'c> {
-    pub fn fill_attributes(
-        &self,
-        context: &'c Context,
-        attributes: &mut Vec<(Identifier<'c>, Attribute<'c>)>,
-    ) {
+    fn into_attributes(self, context: &'c Context) -> Vec<(Identifier<'c>, Attribute<'c>)> {
+        let mut attributes = Vec::with_capacity(7);
+
         if let Some(align) = self.align {
             attributes.push((Identifier::new(context, "alignment"), align.into()));
         }
@@ -156,6 +154,8 @@ impl<'c> LoadStoreOptions<'c> {
         if let Some(tbaa) = self.tbaa {
             attributes.push((Identifier::new(context, "tbaa"), tbaa.into()));
         }
+
+        attributes
     }
 }
 
@@ -165,17 +165,11 @@ pub fn store<'c>(
     value: Value,
     addr: Value,
     location: Location<'c>,
-    extra_options: Option<LoadStoreOptions<'c>>,
+    extra_options: LoadStoreOptions<'c>,
 ) -> Operation<'c> {
-    let mut attributes = vec![];
-
-    if let Some(extra_options) = extra_options {
-        extra_options.fill_attributes(context, &mut attributes);
-    }
-
     OperationBuilder::new("llvm.store", location)
         .add_operands(&[value, addr])
-        .add_attributes(&attributes)
+        .add_attributes(&extra_options.into_attributes(context))
         .build()
 }
 
@@ -185,17 +179,11 @@ pub fn load<'c>(
     addr: Value,
     r#type: Type<'c>,
     location: Location<'c>,
-    extra_options: Option<LoadStoreOptions<'c>>,
+    extra_options: LoadStoreOptions<'c>,
 ) -> Operation<'c> {
-    let mut attributes = vec![];
-
-    if let Some(extra_options) = extra_options {
-        extra_options.fill_attributes(context, &mut attributes);
-    }
-
     OperationBuilder::new("llvm.load", location)
         .add_operands(&[addr])
-        .add_attributes(&attributes)
+        .add_attributes(&extra_options.into_attributes(context))
         .add_results(&[r#type])
         .build()
 }
