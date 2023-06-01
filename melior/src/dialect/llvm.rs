@@ -4,14 +4,15 @@ use crate::{
     ir::{
         attribute::{
             ArrayAttribute, DenseI32ArrayAttribute, DenseI64ArrayAttribute, IntegerAttribute,
-            TypeAttribute,
+            StringAttribute, TypeAttribute,
         },
         operation::OperationBuilder,
-        Attribute, Identifier, Location, Operation, Type, Value,
+        Attribute, Identifier, Location, Operation, Region, Type, Value,
     },
     Context,
 };
 
+pub mod attributes;
 pub mod r#type;
 
 // spell-checker: disable
@@ -188,11 +189,47 @@ pub fn load<'c>(
         .build()
 }
 
+/// Create a `llvm.func` operation.
+pub fn func<'c>(
+    context: &'c Context,
+    name: StringAttribute<'c>,
+    r#type: TypeAttribute<'c>,
+    region: Region,
+    attributes: &[(Identifier<'c>, Attribute<'c>)],
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new("llvm.func", location)
+        .add_attributes(&[
+            (Identifier::new(context, "sym_name"), name.into()),
+            (Identifier::new(context, "function_type"), r#type.into()),
+        ])
+        .add_attributes(attributes)
+        .add_regions(vec![region])
+        .build()
+}
+
+// Creates a `llvm.return` operation.
+pub fn r#return<'c>(value: Option<Value>, location: Location<'c>) -> Operation<'c> {
+    let mut builder = OperationBuilder::new("llvm.return", location);
+
+    if let Some(value) = value {
+        builder = builder.add_operands(&[value]);
+    }
+
+    builder.build()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::{
-        dialect::{arith, func},
+        dialect::{
+            arith, func,
+            llvm::{
+                attributes::{linkage, Linkage},
+                r#type::{function, opaque_pointer},
+            },
+        },
         ir::{
             attribute::{IntegerAttribute, StringAttribute, TypeAttribute},
             r#type::{FunctionType, IntegerType},
@@ -548,6 +585,81 @@ mod tests {
                 ));
 
                 block.append_operation(func::r#return(&[], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            &[],
+            location,
+        ));
+
+        convert_module(&context, &mut module);
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
+    fn compile_func() {
+        let context = create_test_context();
+
+        let location = Location::unknown(&context);
+        let mut module = Module::new(location);
+        let integer_type = IntegerType::new(&context, 32).into();
+
+        module.body().append_operation(func(
+            &context,
+            StringAttribute::new(&context, "printf"),
+            TypeAttribute::new(function(integer_type, &[opaque_pointer(&context)], true)),
+            Region::new(),
+            &[(
+                Identifier::new(&context, "linkage"),
+                linkage(&context, Linkage::External),
+            )],
+            location,
+        ));
+
+        convert_module(&context, &mut module);
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
+    fn compile_return() {
+        let context = create_test_context();
+
+        let location = Location::unknown(&context);
+        let mut module = Module::new(location);
+        let integer_type = IntegerType::new(&context, 64).into();
+        let struct_type = r#type::r#struct(&context, &[integer_type], false);
+
+        module.body().append_operation(func::func(
+            &context,
+            StringAttribute::new(&context, "foo_none"),
+            TypeAttribute::new(FunctionType::new(&context, &[], &[]).into()),
+            {
+                let block = Block::new(&[]);
+
+                block.append_operation(r#return(None, location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            &[],
+            location,
+        ));
+
+        module.body().append_operation(func::func(
+            &context,
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(FunctionType::new(&context, &[struct_type], &[struct_type]).into()),
+            {
+                let block = Block::new(&[(struct_type, location)]);
+
+                block.append_operation(r#return(Some(block.argument(0).unwrap().into()), location));
 
                 let region = Region::new();
                 region.append_block(block);
