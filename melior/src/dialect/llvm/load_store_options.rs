@@ -6,6 +6,8 @@ use crate::{
     Context,
 };
 
+// spell-checker: disable
+
 /// Load/store options.
 #[derive(Debug, Default)]
 pub struct LoadStoreOptions<'c> {
@@ -23,8 +25,6 @@ impl<'c> LoadStoreOptions<'c> {
     pub fn new() -> Self {
         Self::default()
     }
-
-    // spell-checker: disable
 
     /// Sets an alignment.
     pub fn align(mut self, align: Option<IntegerAttribute<'c>>) -> Self {
