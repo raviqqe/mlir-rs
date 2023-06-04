@@ -1,6 +1,5 @@
-use super::Value;
 use crate::{
-    ir::{OperationRef, ValueLike},
+    ir::{OperationRef, Value, ValueLike},
     Error,
 };
 use mlir_sys::{mlirOpResultGetOwner, mlirOpResultGetResultNumber, MlirValue};

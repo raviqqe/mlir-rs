@@ -7,7 +7,7 @@ mod result;
 pub use self::{
     builder::OperationBuilder, printing_flags::OperationPrintingFlags, result::OperationResult,
 };
-use super::{BlockRef, Identifier, RegionRef, Value};
+use super::{BlockRef, Identifier, RegionRef};
 use crate::{
     context::{Context, ContextRef},
     utility::{print_callback, print_string_callback},
