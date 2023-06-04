@@ -12,15 +12,17 @@ use std::{
 
 /// A region.
 #[derive(Debug)]
-pub struct Region {
+pub struct Region<'c> {
     raw: MlirRegion,
+    _block: PhantomData<Block<'c>>,
 }
 
-impl Region {
+impl<'c> Region<'c> {
     /// Creates a region.
     pub fn new() -> Self {
         Self {
             raw: unsafe { mlirRegionCreate() },
+            _block: Default::default(),
         }
     }
 
