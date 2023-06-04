@@ -5,7 +5,7 @@ use crate::{
         attribute::{FlatSymbolRefAttribute, StringAttribute, TypeAttribute},
         operation::OperationBuilder,
         r#type::FunctionType,
-        Attribute, Identifier, Location, Operation, Region, Value,
+        Attribute, Identifier, Location, Operation, Region, Type, Value,
     },
     Context,
 };
@@ -27,11 +27,13 @@ pub fn call<'c>(
 pub fn call_indirect<'c>(
     function: Value,
     arguments: &[Value],
+    result_types: &[Type<'c>],
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("func.call_indirect", location)
         .add_operands(&[function])
         .add_operands(arguments)
+        .add_results(result_types)
         .build()
 }
 
@@ -78,7 +80,8 @@ pub fn r#return<'c>(operands: &[Value], location: Location<'c>) -> Operation<'c>
 mod tests {
     use super::*;
     use crate::{
-        ir::{Block, Module, Type},
+        dialect::index,
+        ir::{attribute::IntegerAttribute, Block, Module, Type},
         test::create_test_context,
     };
 
@@ -128,38 +131,47 @@ mod tests {
         let index_type = Type::index(&context);
         let function_type = FunctionType::new(&context, &[index_type], &[index_type]);
 
-        let function = {
-            let block = Block::new(&[]);
+        let function = func(
+            &context,
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(function_type.into()),
+            {
+                let block = Block::new(&[(index_type, location)]);
 
-            let function = block.append_operation(constant(
-                &context,
-                FlatSymbolRefAttribute::new(&context, "foo"),
-                function_type,
-                location,
-            ));
-            let value = block
-                .append_operation(call_indirect(
-                    function.result(0).unwrap().into(),
-                    &[],
+                let function = block.append_operation(constant(
+                    &context,
+                    FlatSymbolRefAttribute::new(&context, "foo"),
+                    function_type,
                     location,
-                ))
-                .result(0)
-                .unwrap()
-                .into();
-            block.append_operation(r#return(&[value], location));
+                ));
+                let argument = block
+                    .append_operation(index::constant(
+                        &context,
+                        IntegerAttribute::new(42, index_type),
+                        location,
+                    ))
+                    .result(0)
+                    .unwrap()
+                    .into();
+                let value = block
+                    .append_operation(call_indirect(
+                        function.result(0).unwrap().into(),
+                        &[argument],
+                        &[index_type],
+                        location,
+                    ))
+                    .result(0)
+                    .unwrap()
+                    .into();
+                block.append_operation(r#return(&[value], location));
 
-            let region = Region::new();
-            region.append_block(block);
-
-            func(
-                &context,
-                StringAttribute::new(&context, "foo"),
-                TypeAttribute::new(function_type.into()),
-                region,
-                &[],
-                Location::unknown(&context),
-            )
-        };
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            &[],
+            Location::unknown(&context),
+        );
 
         module.body().append_operation(function);
 
