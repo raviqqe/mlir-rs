@@ -54,7 +54,7 @@ impl<'c> Operation<'c> {
     }
 
     /// Gets a result at a position.
-    pub fn result(&self, index: usize) -> Result<OperationResult, Error> {
+    pub fn result(&self, index: usize) -> Result<OperationResult<'c, '_>, Error> {
         unsafe {
             if index < self.result_count() {
                 Ok(OperationResult::from_raw(mlirOperationGetResult(
