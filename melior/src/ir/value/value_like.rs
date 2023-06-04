@@ -4,12 +4,12 @@ use mlir_sys::{
 };
 
 /// Trait for value-like types.
-pub trait ValueLike {
+pub trait ValueLike<'c> {
     /// Converts a value into a raw value.
     fn to_raw(&self) -> MlirValue;
 
     /// Gets a type.
-    fn r#type(&self) -> Type {
+    fn r#type(&self) -> Type<'c> {
         unsafe { Type::from_raw(mlirValueGetType(self.to_raw())) }
     }
 
