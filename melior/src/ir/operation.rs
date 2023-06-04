@@ -228,12 +228,13 @@ impl<'a> OperationRef<'a> {
 
     /// Gets an operation.
     ///
-    /// This function is different from `deref` because the correct lifetime is kept for the return
-    /// type.
+    /// This function is different from `deref` because the correct lifetime is
+    /// kept for the return type.
     ///
     /// # Safety
     ///
-    /// The returned reference is safe to use only in the lifetime scope of the operation reference.
+    /// The returned reference is safe to use only in the lifetime scope of the
+    /// operation reference.
     pub unsafe fn to_ref(&self) -> &'a Operation<'a> {
         // As we can't deref OperationRef<'a> into `&'a Operation`, we forcibly cast its
         // lifetime here to extend it from the lifetime of `ObjectRef<'a>` itself into

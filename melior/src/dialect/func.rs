@@ -82,8 +82,7 @@ pub fn r#return<'c>(operands: &[Value], location: Location<'c>) -> Operation<'c>
 mod tests {
     use super::*;
     use crate::{
-        dialect::index,
-        ir::{attribute::IntegerAttribute, Block, Module, Type},
+        ir::{Block, Module, Type},
         test::create_test_context,
     };
 
