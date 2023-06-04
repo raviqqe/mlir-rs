@@ -95,7 +95,9 @@ impl<'c> Block<'c> {
     }
 
     /// Gets a parent region.
-    pub fn parent_region(&self) -> Option<RegionRef> {
+    // TODO Store lifetime of regions in blocks, or create another type like
+    // `InsertedBlockRef`?
+    pub fn parent_region(&self) -> Option<RegionRef<'c, '_>> {
         unsafe { RegionRef::from_option_raw(mlirBlockGetParentRegion(self.raw)) }
     }
 
