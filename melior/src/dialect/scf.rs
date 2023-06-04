@@ -10,8 +10,8 @@ use crate::{
 
 /// Creates a `scf.condition` operation.
 pub fn condition<'c>(
-    condition: Value<'c>,
-    values: &[Value<'c>],
+    condition: Value<'c, '_>,
+    values: &[Value<'c, '_>],
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("scf.condition", location)
@@ -34,9 +34,9 @@ pub fn execute_region<'c>(
 
 /// Creates a `scf.for` operation.
 pub fn r#for<'c>(
-    start: Value<'c>,
-    end: Value<'c>,
-    step: Value<'c>,
+    start: Value<'c, '_>,
+    end: Value<'c, '_>,
+    step: Value<'c, '_>,
     region: Region,
     location: Location<'c>,
 ) -> Operation<'c> {
@@ -48,7 +48,7 @@ pub fn r#for<'c>(
 
 /// Creates a `scf.if` operation.
 pub fn r#if<'c>(
-    condition: Value<'c>,
+    condition: Value<'c, '_>,
     result_types: &[Type<'c>],
     then_region: Region,
     else_region: Region,
@@ -64,7 +64,7 @@ pub fn r#if<'c>(
 /// Creates a `scf.index_switch` operation.
 pub fn index_switch<'c>(
     context: &'c Context,
-    condition: Value<'c>,
+    condition: Value<'c, '_>,
     result_types: &[Type<'c>],
     cases: DenseI64ArrayAttribute<'c>,
     regions: Vec<Region>,
@@ -80,7 +80,7 @@ pub fn index_switch<'c>(
 
 /// Creates a `scf.while` operation.
 pub fn r#while<'c>(
-    initial_values: &[Value<'c>],
+    initial_values: &[Value<'c, '_>],
     result_types: &[Type<'c>],
     before_region: Region,
     after_region: Region,

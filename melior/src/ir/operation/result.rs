@@ -8,11 +8,11 @@ use std::fmt::{self, Display, Formatter};
 
 /// An operation result.
 #[derive(Clone, Copy, Debug)]
-pub struct OperationResult<'a> {
-    value: Value<'a>,
+pub struct OperationResult<'c, 'a> {
+    value: Value<'c, 'a>,
 }
 
-impl<'a> OperationResult<'a> {
+impl<'c, 'a> OperationResult<'c, 'a> {
     /// Gets a result number.
     pub fn result_number(&self) -> usize {
         unsafe { mlirOpResultGetResultNumber(self.value.to_raw()) as usize }
@@ -35,22 +35,22 @@ impl<'a> OperationResult<'a> {
     }
 }
 
-impl<'a> ValueLike for OperationResult<'a> {
+impl<'c, 'a> ValueLike<'c> for OperationResult<'c, 'a> {
     fn to_raw(&self) -> MlirValue {
         self.value.to_raw()
     }
 }
 
-impl<'a> Display for OperationResult<'a> {
+impl<'c, 'a> Display for OperationResult<'c, 'a> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Value::from(*self).fmt(formatter)
     }
 }
 
-impl<'a> TryFrom<Value<'a>> for OperationResult<'a> {
+impl<'c, 'a> TryFrom<Value<'c, 'a>> for OperationResult<'c, 'a> {
     type Error = Error;
 
-    fn try_from(value: Value<'a>) -> Result<Self, Self::Error> {
+    fn try_from(value: Value<'c, 'a>) -> Result<Self, Self::Error> {
         if value.is_operation_result() {
             Ok(Self { value })
         } else {

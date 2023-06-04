@@ -14,7 +14,7 @@ use std::{
 // Values are always non-owning references to their parents, such as operations
 // and blocks. See the `Value` class in the MLIR C++ API.
 #[derive(Clone, Copy)]
-pub struct Value<'c, 'a> {
+pub struct Value<'c, 'a: 'c> {
     raw: MlirValue,
     _context: PhantomData<&'c Context>,
     _parent: PhantomData<&'a ()>,
@@ -29,6 +29,7 @@ impl<'c, 'a> Value<'c, 'a> {
     pub unsafe fn from_raw(value: MlirValue) -> Self {
         Self {
             raw: value,
+            _context: Default::default(),
             _parent: Default::default(),
         }
     }
@@ -72,7 +73,7 @@ impl<'c, 'a> Debug for Value<'c, 'a> {
     }
 }
 
-from_raw_subtypes!(Value, BlockArgument, OperationResult);
+from_borrowed_raw_subtypes!(Value, BlockArgument, OperationResult);
 
 #[cfg(test)]
 mod tests {

@@ -21,7 +21,7 @@ pub mod r#type;
 /// Creates a `llvm.extractvalue` operation.
 pub fn extract_value<'c>(
     context: &'c Context,
-    container: Value,
+    container: Value<'c, '_>,
     position: DenseI64ArrayAttribute<'c>,
     result_type: Type<'c>,
     location: Location<'c>,
@@ -36,7 +36,7 @@ pub fn extract_value<'c>(
 /// Creates a `llvm.getelementptr` operation.
 pub fn get_element_ptr<'c>(
     context: &'c Context,
-    ptr: Value,
+    ptr: Value<'c, '_>,
     indices: DenseI32ArrayAttribute<'c>,
     element_type: Type<'c>,
     result_type: Type<'c>,
@@ -61,8 +61,8 @@ pub fn get_element_ptr<'c>(
 /// Creates a `llvm.getelementptr` operation with dynamic indices.
 pub fn get_element_ptr_dynamic<'c, const N: usize>(
     context: &'c Context,
-    ptr: Value,
-    indices: &[Value<'c>; N],
+    ptr: Value<'c, '_>,
+    indices: &[Value<'c, '_>; N],
     element_type: Type<'c>,
     result_type: Type<'c>,
     location: Location<'c>,
@@ -87,9 +87,9 @@ pub fn get_element_ptr_dynamic<'c, const N: usize>(
 /// Creates a `llvm.insertvalue` operation.
 pub fn insert_value<'c>(
     context: &'c Context,
-    container: Value,
+    container: Value<'c, '_>,
     position: DenseI64ArrayAttribute<'c>,
-    value: Value,
+    value: Value<'c, '_>,
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("llvm.insertvalue", location)
@@ -116,8 +116,8 @@ pub fn poison<'c>(result_type: Type<'c>, location: Location<'c>) -> Operation<'c
 /// Creates a `llvm.store` operation.
 pub fn store<'c>(
     context: &'c Context,
-    value: Value,
-    addr: Value,
+    value: Value<'c, '_>,
+    addr: Value<'c, '_>,
     location: Location<'c>,
     extra_options: LoadStoreOptions<'c>,
 ) -> Operation<'c> {
@@ -130,7 +130,7 @@ pub fn store<'c>(
 /// Creates a `llvm.load` operation.
 pub fn load<'c>(
     context: &'c Context,
-    addr: Value,
+    addr: Value<'c, '_>,
     r#type: Type<'c>,
     location: Location<'c>,
     extra_options: LoadStoreOptions<'c>,
@@ -162,7 +162,7 @@ pub fn func<'c>(
 }
 
 // Creates a `llvm.return` operation.
-pub fn r#return<'c>(value: Option<Value>, location: Location<'c>) -> Operation<'c> {
+pub fn r#return<'c>(value: Option<Value<'c, '_>>, location: Location<'c>) -> Operation<'c> {
     let mut builder = OperationBuilder::new("llvm.return", location);
 
     if let Some(value) = value {

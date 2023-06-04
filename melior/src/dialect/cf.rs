@@ -15,7 +15,7 @@ use crate::{
 /// Creates a `cf.assert` operation.
 pub fn assert<'c>(
     context: &'c Context,
-    argument: Value<'c>,
+    argument: Value<'c, '_>,
     message: &str,
     location: Location<'c>,
 ) -> Operation<'c> {
@@ -31,7 +31,7 @@ pub fn assert<'c>(
 /// Creates a `cf.br` operation.
 pub fn br<'c>(
     successor: &Block<'c>,
-    destination_operands: &[Value<'c>],
+    destination_operands: &[Value<'c, '_>],
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("cf.br", location)
@@ -43,11 +43,11 @@ pub fn br<'c>(
 /// Creates a `cf.cond_br` operation.
 pub fn cond_br<'c>(
     context: &'c Context,
-    condition: Value<'c>,
+    condition: Value<'c, '_>,
     true_successor: &Block<'c>,
     false_successor: &Block<'c>,
-    true_successor_operands: &[Value],
-    false_successor_operands: &[Value],
+    true_successor_operands: &[Value<'c, '_>],
+    false_successor_operands: &[Value<'c, '_>],
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("cf.cond_br", location)
@@ -78,10 +78,10 @@ pub fn cond_br<'c>(
 pub fn switch<'c>(
     context: &'c Context,
     case_values: &[i64],
-    flag: Value<'c>,
+    flag: Value<'c, '_>,
     flag_type: Type<'c>,
-    default_destination: (&Block<'c>, &[Value]),
-    case_destinations: &[(&Block<'c>, &[Value])],
+    default_destination: (&Block<'c>, &[Value<'c, '_>]),
+    case_destinations: &[(&Block<'c>, &[Value<'c, '_>])],
     location: Location<'c>,
 ) -> Result<Operation<'c>, Error> {
     let (destinations, operands): (Vec<_>, Vec<_>) = [default_destination]

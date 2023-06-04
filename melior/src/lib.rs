@@ -224,12 +224,12 @@ mod tests {
 
         let integer_type = IntegerType::new(&context, 64).into();
 
-        fn compile_add<'a>(
+        fn compile_add<'c, 'a>(
             context: &Context,
             block: &'a Block,
-            lhs: Value<'a>,
-            rhs: Value<'a>,
-        ) -> Value<'a> {
+            lhs: Value<'c, 'a>,
+            rhs: Value<'c, 'a>,
+        ) -> Value<'c, 'a> {
             block
                 .append_operation(arith::addi(lhs, rhs, Location::unknown(context)))
                 .result(0)

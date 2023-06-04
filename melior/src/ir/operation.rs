@@ -207,17 +207,15 @@ impl<'c> Debug for Operation<'c> {
 }
 
 /// A reference to an operation.
-// TODO Should we split context lifetimes? Or, is it transitively proven that
-// 'c > 'a?
 #[derive(Clone, Copy)]
-pub struct OperationRef<'a> {
+pub struct OperationRef<'c, 'a: 'c> {
     raw: MlirOperation,
-    _reference: PhantomData<&'a Operation<'a>>,
+    _reference: PhantomData<&'a Operation<'c>>,
 }
 
-impl<'a> OperationRef<'a> {
+impl<'c, 'a> OperationRef<'c, 'a> {
     /// Gets a result at a position.
-    pub fn result(self, index: usize) -> Result<OperationResult<'a>, Error> {
+    pub fn result(self, index: usize) -> Result<OperationResult<'c, 'a>, Error> {
         unsafe { self.to_ref() }.result(index)
     }
 
@@ -235,7 +233,7 @@ impl<'a> OperationRef<'a> {
     ///
     /// The returned reference is safe to use only in the lifetime scope of the
     /// operation reference.
-    pub unsafe fn to_ref(&self) -> &'a Operation<'a> {
+    pub unsafe fn to_ref(&self) -> &'a Operation<'c> {
         // As we can't deref OperationRef<'a> into `&'a Operation`, we forcibly cast its
         // lifetime here to extend it from the lifetime of `ObjectRef<'a>` itself into
         // `'a`.
@@ -268,7 +266,7 @@ impl<'a> OperationRef<'a> {
     }
 }
 
-impl<'a> Deref for OperationRef<'a> {
+impl<'c, 'a> Deref for OperationRef<'c, 'a> {
     type Target = Operation<'a>;
 
     fn deref(&self) -> &Self::Target {
@@ -276,21 +274,21 @@ impl<'a> Deref for OperationRef<'a> {
     }
 }
 
-impl<'a> PartialEq for OperationRef<'a> {
+impl<'c, 'a> PartialEq for OperationRef<'c, 'a> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirOperationEqual(self.raw, other.raw) }
     }
 }
 
-impl<'a> Eq for OperationRef<'a> {}
+impl<'c, 'a> Eq for OperationRef<'c, 'a> {}
 
-impl<'a> Display for OperationRef<'a> {
+impl<'c, 'a> Display for OperationRef<'c, 'a> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Display::fmt(self.deref(), formatter)
     }
 }
 
-impl<'a> Debug for OperationRef<'a> {
+impl<'c, 'a> Debug for OperationRef<'c, 'a> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Debug::fmt(self.deref(), formatter)
     }
