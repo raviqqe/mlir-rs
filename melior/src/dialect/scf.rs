@@ -23,7 +23,7 @@ pub fn condition<'c>(
 /// Creates a `scf.execute_region` operation.
 pub fn execute_region<'c>(
     result_types: &[Type<'c>],
-    region: Region,
+    region: Region<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("scf.execute_region", location)
@@ -37,7 +37,7 @@ pub fn r#for<'c>(
     start: Value<'c, '_>,
     end: Value<'c, '_>,
     step: Value<'c, '_>,
-    region: Region,
+    region: Region<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("scf.for", location)
@@ -50,8 +50,8 @@ pub fn r#for<'c>(
 pub fn r#if<'c>(
     condition: Value<'c, '_>,
     result_types: &[Type<'c>],
-    then_region: Region,
-    else_region: Region,
+    then_region: Region<'c>,
+    else_region: Region<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("scf.if", location)
@@ -67,7 +67,7 @@ pub fn index_switch<'c>(
     condition: Value<'c, '_>,
     result_types: &[Type<'c>],
     cases: DenseI64ArrayAttribute<'c>,
-    regions: Vec<Region>,
+    regions: Vec<Region<'c>>,
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("scf.index_switch", location)
@@ -82,8 +82,8 @@ pub fn index_switch<'c>(
 pub fn r#while<'c>(
     initial_values: &[Value<'c, '_>],
     result_types: &[Type<'c>],
-    before_region: Region,
-    after_region: Region,
+    before_region: Region<'c>,
+    after_region: Region<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("scf.while", location)
@@ -94,7 +94,7 @@ pub fn r#while<'c>(
 }
 
 /// Creates a `scf.yield` operation.
-pub fn r#yield<'c>(values: &[Value], location: Location<'c>) -> Operation<'c> {
+pub fn r#yield<'c>(values: &[Value<'c, '_>], location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("scf.yield", location)
         .add_operands(values)
         .build()
