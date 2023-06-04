@@ -14,7 +14,7 @@ use crate::{
 pub fn call<'c>(
     context: &'c Context,
     function: FlatSymbolRefAttribute<'c>,
-    arguments: &[Value],
+    arguments: &[Value<'c, '_>],
     result_types: &[Type<'c>],
     location: Location<'c>,
 ) -> Operation<'c> {
@@ -27,8 +27,8 @@ pub fn call<'c>(
 
 /// Create a `func.call_indirect` operation.
 pub fn call_indirect<'c>(
-    function: Value,
-    arguments: &[Value],
+    function: Value<'c, '_>,
+    arguments: &[Value<'c, '_>],
     result_types: &[Type<'c>],
     location: Location<'c>,
 ) -> Operation<'c> {
@@ -57,7 +57,7 @@ pub fn func<'c>(
     context: &'c Context,
     name: StringAttribute<'c>,
     r#type: TypeAttribute<'c>,
-    region: Region,
+    region: Region<'c>,
     attributes: &[(Identifier<'c>, Attribute<'c>)],
     location: Location<'c>,
 ) -> Operation<'c> {
@@ -72,7 +72,7 @@ pub fn func<'c>(
 }
 
 /// Create a `func.return` operation.
-pub fn r#return<'c>(operands: &[Value], location: Location<'c>) -> Operation<'c> {
+pub fn r#return<'c>(operands: &[Value<'c, '_>], location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("func.return", location)
         .add_operands(operands)
         .build()

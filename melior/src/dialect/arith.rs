@@ -46,8 +46,8 @@ pub enum CmpfPredicate {
 pub fn cmpf<'c>(
     context: &'c Context,
     predicate: CmpfPredicate,
-    lhs: Value,
-    rhs: Value,
+    lhs: Value<'c, '_>,
+    rhs: Value<'c, '_>,
     location: Location<'c>,
 ) -> Operation<'c> {
     cmp(context, "arith.cmpf", predicate as i64, lhs, rhs, location)
@@ -71,8 +71,8 @@ pub enum CmpiPredicate {
 pub fn cmpi<'c>(
     context: &'c Context,
     predicate: CmpiPredicate,
-    lhs: Value,
-    rhs: Value,
+    lhs: Value<'c, '_>,
+    rhs: Value<'c, '_>,
     location: Location<'c>,
 ) -> Operation<'c> {
     cmp(context, "arith.cmpi", predicate as i64, lhs, rhs, location)
@@ -82,8 +82,8 @@ fn cmp<'c>(
     context: &'c Context,
     name: &str,
     predicate: i64,
-    lhs: Value,
-    rhs: Value,
+    lhs: Value<'c, '_>,
+    rhs: Value<'c, '_>,
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new(name, location)

@@ -86,7 +86,7 @@ pub fn generate_typed_unary(
         stream.extend(TokenStream::from(quote! {
             #[doc = #document]
             pub fn #name<'c>(
-                value: crate::ir::Value,
+                value: crate::ir::Value<'c, '_>,
                 r#type: crate::ir::Type<'c>,
                 location: crate::ir::Location<'c>,
             ) -> crate::ir::Operation<'c> {
@@ -98,7 +98,7 @@ pub fn generate_typed_unary(
     stream.extend(TokenStream::from(quote! {
         fn typed_unary_operator<'c>(
             name: &str,
-            value: crate::ir::Value,
+            value: crate::ir::Value<'c, '_>,
             r#type: crate::ir::Type<'c>,
             location: crate::ir::Location<'c>,
         ) -> crate::ir::Operation<'c> {
