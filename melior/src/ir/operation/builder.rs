@@ -1,3 +1,4 @@
+use super::Operation;
 use crate::{
     context::Context,
     ir::{
@@ -14,8 +15,6 @@ use mlir_sys::{
     mlirOperationStateGet, MlirOperationState,
 };
 use std::marker::PhantomData;
-
-use super::Operation;
 
 /// An operation builder.
 pub struct OperationBuilder<'c> {
