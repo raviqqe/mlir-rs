@@ -13,8 +13,8 @@ pub fn generate_binary(dialect: &Ident, names: &[Ident]) -> Result<TokenStream, 
         stream.extend(TokenStream::from(quote! {
             #[doc = #document]
             pub fn #name<'c>(
-                lhs: crate::ir::Value,
-                rhs: crate::ir::Value,
+                lhs: crate::ir::Value<'c, '_>,
+                rhs: crate::ir::Value<'c, '_>,
                 location: crate::ir::Location<'c>,
             ) -> crate::ir::Operation<'c> {
                 binary_operator(#operation_name, lhs, rhs, location)
@@ -25,8 +25,8 @@ pub fn generate_binary(dialect: &Ident, names: &[Ident]) -> Result<TokenStream, 
     stream.extend(TokenStream::from(quote! {
         fn binary_operator<'c>(
             name: &str,
-            lhs: crate::ir::Value,
-            rhs: crate::ir::Value,
+            lhs: crate::ir::Value<'c, '_>,
+            rhs: crate::ir::Value<'c, '_>,
             location: crate::ir::Location<'c>,
         ) -> crate::ir::Operation<'c> {
             crate::ir::operation::OperationBuilder::new(name, location)
@@ -49,7 +49,7 @@ pub fn generate_unary(dialect: &Ident, names: &[Ident]) -> Result<TokenStream, B
         stream.extend(TokenStream::from(quote! {
             #[doc = #document]
             pub fn #name<'c>(
-                value: crate::ir::Value,
+                value: crate::ir::Value<'c, '_>,
                 location: crate::ir::Location<'c>,
             ) -> crate::ir::Operation<'c> {
                 unary_operator(#operation_name, value, location)
@@ -60,7 +60,7 @@ pub fn generate_unary(dialect: &Ident, names: &[Ident]) -> Result<TokenStream, B
     stream.extend(TokenStream::from(quote! {
         fn unary_operator<'c>(
             name: &str,
-            value: crate::ir::Value,
+            value: crate::ir::Value<'c, '_>,
             location: crate::ir::Location<'c>,
         ) -> crate::ir::Operation<'c> {
             crate::ir::operation::OperationBuilder::new(name, location)

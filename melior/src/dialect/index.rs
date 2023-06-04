@@ -27,8 +27,8 @@ pub fn constant<'c>(
 pub fn cmp<'c>(
     context: &'c Context,
     predicate: CmpiPredicate,
-    lhs: Value,
-    rhs: Value,
+    lhs: Value<'c, '_>,
+    rhs: Value<'c, '_>,
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("index.cmp", location)
