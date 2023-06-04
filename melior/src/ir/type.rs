@@ -167,7 +167,7 @@ impl<'c> Debug for Type<'c> {
     }
 }
 
-from_raw_subtypes!(
+from_subtypes!(
     Type,
     FunctionType,
     IntegerType,

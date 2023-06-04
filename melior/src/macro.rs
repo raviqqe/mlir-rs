@@ -1,4 +1,4 @@
-macro_rules! from_raw_subtypes {
+macro_rules! from_subtypes {
     ($type:ident,) => {};
     ($type:ident, $name:ident $(, $names:ident)* $(,)?) => {
         impl<'c> From<$name<'c>> for $type<'c> {
@@ -7,11 +7,11 @@ macro_rules! from_raw_subtypes {
             }
         }
 
-        from_raw_subtypes!($type, $($names,)*);
+        from_subtypes!($type, $($names,)*);
     };
 }
 
-macro_rules! from_borrowed_raw_subtypes {
+macro_rules! from_borrowed_subtypes {
     ($type:ident,) => {};
     ($type:ident, $name:ident $(, $names:ident)* $(,)?) => {
         impl<'c, 'a> From<$name<'c, 'a>> for $type<'c, 'a> {
@@ -20,6 +20,6 @@ macro_rules! from_borrowed_raw_subtypes {
             }
         }
 
-        from_borrowed_raw_subtypes!($type, $($names,)*);
+        from_borrowed_subtypes!($type, $($names,)*);
     };
 }

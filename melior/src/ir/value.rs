@@ -73,7 +73,7 @@ impl<'c, 'a> Debug for Value<'c, 'a> {
     }
 }
 
-from_borrowed_raw_subtypes!(Value, BlockArgument, OperationResult);
+from_borrowed_subtypes!(Value, BlockArgument, OperationResult);
 
 #[cfg(test)]
 mod tests {

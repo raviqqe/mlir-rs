@@ -120,7 +120,7 @@ impl<'c> Debug for Attribute<'c> {
     }
 }
 
-from_raw_subtypes!(
+from_subtypes!(
     Attribute,
     ArrayAttribute,
     DenseElementsAttribute,
