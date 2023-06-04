@@ -49,7 +49,8 @@ impl<'c> Operation<'c> {
     }
 
     /// Gets a block.
-    pub fn block(&self) -> Option<BlockRef> {
+    // TODO Store lifetime of block in operations, or create another type like `AppendedOperationRef`?
+    pub fn block(&self) -> Option<BlockRef<'c, '_>> {
         unsafe { BlockRef::from_option_raw(mlirOperationGetBlock(self.raw)) }
     }
 

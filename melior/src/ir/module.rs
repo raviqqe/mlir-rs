@@ -44,7 +44,7 @@ impl<'c> Module<'c> {
     }
 
     /// Gets a block of a module body.
-    pub fn body(&self) -> BlockRef {
+    pub fn body(&self) -> BlockRef<'c, '_> {
         unsafe { BlockRef::from_raw(mlirModuleGetBody(self.raw)) }
     }
 

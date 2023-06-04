@@ -21,7 +21,7 @@ impl<'c, 'a> BlockArgument<'c, 'a> {
     }
 
     /// Gets an owner operation.
-    pub fn owner(&self) -> BlockRef {
+    pub fn owner(&self) -> BlockRef<'c, '_> {
         unsafe { BlockRef::from_raw(mlirBlockArgumentGetOwner(self.value.to_raw())) }
     }
 
