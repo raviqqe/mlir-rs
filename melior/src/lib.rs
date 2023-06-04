@@ -225,10 +225,10 @@ mod tests {
         let integer_type = IntegerType::new(&context, 64).into();
 
         fn compile_add<'c, 'a>(
-            context: &Context,
-            block: &'a Block,
-            lhs: Value<'c, 'a>,
-            rhs: Value<'c, 'a>,
+            context: &'c Context,
+            block: &'a Block<'c>,
+            lhs: Value<'c, '_>,
+            rhs: Value<'c, '_>,
         ) -> Value<'c, 'a> {
             block
                 .append_operation(arith::addi(lhs, rhs, Location::unknown(context)))
