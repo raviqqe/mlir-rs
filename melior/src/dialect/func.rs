@@ -103,20 +103,11 @@ mod tests {
             {
                 let block = Block::new(&[(index_type, location)]);
 
-                let argument = block
-                    .append_operation(index::constant(
-                        &context,
-                        IntegerAttribute::new(42, index_type),
-                        location,
-                    ))
-                    .result(0)
-                    .unwrap()
-                    .into();
                 let value = block
                     .append_operation(call(
                         &context,
                         FlatSymbolRefAttribute::new(&context, "foo"),
-                        &[argument],
+                        &[block.argument(0).unwrap().into()],
                         &[index_type],
                         location,
                     ))
@@ -161,19 +152,10 @@ mod tests {
                     function_type,
                     location,
                 ));
-                let argument = block
-                    .append_operation(index::constant(
-                        &context,
-                        IntegerAttribute::new(42, index_type),
-                        location,
-                    ))
-                    .result(0)
-                    .unwrap()
-                    .into();
                 let value = block
                     .append_operation(call_indirect(
                         function.result(0).unwrap().into(),
-                        &[argument],
+                        &[block.argument(0).unwrap().into()],
                         &[index_type],
                         location,
                     ))
