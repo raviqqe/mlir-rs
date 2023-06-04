@@ -147,7 +147,7 @@ pub fn func<'c>(
     context: &'c Context,
     name: StringAttribute<'c>,
     r#type: TypeAttribute<'c>,
-    region: Region,
+    region: Region<'c>,
     attributes: &[(Identifier<'c>, Attribute<'c>)],
     location: Location<'c>,
 ) -> Operation<'c> {

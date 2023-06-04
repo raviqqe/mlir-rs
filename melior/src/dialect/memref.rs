@@ -17,8 +17,8 @@ use crate::{
 pub fn alloc<'c>(
     context: &'c Context,
     r#type: MemRefType<'c>,
-    dynamic_sizes: &[Value],
-    symbols: &[Value],
+    dynamic_sizes: &[Value<'c, '_>],
+    symbols: &[Value<'c, '_>],
     alignment: Option<IntegerAttribute<'c>>,
     location: Location<'c>,
 ) -> Operation<'c> {
@@ -37,8 +37,8 @@ pub fn alloc<'c>(
 pub fn alloca<'c>(
     context: &'c Context,
     r#type: MemRefType<'c>,
-    dynamic_sizes: &[Value],
-    symbols: &[Value],
+    dynamic_sizes: &[Value<'c, '_>],
+    symbols: &[Value<'c, '_>],
     alignment: Option<IntegerAttribute<'c>>,
     location: Location<'c>,
 ) -> Operation<'c> {
@@ -57,8 +57,8 @@ fn allocate<'c>(
     context: &'c Context,
     name: &str,
     r#type: MemRefType<'c>,
-    dynamic_sizes: &[Value],
-    symbols: &[Value],
+    dynamic_sizes: &[Value<'c, '_>],
+    symbols: &[Value<'c, '_>],
     alignment: Option<IntegerAttribute<'c>>,
     location: Location<'c>,
 ) -> Operation<'c> {
@@ -80,7 +80,11 @@ fn allocate<'c>(
 }
 
 /// Create a `memref.cast` operation.
-pub fn cast<'c>(value: Value, r#type: MemRefType<'c>, location: Location<'c>) -> Operation<'c> {
+pub fn cast<'c>(
+    value: Value<'c, '_>,
+    r#type: MemRefType<'c>,
+    location: Location<'c>,
+) -> Operation<'c> {
     OperationBuilder::new("memref.cast", location)
         .add_operands(&[value])
         .add_results(&[r#type.into()])
@@ -88,14 +92,18 @@ pub fn cast<'c>(value: Value, r#type: MemRefType<'c>, location: Location<'c>) ->
 }
 
 /// Create a `memref.dealloc` operation.
-pub fn dealloc<'c>(value: Value, location: Location<'c>) -> Operation<'c> {
+pub fn dealloc<'c>(value: Value<'c, '_>, location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("memref.dealloc", location)
         .add_operands(&[value])
         .build()
 }
 
 /// Create a `memref.dim` operation.
-pub fn dim<'c>(value: Value, index: Value, location: Location<'c>) -> Operation<'c> {
+pub fn dim<'c>(
+    value: Value<'c, '_>,
+    index: Value<'c, '_>,
+    location: Location<'c>,
+) -> Operation<'c> {
     OperationBuilder::new("memref.dim", location)
         .add_operands(&[value, index])
         .enable_result_type_inference()
@@ -168,7 +176,11 @@ pub fn global<'c>(
 }
 
 /// Create a `memref.load` operation.
-pub fn load<'c>(memref: Value, indices: &[Value], location: Location<'c>) -> Operation<'c> {
+pub fn load<'c>(
+    memref: Value<'c, '_>,
+    indices: &[Value<'c, '_>],
+    location: Location<'c>,
+) -> Operation<'c> {
     OperationBuilder::new("memref.load", location)
         .add_operands(&[memref])
         .add_operands(indices)
@@ -177,7 +189,7 @@ pub fn load<'c>(memref: Value, indices: &[Value], location: Location<'c>) -> Ope
 }
 
 /// Create a `memref.rank` operation.
-pub fn rank<'c>(value: Value, location: Location<'c>) -> Operation<'c> {
+pub fn rank<'c>(value: Value<'c, '_>, location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("memref.rank", location)
         .add_operands(&[value])
         .enable_result_type_inference()
@@ -186,9 +198,9 @@ pub fn rank<'c>(value: Value, location: Location<'c>) -> Operation<'c> {
 
 /// Create a `memref.store` operation.
 pub fn store<'c>(
-    value: Value,
-    memref: Value,
-    indices: &[Value],
+    value: Value<'c, '_>,
+    memref: Value<'c, '_>,
+    indices: &[Value<'c, '_>],
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("memref.store", location)
@@ -200,8 +212,8 @@ pub fn store<'c>(
 /// Create a `memref.realloc` operation.
 pub fn realloc<'c>(
     context: &'c Context,
-    value: Value,
-    size: Option<Value>,
+    value: Value<'c, '_>,
+    size: Option<Value<'c, '_>>,
     r#type: MemRefType<'c>,
     alignment: Option<IntegerAttribute<'c>>,
     location: Location<'c>,
