@@ -47,7 +47,7 @@ impl<'c> OperationBuilder<'c> {
     }
 
     /// Adds operands.
-    pub fn add_operands(mut self, operands: &[Value]) -> Self {
+    pub fn add_operands(mut self, operands: &[Value<'c, '_>]) -> Self {
         unsafe {
             mlirOperationStateAddOperands(
                 &mut self.raw,
@@ -60,7 +60,7 @@ impl<'c> OperationBuilder<'c> {
     }
 
     /// Adds regions.
-    pub fn add_regions(mut self, regions: Vec<Region>) -> Self {
+    pub fn add_regions(mut self, regions: Vec<Region<'c>>) -> Self {
         unsafe {
             mlirOperationStateAddOwnedRegions(
                 &mut self.raw,
@@ -93,7 +93,7 @@ impl<'c> OperationBuilder<'c> {
     }
 
     /// Adds attributes.
-    pub fn add_attributes(mut self, attributes: &[(Identifier, Attribute<'c>)]) -> Self {
+    pub fn add_attributes(mut self, attributes: &[(Identifier<'c>, Attribute<'c>)]) -> Self {
         unsafe {
             mlirOperationStateAddAttributes(
                 &mut self.raw,

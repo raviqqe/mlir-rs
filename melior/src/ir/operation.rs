@@ -79,7 +79,7 @@ impl<'c> Operation<'c> {
     }
 
     /// Gets a region at a position.
-    pub fn region(&self, index: usize) -> Result<RegionRef, Error> {
+    pub fn region(&self, index: usize) -> Result<RegionRef<'c, '_>, Error> {
         unsafe {
             if index < self.region_count() {
                 Ok(RegionRef::from_raw(mlirOperationGetRegion(
@@ -102,7 +102,7 @@ impl<'c> Operation<'c> {
     }
 
     /// Gets the next operation in the same block.
-    pub fn next_in_block(&self) -> Option<OperationRef> {
+    pub fn next_in_block(&self) -> Option<OperationRef<'c, '_>> {
         unsafe {
             let operation = mlirOperationGetNextInBlock(self.raw);
 
