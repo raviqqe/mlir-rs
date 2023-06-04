@@ -168,7 +168,7 @@ impl<'c> Block<'c> {
     /// This function might invalidate existing references to the block if you
     /// drop it too early.
     // TODO Implement this for BlockRefMut instead and mark it safe.
-    pub unsafe fn detach(&self) -> Option<Block> {
+    pub unsafe fn detach(&self) -> Option<Block<'c>> {
         if self.parent_region().is_some() {
             mlirBlockDetach(self.raw);
 
@@ -179,7 +179,7 @@ impl<'c> Block<'c> {
     }
 
     /// Gets a next block in a region.
-    pub fn next_in_region(&self) -> Option<BlockRef> {
+    pub fn next_in_region(&self) -> Option<BlockRef<'c, '_>> {
         unsafe { BlockRef::from_option_raw(mlirBlockGetNextInRegion(self.raw)) }
     }
 
@@ -250,12 +250,12 @@ impl<'c> Debug for Block<'c> {
 
 /// A reference of a block.
 #[derive(Clone, Copy)]
-pub struct BlockRef<'a> {
+pub struct BlockRef<'c, 'a> {
     raw: MlirBlock,
-    _reference: PhantomData<&'a Block<'a>>,
+    _reference: PhantomData<&'a Block<'c>>,
 }
 
-impl<'a> BlockRef<'a> {
+impl<'c, 'a> BlockRef<'c, 'a> {
     /// Creates a block reference from a raw object.
     ///
     /// # Safety
@@ -282,7 +282,7 @@ impl<'a> BlockRef<'a> {
     }
 }
 
-impl<'a> Deref for BlockRef<'a> {
+impl<'c, 'a> Deref for BlockRef<'c, 'a> {
     type Target = Block<'a>;
 
     fn deref(&self) -> &Self::Target {
@@ -290,21 +290,21 @@ impl<'a> Deref for BlockRef<'a> {
     }
 }
 
-impl<'a> PartialEq for BlockRef<'a> {
+impl<'c, 'a> PartialEq for BlockRef<'c, 'a> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirBlockEqual(self.raw, other.raw) }
     }
 }
 
-impl<'a> Eq for BlockRef<'a> {}
+impl<'c, 'a> Eq for BlockRef<'c, 'a> {}
 
-impl<'a> Display for BlockRef<'a> {
+impl<'c, 'a> Display for BlockRef<'c, 'a> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Display::fmt(self.deref(), formatter)
     }
 }
 
-impl<'a> Debug for BlockRef<'a> {
+impl<'c, 'a> Debug for BlockRef<'c, 'a> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Debug::fmt(self.deref(), formatter)
     }
