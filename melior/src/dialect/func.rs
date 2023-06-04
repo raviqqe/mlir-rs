@@ -15,11 +15,13 @@ pub fn call<'c>(
     context: &'c Context,
     function: FlatSymbolRefAttribute<'c>,
     arguments: &[Value],
+    result_types: &[Type<'c>],
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("func.call", location)
         .add_attributes(&[(Identifier::new(context, "callee"), function.into())])
         .add_operands(arguments)
+        .add_results(result_types)
         .build()
 }
 
@@ -91,30 +93,45 @@ mod tests {
 
         let location = Location::unknown(&context);
         let module = Module::new(location);
+        let index_type = Type::index(&context);
+        let function_type = FunctionType::new(&context, &[index_type], &[index_type]);
 
-        let function = {
-            let block = Block::new(&[]);
+        let function = func(
+            &context,
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(function_type.into()),
+            {
+                let block = Block::new(&[(index_type, location)]);
 
-            block.append_operation(call(
-                &context,
-                FlatSymbolRefAttribute::new(&context, "foo"),
-                &[],
-                location,
-            ));
-            block.append_operation(r#return(&[], location));
+                let argument = block
+                    .append_operation(index::constant(
+                        &context,
+                        IntegerAttribute::new(42, index_type),
+                        location,
+                    ))
+                    .result(0)
+                    .unwrap()
+                    .into();
+                let value = block
+                    .append_operation(call(
+                        &context,
+                        FlatSymbolRefAttribute::new(&context, "foo"),
+                        &[argument],
+                        &[index_type],
+                        location,
+                    ))
+                    .result(0)
+                    .unwrap()
+                    .into();
+                block.append_operation(r#return(&[value], location));
 
-            let region = Region::new();
-            region.append_block(block);
-
-            func(
-                &context,
-                StringAttribute::new(&context, "foo"),
-                TypeAttribute::new(FunctionType::new(&context, &[], &[]).into()),
-                region,
-                &[],
-                Location::unknown(&context),
-            )
-        };
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            &[],
+            Location::unknown(&context),
+        );
 
         module.body().append_operation(function);
 

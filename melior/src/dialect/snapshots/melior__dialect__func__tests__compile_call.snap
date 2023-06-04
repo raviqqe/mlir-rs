@@ -3,9 +3,10 @@ source: melior/src/dialect/func.rs
 expression: module.as_operation()
 ---
 module {
-  func.func @foo() {
-    call @foo() : () -> ()
-    return
+  func.func @foo(%arg0: index) -> index {
+    %idx42 = index.constant 42
+    %0 = call @foo(%idx42) : (index) -> index
+    return %0 : index
   }
 }
 
