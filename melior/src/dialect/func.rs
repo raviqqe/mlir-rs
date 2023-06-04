@@ -125,6 +125,8 @@ mod tests {
 
         let location = Location::unknown(&context);
         let module = Module::new(location);
+        let index_type = Type::index(&context);
+        let function_type = FunctionType::new(&context, &[index_type], &[index_type]);
 
         let function = {
             let block = Block::new(&[]);
@@ -132,15 +134,19 @@ mod tests {
             let function = block.append_operation(constant(
                 &context,
                 FlatSymbolRefAttribute::new(&context, "foo"),
-                FunctionType::new(&context, &[], &[]),
+                function_type,
                 location,
             ));
-            block.append_operation(call_indirect(
-                function.result(0).unwrap().into(),
-                &[],
-                location,
-            ));
-            block.append_operation(r#return(&[], location));
+            let value = block
+                .append_operation(call_indirect(
+                    function.result(0).unwrap().into(),
+                    &[],
+                    location,
+                ))
+                .result(0)
+                .unwrap()
+                .into();
+            block.append_operation(r#return(&[value], location));
 
             let region = Region::new();
             region.append_block(block);
@@ -148,7 +154,7 @@ mod tests {
             func(
                 &context,
                 StringAttribute::new(&context, "foo"),
-                TypeAttribute::new(FunctionType::new(&context, &[], &[]).into()),
+                TypeAttribute::new(function_type.into()),
                 region,
                 &[],
                 Location::unknown(&context),
