@@ -14,8 +14,9 @@ use std::{
 // Values are always non-owning references to their parents, such as operations
 // and blocks. See the `Value` class in the MLIR C++ API.
 #[derive(Clone, Copy)]
-pub struct Value<'a> {
+pub struct Value<'c, 'a> {
     raw: MlirValue,
+    _context: PhantomData<&'c Context>,
     _parent: PhantomData<&'a ()>,
 }
 
