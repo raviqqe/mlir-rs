@@ -210,7 +210,7 @@ impl<'c> Debug for Operation<'c> {
 
 /// A reference to an operation.
 #[derive(Clone, Copy)]
-pub struct OperationRef<'c, 'a: 'c> {
+pub struct OperationRef<'c, 'a> {
     raw: MlirOperation,
     _reference: PhantomData<&'a Operation<'c>>,
 }
