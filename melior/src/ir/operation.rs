@@ -221,11 +221,6 @@ impl<'c, 'a> OperationRef<'c, 'a> {
         unsafe { self.to_ref() }.result(index)
     }
 
-    /// Converts an operation reference into a raw object.
-    pub const fn to_raw(self) -> MlirOperation {
-        self.raw
-    }
-
     /// Gets an operation.
     ///
     /// This function is different from `deref` because the correct lifetime is
@@ -240,6 +235,11 @@ impl<'c, 'a> OperationRef<'c, 'a> {
         // lifetime here to extend it from the lifetime of `ObjectRef<'a>` itself into
         // `'a`.
         transmute(self)
+    }
+
+    /// Converts an operation reference into a raw object.
+    pub const fn to_raw(self) -> MlirOperation {
+        self.raw
     }
 
     /// Creates an operation reference from a raw object.
