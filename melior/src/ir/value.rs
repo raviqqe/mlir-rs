@@ -12,7 +12,7 @@ use std::{
 
 /// A value.
 // Values are always non-owning references to their parents, such as operations
-// and block arguments. See the `Value` class in the MLIR C++ API.
+// and blocks. See the `Value` class in the MLIR C++ API.
 #[derive(Clone, Copy)]
 pub struct Value<'a> {
     raw: MlirValue,
