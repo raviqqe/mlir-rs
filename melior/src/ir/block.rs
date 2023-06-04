@@ -255,7 +255,7 @@ pub struct BlockRef<'a> {
     _reference: PhantomData<&'a Block<'a>>,
 }
 
-impl<'c> BlockRef<'c> {
+impl<'a> BlockRef<'a> {
     /// Creates a block reference from a raw object.
     ///
     /// # Safety
