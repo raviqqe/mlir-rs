@@ -216,25 +216,29 @@ pub struct OperationRef<'a> {
 }
 
 impl<'a> OperationRef<'a> {
-    /// Gets an operation.
-    ///
-    /// This function is different from `deref` because the correct lifetime is kept for the return
-    /// type.
-    pub fn as_operation(&self) -> &'a Operation<'a> {
-        // As we can't deref OperationRef<'a> into `&'a Operation`, we forcibly cast its
-        // lifetime here to extend it from the lifetime of `ObjectRef<'a>` itself into
-        // `'a`.
-        unsafe { transmute(self) }
-    }
-
     /// Gets a result at a position.
     pub fn result(self, index: usize) -> Result<OperationResult<'a>, Error> {
-        self.as_operation().result(index)
+        unsafe { self.to_ref() }.result(index)
     }
 
     /// Converts an operation reference into a raw object.
     pub const fn to_raw(self) -> MlirOperation {
         self.raw
+    }
+
+    /// Gets an operation.
+    ///
+    /// This function is different from `deref` because the correct lifetime is kept for the return
+    /// type.
+    ///
+    /// # Safety
+    ///
+    /// The returned reference is safe to use only in the lifetime scope of the operation reference.
+    pub unsafe fn to_ref(&self) -> &'a Operation<'a> {
+        // As we can't deref OperationRef<'a> into `&'a Operation`, we forcibly cast its
+        // lifetime here to extend it from the lifetime of `ObjectRef<'a>` itself into
+        // `'a`.
+        transmute(self)
     }
 
     /// Creates an operation reference from a raw object.

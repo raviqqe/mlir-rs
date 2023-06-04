@@ -150,11 +150,15 @@ impl<'c> ContextRef<'c> {
     ///
     /// This function is different from `deref` because the correct lifetime is kept for the return
     /// type.
-    pub fn to_ref(&self) -> &'c Context {
+    ///
+    /// # Safety
+    ///
+    /// The returned reference is safe to use only in the lifetime scope of the context reference.
+    pub unsafe fn to_ref(&self) -> &'c Context {
         // As we can't deref ContextRef<'a> into `&'a Context`, we forcibly cast its
         // lifetime here to extend it from the lifetime of `ObjectRef<'a>` itself into
         // `'a`.
-        unsafe { transmute(self) }
+        transmute(self)
     }
 
     /// Creates a context reference from a raw object.
