@@ -27,7 +27,7 @@ impl<'c> Region<'c> {
     }
 
     /// Gets the first block in a region.
-    pub fn first_block(&self) -> Option<BlockRef> {
+    pub fn first_block(&self) -> Option<BlockRef<'c, '_>> {
         unsafe {
             let block = mlirRegionGetFirstBlock(self.raw);
 
@@ -40,7 +40,7 @@ impl<'c> Region<'c> {
     }
 
     /// Inserts a block after another block.
-    pub fn insert_block_after(&self, one: BlockRef<'c, '_>, other: Block<'c>) -> BlockRef {
+    pub fn insert_block_after(&self, one: BlockRef<'c, '_>, other: Block<'c>) -> BlockRef<'c, '_> {
         unsafe {
             let r#ref = BlockRef::from_raw(other.to_raw());
 
@@ -51,7 +51,7 @@ impl<'c> Region<'c> {
     }
 
     /// Inserts a block before another block.
-    pub fn insert_block_before(&self, one: BlockRef, other: Block) -> BlockRef {
+    pub fn insert_block_before(&self, one: BlockRef<'c, '_>, other: Block<'c>) -> BlockRef<'c, '_> {
         unsafe {
             let r#ref = BlockRef::from_raw(other.to_raw());
 
@@ -62,7 +62,7 @@ impl<'c> Region<'c> {
     }
 
     /// Appends a block.
-    pub fn append_block(&self, block: Block) -> BlockRef {
+    pub fn append_block(&self, block: Block<'c>) -> BlockRef<'c, '_> {
         unsafe {
             let r#ref = BlockRef::from_raw(block.to_raw());
 
