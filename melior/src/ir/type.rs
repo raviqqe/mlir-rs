@@ -13,7 +13,8 @@ mod type_like;
 
 pub use self::{
     function::FunctionType, id::TypeId, integer::IntegerType, mem_ref::MemRefType,
-    ranked_tensor::RankedTensorType, tuple::TupleType, type_like::TypeLike,
+    ranked_tensor::RankedTensorType, shaped_type_like::ShapedTypeLike, tuple::TupleType,
+    type_like::TypeLike,
 };
 use super::Location;
 use crate::{context::Context, string_ref::StringRef, utility::print_callback};
