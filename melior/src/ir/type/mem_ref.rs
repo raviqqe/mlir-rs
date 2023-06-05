@@ -1,4 +1,4 @@
-use super::{shaped_type::ShapedType, TypeLike};
+use super::{shaped_type_like::ShapedTypeLike, TypeLike};
 use crate::{
     ir::{affine_map::AffineMap, attribute::AttributeLike, Attribute, Location, Type},
     Error,
@@ -77,7 +77,7 @@ impl<'c> MemRefType<'c> {
     }
 }
 
-impl<'c> ShapedType<'c> for MemRefType<'c> {}
+impl<'c> ShapedTypeLike<'c> for MemRefType<'c> {}
 
 type_traits!(MemRefType, is_mem_ref, "mem ref");
 

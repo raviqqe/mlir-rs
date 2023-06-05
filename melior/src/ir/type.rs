@@ -7,7 +7,7 @@ pub mod id;
 mod integer;
 mod mem_ref;
 mod ranked_tensor;
-mod shaped_type;
+mod shaped_type_like;
 mod tuple;
 mod type_like;
 

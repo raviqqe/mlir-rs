@@ -7,7 +7,7 @@ use mlir_sys::{
 };
 
 /// Trait for shaped types.
-pub trait ShapedType<'c>: TypeLike<'c> {
+pub trait ShapedTypeLike<'c>: TypeLike<'c> {
     /// Gets a element type.
     fn element(&self) -> Type<'c> {
         unsafe { Type::from_raw(mlirShapedTypeGetElementType(self.to_raw())) }
