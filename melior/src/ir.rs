@@ -19,7 +19,7 @@ pub use self::{
     location::Location,
     module::Module,
     operation::{Operation, OperationRef},
-    r#type::{Type, TypeLike},
+    r#type::{ShapedTypeLike, Type, TypeLike},
     region::{Region, RegionRef},
     value::{Value, ValueLike},
 };
