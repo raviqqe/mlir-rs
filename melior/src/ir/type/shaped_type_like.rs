@@ -111,17 +111,8 @@ mod tests {
         let context = Context::new();
         let element_type = Type::index(&context);
 
-        assert_eq!(
-            MemRefType::new(element_type, &[], None, None).has_rank(),
-            true
-        );
-        assert_eq!(
-            MemRefType::new(element_type, &[0], None, None).has_rank(),
-            true,
-        );
-        assert_eq!(
-            MemRefType::new(element_type, &[0, 0], None, None).has_rank(),
-            true,
-        );
+        assert!(MemRefType::new(element_type, &[], None, None).has_rank());
+        assert!(MemRefType::new(element_type, &[0], None, None).has_rank(),);
+        assert!(MemRefType::new(element_type, &[0, 0], None, None).has_rank(),);
     }
 }
