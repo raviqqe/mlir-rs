@@ -2,7 +2,7 @@ use crate::{
     context::{Context, ContextRef},
     ir::{Attribute, AttributeLike},
     string_ref::StringRef,
-    utility::{into_raw_array, print_callback},
+    utility::print_callback,
 };
 use mlir_sys::{
     mlirLocationEqual, mlirLocationFileLineColGet, mlirLocationFusedGet, mlirLocationGetContext,
@@ -40,7 +40,7 @@ impl<'c> Location<'c> {
             Self::from_raw(mlirLocationFusedGet(
                 context.to_raw(),
                 locations.len() as isize,
-                into_raw_array(locations.iter().map(|location| location.to_raw()).collect()),
+                locations as *const _ as *const _,
                 attribute.to_raw(),
             ))
         }

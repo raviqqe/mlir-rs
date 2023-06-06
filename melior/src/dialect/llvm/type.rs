@@ -3,7 +3,6 @@
 use crate::{
     context::Context,
     ir::{Type, TypeLike},
-    utility::into_raw_array,
 };
 use mlir_sys::{
     mlirLLVMArrayTypeGet, mlirLLVMFunctionTypeGet, mlirLLVMPointerTypeGet,
@@ -27,7 +26,7 @@ pub fn function<'c>(
         Type::from_raw(mlirLLVMFunctionTypeGet(
             result.to_raw(),
             arguments.len() as isize,
-            into_raw_array(arguments.iter().map(|argument| argument.to_raw()).collect()),
+            arguments as *const _ as *const _,
             variadic_arguments,
         ))
     }
@@ -49,7 +48,7 @@ pub fn r#struct<'c>(context: &'c Context, fields: &[Type<'c>], packed: bool) -> 
         Type::from_raw(mlirLLVMStructTypeLiteralGet(
             context.to_raw(),
             fields.len() as isize,
-            into_raw_array(fields.iter().map(|field| field.to_raw()).collect()),
+            fields as *const _ as *const _,
             packed,
         ))
     }

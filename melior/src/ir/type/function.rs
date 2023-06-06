@@ -1,5 +1,5 @@
 use super::TypeLike;
-use crate::{ir::Type, utility::into_raw_array, Context, Error};
+use crate::{ir::Type, Context, Error};
 use mlir_sys::{
     mlirFunctionTypeGet, mlirFunctionTypeGetInput, mlirFunctionTypeGetNumInputs,
     mlirFunctionTypeGetNumResults, mlirFunctionTypeGetResult, MlirType,
@@ -19,9 +19,9 @@ impl<'c> FunctionType<'c> {
                 Type::from_raw(mlirFunctionTypeGet(
                     context.to_raw(),
                     inputs.len() as isize,
-                    into_raw_array(inputs.iter().map(|r#type| r#type.to_raw()).collect()),
+                    inputs as *const _ as *const _,
                     results.len() as isize,
-                    into_raw_array(results.iter().map(|r#type| r#type.to_raw()).collect()),
+                    results as *const _ as *const _,
                 ))
             },
         }
