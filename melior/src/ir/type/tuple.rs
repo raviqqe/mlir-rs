@@ -85,9 +85,12 @@ mod tests {
     #[test]
     fn r#type() {
         let context = Context::new();
-        let r#type = Type::index(&context);
+        let index_type = Type::index(&context);
+        let float64_type = Type::float64(&context);
+        let tuple = TupleType::new(&context, &[index_type, float64_type]);
 
-        assert_eq!(TupleType::new(&context, &[r#type]).r#type(0), Ok(r#type));
+        assert_eq!(tuple.r#type(0), Ok(index_type));
+        assert_eq!(tuple.r#type(1), Ok(float64_type));
     }
 
     #[test]
