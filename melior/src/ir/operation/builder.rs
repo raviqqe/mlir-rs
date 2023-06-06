@@ -6,6 +6,7 @@ use crate::{
         ValueLike,
     },
     string_ref::StringRef,
+    utility::into_raw_array,
 };
 use mlir_sys::{
     mlirNamedAttributeGet, mlirOperationCreate, mlirOperationStateAddAttributes,
@@ -38,7 +39,7 @@ impl<'c> OperationBuilder<'c> {
             mlirOperationStateAddResults(
                 &mut self.raw,
                 results.len() as isize,
-                results as *const _ as *const _,
+                into_raw_array(results.iter().map(|r#type| r#type.to_raw()).collect()),
             )
         }
 
@@ -51,7 +52,7 @@ impl<'c> OperationBuilder<'c> {
             mlirOperationStateAddOperands(
                 &mut self.raw,
                 operands.len() as isize,
-                operands as *const _ as *const _,
+                into_raw_array(operands.iter().map(|value| value.to_raw()).collect()),
             )
         }
 
@@ -64,7 +65,12 @@ impl<'c> OperationBuilder<'c> {
             mlirOperationStateAddOwnedRegions(
                 &mut self.raw,
                 regions.len() as isize,
-                regions.leak().as_ptr() as *const _ as *const _,
+                into_raw_array(
+                    regions
+                        .into_iter()
+                        .map(|region| region.into_raw())
+                        .collect(),
+                ),
             )
         }
 
@@ -79,7 +85,7 @@ impl<'c> OperationBuilder<'c> {
             mlirOperationStateAddSuccessors(
                 &mut self.raw,
                 successors.len() as isize,
-                successors as *const _ as *const _,
+                into_raw_array(successors.iter().map(|block| block.to_raw()).collect()),
             )
         }
 
@@ -92,13 +98,14 @@ impl<'c> OperationBuilder<'c> {
             mlirOperationStateAddAttributes(
                 &mut self.raw,
                 attributes.len() as isize,
-                attributes
-                    .iter()
-                    .map(|(identifier, attribute)| {
-                        mlirNamedAttributeGet(identifier.to_raw(), attribute.to_raw())
-                    })
-                    .collect::<Vec<_>>()
-                    .as_ptr() as *const _ as *const _,
+                into_raw_array(
+                    attributes
+                        .iter()
+                        .map(|(identifier, attribute)| {
+                            mlirNamedAttributeGet(identifier.to_raw(), attribute.to_raw())
+                        })
+                        .collect(),
+                ),
             )
         }
 
