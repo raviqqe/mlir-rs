@@ -1,12 +1,8 @@
 use super::Operation;
 use crate::{
     context::Context,
-    ir::{
-        Attribute, AttributeLike, Block, Identifier, Location, Region, Type, TypeLike, Value,
-        ValueLike,
-    },
+    ir::{Attribute, AttributeLike, Block, Identifier, Location, Region, Type, Value},
     string_ref::StringRef,
-    utility::into_raw_array,
 };
 use mlir_sys::{
     mlirNamedAttributeGet, mlirOperationCreate, mlirOperationStateAddAttributes,
@@ -126,7 +122,10 @@ impl<'c> OperationBuilder<'c> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{ir::Block, test::create_test_context};
+    use crate::{
+        ir::{Block, ValueLike},
+        test::create_test_context,
+    };
 
     #[test]
     fn new() {

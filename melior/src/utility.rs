@@ -65,11 +65,6 @@ unsafe extern "C" fn handle_parse_error(raw_string: MlirStringRef, data: *mut c_
     }
 }
 
-// TODO Use into_raw_parts.
-pub(crate) unsafe fn into_raw_array<T>(xs: Vec<T>) -> *mut T {
-    xs.leak().as_mut_ptr()
-}
-
 pub(crate) unsafe extern "C" fn print_callback(string: MlirStringRef, data: *mut c_void) {
     let (formatter, result) = &mut *(data as *mut (&mut Formatter, fmt::Result));
 
