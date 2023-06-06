@@ -1,5 +1,5 @@
 use super::TypeLike;
-use crate::{ir::Type, utility::into_raw_array, Context, Error};
+use crate::{ir::Type, Context, Error};
 use mlir_sys::{mlirTupleTypeGet, mlirTupleTypeGetNumTypes, mlirTupleTypeGetType, MlirType};
 
 /// A tuple type.
@@ -15,7 +15,7 @@ impl<'c> TupleType<'c> {
             Self::from_raw(mlirTupleTypeGet(
                 context.to_raw(),
                 types.len() as isize,
-                into_raw_array(types.iter().map(|r#type| r#type.to_raw()).collect()),
+                types as *const _ as *const _,
             ))
         }
     }
