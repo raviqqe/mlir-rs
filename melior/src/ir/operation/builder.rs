@@ -71,6 +71,7 @@ impl<'c> OperationBuilder<'c> {
     /// Adds successor blocks.
     // TODO Fix this to ensure blocks are alive while they are referenced by the
     // operation.
+    // TODO Should we accept `BlockRef`?
     pub fn add_successors(mut self, successors: &[&Block<'c>]) -> Self {
         unsafe {
             mlirOperationStateAddSuccessors(
@@ -88,6 +89,7 @@ impl<'c> OperationBuilder<'c> {
     }
 
     /// Adds attributes.
+    // TODO Should we accept `NamedAttribute`?
     pub fn add_attributes(mut self, attributes: &[(Identifier<'c>, Attribute<'c>)]) -> Self {
         unsafe {
             mlirOperationStateAddAttributes(

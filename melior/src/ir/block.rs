@@ -29,6 +29,7 @@ pub struct Block<'c> {
 
 impl<'c> Block<'c> {
     /// Creates a block.
+    // TODO Should we accept types and locations separately?
     pub fn new(arguments: &[(Type<'c>, Location<'c>)]) -> Self {
         unsafe {
             Self::from_raw(mlirBlockCreate(
