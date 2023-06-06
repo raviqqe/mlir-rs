@@ -4,11 +4,7 @@ mod argument;
 
 pub use self::argument::BlockArgument;
 use super::{Location, Operation, OperationRef, RegionRef, Type, TypeLike, Value};
-use crate::{
-    context::Context,
-    utility::{into_raw_array, print_callback},
-    Error,
-};
+use crate::{context::Context, utility::print_callback, Error};
 use mlir_sys::{
     mlirBlockAddArgument, mlirBlockAppendOwnedOperation, mlirBlockCreate, mlirBlockDestroy,
     mlirBlockDetach, mlirBlockEqual, mlirBlockGetArgument, mlirBlockGetFirstOperation,
@@ -37,18 +33,16 @@ impl<'c> Block<'c> {
         unsafe {
             Self::from_raw(mlirBlockCreate(
                 arguments.len() as isize,
-                into_raw_array(
-                    arguments
-                        .iter()
-                        .map(|(argument, _)| argument.to_raw())
-                        .collect(),
-                ),
-                into_raw_array(
-                    arguments
-                        .iter()
-                        .map(|(_, location)| location.to_raw())
-                        .collect(),
-                ),
+                arguments
+                    .iter()
+                    .map(|(argument, _)| argument.to_raw())
+                    .collect::<Vec<_>>()
+                    .as_ptr() as *const _,
+                arguments
+                    .iter()
+                    .map(|(_, location)| location.to_raw())
+                    .collect::<Vec<_>>()
+                    .as_ptr() as *const _,
             ))
         }
     }
