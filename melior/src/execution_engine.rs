@@ -1,7 +1,7 @@
 use crate::{ir::Module, logical_result::LogicalResult, string_ref::StringRef, Error};
 use mlir_sys::{
     mlirExecutionEngineCreate, mlirExecutionEngineDestroy, mlirExecutionEngineDumpToObjectFile,
-    mlirExecutionEngineInvokePacked, MlirExecutionEngine,
+    mlirExecutionEngineInvokePacked, mlirExecutionEngineRegisterSymbol, MlirExecutionEngine,
 };
 use std::ffi::c_void;
 
@@ -55,6 +55,20 @@ impl ExecutionEngine {
         } else {
             Err(Error::InvokeFunction)
         }
+    }
+
+    /// Register a symbol with the jit. This symbol will be accessible to the jitted code.
+    ///
+    /// # Safety
+    ///
+    /// This function modifies makes a pointer accessible to the jit. If said pointer is invalid or
+    /// misaligned, calling this function might result in undefined behavior.
+    pub unsafe fn register_symbol(&self, name: &str, ptr: *mut ()) {
+        mlirExecutionEngineRegisterSymbol(
+            self.raw,
+            StringRef::from(name).to_raw(),
+            ptr as *mut c_void,
+        );
     }
 
     /// Dumps a module to an object file.
