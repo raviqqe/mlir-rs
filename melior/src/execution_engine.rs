@@ -3,7 +3,6 @@ use mlir_sys::{
     mlirExecutionEngineCreate, mlirExecutionEngineDestroy, mlirExecutionEngineDumpToObjectFile,
     mlirExecutionEngineInvokePacked, mlirExecutionEngineRegisterSymbol, MlirExecutionEngine,
 };
-use std::ffi::c_void;
 
 /// An execution engine.
 pub struct ExecutionEngine {
@@ -47,7 +46,7 @@ impl ExecutionEngine {
         let result = LogicalResult::from_raw(mlirExecutionEngineInvokePacked(
             self.raw,
             StringRef::from(name).to_raw(),
-            arguments.as_mut_ptr() as *mut *mut c_void,
+            arguments.as_mut_ptr() as _,
         ));
 
         if result.is_success() {
@@ -65,11 +64,7 @@ impl ExecutionEngine {
     /// given pointer is invalid or misaligned, calling this function might
     /// result in undefined behavior.
     pub unsafe fn register_symbol(&self, name: &str, ptr: *mut ()) {
-        mlirExecutionEngineRegisterSymbol(
-            self.raw,
-            StringRef::from(name).to_raw(),
-            ptr as *mut c_void,
-        );
+        mlirExecutionEngineRegisterSymbol(self.raw, StringRef::from(name).to_raw(), ptr as _);
     }
 
     /// Dumps a module to an object file.
