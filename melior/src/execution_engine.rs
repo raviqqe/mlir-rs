@@ -57,12 +57,13 @@ impl ExecutionEngine {
         }
     }
 
-    /// Register a symbol with the jit. This symbol will be accessible to the jitted code.
+    /// Register a symbol. This symbol will be accessible to the JIT'd codes.
     ///
     /// # Safety
     ///
-    /// This function modifies makes a pointer accessible to the jit. If said pointer is invalid or
-    /// misaligned, calling this function might result in undefined behavior.
+    /// This function makes a pointer accessible to the execution engine. If a
+    /// given pointer is invalid or misaligned, calling this function might
+    /// result in undefined behavior.
     pub unsafe fn register_symbol(&self, name: &str, ptr: *mut ()) {
         mlirExecutionEngineRegisterSymbol(
             self.raw,
