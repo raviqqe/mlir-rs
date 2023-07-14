@@ -11,7 +11,10 @@ use crate::{
     Context,
 };
 
+pub use alloca_options::*;
 pub use load_store_options::*;
+
+mod alloca_options;
 pub mod attributes;
 mod load_store_options;
 pub mod r#type;
@@ -113,6 +116,41 @@ pub fn poison<'c>(result_type: Type<'c>, location: Location<'c>) -> Operation<'c
         .build()
 }
 
+/// Creates a `llvm.mlir.null` operation. A null pointer.
+pub fn nullptr<'c>(ptr_type: Type<'c>, location: Location<'c>) -> Operation<'c> {
+    OperationBuilder::new("llvm.mlir.null", location)
+        .add_results(&[ptr_type])
+        .build()
+}
+
+/// Creates a `llvm.unreachable` operation. A null pointer.
+pub fn unreachable(location: Location) -> Operation {
+    OperationBuilder::new("llvm.unreachable", location).build()
+}
+
+/// Creates a `llvm.bitcast` operation.
+pub fn bitcast<'c>(arg: Value<'c, '_>, res: Type<'c>, location: Location<'c>) -> Operation<'c> {
+    OperationBuilder::new("llvm.bitcast", location)
+        .add_operands(&[arg])
+        .add_results(&[res])
+        .build()
+}
+
+/// Creates a `llvm.alloca` operation.
+pub fn alloca<'c>(
+    context: &'c Context,
+    array_size: Value<'c, '_>,
+    ptr_type: Type<'c>,
+    location: Location<'c>,
+    extra_options: AllocaOptions<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new("llvm.alloca", location)
+        .add_operands(&[array_size])
+        .add_attributes(&extra_options.into_attributes(context))
+        .add_results(&[ptr_type])
+        .build()
+}
+
 /// Creates a `llvm.store` operation.
 pub fn store<'c>(
     context: &'c Context,
@@ -170,6 +208,21 @@ pub fn r#return<'c>(value: Option<Value<'c, '_>>, location: Location<'c>) -> Ope
     }
 
     builder.build()
+}
+
+/// Creates a `llvm.call_intrinsic` operation.
+pub fn call_intrinsic<'c>(
+    context: &'c Context,
+    intrin: StringAttribute<'c>,
+    args: &[Value<'c, '_>],
+    results: &[Type<'c>],
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new("llvm.call_intrinsic", location)
+        .add_operands(args)
+        .add_attributes(&[(Identifier::new(context, "intrin"), intrin.into())])
+        .add_results(results)
+        .build()
 }
 
 #[cfg(test)]
@@ -442,6 +495,46 @@ mod tests {
                 let block = Block::new(&[(struct_type, location)]);
 
                 block.append_operation(poison(struct_type, location));
+
+                block.append_operation(func::r#return(&[], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            &[],
+            location,
+        ));
+
+        convert_module(&context, &mut module);
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
+    fn compile_alloca() {
+        let context = create_test_context();
+
+        let location = Location::unknown(&context);
+        let mut module = Module::new(location);
+        let integer_type = IntegerType::new(&context, 64).into();
+        let ptr_type = r#type::opaque_pointer(&context);
+
+        module.body().append_operation(func::func(
+            &context,
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(FunctionType::new(&context, &[integer_type], &[]).into()),
+            {
+                let block = Block::new(&[(integer_type, location)]);
+
+                block.append_operation(alloca(
+                    &context,
+                    block.argument(0).unwrap().into(),
+                    ptr_type,
+                    location,
+                    AllocaOptions::new().elem_type(Some(TypeAttribute::new(integer_type))),
+                ));
 
                 block.append_operation(func::r#return(&[], location));
 

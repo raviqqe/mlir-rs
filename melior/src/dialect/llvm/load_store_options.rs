@@ -9,7 +9,7 @@ use crate::{
 // spell-checker: disable
 
 /// Load/store options.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone, Copy)]
 pub struct LoadStoreOptions<'c> {
     align: Option<IntegerAttribute<'c>>,
     volatile: bool,
