@@ -51,7 +51,15 @@ pub trait ExternalPass<'c>: Sized + Clone {
     fn construct(&mut self) {}
     fn destruct(&mut self) {}
     fn initialize(&mut self, context: ContextRef<'c>);
-    fn run(&mut self, operation: OperationRef);
+    fn run(&mut self, operation: OperationRef<'c, '_>);
+}
+
+impl<'c, F: Fn(OperationRef<'c, '_>) + Clone> ExternalPass<'c> for F {
+    fn initialize(&mut self, _context: ContextRef<'c>) {}
+
+    fn run(&mut self, operation: OperationRef<'c, '_>) {
+        self(operation)
+    }
 }
 
 pub fn create_external<'c, T: ExternalPass<'c>>(
