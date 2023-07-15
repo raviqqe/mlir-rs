@@ -6,6 +6,8 @@ use crate::{
     Context,
 };
 
+const ATTRIBUTE_COUNT: usize = 7;
+
 // spell-checker: disable
 
 /// Load/store options.
@@ -72,7 +74,7 @@ impl<'c> LoadStoreOptions<'c> {
         self,
         context: &'c Context,
     ) -> Vec<(Identifier<'c>, Attribute<'c>)> {
-        let mut attributes = Vec::with_capacity(7);
+        let mut attributes = Vec::with_capacity(ATTRIBUTE_COUNT);
 
         if let Some(align) = self.align {
             attributes.push((Identifier::new(context, "alignment"), align.into()));
