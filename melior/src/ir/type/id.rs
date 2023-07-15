@@ -3,7 +3,10 @@
 mod allocator;
 
 pub use allocator::Allocator;
-use mlir_sys::{mlirTypeIDEqual, mlirTypeIDHashValue, MlirTypeID};
+use mlir_sys::{
+    mlirTypeIDAllocatorAllocateTypeID, mlirTypeIDAllocatorCreate, mlirTypeIDAllocatorDestroy,
+    mlirTypeIDEqual, mlirTypeIDHashValue, MlirTypeID,
+};
 use std::hash::{Hash, Hasher};
 
 /// A type ID.
@@ -26,11 +29,12 @@ impl TypeId {
         self.raw
     }
 
-    pub fn create<T>(t: &T) -> Self {
+    pub fn create() -> Self {
         unsafe {
-            Self::from_raw(mlir_sys::mlirTypeIDCreate(
-                std::ptr::addr_of!(t) as *mut std::ffi::c_void
-            ))
+            let allocator = mlirTypeIDAllocatorCreate();
+            let id = mlirTypeIDAllocatorAllocateTypeID(allocator);
+            mlirTypeIDAllocatorDestroy(allocator);
+            Self::from_raw(id)
         }
     }
 }

@@ -65,7 +65,7 @@ pub trait ExternalPass<'a>: Sized + Clone {
             let pass = Box::<Self>::into_raw(Box::new(self));
             let pass_ref = pass.as_ref().expect("pass is still valid");
             let raw_pass = mlir_sys::mlirCreateExternalPass(
-                pass_ref.type_id().to_raw(),
+                TypeId::create().to_raw(),
                 pass_ref.name().to_raw(),
                 pass_ref.argument().to_raw(),
                 pass_ref.description().to_raw(),
@@ -79,7 +79,6 @@ pub trait ExternalPass<'a>: Sized + Clone {
         }
     }
 
-    fn type_id(&self) -> TypeId;
     fn name(&self) -> StringRef<'a>;
     fn argument(&self) -> StringRef<'a>;
     fn description(&self) -> StringRef<'a>;
