@@ -104,6 +104,10 @@ impl DialectHandle {
     pub const unsafe fn from_raw(handle: MlirDialectHandle) -> Self {
         Self { raw: handle }
     }
+
+    pub const unsafe fn to_raw(self) -> MlirDialectHandle {
+        self.raw
+    }
 }
 
 #[cfg(test)]

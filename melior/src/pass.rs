@@ -2,6 +2,7 @@
 
 pub mod r#async;
 pub mod conversion;
+pub mod external;
 pub mod gpu;
 pub mod linalg;
 mod manager;
@@ -9,7 +10,9 @@ mod operation_manager;
 pub mod sparse_tensor;
 pub mod transform;
 
-pub use self::{manager::PassManager, operation_manager::OperationPassManager};
+pub use self::{
+    external::ExternalPass, manager::PassManager, operation_manager::OperationPassManager,
+};
 use mlir_sys::MlirPass;
 
 /// A pass.
@@ -27,6 +30,10 @@ impl Pass {
         Self {
             raw: unsafe { create_raw() },
         }
+    }
+
+    pub unsafe fn from_raw(raw: MlirPass) -> Self {
+        Self { raw }
     }
 
     /// Converts a pass into a raw object.

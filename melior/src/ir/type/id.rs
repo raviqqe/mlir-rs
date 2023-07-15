@@ -21,6 +21,18 @@ impl TypeId {
     pub const unsafe fn from_raw(raw: MlirTypeID) -> Self {
         Self { raw }
     }
+
+    pub unsafe fn to_raw(self) -> MlirTypeID {
+        self.raw
+    }
+
+    pub fn create<T>(t: &T) -> Self {
+        unsafe {
+            Self::from_raw(mlir_sys::mlirTypeIDCreate(
+                std::ptr::addr_of!(t) as *mut std::ffi::c_void
+            ))
+        }
+    }
 }
 
 impl PartialEq for TypeId {
