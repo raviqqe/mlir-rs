@@ -10,7 +10,6 @@ use crate::{
     },
     Context,
 };
-
 pub use alloca_options::*;
 pub use load_store_options::*;
 
@@ -123,7 +122,7 @@ pub fn nullptr<'c>(ptr_type: Type<'c>, location: Location<'c>) -> Operation<'c> 
         .build()
 }
 
-/// Creates a `llvm.unreachable` operation. A null pointer.
+/// Creates a `llvm.unreachable` operation.
 pub fn unreachable(location: Location) -> Operation {
     OperationBuilder::new("llvm.unreachable", location).build()
 }
