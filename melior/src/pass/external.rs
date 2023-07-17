@@ -165,7 +165,7 @@ mod tests {
         ir::{
             attribute::{StringAttribute, TypeAttribute},
             r#type::FunctionType,
-            Block, Location, Module, Region,
+            Block, Identifier, Location, Module, Region,
         },
         pass::PassManager,
         test::create_test_context,
@@ -226,6 +226,17 @@ mod tests {
                 assert_eq!(self.value, 20);
                 self.value = 30;
                 assert!(operation.verify());
+                assert!(
+                    operation
+                        .region(0)
+                        .expect("module has a body")
+                        .first_block()
+                        .expect("module has a body")
+                        .first_operation()
+                        .expect("body has a function")
+                        .name()
+                        == Identifier::new(&operation.context(), "func.func")
+                );
             }
         }
 
@@ -265,6 +276,17 @@ mod tests {
         pass_manager.add_pass(create_external(
             |operation: OperationRef| {
                 assert!(operation.verify());
+                assert!(
+                    operation
+                        .region(0)
+                        .expect("module has a body")
+                        .first_block()
+                        .expect("module has a body")
+                        .first_operation()
+                        .expect("body has a function")
+                        .name()
+                        == Identifier::new(&operation.context(), "func.func")
+                );
             },
             TypeId::create(&TEST_FN_PASS),
             "test closure",
