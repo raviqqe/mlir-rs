@@ -157,3 +157,122 @@ pub fn create_external<'c, T: ExternalPass<'c>>(
         Pass::from_raw(raw_pass)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        dialect::func,
+        ir::{
+            attribute::{StringAttribute, TypeAttribute},
+            r#type::FunctionType,
+            Block, Location, Module, Region,
+        },
+        pass::PassManager,
+        test::create_test_context,
+        Context,
+    };
+
+    use super::*;
+
+    #[repr(align(8))]
+    struct PassId;
+
+    fn create_module(context: &Context) -> Module {
+        let location = Location::unknown(&context);
+        let module = Module::new(location);
+
+        module.body().append_operation(func::func(
+            &context,
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(FunctionType::new(&context, &[], &[]).into()),
+            {
+                let block = Block::new(&[]);
+                block.append_operation(func::r#return(&[], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            &[],
+            location,
+        ));
+        module
+    }
+
+    #[test]
+    fn external_pass() {
+        static TEST_PASS: PassId = PassId;
+
+        #[derive(Clone, Debug)]
+        struct TestPass {
+            value: i32,
+        }
+
+        impl<'c> ExternalPass<'c> for TestPass {
+            fn construct(&mut self) {
+                assert_eq!(self.value, 10);
+            }
+
+            fn destruct(&mut self) {
+                assert_eq!(self.value, 30);
+            }
+
+            fn initialize(&mut self, _context: ContextRef<'c>) {
+                assert_eq!(self.value, 10);
+                self.value = 20;
+            }
+
+            fn run(&mut self, operation: OperationRef<'c, '_>) {
+                assert_eq!(self.value, 20);
+                self.value = 30;
+                assert!(operation.verify());
+            }
+        }
+
+        impl TestPass {
+            fn create(self) -> Pass {
+                create_external(
+                    self,
+                    TypeId::create(&TEST_PASS),
+                    "test pass",
+                    "test argument",
+                    "a test pass",
+                    "",
+                    &[DialectHandle::func()],
+                )
+            }
+        }
+
+        let context = create_test_context();
+
+        let mut module = create_module(&context);
+        let pass_manager = PassManager::new(&context);
+
+        let test_pass = TestPass { value: 10 };
+        pass_manager.add_pass(test_pass.create());
+        pass_manager.run(&mut module).unwrap();
+    }
+
+    #[test]
+    fn external_fn_pass() {
+        static TEST_FN_PASS: PassId = PassId;
+
+        let context = create_test_context();
+
+        let mut module = create_module(&context);
+        let pass_manager = PassManager::new(&context);
+
+        pass_manager.add_pass(create_external(
+            |operation: OperationRef| {
+                assert!(operation.verify());
+            },
+            TypeId::create(&TEST_FN_PASS),
+            "test closure",
+            "test argument",
+            "test",
+            "",
+            &[DialectHandle::func()],
+        ));
+        pass_manager.run(&mut module).unwrap();
+    }
+}
