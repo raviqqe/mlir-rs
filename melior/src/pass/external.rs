@@ -26,7 +26,7 @@ unsafe extern "C" fn callback_initialize<'a, T: ExternalPass<'a>>(
     pass.as_mut()
         .expect("pass should be valid when called")
         .initialize(ContextRef::from_raw(ctx));
-    return MlirLogicalResult { value: 1 };
+    MlirLogicalResult { value: 1 }
 }
 
 unsafe extern "C" fn callback_run<'a, T: ExternalPass<'a>>(
@@ -54,7 +54,7 @@ pub trait ExternalPass<'c>: Sized + Clone {
     fn run(&mut self, operation: OperationRef<'c, '_>);
 }
 
-impl<'c, F: Fn(OperationRef<'c, '_>) + Clone> ExternalPass<'c> for F {
+impl<'c, F: FnMut(OperationRef<'c, '_>) + Clone> ExternalPass<'c> for F {
     fn initialize(&mut self, _context: ContextRef<'c>) {}
 
     fn run(&mut self, operation: OperationRef<'c, '_>) {
@@ -64,6 +64,7 @@ impl<'c, F: Fn(OperationRef<'c, '_>) + Clone> ExternalPass<'c> for F {
 
 pub fn create_external<'c, T: ExternalPass<'c>>(
     pass: T,
+    pass_id: TypeId,
     name: &str,
     argument: &str,
     description: &str,
@@ -71,8 +72,7 @@ pub fn create_external<'c, T: ExternalPass<'c>>(
     dependent_dialects: &[DialectHandle],
 ) -> Pass {
     unsafe {
-        let mut dep_dialects_raw: Vec<_> =
-            dependent_dialects.into_iter().map(|d| d.to_raw()).collect();
+        let mut dep_dialects_raw: Vec<_> = dependent_dialects.iter().map(|d| d.to_raw()).collect();
         let callbacks = mlir_sys::MlirExternalPassCallbacks {
             construct: Some(std::mem::transmute(callback_construct::<T> as *const ())),
             destruct: Some(std::mem::transmute(callback_destruct::<T> as *const ())),
@@ -82,7 +82,7 @@ pub fn create_external<'c, T: ExternalPass<'c>>(
         };
         let pass_box = Box::<T>::into_raw(Box::new(pass));
         let raw_pass = mlir_sys::mlirCreateExternalPass(
-            TypeId::create().to_raw(),
+            pass_id.to_raw(),
             StringRef::from(name).to_raw(),
             StringRef::from(argument).to_raw(),
             StringRef::from(description).to_raw(),

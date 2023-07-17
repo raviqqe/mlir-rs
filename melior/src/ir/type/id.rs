@@ -3,10 +3,7 @@
 mod allocator;
 
 pub use allocator::Allocator;
-use mlir_sys::{
-    mlirTypeIDAllocatorAllocateTypeID, mlirTypeIDAllocatorCreate, mlirTypeIDAllocatorDestroy,
-    mlirTypeIDEqual, mlirTypeIDHashValue, MlirTypeID,
-};
+use mlir_sys::{mlirTypeIDEqual, mlirTypeIDHashValue, MlirTypeID};
 use std::hash::{Hash, Hasher};
 
 /// A type ID.
@@ -25,16 +22,25 @@ impl TypeId {
         Self { raw }
     }
 
-    pub unsafe fn to_raw(self) -> MlirTypeID {
+    /// Converts a type ID into a raw object.
+    pub const fn to_raw(self) -> MlirTypeID {
         self.raw
     }
 
-    pub fn create() -> Self {
+    /// Creates a type ID from an 8-byte aligned reference.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the given reference is not 8-byte aligned.
+    pub fn create<T>(t: &T) -> Self {
         unsafe {
-            let allocator = mlirTypeIDAllocatorCreate();
-            let id = mlirTypeIDAllocatorAllocateTypeID(allocator);
-            mlirTypeIDAllocatorDestroy(allocator);
-            Self::from_raw(id)
+            let ptr = t as *const _ as *const std::ffi::c_void;
+            assert_eq!(
+                ptr.align_offset(8),
+                0,
+                "type ID pointer must be 8-byte aligned"
+            );
+            Self::from_raw(mlir_sys::mlirTypeIDCreate(ptr))
         }
     }
 }

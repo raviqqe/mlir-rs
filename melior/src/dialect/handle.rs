@@ -105,7 +105,8 @@ impl DialectHandle {
         Self { raw: handle }
     }
 
-    pub const unsafe fn to_raw(self) -> MlirDialectHandle {
+    /// Converts a dialect handle into a raw object.
+    pub const fn to_raw(self) -> MlirDialectHandle {
         self.raw
     }
 }
