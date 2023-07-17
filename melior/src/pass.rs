@@ -11,7 +11,8 @@ pub mod sparse_tensor;
 pub mod transform;
 
 pub use self::{
-    external::ExternalPass, manager::PassManager, operation_manager::OperationPassManager,
+    external::create_external, external::ExternalPass, manager::PassManager,
+    operation_manager::OperationPassManager,
 };
 use mlir_sys::MlirPass;
 

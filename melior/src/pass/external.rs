@@ -1,3 +1,5 @@
+//! External passes
+
 use super::Pass;
 use crate::{
     dialect::DialectHandle,
@@ -47,6 +49,39 @@ unsafe extern "C" fn callback_clone<'a, T: ExternalPass<'a>>(pass: *mut T) -> *m
     ))
 }
 
+/// A trait for MLIR passes written in Rust.
+///
+/// This trait is implemented for any type that implements `FnMut`,
+/// but can be implemented for any struct that implements `Clone`.
+///
+/// # Examples
+///
+/// The following example pass dumps operations.
+///
+/// ```
+/// use melior::{
+///     ir::OperationRef,
+///     pass::ExternalPass,
+///     ContextRef,
+/// };
+///
+/// #[derive(Clone, Debug)]
+/// struct ExamplePass;
+///
+/// impl<'c> ExternalPass<'c> for ExamplePass {
+///     fn construct(&mut self) {
+///         println!("Constructed pass!");
+///     }
+///
+///     fn initialize(&mut self, context: ContextRef<'c>) {
+///         println!("Initialize called!");
+///     }
+///
+///     fn run(&mut self, operation: OperationRef<'c, '_>) {
+///         operation.dump();
+///     }
+/// }
+/// ```
 pub trait ExternalPass<'c>: Sized + Clone {
     fn construct(&mut self) {}
     fn destruct(&mut self) {}
@@ -62,6 +97,33 @@ impl<'c, F: FnMut(OperationRef<'c, '_>) + Clone> ExternalPass<'c> for F {
     }
 }
 
+/// Creates a `Pass` object from an external pass
+///
+/// # Examples
+///
+/// ```
+/// use melior::{
+///     ir::{r#type::TypeId, OperationRef},
+///     pass::create_external,
+/// };
+///
+/// #[repr(align(8))]
+/// struct PassId;
+///
+/// static EXAMPLE_PASS: PassId = PassId;
+///
+/// create_external(
+///     |operation: OperationRef| {
+///         operation.dump();
+///     },
+///     TypeId::create(&EXAMPLE_PASS),
+///     "name",
+///     "argument",
+///     "description",
+///     "",
+///     &[],
+/// );
+/// ```
 pub fn create_external<'c, T: ExternalPass<'c>>(
     pass: T,
     pass_id: TypeId,
