@@ -3,7 +3,7 @@
 use crate::{
     ir::{
         attribute::IntegerAttribute, operation::OperationBuilder, r#type::IntegerType, Attribute,
-        Identifier, Location, Operation, Value,
+        Identifier, Location, Operation, Value, ValueLike,
     },
     Context,
 };
@@ -94,6 +94,19 @@ fn cmp<'c>(
         .add_operands(&[lhs, rhs])
         .enable_result_type_inference()
         .build()
+}
+
+/// Creates an `arith.select` operation.
+pub fn select<'c>(
+    condition: Value<'c, '_>,
+    true_value: Value<'c, '_>,
+    false_value: Value<'c, '_>,
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new("arith.select", location)
+                .add_operands(&[condition, true_value, false_value])
+                .add_results(&[true_value.r#type()])
+                .build()
 }
 
 melior_macro::binary_operations!(
@@ -578,6 +591,51 @@ mod tests {
                 StringAttribute::new(&context, "foo"),
                 TypeAttribute::new(
                     FunctionType::new(&context, &[integer_type, integer_type], &[integer_type])
+                        .into(),
+                ),
+                region,
+                &[],
+                Location::unknown(&context),
+            )
+        };
+
+        module.body().append_operation(function);
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
+    fn compile_select() {
+        let context = Context::new();
+        load_all_dialects(&context);
+
+        let location = Location::unknown(&context);
+        let module = Module::new(location);
+
+        let integer_type = IntegerType::new(&context, 64).into();
+        let bool_type = IntegerType::new(&context, 1).into();
+
+        let function = {
+            let block = Block::new(&[(bool_type, location), (integer_type, location), (integer_type, location)]);
+
+            let val = block.append_operation(select(
+                block.argument(0).unwrap().into(),
+                block.argument(1).unwrap().into(),
+                block.argument(2).unwrap().into(),
+                location,
+            ));
+
+            block.append_operation(func::r#return(&[val.result(0).unwrap().into()], location));
+
+            let region = Region::new();
+            region.append_block(block);
+
+            func::func(
+                &context,
+                StringAttribute::new(&context, "foo"),
+                TypeAttribute::new(
+                    FunctionType::new(&context, &[bool_type, integer_type, integer_type], &[integer_type])
                         .into(),
                 ),
                 region,
