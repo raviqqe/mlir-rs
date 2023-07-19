@@ -104,9 +104,9 @@ pub fn select<'c>(
     location: Location<'c>,
 ) -> Operation<'c> {
     OperationBuilder::new("arith.select", location)
-                .add_operands(&[condition, true_value, false_value])
-                .add_results(&[true_value.r#type()])
-                .build()
+        .add_operands(&[condition, true_value, false_value])
+        .add_results(&[true_value.r#type()])
+        .build()
 }
 
 melior_macro::binary_operations!(
@@ -617,7 +617,11 @@ mod tests {
         let bool_type = IntegerType::new(&context, 1).into();
 
         let function = {
-            let block = Block::new(&[(bool_type, location), (integer_type, location), (integer_type, location)]);
+            let block = Block::new(&[
+                (bool_type, location),
+                (integer_type, location),
+                (integer_type, location),
+            ]);
 
             let val = block.append_operation(select(
                 block.argument(0).unwrap().into(),
@@ -635,8 +639,12 @@ mod tests {
                 &context,
                 StringAttribute::new(&context, "foo"),
                 TypeAttribute::new(
-                    FunctionType::new(&context, &[bool_type, integer_type, integer_type], &[integer_type])
-                        .into(),
+                    FunctionType::new(
+                        &context,
+                        &[bool_type, integer_type, integer_type],
+                        &[integer_type],
+                    )
+                    .into(),
                 ),
                 region,
                 &[],
