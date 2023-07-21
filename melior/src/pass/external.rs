@@ -139,14 +139,6 @@ pub fn create_external<'c, T: ExternalPass<'c>>(
     dependent_dialects: &[DialectHandle],
 ) -> Pass {
     unsafe {
-        let callbacks = MlirExternalPassCallbacks {
-            construct: Some(transmute(callback_construct::<T> as *const ())),
-            destruct: Some(transmute(callback_destruct::<T> as *const ())),
-            initialize: Some(transmute(callback_initialize::<T> as *const ())),
-            run: Some(transmute(callback_run::<T> as *const ())),
-            clone: Some(transmute(callback_clone::<T> as *const ())),
-        };
-
         Pass::from_raw(mlirCreateExternalPass(
             pass_id.to_raw(),
             StringRef::from(name).to_raw(),
@@ -155,7 +147,13 @@ pub fn create_external<'c, T: ExternalPass<'c>>(
             StringRef::from(op_name).to_raw(),
             dependent_dialects.len() as isize,
             dependent_dialects.as_ptr() as _,
-            callbacks,
+            MlirExternalPassCallbacks {
+                construct: Some(transmute(callback_construct::<T> as *const ())),
+                destruct: Some(transmute(callback_destruct::<T> as *const ())),
+                initialize: Some(transmute(callback_initialize::<T> as *const ())),
+                run: Some(transmute(callback_run::<T> as *const ())),
+                clone: Some(transmute(callback_clone::<T> as *const ())),
+            },
             Box::<T>::into_raw(Box::new(pass)) as _,
         ))
     }
