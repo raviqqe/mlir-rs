@@ -163,6 +163,7 @@ pub fn create_external<'c, T: ExternalPass<'c>>(
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::{
         dialect::func,
         ir::{
@@ -174,8 +175,6 @@ mod tests {
         test::create_test_context,
         Context,
     };
-
-    use super::*;
 
     #[repr(align(8))]
     struct PassId;
