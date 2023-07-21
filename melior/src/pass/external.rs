@@ -154,7 +154,7 @@ pub fn create_external<'c, T: ExternalPass<'c>>(
                 run: Some(transmute(callback_run::<T> as *const ())),
                 clone: Some(transmute(callback_clone::<T> as *const ())),
             },
-            Box::<T>::into_raw(Box::new(pass)) as _,
+            Box::into_raw(Box::new(pass)) as _,
         ))
     }
 }
