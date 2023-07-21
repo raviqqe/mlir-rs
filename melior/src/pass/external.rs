@@ -177,13 +177,13 @@ mod tests {
     struct PassId;
 
     fn create_module(context: &Context) -> Module {
-        let location = Location::unknown(&context);
+        let location = Location::unknown(context);
         let module = Module::new(location);
 
         module.body().append_operation(func::func(
-            &context,
-            StringAttribute::new(&context, "foo"),
-            TypeAttribute::new(FunctionType::new(&context, &[], &[]).into()),
+            context,
+            StringAttribute::new(context, "foo"),
+            TypeAttribute::new(FunctionType::new(context, &[], &[]).into()),
             {
                 let block = Block::new(&[]);
                 block.append_operation(func::r#return(&[], location));

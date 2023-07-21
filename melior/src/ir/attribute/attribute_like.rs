@@ -28,7 +28,7 @@ pub trait AttributeLike<'c> {
 
     /// Gets a type ID.
     fn type_id(&self) -> TypeId<'c> {
-        unsafe { r#type::TypeId::from_raw(mlirAttributeGetTypeID(self.to_raw())) }
+        unsafe { TypeId::from_raw(mlirAttributeGetTypeID(self.to_raw())) }
     }
 
     /// Dumps a attribute.
