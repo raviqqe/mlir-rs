@@ -1,7 +1,5 @@
 //! External passes
 
-use std::mem::transmute;
-
 use super::Pass;
 use crate::{
     dialect::DialectHandle,
@@ -12,6 +10,7 @@ use mlir_sys::{
     mlirCreateExternalPass, MlirContext, MlirExternalPass, MlirExternalPassCallbacks,
     MlirLogicalResult, MlirOperation,
 };
+use std::{mem::transmute, ptr::drop_in_place};
 
 unsafe extern "C" fn callback_construct<'a, T: ExternalPass<'a>>(pass: *mut T) {
     pass.as_mut()
@@ -23,7 +22,7 @@ unsafe extern "C" fn callback_destruct<'a, T: ExternalPass<'a>>(pass: *mut T) {
     pass.as_mut()
         .expect("pass should be valid when called")
         .destruct();
-    std::ptr::drop_in_place(pass);
+    drop_in_place(pass);
 }
 
 unsafe extern "C" fn callback_initialize<'a, T: ExternalPass<'a>>(
