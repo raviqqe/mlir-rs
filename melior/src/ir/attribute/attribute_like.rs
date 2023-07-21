@@ -1,8 +1,5 @@
 use crate::{
-    ir::{
-        r#type::{self, TypeId},
-        Type,
-    },
+    ir::{r#type::TypeId, Type},
     ContextRef,
 };
 use melior_macro::attribute_check_functions;
