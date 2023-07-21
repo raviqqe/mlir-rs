@@ -1,5 +1,7 @@
 //! External passes
 
+use std::mem::transmute;
+
 use super::Pass;
 use crate::{
     dialect::DialectHandle,
@@ -139,11 +141,11 @@ pub fn create_external<'c, T: ExternalPass<'c>>(
     unsafe {
         let mut dep_dialects_raw: Vec<_> = dependent_dialects.iter().map(|d| d.to_raw()).collect();
         let callbacks = MlirExternalPassCallbacks {
-            construct: Some(std::mem::transmute(callback_construct::<T> as *const ())),
-            destruct: Some(std::mem::transmute(callback_destruct::<T> as *const ())),
-            initialize: Some(std::mem::transmute(callback_initialize::<T> as *const ())),
-            run: Some(std::mem::transmute(callback_run::<T> as *const ())),
-            clone: Some(std::mem::transmute(callback_clone::<T> as *const ())),
+            construct: Some(transmute(callback_construct::<T> as *const ())),
+            destruct: Some(transmute(callback_destruct::<T> as *const ())),
+            initialize: Some(transmute(callback_initialize::<T> as *const ())),
+            run: Some(transmute(callback_run::<T> as *const ())),
+            clone: Some(transmute(callback_clone::<T> as *const ())),
         };
         let pass_box = Box::<T>::into_raw(Box::new(pass));
         let raw_pass = mlirCreateExternalPass(
@@ -155,7 +157,7 @@ pub fn create_external<'c, T: ExternalPass<'c>>(
             dep_dialects_raw.len() as isize,
             dep_dialects_raw.as_mut_ptr(),
             callbacks,
-            pass_box as *mut std::ffi::c_void,
+            pass_box as _,
         );
         Pass::from_raw(raw_pass)
     }
