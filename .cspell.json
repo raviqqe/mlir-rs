@@ -31,6 +31,7 @@
     "nvgpu",
     "nvvm",
     "realloc",
+    "repr",
     "rocdl",
     "rustc",
     "sccp",
