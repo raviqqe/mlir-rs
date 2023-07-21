@@ -68,7 +68,7 @@ mod tests {
 
     #[test]
     fn create_from_reference() {
-        const VALUE: u64 = 0;
+        static VALUE: u64 = 0;
 
         TypeId::create(&VALUE);
     }
@@ -76,7 +76,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn reject_invalid_alignment() {
-        const VALUES: [u8; 2] = [1u8; 2];
+        static VALUES: [u8; 2] = [1u8; 2];
 
         TypeId::create(&VALUES[1]);
     }
