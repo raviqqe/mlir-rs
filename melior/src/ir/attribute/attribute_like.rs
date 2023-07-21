@@ -1,5 +1,8 @@
 use crate::{
-    ir::{r#type, Type},
+    ir::{
+        r#type::{self, TypeId},
+        Type,
+    },
     ContextRef,
 };
 use melior_macro::attribute_check_functions;
@@ -24,7 +27,7 @@ pub trait AttributeLike<'c> {
     }
 
     /// Gets a type ID.
-    fn type_id(&self) -> r#type::TypeId {
+    fn type_id(&self) -> TypeId<'c> {
         unsafe { r#type::TypeId::from_raw(mlirAttributeGetTypeID(self.to_raw())) }
     }
 
