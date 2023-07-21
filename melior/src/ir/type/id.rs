@@ -4,22 +4,29 @@ mod allocator;
 
 pub use allocator::Allocator;
 use mlir_sys::{mlirTypeIDCreate, mlirTypeIDEqual, mlirTypeIDHashValue, MlirTypeID};
-use std::hash::{Hash, Hasher};
+use std::{
+    hash::{Hash, Hasher},
+    marker::PhantomData,
+};
 
 /// A type ID.
 #[derive(Clone, Copy, Debug)]
-pub struct TypeId {
+pub struct TypeId<'c> {
     raw: MlirTypeID,
+    _owner: PhantomData<&'c ()>,
 }
 
-impl TypeId {
+impl TypeId<'_> {
     /// Creates a type ID from a raw object.
     ///
     /// # Safety
     ///
     /// A raw object must be valid.
     pub const unsafe fn from_raw(raw: MlirTypeID) -> Self {
-        Self { raw }
+        Self {
+            raw,
+            _owner: PhantomData,
+        }
     }
 
     /// Converts a type ID into a raw object.
@@ -46,15 +53,15 @@ impl TypeId {
     }
 }
 
-impl PartialEq for TypeId {
+impl PartialEq for TypeId<'_> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirTypeIDEqual(self.raw, other.raw) }
     }
 }
 
-impl Eq for TypeId {}
+impl Eq for TypeId<'_> {}
 
-impl Hash for TypeId {
+impl Hash for TypeId<'_> {
     fn hash<H: Hasher>(&self, hasher: &mut H) {
         unsafe {
             mlirTypeIDHashValue(self.raw).hash(hasher);
