@@ -67,10 +67,17 @@ mod tests {
     use super::*;
 
     #[test]
+    fn create_from_reference() {
+        const VALUE: u64 = 0;
+
+        TypeId::create(&VALUE);
+    }
+
+    #[test]
     #[should_panic]
     fn reject_invalid_alignment() {
-        let xs = [1u8; 2];
+        const VALUES: [u8; 2] = [1u8; 2];
 
-        TypeId::create(&xs[1]);
+        TypeId::create(&VALUES[1]);
     }
 }
