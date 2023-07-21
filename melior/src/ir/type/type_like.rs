@@ -13,7 +13,7 @@ pub trait TypeLike<'c> {
     }
 
     /// Gets an ID.
-    fn id(&self) -> TypeId {
+    fn id(&self) -> TypeId<'c> {
         unsafe { TypeId::from_raw(mlirTypeGetTypeID(self.to_raw())) }
     }
 
