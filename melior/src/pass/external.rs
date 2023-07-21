@@ -6,7 +6,10 @@ use crate::{
     ir::{r#type::TypeId, OperationRef},
     ContextRef, StringRef,
 };
-use mlir_sys::{MlirContext, MlirExternalPass, MlirLogicalResult, MlirOperation};
+use mlir_sys::{
+    mlirCreateExternalPass, MlirContext, MlirExternalPass, MlirExternalPassCallbacks,
+    MlirLogicalResult, MlirOperation,
+};
 
 unsafe extern "C" fn callback_construct<'a, T: ExternalPass<'a>>(pass: *mut T) {
     pass.as_mut()
@@ -135,7 +138,7 @@ pub fn create_external<'c, T: ExternalPass<'c>>(
 ) -> Pass {
     unsafe {
         let mut dep_dialects_raw: Vec<_> = dependent_dialects.iter().map(|d| d.to_raw()).collect();
-        let callbacks = mlir_sys::MlirExternalPassCallbacks {
+        let callbacks = MlirExternalPassCallbacks {
             construct: Some(std::mem::transmute(callback_construct::<T> as *const ())),
             destruct: Some(std::mem::transmute(callback_destruct::<T> as *const ())),
             initialize: Some(std::mem::transmute(callback_initialize::<T> as *const ())),
@@ -143,7 +146,7 @@ pub fn create_external<'c, T: ExternalPass<'c>>(
             clone: Some(std::mem::transmute(callback_clone::<T> as *const ())),
         };
         let pass_box = Box::<T>::into_raw(Box::new(pass));
-        let raw_pass = mlir_sys::mlirCreateExternalPass(
+        let raw_pass = mlirCreateExternalPass(
             pass_id.to_raw(),
             StringRef::from(name).to_raw(),
             StringRef::from(argument).to_raw(),
