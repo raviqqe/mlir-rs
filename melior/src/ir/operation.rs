@@ -33,8 +33,6 @@ use std::{
     ops::Deref,
 };
 
-pub type OperationOperand<'c, 'a> = Value<'c, 'a>;
-
 /// An operation.
 pub struct Operation<'c> {
     raw: MlirOperation,
@@ -65,10 +63,10 @@ impl<'c> Operation<'c> {
     }
 
     /// Gets the operand at a position.
-    pub fn operand(&self, index: usize) -> Result<OperationOperand<'c, '_>, Error> {
+    pub fn operand(&self, index: usize) -> Result<Value<'c, '_>, Error> {
         unsafe {
             if index < self.operand_count() {
-                Ok(OperationOperand::from_raw(mlirOperationGetOperand(
+                Ok(Value::from_raw(mlirOperationGetOperand(
                     self.raw,
                     index as isize,
                 )))
@@ -83,7 +81,7 @@ impl<'c> Operation<'c> {
     }
 
     /// Gets all operands.
-    pub fn operands(&self) -> Result<Vec<OperationOperand<'c, '_>>, Error> {
+    pub fn operands(&self) -> Result<Vec<Value<'c, '_>>, Error> {
         self.operands_range(0..self.operand_count())
     }
 
@@ -91,7 +89,7 @@ impl<'c> Operation<'c> {
     pub fn operands_range(
         &self,
         range: std::ops::Range<usize>,
-    ) -> Result<Vec<OperationOperand<'c, '_>>, Error> {
+    ) -> Result<Vec<Value<'c, '_>>, Error> {
         let mut operands = Vec::new();
 
         for i in range {
@@ -167,42 +165,40 @@ impl<'c> Operation<'c> {
     }
 
     /// Gets a attribute with the given name.
-    pub fn attribute(&self, name: impl AsRef<str>) -> Option<Attribute<'c>> {
+    pub fn attribute(&self, name: &str) -> Option<Attribute<'c>> {
         unsafe {
             Attribute::from_option_raw(mlirOperationGetAttributeByName(
                 self.raw,
-                StringRef::from(name.as_ref()).to_raw(),
+                StringRef::from(name).to_raw(),
             ))
         }
     }
 
     /// Checks if the operation has a attribute with the given name.
-    pub fn has_attribute(&self, name: impl AsRef<str>) -> bool {
+    pub fn has_attribute(&self, name: &str) -> bool {
         self.attribute(name).is_some()
     }
 
     /// Sets the attribute with the given name to the given attribute.
-    pub fn set_attribute(&mut self, name: impl AsRef<str>, attribute: impl AttributeLike<'c>) {
+    pub fn set_attribute(&mut self, name: &str, attribute: &Attribute<'c>) {
         unsafe {
             mlirOperationSetAttributeByName(
                 self.raw,
-                StringRef::from(name.as_ref()).to_raw(),
+                StringRef::from(name).to_raw(),
                 attribute.to_raw(),
             )
         }
     }
 
     /// Removes the attribute with the given name.
-    pub fn remove_attribute(&mut self, name: impl AsRef<str>) -> Result<(), Error> {
+    pub fn remove_attribute(&mut self, name: &str) -> Result<(), Error> {
         unsafe {
-            let result = mlirOperationRemoveAttributeByName(
-                self.raw,
-                StringRef::from(name.as_ref()).to_raw(),
-            );
+            let result =
+                mlirOperationRemoveAttributeByName(self.raw, StringRef::from(name).to_raw());
             if result {
                 Ok(())
             } else {
-                Err(Error::OperationAttributeExpected(name.as_ref().into()))
+                Err(Error::OperationAttributeExpected(name.into()))
             }
         }
     }
@@ -517,7 +513,7 @@ mod tests {
         let mut operation = OperationBuilder::new("foo", Location::unknown(&context))
             .add_attribute(
                 &Identifier::new(&context, "foo"),
-                &StringAttribute::new(&context, "bar"),
+                &StringAttribute::new(&context, "bar").into(),
             )
             .build();
         assert!(operation.has_attribute("foo"));
@@ -527,7 +523,7 @@ mod tests {
         );
         assert!(operation.remove_attribute("foo").is_ok());
         assert!(operation.remove_attribute("foo").is_err());
-        operation.set_attribute("foo", StringAttribute::new(&context, "foo"));
+        operation.set_attribute("foo", &StringAttribute::new(&context, "foo").into());
         assert_eq!(
             operation.attribute("foo").map(|a| a.to_string()),
             Some("\"foo\"".into())

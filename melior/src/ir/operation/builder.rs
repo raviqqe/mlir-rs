@@ -121,11 +121,7 @@ impl<'c> OperationBuilder<'c> {
     }
 
     /// Adds a single attribute.
-    pub fn add_attribute(
-        mut self,
-        name: &Identifier<'c>,
-        attribute: &impl AttributeLike<'c>,
-    ) -> Self {
+    pub fn add_attribute(mut self, name: &Identifier<'c>, attribute: &Attribute<'c>) -> Self {
         unsafe {
             mlirOperationStateAddAttributes(
                 &mut self.raw,
