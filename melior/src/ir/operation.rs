@@ -7,11 +7,11 @@ mod result;
 pub use self::{
     builder::OperationBuilder, printing_flags::OperationPrintingFlags, result::OperationResult,
 };
-use super::{BlockRef, Identifier, RegionRef};
+use super::{Attribute, AttributeLike, BlockRef, Identifier, RegionRef, Value};
 use crate::{
     context::{Context, ContextRef},
     utility::{print_callback, print_string_callback},
-    Error,
+    Error, StringRef,
 };
 use core::{
     fmt,
@@ -19,10 +19,12 @@ use core::{
 };
 use mlir_sys::{
     mlirOperationClone, mlirOperationDestroy, mlirOperationDump, mlirOperationEqual,
-    mlirOperationGetBlock, mlirOperationGetContext, mlirOperationGetName,
-    mlirOperationGetNextInBlock, mlirOperationGetNumRegions, mlirOperationGetNumResults,
+    mlirOperationGetAttributeByName, mlirOperationGetBlock, mlirOperationGetContext,
+    mlirOperationGetName, mlirOperationGetNextInBlock, mlirOperationGetNumOperands,
+    mlirOperationGetNumRegions, mlirOperationGetNumResults, mlirOperationGetOperand,
     mlirOperationGetRegion, mlirOperationGetResult, mlirOperationPrint,
-    mlirOperationPrintWithFlags, mlirOperationVerify, MlirOperation,
+    mlirOperationPrintWithFlags, mlirOperationRemoveAttributeByName,
+    mlirOperationSetAttributeByName, mlirOperationVerify, MlirOperation,
 };
 use std::{
     ffi::c_void,
@@ -30,6 +32,8 @@ use std::{
     marker::PhantomData,
     ops::Deref,
 };
+
+pub type OperationOperand<'c, 'a> = Value<'c, 'a>;
 
 /// An operation.
 pub struct Operation<'c> {
@@ -55,6 +59,53 @@ impl<'c> Operation<'c> {
         unsafe { BlockRef::from_option_raw(mlirOperationGetBlock(self.raw)) }
     }
 
+    /// Gets the number of operands.
+    pub fn operand_count(&self) -> usize {
+        unsafe { mlirOperationGetNumOperands(self.raw) as usize }
+    }
+
+    /// Gets the operand at a position.
+    pub fn operand(&self, index: usize) -> Result<OperationOperand<'c, '_>, Error> {
+        unsafe {
+            if index < self.operand_count() {
+                Ok(OperationOperand::from_raw(mlirOperationGetOperand(
+                    self.raw,
+                    index as isize,
+                )))
+            } else {
+                Err(Error::PositionOutOfBounds {
+                    name: "operation operand",
+                    value: self.to_string(),
+                    index,
+                })
+            }
+        }
+    }
+
+    /// Gets all operands.
+    pub fn operands(&self) -> Result<Vec<OperationOperand<'c, '_>>, Error> {
+        self.operands_range(0..self.operand_count())
+    }
+
+    /// Gets operands in a given range.
+    pub fn operands_range(
+        &self,
+        range: std::ops::Range<usize>,
+    ) -> Result<Vec<OperationOperand<'c, '_>>, Error> {
+        let mut operands = Vec::new();
+
+        for i in range {
+            operands.push(self.operand(i)?);
+        }
+
+        Ok(operands)
+    }
+
+    /// Gets the number of results.
+    pub fn result_count(&self) -> usize {
+        unsafe { mlirOperationGetNumResults(self.raw) as usize }
+    }
+
     /// Gets a result at a position.
     pub fn result(&self, index: usize) -> Result<OperationResult<'c, '_>, Error> {
         unsafe {
@@ -73,9 +124,23 @@ impl<'c> Operation<'c> {
         }
     }
 
-    /// Gets a number of results.
-    pub fn result_count(&self) -> usize {
-        unsafe { mlirOperationGetNumResults(self.raw) as usize }
+    /// Gets all results.
+    pub fn results(&self) -> Result<Vec<OperationResult<'c, '_>>, Error> {
+        self.results_range(0..self.result_count())
+    }
+
+    /// Gets results in a given range.
+    pub fn results_range(
+        &self,
+        range: std::ops::Range<usize>,
+    ) -> Result<Vec<OperationResult<'c, '_>>, Error> {
+        let mut results = Vec::new();
+
+        for i in range {
+            results.push(self.result(i)?);
+        }
+
+        Ok(results)
     }
 
     /// Gets a region at a position.
@@ -99,6 +164,47 @@ impl<'c> Operation<'c> {
     /// Gets a number of regions.
     pub fn region_count(&self) -> usize {
         unsafe { mlirOperationGetNumRegions(self.raw) as usize }
+    }
+
+    /// Gets a attribute with the given name.
+    pub fn attribute(&self, name: impl AsRef<str>) -> Option<Attribute<'c>> {
+        unsafe {
+            Attribute::from_option_raw(mlirOperationGetAttributeByName(
+                self.raw,
+                StringRef::from(name.as_ref()).to_raw(),
+            ))
+        }
+    }
+
+    /// Checks if the operation has a attribute with the given name.
+    pub fn has_attribute(&self, name: impl AsRef<str>) -> bool {
+        self.attribute(name).is_some()
+    }
+
+    /// Sets the attribute with the given name to the given attribute.
+    pub fn set_attribute(&mut self, name: impl AsRef<str>, attribute: impl AttributeLike<'c>) {
+        unsafe {
+            mlirOperationSetAttributeByName(
+                self.raw,
+                StringRef::from(name.as_ref()).to_raw(),
+                attribute.to_raw(),
+            )
+        }
+    }
+
+    /// Removes the attribute with the given name.
+    pub fn remove_attribute(&mut self, name: impl AsRef<str>) -> Result<(), Error> {
+        unsafe {
+            let result = mlirOperationRemoveAttributeByName(
+                self.raw,
+                StringRef::from(name.as_ref()).to_raw(),
+            );
+            if result {
+                Ok(())
+            } else {
+                Err(Error::OperationAttributeExpected(name.as_ref().into()))
+            }
+        }
     }
 
     /// Gets the next operation in the same block.
@@ -301,7 +407,7 @@ mod tests {
     use super::*;
     use crate::{
         context::Context,
-        ir::{Block, Location},
+        ir::{attribute::StringAttribute, Block, Location, Type},
         test::create_test_context,
     };
     use pretty_assertions::assert_eq;
@@ -379,6 +485,52 @@ mod tests {
                 value: "\"foo\"() : () -> ()\n".into(),
                 index: 0
             })
+        );
+    }
+
+    #[test]
+    fn operands_range() {
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
+
+        let location = Location::unknown(&context);
+        let r#type = Type::index(&context);
+        let block = Block::new(&[(r#type, location)]);
+        let argument: Value = block.argument(0).unwrap().into();
+
+        let operands = vec![argument.clone(), argument.clone(), argument.clone()];
+        let operation = OperationBuilder::new("foo", Location::unknown(&context))
+            .add_operands(&operands)
+            .build();
+
+        assert_eq!(
+            operation.operands_range(1..operation.operand_count()),
+            Ok(vec![argument.clone(), argument.clone()])
+        );
+    }
+
+    #[test]
+    fn attribute() {
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
+
+        let mut operation = OperationBuilder::new("foo", Location::unknown(&context))
+            .add_attribute(
+                &Identifier::new(&context, "foo"),
+                &StringAttribute::new(&context, "bar"),
+            )
+            .build();
+        assert!(operation.has_attribute("foo"));
+        assert_eq!(
+            operation.attribute("foo").map(|a| a.to_string()),
+            Some("\"bar\"".into())
+        );
+        assert!(operation.remove_attribute("foo").is_ok());
+        assert!(operation.remove_attribute("foo").is_err());
+        operation.set_attribute("foo", StringAttribute::new(&context, "foo"));
+        assert_eq!(
+            operation.attribute("foo").map(|a| a.to_string()),
+            Some("\"foo\"".into())
         );
     }
 
