@@ -21,10 +21,11 @@ use mlir_sys::{
     mlirOperationClone, mlirOperationDestroy, mlirOperationDump, mlirOperationEqual,
     mlirOperationGetAttributeByName, mlirOperationGetBlock, mlirOperationGetContext,
     mlirOperationGetName, mlirOperationGetNextInBlock, mlirOperationGetNumOperands,
-    mlirOperationGetNumRegions, mlirOperationGetNumResults, mlirOperationGetOperand,
-    mlirOperationGetRegion, mlirOperationGetResult, mlirOperationPrint,
-    mlirOperationPrintWithFlags, mlirOperationRemoveAttributeByName,
-    mlirOperationSetAttributeByName, mlirOperationVerify, MlirOperation,
+    mlirOperationGetNumRegions, mlirOperationGetNumResults, mlirOperationGetNumSuccessors,
+    mlirOperationGetOperand, mlirOperationGetRegion, mlirOperationGetResult,
+    mlirOperationGetSuccessor, mlirOperationPrint, mlirOperationPrintWithFlags,
+    mlirOperationRemoveAttributeByName, mlirOperationSetAttributeByName, mlirOperationVerify,
+    MlirOperation,
 };
 use std::{
     ffi::c_void,
@@ -64,39 +65,25 @@ impl<'c> Operation<'c> {
 
     /// Gets the operand at a position.
     pub fn operand(&self, index: usize) -> Result<Value<'c, '_>, Error> {
-        unsafe {
-            if index < self.operand_count() {
+        if index < self.operand_count() {
+            unsafe {
                 Ok(Value::from_raw(mlirOperationGetOperand(
                     self.raw,
                     index as isize,
                 )))
-            } else {
-                Err(Error::PositionOutOfBounds {
-                    name: "operation operand",
-                    value: self.to_string(),
-                    index,
-                })
             }
+        } else {
+            Err(Error::PositionOutOfBounds {
+                name: "operation operand",
+                value: self.to_string(),
+                index,
+            })
         }
     }
 
     /// Gets all operands.
-    pub fn operands(&self) -> Result<Vec<Value<'c, '_>>, Error> {
-        self.operands_range(0..self.operand_count())
-    }
-
-    /// Gets operands in a given range.
-    pub fn operands_range(
-        &self,
-        range: std::ops::Range<usize>,
-    ) -> Result<Vec<Value<'c, '_>>, Error> {
-        let mut operands = Vec::new();
-
-        for i in range {
-            operands.push(self.operand(i)?);
-        }
-
-        Ok(operands)
+    pub fn operands(&self) -> impl Iterator<Item = Value<'c, '_>> {
+        (0..self.operand_count()).map(|index| self.operand(index).expect("valid operand index"))
     }
 
     /// Gets the number of results.
@@ -106,62 +93,82 @@ impl<'c> Operation<'c> {
 
     /// Gets a result at a position.
     pub fn result(&self, index: usize) -> Result<OperationResult<'c, '_>, Error> {
-        unsafe {
-            if index < self.result_count() {
+        if index < self.result_count() {
+            unsafe {
                 Ok(OperationResult::from_raw(mlirOperationGetResult(
                     self.raw,
                     index as isize,
                 )))
-            } else {
-                Err(Error::PositionOutOfBounds {
-                    name: "operation result",
-                    value: self.to_string(),
-                    index,
-                })
             }
+        } else {
+            Err(Error::PositionOutOfBounds {
+                name: "operation result",
+                value: self.to_string(),
+                index,
+            })
         }
     }
 
     /// Gets all results.
-    pub fn results(&self) -> Result<Vec<OperationResult<'c, '_>>, Error> {
-        self.results_range(0..self.result_count())
-    }
-
-    /// Gets results in a given range.
-    pub fn results_range(
-        &self,
-        range: std::ops::Range<usize>,
-    ) -> Result<Vec<OperationResult<'c, '_>>, Error> {
-        let mut results = Vec::new();
-
-        for i in range {
-            results.push(self.result(i)?);
-        }
-
-        Ok(results)
-    }
-
-    /// Gets a region at a position.
-    pub fn region(&self, index: usize) -> Result<RegionRef<'c, '_>, Error> {
-        unsafe {
-            if index < self.region_count() {
-                Ok(RegionRef::from_raw(mlirOperationGetRegion(
-                    self.raw,
-                    index as isize,
-                )))
-            } else {
-                Err(Error::PositionOutOfBounds {
-                    name: "region",
-                    value: self.to_string(),
-                    index,
-                })
-            }
-        }
+    pub fn results(&self) -> impl Iterator<Item = OperationResult<'c, '_>> {
+        (0..self.result_count()).map(|index| self.result(index).expect("valid result index"))
     }
 
     /// Gets a number of regions.
     pub fn region_count(&self) -> usize {
         unsafe { mlirOperationGetNumRegions(self.raw) as usize }
+    }
+
+    /// Gets a region at a position.
+    pub fn region(&self, index: usize) -> Result<RegionRef<'c, '_>, Error> {
+        if index < self.region_count() {
+            unsafe {
+                Ok(RegionRef::from_raw(mlirOperationGetRegion(
+                    self.raw,
+                    index as isize,
+                )))
+            }
+        } else {
+            Err(Error::PositionOutOfBounds {
+                name: "region",
+                value: self.to_string(),
+                index,
+            })
+        }
+    }
+
+    /// Gets all regions.
+    pub fn regions(&self) -> impl Iterator<Item = RegionRef<'c, '_>> {
+        (0..self.result_count()).map(|index| self.region(index).expect("valid result index"))
+    }
+
+    /// Gets a number of successors.
+    pub fn successor_count(&self) -> usize {
+        unsafe { mlirOperationGetNumSuccessors(self.raw) as usize }
+    }
+
+    /// Gets a successor at a position.
+    pub fn successor(&self, index: usize) -> Result<BlockRef<'c, '_>, Error> {
+        if index < self.successor_count() {
+            unsafe {
+                Ok(BlockRef::from_raw(mlirOperationGetSuccessor(
+                    self.raw,
+                    index as isize,
+                )))
+            }
+        } else {
+            Err(Error::PositionOutOfBounds {
+                name: "successor",
+                value: self.to_string(),
+                index,
+            })
+        }
+    }
+
+    /// Gets all successorss.
+    pub fn successors(&self) -> impl Iterator<Item = BlockRef<'c, '_>> {
+        (0..self.successor_count())
+            .map(|index| self.successor(index).expect("valid successor index"))
     }
 
     /// Gets a attribute with the given name.
@@ -192,15 +199,9 @@ impl<'c> Operation<'c> {
 
     /// Removes the attribute with the given name.
     pub fn remove_attribute(&mut self, name: &str) -> Result<(), Error> {
-        unsafe {
-            let result =
-                mlirOperationRemoveAttributeByName(self.raw, StringRef::from(name).to_raw());
-            if result {
-                Ok(())
-            } else {
-                Err(Error::OperationAttributeExpected(name.into()))
-            }
-        }
+        unsafe { mlirOperationRemoveAttributeByName(self.raw, StringRef::from(name).to_raw()) }
+            .then_some(())
+            .ok_or(Error::OperationAttributeExpected(name.into()))
     }
 
     /// Gets the next operation in the same block.
@@ -485,7 +486,7 @@ mod tests {
     }
 
     #[test]
-    fn operands_range() {
+    fn operands() {
         let context = create_test_context();
         context.set_allow_unregistered_dialects(true);
 
@@ -500,8 +501,8 @@ mod tests {
             .build();
 
         assert_eq!(
-            operation.operands_range(1..operation.operand_count()),
-            Ok(vec![argument.clone(), argument.clone()])
+            operation.operands().skip(1).collect::<Vec<_>>(),
+            vec![argument.clone(), argument.clone()]
         );
     }
 
@@ -511,10 +512,10 @@ mod tests {
         context.set_allow_unregistered_dialects(true);
 
         let mut operation = OperationBuilder::new("foo", Location::unknown(&context))
-            .add_attribute(
-                &Identifier::new(&context, "foo"),
-                &StringAttribute::new(&context, "bar").into(),
-            )
+            .add_attributes(&[(
+                Identifier::new(&context, "foo"),
+                StringAttribute::new(&context, "bar").into(),
+            )])
             .build();
         assert!(operation.has_attribute("foo"));
         assert_eq!(
