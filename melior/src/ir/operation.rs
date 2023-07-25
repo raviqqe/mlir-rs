@@ -19,13 +19,13 @@ use core::{
 };
 use mlir_sys::{
     mlirOperationClone, mlirOperationDestroy, mlirOperationDump, mlirOperationEqual,
-    mlirOperationGetAttributeByName, mlirOperationGetBlock, mlirOperationGetContext,
-    mlirOperationGetName, mlirOperationGetNextInBlock, mlirOperationGetNumOperands,
-    mlirOperationGetNumRegions, mlirOperationGetNumResults, mlirOperationGetNumSuccessors,
-    mlirOperationGetOperand, mlirOperationGetRegion, mlirOperationGetResult,
-    mlirOperationGetSuccessor, mlirOperationPrint, mlirOperationPrintWithFlags,
-    mlirOperationRemoveAttributeByName, mlirOperationSetAttributeByName, mlirOperationVerify,
-    MlirOperation,
+    mlirOperationGetAttribute, mlirOperationGetAttributeByName, mlirOperationGetBlock,
+    mlirOperationGetContext, mlirOperationGetName, mlirOperationGetNextInBlock,
+    mlirOperationGetNumAttributes, mlirOperationGetNumOperands, mlirOperationGetNumRegions,
+    mlirOperationGetNumResults, mlirOperationGetNumSuccessors, mlirOperationGetOperand,
+    mlirOperationGetRegion, mlirOperationGetResult, mlirOperationGetSuccessor, mlirOperationPrint,
+    mlirOperationPrintWithFlags, mlirOperationRemoveAttributeByName,
+    mlirOperationSetAttributeByName, mlirOperationVerify, MlirOperation,
 };
 use std::{
     ffi::c_void,
@@ -114,7 +114,7 @@ impl<'c> Operation<'c> {
         (0..self.result_count()).map(|index| self.result(index).expect("valid result index"))
     }
 
-    /// Gets a number of regions.
+    /// Gets the number of regions.
     pub fn region_count(&self) -> usize {
         unsafe { mlirOperationGetNumRegions(self.raw) as usize }
     }
@@ -142,7 +142,7 @@ impl<'c> Operation<'c> {
         (0..self.result_count()).map(|index| self.region(index).expect("valid result index"))
     }
 
-    /// Gets a number of successors.
+    /// Gets the number of successors.
     pub fn successor_count(&self) -> usize {
         unsafe { mlirOperationGetNumSuccessors(self.raw) as usize }
     }
@@ -169,6 +169,36 @@ impl<'c> Operation<'c> {
     pub fn successors(&self) -> impl Iterator<Item = BlockRef<'c, '_>> {
         (0..self.successor_count())
             .map(|index| self.successor(index).expect("valid successor index"))
+    }
+
+    /// Gets the number of attributes.
+    pub fn attribute_count(&self) -> usize {
+        unsafe { mlirOperationGetNumAttributes(self.raw) as usize }
+    }
+
+    /// Gets a attribute at a position.
+    pub fn attribute_at(&self, index: usize) -> Result<(Identifier<'c>, Attribute<'c>), Error> {
+        if index < self.attribute_count() {
+            unsafe {
+                let named_attribute = mlirOperationGetAttribute(self.raw, index as isize);
+                Ok((
+                    Identifier::from_raw(named_attribute.name),
+                    Attribute::from_raw(named_attribute.attribute),
+                ))
+            }
+        } else {
+            Err(Error::PositionOutOfBounds {
+                name: "attribute",
+                value: self.to_string(),
+                index,
+            })
+        }
+    }
+
+    /// Gets all attributes.
+    pub fn attributes(&'c self) -> impl Iterator<Item = (Identifier<'c>, Attribute<'c>)> {
+        (0..self.attribute_count())
+            .map(|index| self.attribute_at(index).expect("valid attribute index"))
     }
 
     /// Gets a attribute with the given name.
@@ -529,6 +559,13 @@ mod tests {
             operation.attribute("foo").map(|a| a.to_string()),
             Some("\"foo\"".into())
         );
+        assert_eq!(
+            operation.attributes().next(),
+            Some((
+                Identifier::new(&context, "foo"),
+                StringAttribute::new(&context, "foo").into()
+            ))
+        )
     }
 
     #[test]
