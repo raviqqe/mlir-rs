@@ -213,7 +213,7 @@ impl<'c> Operation<'c> {
     pub fn remove_attribute(&mut self, name: &str) -> Result<(), Error> {
         unsafe { mlirOperationRemoveAttributeByName(self.raw, StringRef::from(name).to_raw()) }
             .then_some(())
-            .ok_or(Error::OperationAttributeNotFound(name.into()))
+            .ok_or(Error::AttributeNotFound(name.into()))
     }
 
     /// Gets the next operation in the same block.

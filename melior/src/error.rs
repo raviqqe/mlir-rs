@@ -15,7 +15,7 @@ pub enum Error {
     },
     InvokeFunction,
     OperationResultExpected(String),
-    OperationAttributeNotFound(String),
+    AttributeNotFound(String),
     PositionOutOfBounds {
         name: &'static str,
         value: String,
@@ -34,6 +34,9 @@ impl Display for Error {
             Self::AttributeExpected(r#type, attribute) => {
                 write!(formatter, "{type} attribute expected: {attribute}")
             }
+            Self::AttributeNotFound(name) => {
+                write!(formatter, "attribute {name} not found")
+            }
             Self::BlockArgumentExpected(value) => {
                 write!(formatter, "block argument expected: {value}")
             }
@@ -43,9 +46,6 @@ impl Display for Error {
             Self::InvokeFunction => write!(formatter, "failed to invoke JIT-compiled function"),
             Self::OperationResultExpected(value) => {
                 write!(formatter, "operation result expected: {value}")
-            }
-            Self::OperationAttributeNotFound(name) => {
-                write!(formatter, "attribute {name} not found")
             }
             Self::ParsePassPipeline(message) => {
                 write!(formatter, "failed to parse pass pipeline:\n{}", message)
