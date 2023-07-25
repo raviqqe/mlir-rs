@@ -196,7 +196,7 @@ impl<'c> Operation<'c> {
     }
 
     /// Gets all attributes.
-    pub fn attributes(&'c self) -> impl Iterator<Item = (Identifier<'c>, Attribute<'c>)> {
+    pub fn attributes(&self) -> impl Iterator<Item = (Identifier<'c>, Attribute<'c>)> + '_ {
         (0..self.attribute_count())
             .map(|index| self.attribute_at(index).expect("valid attribute index"))
     }
