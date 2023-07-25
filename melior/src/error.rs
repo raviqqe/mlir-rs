@@ -15,7 +15,7 @@ pub enum Error {
     },
     InvokeFunction,
     OperationResultExpected(String),
-    OperationAttributeExpected(String),
+    OperationAttributeNotFound(String),
     PositionOutOfBounds {
         name: &'static str,
         value: String,
@@ -44,8 +44,8 @@ impl Display for Error {
             Self::OperationResultExpected(value) => {
                 write!(formatter, "operation result expected: {value}")
             }
-            Self::OperationAttributeExpected(value) => {
-                write!(formatter, "attribute {value} expected")
+            Self::OperationAttributeNotFound(name) => {
+                write!(formatter, "attribute {name} not found")
             }
             Self::ParsePassPipeline(message) => {
                 write!(formatter, "failed to parse pass pipeline:\n{}", message)

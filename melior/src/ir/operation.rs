@@ -66,12 +66,7 @@ impl<'c> Operation<'c> {
     /// Gets the operand at a position.
     pub fn operand(&self, index: usize) -> Result<Value<'c, '_>, Error> {
         if index < self.operand_count() {
-            unsafe {
-                Ok(Value::from_raw(mlirOperationGetOperand(
-                    self.raw,
-                    index as isize,
-                )))
-            }
+            Ok(unsafe { Value::from_raw(mlirOperationGetOperand(self.raw, index as isize)) })
         } else {
             Err(Error::PositionOutOfBounds {
                 name: "operation operand",
@@ -94,12 +89,9 @@ impl<'c> Operation<'c> {
     /// Gets a result at a position.
     pub fn result(&self, index: usize) -> Result<OperationResult<'c, '_>, Error> {
         if index < self.result_count() {
-            unsafe {
-                Ok(OperationResult::from_raw(mlirOperationGetResult(
-                    self.raw,
-                    index as isize,
-                )))
-            }
+            Ok(unsafe {
+                OperationResult::from_raw(mlirOperationGetResult(self.raw, index as isize))
+            })
         } else {
             Err(Error::PositionOutOfBounds {
                 name: "operation result",
@@ -122,12 +114,7 @@ impl<'c> Operation<'c> {
     /// Gets a region at a position.
     pub fn region(&self, index: usize) -> Result<RegionRef<'c, '_>, Error> {
         if index < self.region_count() {
-            unsafe {
-                Ok(RegionRef::from_raw(mlirOperationGetRegion(
-                    self.raw,
-                    index as isize,
-                )))
-            }
+            Ok(unsafe { RegionRef::from_raw(mlirOperationGetRegion(self.raw, index as isize)) })
         } else {
             Err(Error::PositionOutOfBounds {
                 name: "region",
@@ -150,12 +137,7 @@ impl<'c> Operation<'c> {
     /// Gets a successor at a position.
     pub fn successor(&self, index: usize) -> Result<BlockRef<'c, '_>, Error> {
         if index < self.successor_count() {
-            unsafe {
-                Ok(BlockRef::from_raw(mlirOperationGetSuccessor(
-                    self.raw,
-                    index as isize,
-                )))
-            }
+            Ok(unsafe { BlockRef::from_raw(mlirOperationGetSuccessor(self.raw, index as isize)) })
         } else {
             Err(Error::PositionOutOfBounds {
                 name: "successor",
@@ -231,7 +213,7 @@ impl<'c> Operation<'c> {
     pub fn remove_attribute(&mut self, name: &str) -> Result<(), Error> {
         unsafe { mlirOperationRemoveAttributeByName(self.raw, StringRef::from(name).to_raw()) }
             .then_some(())
-            .ok_or(Error::OperationAttributeExpected(name.into()))
+            .ok_or(Error::OperationAttributeNotFound(name.into()))
     }
 
     /// Gets the next operation in the same block.
