@@ -8,6 +8,7 @@ use std::{
 #[derive(Debug, Eq, PartialEq)]
 pub enum Error {
     AttributeExpected(&'static str, String),
+    AttributeNotFound(String),
     BlockArgumentExpected(String),
     ElementExpected {
         r#type: &'static str,
@@ -15,7 +16,6 @@ pub enum Error {
     },
     InvokeFunction,
     OperationResultExpected(String),
-    AttributeNotFound(String),
     PositionOutOfBounds {
         name: &'static str,
         value: String,
