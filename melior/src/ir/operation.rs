@@ -165,7 +165,7 @@ impl<'c> Operation<'c> {
         }
     }
 
-    /// Gets all successorss.
+    /// Gets all successors.
     pub fn successors(&self) -> impl Iterator<Item = BlockRef<'c, '_>> {
         (0..self.successor_count())
             .map(|index| self.successor(index).expect("valid successor index"))
