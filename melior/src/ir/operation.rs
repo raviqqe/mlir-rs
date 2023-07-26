@@ -126,7 +126,7 @@ impl<'c> Operation<'c> {
 
     /// Gets all regions.
     pub fn regions(&self) -> impl Iterator<Item = RegionRef<'c, '_>> {
-        (0..self.result_count()).map(|index| self.region(index).expect("valid result index"))
+        (0..self.region_count()).map(|index| self.region(index).expect("valid result index"))
     }
 
     /// Gets the number of successors.
@@ -416,7 +416,7 @@ mod tests {
     use super::*;
     use crate::{
         context::Context,
-        ir::{attribute::StringAttribute, Block, Location, Type},
+        ir::{attribute::StringAttribute, Block, Location, Region, Type},
         test::create_test_context,
     };
     use pretty_assertions::assert_eq;
@@ -507,14 +507,29 @@ mod tests {
         let block = Block::new(&[(r#type, location)]);
         let argument: Value = block.argument(0).unwrap().into();
 
-        let operands = vec![argument.clone(), argument.clone(), argument.clone()];
+        let operands = vec![argument, argument, argument];
         let operation = OperationBuilder::new("foo", Location::unknown(&context))
             .add_operands(&operands)
             .build();
 
         assert_eq!(
             operation.operands().skip(1).collect::<Vec<_>>(),
-            vec![argument.clone(), argument.clone()]
+            vec![argument, argument]
+        );
+    }
+
+    #[test]
+    fn regions() {
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
+
+        let operation = OperationBuilder::new("foo", Location::unknown(&context))
+            .add_regions(vec![Region::new()])
+            .build();
+
+        assert_eq!(
+            operation.regions().collect::<Vec<_>>(),
+            vec![operation.region(0).unwrap()]
         );
     }
 
