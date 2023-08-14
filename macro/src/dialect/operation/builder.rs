@@ -2,7 +2,7 @@ use convert_case::{Case, Casing};
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 
-use crate::dialect::utils::sanitize_name_snake;
+use crate::utility::sanitize_name_snake;
 
 use super::{FieldKind, Operation};
 
@@ -312,6 +312,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
 
         let doc = format!("Create a new {}", self.operation.summary);
         quote! {
+            #[allow(clippy::too_many_arguments)]
             #[doc = #doc]
             pub fn #name<'c>(#(#args),*) -> #class_name<'c> {
                 #class_name::builder(location)#(#builder_calls)*.build()

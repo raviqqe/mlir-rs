@@ -1,6 +1,6 @@
 use super::{FieldKind, OperationField, SequenceInfo, VariadicKind};
 
-use crate::dialect::utils::sanitize_name_snake;
+use crate::utility::sanitize_name_snake;
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 

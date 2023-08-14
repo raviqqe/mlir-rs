@@ -4,9 +4,8 @@ mod builder;
 use crate::dialect::{
     error::{Error, ExpectedSuperClassError},
     types::{AttributeConstraint, RegionConstraint, SuccessorConstraint, Trait, TypeConstraint},
-    utils::sanitize_name_snake,
 };
-use convert_case::{Case, Casing};
+use crate::utility::sanitize_name_snake;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, ToTokens, TokenStreamExt};
 use tblgen::error::WithLocation;
@@ -477,10 +476,9 @@ impl<'a> Operation<'a> {
         };
 
         let can_infer_type = traits.iter().any(|t| {
-            t.has_name("::mlir::OpTrait::SameOperandsAndResultType")
+            (t.has_name("::mlir::OpTrait::FirstAttrDerivedResultType")
+                || t.has_name("::mlir::OpTrait::SameOperandsAndResultType"))
                 && num_variable_length_results == 0
-                || t.has_name("::mlir::OpTrait::FirstAttrDerivedResultType")
-                    && num_variable_length_results == 0
                 || t.has_name("::mlir::InferTypeOpInterface::Trait") && regions_dag.num_args() == 0
         });
 

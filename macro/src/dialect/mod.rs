@@ -2,18 +2,17 @@ extern crate proc_macro;
 mod error;
 mod operation;
 mod types;
-mod utils;
 
 use std::io::Write;
 use std::{env, error::Error, fs::OpenOptions, path::Path, process::Command};
 
+use crate::utility::sanitize_name_snake;
 use operation::Operation;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::{format_ident, quote};
 use syn::{bracketed, parse::Parse, punctuated::Punctuated, LitStr, Token};
 use tblgen::{record::Record, record_keeper::RecordKeeper, TableGenParser};
-use utils::sanitize_name_snake;
 
 const LLVM_MAJOR_VERSION: usize = 16;
 
@@ -170,7 +169,7 @@ pub fn generate_dialect(mut input: DialectMacroInput) -> Result<TokenStream, Box
         .find_map(|def| {
             def.str_value("name")
                 .ok()
-                .and_then(|n| if n == &input.name { Some(def) } else { None })
+                .and_then(|n| if n == input.name { Some(def) } else { None })
         })
         .ok_or_else(|| syn::Error::new(Span::call_site(), "dialect not found"))?;
     let dialect = dialect_module(&input.name, dialect_def, &keeper)
