@@ -1,15 +1,24 @@
 mod attribute;
+mod dialect;
 mod operation;
 mod parse;
 mod pass;
 mod r#type;
 mod utility;
 
+use dialect::DialectMacroInput;
 use parse::{DialectOperationSet, IdentifierList};
 use proc_macro::TokenStream;
 use quote::quote;
 use std::error::Error;
 use syn::parse_macro_input;
+
+#[proc_macro]
+pub fn dialect(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DialectMacroInput);
+
+    convert_result(dialect::generate_dialect(input))
+}
 
 #[proc_macro]
 pub fn binary_operations(stream: TokenStream) -> TokenStream {

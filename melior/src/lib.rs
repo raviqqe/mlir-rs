@@ -1,10 +1,13 @@
 #![doc = include_str!("../README.md")]
 
+extern crate self as melior;
+
 #[macro_use]
 mod r#macro;
 mod context;
 pub mod diagnostic;
 pub mod dialect;
+pub mod dialect_gen;
 mod error;
 mod execution_engine;
 pub mod ir;
@@ -21,6 +24,8 @@ pub use self::{
     execution_engine::ExecutionEngine,
     string_ref::StringRef,
 };
+
+pub use melior_macro::dialect;
 
 #[cfg(test)]
 mod tests {
