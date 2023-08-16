@@ -18,6 +18,9 @@ use crate::{
 use mlir_sys::{mlirDialectEqual, mlirDialectGetContext, mlirDialectGetNamespace, MlirDialect};
 use std::marker::PhantomData;
 
+#[cfg(feature = "ods-dialects")]
+pub mod ods;
+
 /// A dialect.
 #[derive(Clone, Copy, Debug)]
 pub struct Dialect<'c> {

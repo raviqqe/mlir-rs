@@ -9,6 +9,9 @@ documentation = "https://raviqqe.github.io/melior/melior/"
 readme = "../README.md"
 keywords = ["mlir", "llvm"]
 
+[features]
+ods-dialects = []
+
 [dependencies]
 criterion = "0.5.1"
 dashmap = "5.5.0"

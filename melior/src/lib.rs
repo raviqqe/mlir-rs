@@ -7,7 +7,6 @@ mod r#macro;
 mod context;
 pub mod diagnostic;
 pub mod dialect;
-pub mod dialect_gen;
 mod error;
 mod execution_engine;
 pub mod ir;

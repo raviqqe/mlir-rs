@@ -240,7 +240,6 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
         };
 
         let doc = format!("Builder for {}", self.operation.summary);
-        // let mut summary = self.operation.summary.clone();
 
         let iter_all_any = self.type_state.iter_all_any();
         quote! {
