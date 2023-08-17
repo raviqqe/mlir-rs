@@ -103,23 +103,21 @@ impl<'a> OperationField<'a> {
                                                 .element(#index)
                                                 .expect("has segment size") as usize;
                         };
-                        let get_elements = if constraint.is_variable_length() {
-                            if constraint.is_optional() {
-                                quote! {
-                                    if group_len == 0 {
-                                        None
-                                    } else {
-                                        self.operation.#kind_ident(start).ok()
-                                    }
-                                }
-                            } else {
-                                quote! {
-                                    self.operation.#plural().skip(start).take(group_len)
+                        let get_elements = if !constraint.is_variable_length() {
+                            quote! {
+                                self.operation.#kind_ident(start).expect(#error)
+                            }
+                        } else if constraint.is_optional() {
+                            quote! {
+                                if group_len == 0 {
+                                    None
+                                } else {
+                                    self.operation.#kind_ident(start).ok()
                                 }
                             }
                         } else {
                             quote! {
-                                self.operation.#kind_ident(start).expect(#error)
+                                self.operation.#plural().skip(start).take(group_len)
                             }
                         };
                         quote! { #compute_start_length #get_elements }
