@@ -1,10 +1,8 @@
+use super::{FieldKind, Operation};
+use crate::utility::sanitize_name_snake;
 use convert_case::{Case, Casing};
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
-
-use crate::utility::sanitize_name_snake;
-
-use super::{FieldKind, Operation};
 
 #[derive(Debug)]
 struct TypeStateItem {
@@ -97,62 +95,63 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
         phantoms: &'a [TokenStream],
     ) -> impl Iterator<Item = TokenStream> + 'a {
         let builder_ident = format_ident!("{}Builder", self.operation.class_name);
-        self.operation.fields.iter().map(move |f| {
-            let n = sanitize_name_snake(f.name);
-            let st = &f.param_type;
-            let args = quote! { #n: #st };
-            let add = format_ident!("add_{}s", f.kind.as_str());
+        self.operation.fields.iter().map(move |field| {
+            let name = sanitize_name_snake(field.name);
+            let st = &field.param_type;
+            let args = quote! { #name: #st };
+            let add = format_ident!("add_{}s", field.kind.as_str());
 
             let add_args = {
                 let mlir_ident = {
-                    let name_str = &f.name;
+                    let name_str = &field.name;
                     quote! { ::melior::ir::Identifier::new(self.context, #name_str) }
                 };
 
                 // Argument types can be singular and variadic, but add functions in melior
                 // are always variadic, so we need to create a slice or vec for singular
                 // arguments
-                match &f.kind {
+                match &field.kind {
                     FieldKind::Operand(tc) | FieldKind::Result(tc) => {
                         if tc.is_variable_length() && !tc.is_optional() {
-                            quote! { #n }
+                            quote! { #name }
                         } else {
-                            quote! { &[#n] }
+                            quote! { &[#name] }
                         }
                     }
                     FieldKind::Attribute(_) => {
-                        quote! { &[(#mlir_ident, #n.into())] }
+                        quote! { &[(#mlir_ident, #name.into())] }
                     }
                     FieldKind::Successor(sc) => {
                         if sc.is_variadic() {
-                            quote! { #n }
+                            quote! { #name }
                         } else {
-                            quote! { &[#n] }
+                            quote! { &[#name] }
                         }
                     }
                     FieldKind::Region(rc) => {
                         if rc.is_variadic() {
-                            quote! { #n }
+                            quote! { #name }
                         } else {
-                            quote! { vec![#n] }
+                            quote! { vec![#name] }
                         }
                     }
                 }
             };
 
-            if !f.optional && !f.has_default {
-                if let FieldKind::Result(_) = f.kind {
+            if !field.optional && !field.has_default {
+                if let FieldKind::Result(_) = field.kind {
                     if self.operation.can_infer_type {
                         // Don't allow setting the result type when it can be inferred
                         return quote!();
                     }
                 }
-                let iter_all_any_without = self.type_state.iter_all_any_without(f.name.to_string());
-                let iter_set_yes = self.type_state.iter_set_yes(f.name.to_string());
-                let iter_set_no = self.type_state.iter_set_no(f.name.to_string());
+                let iter_all_any_without =
+                    self.type_state.iter_all_any_without(field.name.to_string());
+                let iter_set_yes = self.type_state.iter_set_yes(field.name.to_string());
+                let iter_set_no = self.type_state.iter_set_no(field.name.to_string());
                 quote! {
                     impl<'c, #(#iter_all_any_without),*> #builder_ident<'c, #(#iter_set_no),*> {
-                        pub fn #n(mut self, #args) -> #builder_ident<'c, #(#iter_set_yes),*> {
+                        pub fn #name(mut self, #args) -> #builder_ident<'c, #(#iter_set_yes),*> {
                             self.builder = self.builder.#add(#add_args);
                             let Self { context, mut builder, #(#field_names),* } = self;
                             #builder_ident {
@@ -167,7 +166,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
                 let iter_all_any = self.type_state.iter_all_any().collect::<Vec<_>>();
                 quote! {
                     impl<'c, #(#iter_all_any),*> #builder_ident<'c, #(#iter_all_any),*> {
-                        pub fn #n(mut self, #args) -> #builder_ident<'c, #(#iter_all_any),*> {
+                        pub fn #name(mut self, #args) -> #builder_ident<'c, #(#iter_all_any),*> {
                             self.builder = self.builder.#add(#add_args);
                             self
                         }
@@ -241,8 +240,8 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
         };
 
         let doc = format!("Builder for {}", self.operation.summary);
-
         let iter_all_any = self.type_state.iter_all_any();
+
         quote! {
             #type_state_structs
 
