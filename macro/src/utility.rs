@@ -1,3 +1,4 @@
+use comrak::{arena_tree::NodeEdge, nodes::Ast, parse_document, Arena};
 use convert_case::{Case, Casing};
 use once_cell::sync::Lazy;
 use proc_macro2::Ident;
@@ -34,6 +35,19 @@ static CODE_BLOCK_PATTERN: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?s)```\n(.*
 
 // TODO Use the `comrak` crate.
 pub fn sanitize_documentation(documentation: &str) -> String {
+    let mut arena = Arena::new();
+    let node = parse_document(&mut arena, documentation, &Default::default());
+
+    for node in node.traverse() {
+        match node {
+            NodeEdge::Start(node) => match node.data {
+                Ast::CodeBlock(block) => foo,
+                _ => {}
+            },
+            NodeEdge::End(_) => {}
+        }
+    }
+
     CODE_BLOCK_PATTERN
         .replace_all(documentation, |captures: &Captures| {
             format!("```text\n{}", captures.get(1).unwrap().as_str())
