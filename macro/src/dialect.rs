@@ -21,23 +21,21 @@ use tblgen::{record::Record, record_keeper::RecordKeeper, TableGenParser};
 
 const LLVM_MAJOR_VERSION: usize = 16;
 
-fn dialect_module<'a>(
+fn dialect_module(
     name: &str,
-    dialect: Record<'a>,
-    record_keeper: &'a RecordKeeper,
+    dialect: Record,
+    record_keeper: &RecordKeeper,
 ) -> Result<proc_macro2::TokenStream, error::Error> {
     let operations = record_keeper
         .all_derived_definitions("Op")
         .map(Operation::from_def)
-        .filter_map(|operation: Result<Operation, _>| match operation {
-            Ok(operation) => (operation.dialect.name() == dialect.name()).then_some(Ok(operation)),
-            Err(error) => Some(Err(error)),
-        })
-        .collect::<Result<Vec<_>, _>>()?;
+        .collect::<Result<Vec<_>, _>>()?
+        .into_iter()
+        .filter(|operation| operation.dialect.name() == dialect.name())
+        .collect::<Vec<_>>();
 
     let doc = format!(
-        "`{}` dialect.\n\n{}",
-        name,
+        "`{name}` dialect.\n\n{}",
         unindent::unindent(dialect.str_value("description").unwrap_or(""),)
     );
     let name = sanitize_name_snake(name);
