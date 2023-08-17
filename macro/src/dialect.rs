@@ -87,7 +87,7 @@ impl Parse for DialectMacroInput {
         let mut name = None;
         let mut tablegen = None;
         let mut td_file = None;
-        let mut includes = None;
+        let mut includes = vec![];
 
         for item in list {
             match item {
@@ -95,7 +95,7 @@ impl Parse for DialectMacroInput {
                 InputField::TableGen(td) => tablegen = Some(td.value()),
                 InputField::TdFile(file) => td_file = Some(file.value()),
                 InputField::Includes(field) => {
-                    includes = Some(field.into_iter().map(|literal| literal.value()).collect())
+                    includes = field.into_iter().map(|literal| literal.value()).collect()
                 }
             }
         }
@@ -104,7 +104,7 @@ impl Parse for DialectMacroInput {
             name: name.ok_or(input.error("dialect name required"))?,
             tablegen,
             td_file,
-            includes: includes.unwrap_or(Vec::new()),
+            includes,
         })
     }
 }
