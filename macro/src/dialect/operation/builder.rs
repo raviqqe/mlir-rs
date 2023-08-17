@@ -47,21 +47,21 @@ impl TypeStateList {
     }
 
     pub fn iter_set_yes(&self, field_name: String) -> impl Iterator<Item = &Ident> {
-        self.0.iter().map(move |i| {
-            if i.field_name == field_name {
-                &i.yes
+        self.0.iter().map(move |item| {
+            if item.field_name == field_name {
+                &item.yes
             } else {
-                &i.t
+                &item.t
             }
         })
     }
 
     pub fn iter_set_no(&self, field_name: String) -> impl Iterator<Item = &Ident> {
-        self.0.iter().map(move |i| {
-            if i.field_name == field_name {
-                &i.no
+        self.0.iter().map(move |item| {
+            if item.field_name == field_name {
+                &item.no
             } else {
-                &i.t
+                &item.t
             }
         })
     }
@@ -76,7 +76,7 @@ impl TypeStateList {
 }
 
 pub struct OperationBuilder<'o, 'c> {
-    pub(crate) operation: &'c Operation<'o>,
+    operation: &'c Operation<'o>,
     type_state: TypeStateList,
 }
 

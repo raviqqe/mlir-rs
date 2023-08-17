@@ -236,7 +236,7 @@ pub struct Operation<'a> {
     pub(crate) fields: Vec<OperationField<'a>>,
     pub(crate) can_infer_type: bool,
     pub(crate) summary: String,
-    pub(crate) description: String,
+    description: String,
 }
 
 impl<'a> Operation<'a> {
