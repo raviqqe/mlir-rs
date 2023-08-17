@@ -22,9 +22,9 @@ fn dialect_module<'a>(
     let operations = record_keeper
         .all_derived_definitions("Op")
         .map(Operation::from_def)
-        .filter_map(|o: Result<Operation, _>| match o {
-            Ok(o) => (o.dialect.name() == dialect.name()).then_some(Ok(o)),
-            Err(e) => Some(Err(e)),
+        .filter_map(|operation: Result<Operation, _>| match operation {
+            Ok(operation) => (operation.dialect.name() == dialect.name()).then_some(Ok(operation)),
+            Err(error) => Some(Err(error)),
         })
         .collect::<Result<Vec<_>, _>>()?;
 
