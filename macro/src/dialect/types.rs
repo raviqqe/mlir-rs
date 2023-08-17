@@ -52,7 +52,6 @@ pub static ATTRIBUTE_TYPES: Lazy<HashMap<&'static str, &'static str>> = Lazy::ne
 #[derive(Debug, Clone, Copy)]
 pub struct RegionConstraint<'a>(Record<'a>);
 
-#[allow(unused)]
 impl<'a> RegionConstraint<'a> {
     pub fn new(record: Record<'a>) -> Self {
         Self(record)
@@ -74,7 +73,6 @@ impl<'a> Deref for RegionConstraint<'a> {
 #[derive(Debug, Clone, Copy)]
 pub struct SuccessorConstraint<'a>(Record<'a>);
 
-#[allow(unused)]
 impl<'a> SuccessorConstraint<'a> {
     pub fn new(record: Record<'a>) -> Self {
         Self(record)
@@ -96,7 +94,6 @@ impl<'a> Deref for SuccessorConstraint<'a> {
 #[derive(Debug, Clone, Copy)]
 pub struct TypeConstraint<'a>(Record<'a>);
 
-#[allow(unused)]
 impl<'a> TypeConstraint<'a> {
     pub fn new(record: Record<'a>) -> Self {
         Self(record)
@@ -110,6 +107,7 @@ impl<'a> TypeConstraint<'a> {
         self.0.subclass_of("Variadic")
     }
 
+    #[allow(unused)]
     pub fn is_variadic_of_variadic(&self) -> bool {
         self.0.subclass_of("VariadicOfVariadic")
     }
@@ -130,20 +128,22 @@ impl<'a> Deref for TypeConstraint<'a> {
 #[derive(Debug, Clone, Copy)]
 pub struct AttributeConstraint<'a>(Record<'a>);
 
-#[allow(unused)]
 impl<'a> AttributeConstraint<'a> {
     pub fn new(record: Record<'a>) -> Self {
         Self(record)
     }
 
+    #[allow(unused)]
     pub fn is_derived(&self) -> bool {
         self.0.subclass_of("DerivedAttr")
     }
 
+    #[allow(unused)]
     pub fn is_type_attr(&self) -> bool {
         self.0.subclass_of("TypeAttrBase")
     }
 
+    #[allow(unused)]
     pub fn is_symbol_ref_attr(&self) -> bool {
         self.0.name() == Ok("SymbolRefAttr")
             || self.0.name() == Ok("FlatSymbolRefAttr")
@@ -151,6 +151,7 @@ impl<'a> AttributeConstraint<'a> {
             || self.0.subclass_of("FlatSymbolRefAttr")
     }
 
+    #[allow(unused)]
     pub fn is_enum_attr(&self) -> bool {
         self.0.subclass_of("EnumAttrInfo")
     }
@@ -205,7 +206,6 @@ pub struct Trait<'a> {
     def: Record<'a>,
 }
 
-#[allow(unused)]
 impl<'a> Trait<'a> {
     pub fn new(def: Record<'a>) -> Self {
         Self {
@@ -258,6 +258,7 @@ impl<'a> Trait<'a> {
         }
     }
 
+    #[allow(unused)]
     pub fn kind(&self) -> &TraitKind {
         &self.kind
     }
