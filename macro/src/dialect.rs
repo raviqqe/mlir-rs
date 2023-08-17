@@ -7,15 +7,7 @@ use operation::Operation;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::{format_ident, quote};
-use std::{
-    env,
-    error::Error,
-    fs::OpenOptions,
-    io::{self, Write},
-    path::Path,
-    process::Command,
-    str,
-};
+use std::{env, error::Error, path::Path, process::Command, str};
 use syn::{bracketed, parse::Parse, punctuated::Punctuated, LitStr, Token};
 use tblgen::{record::Record, record_keeper::RecordKeeper, TableGenParser};
 
@@ -115,33 +107,6 @@ impl Parse for DialectMacroInput {
     }
 }
 
-// Writes `tablegen_compile_commands.yaml` for any TableGen file that is being
-// parsed. See: https://mlir.llvm.org/docs/Tools/MLIRLSP/#tablegen-lsp-language-server--tblgen-lsp-server
-fn emit_tablegen_compile_commands(td_file: &str, includes: &[String]) -> Result<(), io::Error> {
-    let directory = env::current_dir()?;
-    let mut file = OpenOptions::new()
-        .write(true)
-        .append(true)
-        .create(true)
-        .open(directory.join("tablegen_compile_commands.yml"))?;
-
-    writeln!(file, "--- !FileInfo:")?;
-    writeln!(
-        file,
-        "  filepath: \"{}\"",
-        directory.join(td_file).to_str().unwrap()
-    )?;
-    writeln!(
-        file,
-        "  includes: \"{}\"",
-        includes
-            .iter()
-            .map(|string| directory.join(string).to_str().unwrap().to_owned())
-            .collect::<Vec<_>>()
-            .join(";")
-    )
-}
-
 pub fn generate_dialect(mut input: DialectMacroInput) -> Result<TokenStream, Box<dyn Error>> {
     // spell-checker: disable-next-line
     input.includes.push(llvm_config("--includedir")?);
@@ -162,13 +127,6 @@ pub fn generate_dialect(mut input: DialectMacroInput) -> Result<TokenStream, Box
 
     for include in &input.includes {
         td_parser = td_parser.add_include_path(include);
-    }
-
-    // spell-checker: disable-next-line
-    if env::var("DIALECTGEN_TABLEGEN_COMPILE_COMMANDS").is_ok() {
-        if let Some(td_file) = &input.td_file {
-            emit_tablegen_compile_commands(td_file, &input.includes)?;
-        }
     }
 
     let keeper = td_parser.parse().map_err(|_| error::Error::ParseError)?;
