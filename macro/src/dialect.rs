@@ -184,10 +184,7 @@ pub fn generate_dialect(mut input: DialectMacroInput) -> Result<TokenStream, Box
     let dialect = dialect_module(&input.name, dialect_def, &keeper)
         .map_err(|error| error.add_source_info(keeper.source_info()))?;
 
-    Ok(quote! {
-        #dialect
-    }
-    .into())
+    Ok(quote! { #dialect }.into())
 }
 
 fn llvm_config(argument: &str) -> Result<String, Box<dyn Error>> {
