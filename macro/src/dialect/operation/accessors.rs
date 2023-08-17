@@ -96,12 +96,12 @@ impl<'a> OperationField<'a> {
                                         .expect(#attr_missing_error)
                                 ).expect("is a DenseI32ArrayAttribute");
                             let start = (0..#index)
-                                            .map(|i| attribute.element(i)
-                                            .expect("has segment size"))
-                                            .sum::<i32>() as usize;
+                                .map(|i| attribute.element(i)
+                                .expect("has segment size"))
+                                .sum::<i32>() as usize;
                             let group_len = attribute
-                                                .element(#index)
-                                                .expect("has segment size") as usize;
+                                .element(#index)
+                                .expect("has segment size") as usize;
                         };
                         let get_elements = if !constraint.is_variable_length() {
                             quote! {
