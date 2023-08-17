@@ -513,7 +513,6 @@ name = "melior-macro"
 version = "0.4.2"
 dependencies = [
  "convert_case",
- "lazy_static",
  "melior",
  "mlir-sys",
  "once_cell",

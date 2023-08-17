@@ -1,35 +1,52 @@
+use once_cell::sync::Lazy;
 use std::collections::HashMap;
-
-use lazy_static::lazy_static;
 use tblgen::record::Record;
 
-lazy_static! {
-    pub static ref ATTRIBUTE_TYPES: HashMap<&'static str, &'static str> = {
-        let mut m = HashMap::new();
-        macro_rules! attr {
-            ($($mlir:ident => $melior:ident),* $(,)*) => {
-                $(
-                    m.insert(
-                        concat!("::mlir::", stringify!($mlir)),
-                        concat!("::melior::ir::attribute::", stringify!($melior)),
-                    );
-                )*
-            };
-        }
-        attr!(
-            ArrayAttr => ArrayAttribute,
-            Attribute => Attribute,
-            DenseElementsAttr => DenseElementsAttribute,
-            DenseI32ArrayAttr => DenseI32ArrayAttribute,
-            FlatSymbolRefAttr => FlatSymbolRefAttribute,
-            FloatAttr => FloatAttribute,
-            IntegerAttr => IntegerAttribute,
-            StringAttr => StringAttribute,
-            TypeAttr => TypeAttribute,
-        );
-        m
+macro_rules! prefixed_string {
+    ($prefix:literal, $name:ident) => {
+        concat!($prefix, stringify!($name))
     };
 }
+
+macro_rules! mlir_attribute {
+    ($name:ident) => {
+        prefixed_string!("::mlir::", $name)
+    };
+}
+
+macro_rules! melior_attribute {
+    ($name:ident) => {
+        prefixed_string!("::melior::ir::attribute::", $name)
+    };
+}
+
+pub static ATTRIBUTE_TYPES: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
+    let mut m = HashMap::new();
+
+    macro_rules! attr {
+        ($($mlir:ident => $melior:ident),* $(,)*) => {
+            $(
+                m.insert(
+                    mlir_attribute!($mlir),
+                    melior_attribute!($melior),
+                );
+            )*
+        };
+    }
+
+    attr!(
+        ArrayAttr => ArrayAttribute,
+        Attribute => Attribute,
+        DenseElementsAttr => DenseElementsAttribute,
+        DenseI32ArrayAttr => DenseI32ArrayAttribute,
+        FlatSymbolRefAttr => FlatSymbolRefAttribute,
+        FloatAttr => FloatAttribute,
+        IntegerAttr => IntegerAttribute,
+        StringAttr => StringAttribute,
+        TypeAttr => TypeAttribute,
+    );
+    m
+});
 
 #[derive(Debug, Clone, Copy)]
 pub struct RegionConstraint<'a>(Record<'a>);
