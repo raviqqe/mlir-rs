@@ -2,15 +2,15 @@ use super::error::Error;
 use comrak::{arena_tree::NodeEdge, format_commonmark, nodes::NodeValue, parse_document, Arena};
 
 pub fn sanitize_documentation(string: &str) -> Result<String, Error> {
-    let mut arena = Arena::new();
-    let node = parse_document(&mut arena, string, &Default::default());
+    let arena = Arena::new();
+    let node = parse_document(&arena, string, &Default::default());
 
     for node in node.traverse() {
         if let NodeEdge::Start(node) = node {
             let mut ast = node.data.borrow_mut();
 
             if let NodeValue::CodeBlock(block) = &mut ast.value {
-                if block.info == "" {
+                if block.info.is_empty() {
                     block.info = "text".into();
                 }
             }
