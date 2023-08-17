@@ -1,11 +1,10 @@
-use std::{error::Error, io};
-
 use comrak::{arena_tree::NodeEdge, format_commonmark, nodes::NodeValue, parse_document, Arena};
 use convert_case::{Case, Casing};
 use once_cell::sync::Lazy;
 use proc_macro2::Ident;
 use quote::format_ident;
 use regex::{Captures, Regex};
+use std::error::Error;
 
 static RESERVED_NAMES: &[&str] = &["name", "operation", "builder"];
 
