@@ -182,7 +182,7 @@ pub fn generate_dialect(mut input: DialectMacroInput) -> Result<TokenStream, Box
         })
         .ok_or_else(|| syn::Error::new(Span::call_site(), "dialect not found"))?;
     let dialect = dialect_module(&input.name, dialect_def, &keeper)
-        .map_err(|e| e.add_source_info(keeper.source_info()))?;
+        .map_err(|error| error.add_source_info(keeper.source_info()))?;
 
     Ok(quote! {
         #dialect
