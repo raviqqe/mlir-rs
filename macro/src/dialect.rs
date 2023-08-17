@@ -91,11 +91,11 @@ impl Parse for DialectMacroInput {
 
         for item in list {
             match item {
-                InputField::Name(n) => name = Some(n.value()),
+                InputField::Name(field) => name = Some(field.value()),
                 InputField::TableGen(td) => tablegen = Some(td.value()),
-                InputField::TdFile(f) => td_file = Some(f.value()),
-                InputField::Includes(inc) => {
-                    includes = Some(inc.into_iter().map(|l| l.value()).collect())
+                InputField::TdFile(file) => td_file = Some(file.value()),
+                InputField::Includes(field) => {
+                    includes = Some(field.into_iter().map(|literal| literal.value()).collect())
                 }
             }
         }
@@ -128,7 +128,7 @@ fn emit_tablegen_compile_commands(td_file: &str, includes: &[String]) {
                 "  includes: \"{}\"",
                 includes
                     .iter()
-                    .map(|s| pwd.join(s.as_str()).to_str().unwrap().to_owned())
+                    .map(|string| pwd.join(string).to_str().unwrap().to_owned())
                     .collect::<Vec<_>>()
                     .join(";")
             );
@@ -142,23 +142,23 @@ pub fn generate_dialect(mut input: DialectMacroInput) -> Result<TokenStream, Box
 
     let mut td_parser = TableGenParser::new();
 
-    if let Some(source) = input.tablegen.as_ref() {
+    if let Some(source) = &input.tablegen {
         td_parser = td_parser
-            .add_source(source.as_str())
+            .add_source(source)
             .map_err(|e| syn::Error::new(Span::call_site(), format!("{}", e)))?;
     }
-    if let Some(file) = input.td_file.as_ref() {
+    if let Some(file) = &input.td_file {
         td_parser = td_parser
-            .add_source_file(file.as_str())
+            .add_source_file(file)
             .map_err(|e| syn::Error::new(Span::call_site(), format!("{}", e)))?;
     }
-    for include in input.includes.iter() {
-        td_parser = td_parser.add_include_path(include.as_str());
+    for include in &input.includes {
+        td_parser = td_parser.add_include_path(include);
     }
 
     // spell-checker: disable-next-line
     if env::var("DIALECTGEN_TABLEGEN_COMPILE_COMMANDS").is_ok() {
-        if let Some(td_file) = input.td_file.as_ref() {
+        if let Some(td_file) = &input.td_file {
             emit_tablegen_compile_commands(td_file, &input.includes);
         }
     }
