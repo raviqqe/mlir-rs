@@ -208,27 +208,29 @@ pub struct Trait<'a> {
 #[allow(unused)]
 impl<'a> Trait<'a> {
     pub fn new(def: Record<'a>) -> Self {
-        let kind = if def.subclass_of("PredTrait") {
-            TraitKind::Pred {}
-        } else if def.subclass_of("InterfaceTrait") {
-            TraitKind::Interface {
-                name: Self::name(def),
-            }
-        } else if def.subclass_of("NativeTrait") {
-            TraitKind::Native {
-                name: Self::name(def),
-                is_structural: def.subclass_of("StructuralOpTrait"),
-            }
-        } else if def.subclass_of("GenInternalTrait") {
-            TraitKind::Internal {
-                name: def
-                    .string_value("trait")
-                    .expect("trait def has trait value"),
-            }
-        } else {
-            unreachable!("invalid trait")
-        };
-        Self { kind, def }
+        Self {
+            def,
+            kind: if def.subclass_of("PredTrait") {
+                TraitKind::Pred {}
+            } else if def.subclass_of("InterfaceTrait") {
+                TraitKind::Interface {
+                    name: Self::name(def),
+                }
+            } else if def.subclass_of("NativeTrait") {
+                TraitKind::Native {
+                    name: Self::name(def),
+                    is_structural: def.subclass_of("StructuralOpTrait"),
+                }
+            } else if def.subclass_of("GenInternalTrait") {
+                TraitKind::Internal {
+                    name: def
+                        .string_value("trait")
+                        .expect("trait def has trait value"),
+                }
+            } else {
+                unreachable!("invalid trait")
+            },
+        }
     }
 
     pub fn has_name(&self, expected_name: &str) -> bool {
