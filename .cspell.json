@@ -41,6 +41,7 @@
     "spirv",
     "stdc",
     "strided",
+    "tblgen",
     "tosa",
     "unranked",
     "vulkan"
