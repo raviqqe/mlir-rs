@@ -146,7 +146,7 @@ fn emit_tablegen_compile_commands(td_file: &str, includes: &[String]) -> Result<
 
 pub fn generate_dialect(mut input: DialectMacroInput) -> Result<TokenStream, Box<dyn Error>> {
     // spell-checker: disable-next-line
-    input.includes.push(llvm_config("--includedir").unwrap());
+    input.includes.push(llvm_config("--includedir")?);
 
     let mut td_parser = TableGenParser::new();
 
