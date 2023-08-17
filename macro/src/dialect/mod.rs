@@ -3,8 +3,7 @@ mod error;
 mod operation;
 mod types;
 
-use std::io::Write;
-use std::{env, error::Error, fs::OpenOptions, path::Path, process::Command};
+use std::{env, error::Error, fs::OpenOptions, io::Write, path::Path, process::Command};
 
 use crate::utility::sanitize_name_snake;
 use operation::Operation;
@@ -110,8 +109,8 @@ impl Parse for DialectMacroInput {
     }
 }
 
-// Writes `tablegen_compile_commands.yaml` for any TableGen file that is being parsed.
-// See: https://mlir.llvm.org/docs/Tools/MLIRLSP/#tablegen-lsp-language-server--tblgen-lsp-server
+// Writes `tablegen_compile_commands.yaml` for any TableGen file that is being
+// parsed. See: https://mlir.llvm.org/docs/Tools/MLIRLSP/#tablegen-lsp-language-server--tblgen-lsp-server
 fn emit_tablegen_compile_commands(td_file: &str, includes: &[String]) {
     let pwd = std::env::current_dir();
     if let Ok(pwd) = pwd {

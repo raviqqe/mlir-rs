@@ -110,7 +110,8 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
                 };
 
                 // Argument types can be singular and variadic, but add functions in melior
-                // are always variadic, so we need to create a slice or vec for singular arguments
+                // are always variadic, so we need to create a slice or vec for singular
+                // arguments
                 match &f.kind {
                     FieldKind::Operand(tc) | FieldKind::Result(tc) => {
                         if tc.is_variable_length() && !tc.is_optional() {

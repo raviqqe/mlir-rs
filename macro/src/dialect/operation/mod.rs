@@ -1,15 +1,18 @@
 mod accessors;
 mod builder;
 
-use crate::dialect::{
-    error::{Error, ExpectedSuperClassError},
-    types::{AttributeConstraint, RegionConstraint, SuccessorConstraint, Trait, TypeConstraint},
+use crate::{
+    dialect::{
+        error::{Error, ExpectedSuperClassError},
+        types::{
+            AttributeConstraint, RegionConstraint, SuccessorConstraint, Trait, TypeConstraint,
+        },
+    },
+    utility::sanitize_name_snake,
 };
-use crate::utility::sanitize_name_snake;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, ToTokens, TokenStreamExt};
-use tblgen::error::WithLocation;
-use tblgen::record::Record;
+use tblgen::{error::WithLocation, record::Record};
 
 use self::builder::OperationBuilder;
 
@@ -284,7 +287,8 @@ impl<'a> Operation<'a> {
             ))
         });
 
-        // Creates an initial `VariadicKind` instance based on SameSize and AttrSized traits.
+        // Creates an initial `VariadicKind` instance based on SameSize and AttrSized
+        // traits.
         let initial_variadic_kind = |num_variable_length: usize, kind_name_upper: &str| {
             let same_size_trait = format!("::mlir::OpTrait::SameVariadic{}Size", kind_name_upper);
             let attr_sized = format!("::mlir::OpTrait::AttrSized{}Segments", kind_name_upper);

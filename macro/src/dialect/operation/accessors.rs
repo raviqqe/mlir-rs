@@ -28,7 +28,8 @@ impl<'a> OperationField<'a> {
                         if t.is_variable_length() {
                             if t.is_optional() {
                                 // Optional element, and some singular elements.
-                                // Only present if the amount of groups is at least the number of elements.
+                                // Only present if the amount of groups is at least the number of
+                                // elements.
                                 quote! {
                                   if self.operation.#count() < #len {
                                     None

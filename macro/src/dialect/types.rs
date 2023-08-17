@@ -21,12 +21,12 @@ macro_rules! melior_attribute {
 }
 
 pub static ATTRIBUTE_TYPES: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
-    let mut m = HashMap::new();
+    let mut map = HashMap::new();
 
     macro_rules! initialize_attributes {
         ($($mlir:ident => $melior:ident),* $(,)*) => {
             $(
-                m.insert(
+                map.insert(
                     mlir_attribute!($mlir),
                     melior_attribute!($melior),
                 );
@@ -46,7 +46,7 @@ pub static ATTRIBUTE_TYPES: Lazy<HashMap<&'static str, &'static str>> = Lazy::ne
         TypeAttr => TypeAttribute,
     );
 
-    m
+    map
 });
 
 #[derive(Debug, Clone, Copy)]
