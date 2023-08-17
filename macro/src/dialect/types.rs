@@ -263,8 +263,9 @@ impl<'a> Trait<'a> {
     }
 }
 
-impl<'a> std::ops::Deref for Trait<'a> {
+impl<'a> Deref for Trait<'a> {
     type Target = Record<'a>;
+
     fn deref(&self) -> &Self::Target {
         &self.def
     }
