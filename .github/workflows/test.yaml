@@ -12,7 +12,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - uses: Homebrew/actions/setup-homebrew@master
       - run: tools/setup.sh
-      - run: cargo build
+      - run: cargo build --all-features
   test:
     strategy:
       fail-fast: false
@@ -26,7 +26,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - uses: Homebrew/actions/setup-homebrew@master
       - run: tools/setup.sh
-      - run: cargo test
+      - run: cargo test --all-features
   bench:
     runs-on: ubuntu-latest
     steps:

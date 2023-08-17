@@ -12,7 +12,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - uses: Homebrew/actions/setup-homebrew@master
       - run: tools/setup.sh
-      - run: cargo clippy -- -D warnings
+      - run: cargo clippy --all-features -- -D warnings
   format:
     runs-on: ubuntu-latest
     steps:
