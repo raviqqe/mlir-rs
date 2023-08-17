@@ -6,20 +6,14 @@ pub fn sanitize_documentation(string: &str) -> Result<String, Error> {
     let node = parse_document(&mut arena, string, &Default::default());
 
     for node in node.traverse() {
-        match node {
-            NodeEdge::Start(node) => {
-                let mut ast = node.data.borrow_mut();
+        if let NodeEdge::Start(node) = node {
+            let mut ast = node.data.borrow_mut();
 
-                match &mut ast.value {
-                    NodeValue::CodeBlock(block) => {
-                        if block.info == "" {
-                            block.info = "text".into();
-                        }
-                    }
-                    _ => {}
+            if let NodeValue::CodeBlock(block) = &mut ast.value {
+                if block.info == "" {
+                    block.info = "text".into();
                 }
             }
-            NodeEdge::End(_) => {}
         }
     }
 
