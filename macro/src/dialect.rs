@@ -112,18 +112,22 @@ impl Parse for DialectMacroInput {
 // Writes `tablegen_compile_commands.yaml` for any TableGen file that is being
 // parsed. See: https://mlir.llvm.org/docs/Tools/MLIRLSP/#tablegen-lsp-language-server--tblgen-lsp-server
 fn emit_tablegen_compile_commands(td_file: &str, includes: &[String]) {
-    let pwd = env::current_dir();
-    if let Ok(pwd) = pwd {
-        let path = pwd.join(td_file);
+    if let Ok(pwd) = env::current_dir() {
         let file = OpenOptions::new()
             .write(true)
             .append(true)
             .create(true)
             .open(pwd.join("tablegen_compile_commands.yml"));
+
         if let Ok(mut file) = file {
             writeln!(file, "--- !FileInfo:").unwrap();
-            writeln!(file, "  filepath: \"{}\"", path.to_str().unwrap()).unwrap();
-            let _ = writeln!(
+            writeln!(
+                file,
+                "  filepath: \"{}\"",
+                pwd.join(td_file).to_str().unwrap()
+            )
+            .unwrap();
+            writeln!(
                 file,
                 "  includes: \"{}\"",
                 includes
@@ -131,7 +135,8 @@ fn emit_tablegen_compile_commands(td_file: &str, includes: &[String]) {
                     .map(|string| pwd.join(string).to_str().unwrap().to_owned())
                     .collect::<Vec<_>>()
                     .join(";")
-            );
+            )
+            .unwrap();
         }
     }
 }
