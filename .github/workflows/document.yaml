@@ -12,7 +12,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - uses: Homebrew/actions/setup-homebrew@master
       - run: tools/setup.sh
-      - run: cargo doc
+      - run: cargo doc --all-features
       - uses: peaceiris/actions-gh-pages@v3
         if: github.ref == 'refs/heads/main'
         with:
