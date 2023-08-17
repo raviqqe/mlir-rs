@@ -164,9 +164,10 @@ impl<'a> OperationField<'a> {
                     quote! { self.operation.attribute(#name).is_some() }
                 } else {
                     quote! {
-                        Ok(self.operation
+                        self.operation
                             .attribute(#name)?
-                            .try_into()?)
+                            .try_into()
+                            .map_err(::melior::Error::from)
                     }
                 })
             }
