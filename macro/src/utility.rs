@@ -1,4 +1,8 @@
-use comrak::{arena_tree::NodeEdge, nodes::Ast, parse_document, Arena};
+use comrak::{
+    arena_tree::NodeEdge,
+    nodes::{Ast, NodeValue},
+    parse_document, Arena,
+};
 use convert_case::{Case, Casing};
 use once_cell::sync::Lazy;
 use proc_macro2::Ident;
@@ -31,28 +35,29 @@ pub fn sanitize_name(name: &str) -> Ident {
     syn::parse_str::<Ident>(&name).unwrap_or(format_ident!("r#{}", name))
 }
 
-static CODE_BLOCK_PATTERN: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?s)```\n(.*?```)"#).unwrap());
-
-// TODO Use the `comrak` crate.
 pub fn sanitize_documentation(documentation: &str) -> String {
     let mut arena = Arena::new();
     let node = parse_document(&mut arena, documentation, &Default::default());
 
     for node in node.traverse() {
         match node {
-            NodeEdge::Start(node) => match node.data {
-                Ast::CodeBlock(block) => foo,
-                _ => {}
-            },
+            NodeEdge::Start(node) => {
+                let mut ast = node.data.borrow_mut();
+
+                match &mut ast.value {
+                    NodeValue::CodeBlock(block) => {
+                        if block.info == "" {
+                            block.info = "text".into();
+                        }
+                    }
+                    _ => {}
+                }
+            }
             NodeEdge::End(_) => {}
         }
     }
 
-    CODE_BLOCK_PATTERN
-        .replace_all(documentation, |captures: &Captures| {
-            format!("```text\n{}", captures.get(1).unwrap().as_str())
-        })
-        .to_string()
+    format_commonmark(node)
 }
 
 static NAME_PATTERN: Lazy<Regex> = Lazy::new(|| {
