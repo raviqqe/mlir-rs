@@ -1,3 +1,5 @@
+//! Experimental dialect operations and their builders generated automatically from TableGen files.
+
 melior_macro::dialect! {
     name: "affine",
     tablegen: r#"include "mlir/Dialect/Affine/IR/AffineOps.td""#
