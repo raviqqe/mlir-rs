@@ -32,6 +32,7 @@ pub fn sanitize_name(name: &str) -> Ident {
 
 static CODE_BLOCK_PATTERN: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?s)```\n(.*?```)"#).unwrap());
 
+// TODO Use the `comrak` crate.
 pub fn sanitize_documentation(documentation: &str) -> String {
     CODE_BLOCK_PATTERN
         .replace_all(documentation, |captures: &Captures| {
