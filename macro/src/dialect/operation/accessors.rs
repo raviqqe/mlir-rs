@@ -197,26 +197,24 @@ impl<'a> OperationField<'a> {
     }
 
     fn setter_impl(&self) -> Option<TokenStream> {
-        match &self.kind {
-            FieldKind::Attribute(constraint) => {
-                let n = &self.name;
+        let FieldKind::Attribute(constraint) = &self.kind else {
+            return None;
+        };
+        let name = &self.name;
 
-                Some(if constraint.is_unit() {
-                    quote! {
-                        if value {
-                          self.operation.set_attribute(#n, Attribute::unit(&self.operation.context()));
-                        } else {
-                          let _ = self.operation.remove_attribute(#n);
-                        }
-                    }
+        Some(if constraint.is_unit() {
+            quote! {
+                if value {
+                  self.operation.set_attribute(#name, Attribute::unit(&self.operation.context()));
                 } else {
-                    quote! {
-                        self.operation.set_attribute(#n, &value.into());
-                    }
-                })
+                  let _ = self.operation.remove_attribute(#name);
+                }
             }
-            _ => None,
-        }
+        } else {
+            quote! {
+                self.operation.set_attribute(#name, &value.into());
+            }
+        })
     }
 
     pub fn accessors(&self) -> TokenStream {
