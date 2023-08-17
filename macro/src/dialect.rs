@@ -1,8 +1,10 @@
 mod error;
 mod operation;
 mod types;
+mod utility;
 
-use crate::utility::{sanitize_documentation, sanitize_name_snake};
+use self::utility::sanitize_documentation;
+use crate::utility::sanitize_name_snake;
 use operation::Operation;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
@@ -30,7 +32,7 @@ fn dialect_module(
         "`{name}` dialect.\n\n{}",
         sanitize_documentation(&unindent::unindent(
             dialect.str_value("description").unwrap_or(""),
-        ))
+        ))?
     );
     let name = sanitize_name_snake(name);
 

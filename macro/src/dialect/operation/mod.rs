@@ -9,11 +9,13 @@ use crate::{
             AttributeConstraint, RegionConstraint, SuccessorConstraint, Trait, TypeConstraint,
         },
     },
-    utility::{sanitize_documentation, sanitize_name_snake},
+    utility::sanitize_name_snake,
 };
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, ToTokens, TokenStreamExt};
 use tblgen::{error::WithLocation, record::Record};
+
+use super::utility::sanitize_documentation;
 
 #[derive(Debug, Clone, Copy)]
 pub enum FieldKind<'a> {
@@ -534,13 +536,13 @@ impl<'a> ToTokens for Operation<'a> {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         let class_name = format_ident!("{}", &self.class_name);
         let name = self.name();
-        let accessors = self.fields.iter().map(|f| f.accessors());
+        let accessors = self.fields.iter().map(|field| field.accessors());
         let builder = OperationBuilder::new(self);
         let builder_tokens = builder.builder();
         let builder_fn = builder.create_op_builder_fn();
         let default_constructor = builder.default_constructor();
         let summary = &self.summary;
-        let description = sanitize_documentation(&self.description);
+        let description = sanitize_documentation(&self.description).unwrap();
 
         tokens.append_all(quote! {
             #[doc = #summary]

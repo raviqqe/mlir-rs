@@ -1,10 +1,8 @@
-use comrak::{arena_tree::NodeEdge, format_commonmark, nodes::NodeValue, parse_document, Arena};
 use convert_case::{Case, Casing};
 use once_cell::sync::Lazy;
 use proc_macro2::Ident;
 use quote::format_ident;
 use regex::{Captures, Regex};
-use std::error::Error;
 
 static RESERVED_NAMES: &[&str] = &["name", "operation", "builder"];
 
@@ -30,35 +28,6 @@ pub fn sanitize_name(name: &str) -> Ident {
     // Try to parse the string as an ident, and prefix the identifier
     // with "r#" if it is not a valid identifier.
     syn::parse_str::<Ident>(&name).unwrap_or(format_ident!("r#{}", name))
-}
-
-pub fn sanitize_documentation(string: &str) -> Result<String, Box<dyn Error>> {
-    let mut arena = Arena::new();
-    let node = parse_document(&mut arena, string, &Default::default());
-
-    for node in node.traverse() {
-        match node {
-            NodeEdge::Start(node) => {
-                let mut ast = node.data.borrow_mut();
-
-                match &mut ast.value {
-                    NodeValue::CodeBlock(block) => {
-                        if block.info == "" {
-                            block.info = "text".into();
-                        }
-                    }
-                    _ => {}
-                }
-            }
-            NodeEdge::End(_) => {}
-        }
-    }
-
-    let mut buffer = vec![];
-
-    format_commonmark(node, &Default::default(), &mut buffer)?;
-
-    Ok(String::from_utf8(buffer)?)
 }
 
 static NAME_PATTERN: Lazy<Regex> = Lazy::new(|| {
@@ -94,25 +63,5 @@ mod tests {
         assert_eq!(map_name("f_64"), "f64");
         assert_eq!(map_name("float_8_e_5_m_2"), "float8e5m2");
         assert_eq!(map_name("float_8_e_4_m_3_fn"), "float8e4m3fn");
-    }
-
-    mod sanitize_documentation {
-        use super::*;
-
-        #[test]
-        fn sanitize_code_block() {
-            assert_eq!(
-                &sanitize_documentation("```\nfoo\n```"),
-                "```text\nfoo\n```"
-            );
-        }
-
-        #[test]
-        fn sanitize_code_blocks() {
-            assert_eq!(
-                &sanitize_documentation("```\nfoo\n```\n```\nbar\n```"),
-                "```text\nfoo\n```\n```text\nbar\n```"
-            );
-        }
     }
 }

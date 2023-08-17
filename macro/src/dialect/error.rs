@@ -1,6 +1,8 @@
 use std::{
     error,
     fmt::{self, Display, Formatter},
+    io,
+    string::FromUtf8Error,
 };
 use tblgen::{
     error::{SourceError, TableGenError},
@@ -9,10 +11,12 @@ use tblgen::{
 
 #[derive(Debug)]
 pub enum Error {
+    ExpectedSuperClass(SourceError<ExpectedSuperClassError>),
+    Io(io::Error),
+    ParseError,
     Syn(syn::Error),
     TableGen(tblgen::Error),
-    ExpectedSuperClass(SourceError<ExpectedSuperClassError>),
-    ParseError,
+    Utf8(FromUtf8Error),
 }
 
 impl Error {
@@ -20,7 +24,7 @@ impl Error {
         match self {
             Self::TableGen(error) => error.add_source_info(info).into(),
             Self::ExpectedSuperClass(error) => error.add_source_info(info).into(),
-            Self::Syn(_) | Self::ParseError => self,
+            Self::Io(_) | Self::ParseError | Self::Syn(_) | Self::Utf8(_) => self,
         }
     }
 }
@@ -28,10 +32,12 @@ impl Error {
 impl Display for Error {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         match self {
+            Self::ExpectedSuperClass(error) => write!(formatter, "invalid ODS input: {error}"),
+            Self::Io(error) => write!(formatter, "{error}"),
+            Self::ParseError => write!(formatter, "error parsing TableGen source"),
             Self::Syn(error) => write!(formatter, "failed to parse macro input: {error}"),
             Self::TableGen(error) => write!(formatter, "invalid ODS input: {error}"),
-            Self::ExpectedSuperClass(error) => write!(formatter, "invalid ODS input: {error}"),
-            Self::ParseError => write!(formatter, "error parsing TableGen source"),
+            Self::Utf8(error) => write!(formatter, "{error}"),
         }
     }
 }
@@ -53,6 +59,18 @@ impl From<SourceError<TableGenError>> for Error {
 impl From<syn::Error> for Error {
     fn from(error: syn::Error) -> Self {
         Self::Syn(error)
+    }
+}
+
+impl From<io::Error> for Error {
+    fn from(error: io::Error) -> Self {
+        Self::Io(error)
+    }
+}
+
+impl From<FromUtf8Error> for Error {
+    fn from(error: FromUtf8Error) -> Self {
+        Self::Utf8(error)
     }
 }
 
