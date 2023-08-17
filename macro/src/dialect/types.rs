@@ -231,11 +231,11 @@ impl<'a> Trait<'a> {
         Self { kind, def }
     }
 
-    pub fn has_name(&self, n: &str) -> bool {
+    pub fn has_name(&self, expected_name: &str) -> bool {
         match &self.kind {
             TraitKind::Native { name, .. }
             | TraitKind::Internal { name }
-            | TraitKind::Interface { name } => n == name,
+            | TraitKind::Interface { name } => expected_name == name,
             TraitKind::Pred {} => false,
         }
     }
