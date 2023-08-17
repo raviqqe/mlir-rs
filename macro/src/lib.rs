@@ -13,6 +13,16 @@ use quote::quote;
 use std::error::Error;
 use syn::parse_macro_input;
 
+/// Generates a dialect module from a TableGen file.
+///
+/// # Examples
+///
+/// ```rust
+/// dialect! {
+///     name: "func",
+///     tablegen: r#"include "mlir/Dialect/Func/IR/FuncOps.td""#
+/// }
+/// ```
 #[proc_macro]
 pub fn dialect(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DialectMacroInput);
