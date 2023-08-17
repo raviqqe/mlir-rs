@@ -6,7 +6,7 @@ use quote::{format_ident, quote};
 impl<'a> OperationField<'a> {
     fn getter_impl(&self) -> Option<TokenStream> {
         match &self.kind {
-            FieldKind::Operand(t) | FieldKind::Result(t) => {
+            FieldKind::Operand(constraint) | FieldKind::Result(constraint) => {
                 let kind = self.kind.as_str();
                 let kind_ident = format_ident!("{}", kind);
                 let plural = format_ident!("{}s", kind);
@@ -24,8 +24,8 @@ impl<'a> OperationField<'a> {
                         seen_variable_length,
                     } => {
                         // At most one variable length group
-                        if t.is_variable_length() {
-                            if t.is_optional() {
+                        if constraint.is_variable_length() {
+                            if constraint.is_optional() {
                                 // Optional element, and some singular elements.
                                 // Only present if the amount of groups is at least the number of
                                 // elements.
@@ -73,7 +73,7 @@ impl<'a> OperationField<'a> {
                             let start = #num_preceding_simple + #num_preceding_variadic * group_len;
                         };
 
-                        let get_elements = if t.is_variable_length() {
+                        let get_elements = if constraint.is_variable_length() {
                             quote! {
                                 self.operation.#plural().skip(start).take(group_len)
                             }
@@ -103,8 +103,8 @@ impl<'a> OperationField<'a> {
                                                 .element(#index)
                                                 .expect("has segment size") as usize;
                         };
-                        let get_elements = if t.is_variable_length() {
-                            if t.is_optional() {
+                        let get_elements = if constraint.is_variable_length() {
+                            if constraint.is_optional() {
                                 quote! {
                                     if group_len == 0 {
                                         None
