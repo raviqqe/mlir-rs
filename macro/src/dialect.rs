@@ -57,26 +57,25 @@ enum InputField {
 
 impl Parse for InputField {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
-        let ident: Ident = input.parse()?;
-        let _: Token![:] = input.parse()?;
+        let ident = input.parse::<Ident>()?;
+
+        input.parse::<Token![:]>()?;
+
         if ident == format_ident!("name") {
-            return Ok(Self::Name(input.parse()?));
-        }
-        if ident == format_ident!("tablegen") {
-            return Ok(Self::TableGen(input.parse()?));
-        }
-        if ident == format_ident!("td_file") {
-            return Ok(Self::TdFile(input.parse()?));
-        }
-        if ident == format_ident!("include_dirs") {
+            Ok(Self::Name(input.parse()?))
+        } else if ident == format_ident!("tablegen") {
+            Ok(Self::TableGen(input.parse()?))
+        } else if ident == format_ident!("td_file") {
+            Ok(Self::TdFile(input.parse()?))
+        } else if ident == format_ident!("include_dirs") {
             let content;
             bracketed!(content in input);
-            return Ok(Self::Includes(
+            Ok(Self::Includes(
                 Punctuated::<LitStr, Token![,]>::parse_terminated(&content)?,
-            ));
+            ))
+        } else {
+            Err(input.error(format!("invalid field {}", ident)))
         }
-
-        Err(input.error(format!("invalid field {}", ident)))
     }
 }
 
