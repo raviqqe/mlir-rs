@@ -33,20 +33,21 @@ pub fn sanitize_documentation(string: &str) -> Result<String, Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use pretty_assertions::assert_eq;
 
     #[test]
     fn sanitize_code_block() {
         assert_eq!(
-            &sanitize_documentation("```\nfoo\n```").unwrap(),
-            "``` text\nfoo\n```"
+            &sanitize_documentation("```\nfoo\n```\n").unwrap(),
+            "``` text\nfoo\n```\n"
         );
     }
 
     #[test]
     fn sanitize_code_blocks() {
         assert_eq!(
-            &sanitize_documentation("```\nfoo\n```\n```\nbar\n```").unwrap(),
-            "``` text\nfoo\n```\n```text \nbar\n```"
+            &sanitize_documentation("```\nfoo\n```\n\n```\nbar\n```\n").unwrap(),
+            "``` text\nfoo\n```\n\n``` text\nbar\n```\n"
         );
     }
 }

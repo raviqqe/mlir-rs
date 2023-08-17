@@ -26,3 +26,4 @@ unindent = "0.2.2"
 [dev-dependencies]
 melior = { path = "../melior" }
 mlir-sys = "0.2"
+pretty_assertions = "1.4.0"
