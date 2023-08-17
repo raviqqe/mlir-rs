@@ -1,8 +1,6 @@
-use comrak::{
-    arena_tree::NodeEdge,
-    nodes::{Ast, NodeValue},
-    parse_document, Arena,
-};
+use std::io;
+
+use comrak::{arena_tree::NodeEdge, format_commonmark, nodes::NodeValue, parse_document, Arena};
 use convert_case::{Case, Casing};
 use once_cell::sync::Lazy;
 use proc_macro2::Ident;
@@ -35,9 +33,9 @@ pub fn sanitize_name(name: &str) -> Ident {
     syn::parse_str::<Ident>(&name).unwrap_or(format_ident!("r#{}", name))
 }
 
-pub fn sanitize_documentation(documentation: &str) -> String {
+pub fn sanitize_documentation(string: &str) -> Result<String, io::Error> {
     let mut arena = Arena::new();
-    let node = parse_document(&mut arena, documentation, &Default::default());
+    let node = parse_document(&mut arena, string, &Default::default());
 
     for node in node.traverse() {
         match node {
@@ -57,7 +55,11 @@ pub fn sanitize_documentation(documentation: &str) -> String {
         }
     }
 
-    format_commonmark(node)
+    let mut string = String::new();
+
+    format_commonmark(node, &Default::default(), &mut string)?;
+
+    Ok(string)
 }
 
 static NAME_PATTERN: Lazy<Regex> = Lazy::new(|| {
