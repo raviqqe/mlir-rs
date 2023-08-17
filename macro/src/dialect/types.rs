@@ -157,13 +157,13 @@ impl<'a> AttributeConstraint<'a> {
             .ok()
             .and_then(|v| ATTRIBUTE_TYPES.get(v.as_str().trim()))
             .copied()
-            .unwrap_or("::melior::ir::attribute::Attribute")
+            .unwrap_or(melior_attribute!(Attribute))
     }
 
     pub fn is_unit(&self) -> bool {
         self.0
             .string_value("storageType")
-            .map(|v| v == "::mlir::UnitAttr")
+            .map(|v| v == mlir_attribute!(UnitAttr))
             .unwrap_or(false)
     }
 
