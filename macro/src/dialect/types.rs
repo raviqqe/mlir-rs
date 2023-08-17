@@ -244,11 +244,11 @@ impl<'a> Trait<'a> {
         let r#trait = def
             .string_value("trait")
             .expect("trait def has trait value");
-        let namespace = def.string_value("cppNamespace").ok().and_then(|n| {
-            if n.is_empty() {
+        let namespace = def.string_value("cppNamespace").ok().and_then(|namespace| {
+            if namespace.is_empty() {
                 None
             } else {
-                Some(n)
+                Some(namespace)
             }
         });
         if let Some(namespace) = namespace {
