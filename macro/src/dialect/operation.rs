@@ -541,7 +541,8 @@ impl<'a> ToTokens for Operation<'a> {
         let builder_fn = builder.create_op_builder_fn();
         let default_constructor = builder.default_constructor();
         let summary = &self.summary;
-        let description = sanitize_documentation(&self.description).unwrap();
+        let description =
+            sanitize_documentation(&self.description).expect("valid Markdown documentation");
 
         tokens.append_all(quote! {
             #[doc = #summary]
