@@ -310,7 +310,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
         });
         args.push(quote! { location: ::melior::ir::Location<'c> });
 
-        let doc = format!("Create a new {}", self.operation.summary);
+        let doc = format!("Creates a new {}", self.operation.summary);
         quote! {
             #[allow(clippy::too_many_arguments)]
             #[doc = #doc]
