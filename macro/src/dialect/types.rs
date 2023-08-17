@@ -45,6 +45,7 @@ pub static ATTRIBUTE_TYPES: Lazy<HashMap<&'static str, &'static str>> = Lazy::ne
         StringAttr => StringAttribute,
         TypeAttr => TypeAttribute,
     );
+
     m
 });
 
