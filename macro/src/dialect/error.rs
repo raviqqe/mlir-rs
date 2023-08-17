@@ -40,20 +40,20 @@ impl Display for Error {
 impl error::Error for Error {}
 
 impl From<SourceError<ExpectedSuperClassError>> for Error {
-    fn from(value: SourceError<ExpectedSuperClassError>) -> Self {
-        Self::ExpectedSuperClass(value)
+    fn from(error: SourceError<ExpectedSuperClassError>) -> Self {
+        Self::ExpectedSuperClass(error)
     }
 }
 
 impl From<SourceError<TableGenError>> for Error {
-    fn from(value: SourceError<TableGenError>) -> Self {
-        Self::TableGen(value)
+    fn from(error: SourceError<TableGenError>) -> Self {
+        Self::TableGen(error)
     }
 }
 
 impl From<syn::Error> for Error {
-    fn from(value: syn::Error) -> Self {
-        Self::Syn(value)
+    fn from(error: syn::Error) -> Self {
+        Self::Syn(error)
     }
 }
 
