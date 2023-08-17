@@ -19,6 +19,7 @@ impl<'a> OperationField<'a> {
                     .variadic_info
                     .as_ref()
                     .expect("operands and results need variadic info");
+
                 Some(match variadic_kind {
                     VariadicKind::Simple {
                         seen_variable_length,
@@ -72,7 +73,6 @@ impl<'a> OperationField<'a> {
                             let group_len = total_var_len / #num_variable_length;
                             let start = #num_preceding_simple + #num_preceding_variadic * group_len;
                         };
-
                         let get_elements = if constraint.is_variable_length() {
                             quote! {
                                 self.operation.#plural().skip(start).take(group_len)
@@ -82,6 +82,7 @@ impl<'a> OperationField<'a> {
                                 self.operation.#kind_ident(start).expect(#error)
                             }
                         };
+
                         quote! { #compute_start_length #get_elements }
                     }
                     VariadicKind::AttrSized {} => {
@@ -121,6 +122,7 @@ impl<'a> OperationField<'a> {
                                 self.operation.#plural().skip(start).take(group_len)
                             }
                         };
+
                         quote! { #compute_start_length #get_elements }
                     }
                 })
