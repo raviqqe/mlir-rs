@@ -468,13 +468,11 @@ impl<'a> Operation<'a> {
             .collect::<Result<Vec<_>, _>>()?;
 
         let name = def.name()?;
-        let class_name = if !name.contains('_') {
-            // Class name with a leading underscore and without dialect prefix
-            name
-        } else if !name.starts_with('_') {
-            // Class name without dialect prefix
-            let mut split = name.split('_');
-            split.nth(1).expect("string contains separator '_'")
+        let class_name = if name.contains('_') && !name.starts_with('_') {
+            // Trim dialect prefix from name
+            name.split('_')
+                .nth(1)
+                .expect("string contains separator '_'")
         } else {
             name
         };
