@@ -9,7 +9,7 @@ use crate::{
             AttributeConstraint, RegionConstraint, SuccessorConstraint, Trait, TypeConstraint,
         },
     },
-    utility::sanitize_name_snake,
+    utility::{sanitize_documentation, sanitize_name_snake},
 };
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, ToTokens, TokenStreamExt};
@@ -540,7 +540,8 @@ impl<'a> ToTokens for Operation<'a> {
         let builder_fn = builder.create_op_builder_fn();
         let default_constructor = builder.default_constructor();
         let summary = &self.summary;
-        let description = &self.description;
+        let description = sanitize_documentation(&self.description);
+
         tokens.append_all(quote! {
             #[doc = #summary]
             #[doc = "\n\n"]

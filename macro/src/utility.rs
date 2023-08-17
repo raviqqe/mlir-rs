@@ -30,12 +30,12 @@ pub fn sanitize_name(name: &str) -> Ident {
     syn::parse_str::<Ident>(&name).unwrap_or(format_ident!("r#{}", name))
 }
 
-static CODE_BLOCK_PATTERN: Lazy<Regex> = Lazy::new(|| Regex::new(r#"```\n([^\n])"#).unwrap());
+static CODE_BLOCK_PATTERN: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?s)```\n(.*?```)"#).unwrap());
 
-pub fn sanitize_documentation(name: &str) -> String {
+pub fn sanitize_documentation(documentation: &str) -> String {
     CODE_BLOCK_PATTERN
-        .replace_all(name, |captures: &Captures| {
-            format!("```bnf\n{}", captures.get(0).unwrap().as_str())
+        .replace_all(documentation, |captures: &Captures| {
+            format!("```text\n{}", captures.get(1).unwrap().as_str())
         })
         .to_string()
 }
