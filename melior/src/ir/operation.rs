@@ -184,18 +184,19 @@ impl<'c> Operation<'c> {
     }
 
     /// Gets a attribute with the given name.
-    pub fn attribute(&self, name: &str) -> Option<Attribute<'c>> {
+    pub fn attribute(&self, name: &str) -> Result<Attribute<'c>, Error> {
         unsafe {
             Attribute::from_option_raw(mlirOperationGetAttributeByName(
                 self.raw,
                 StringRef::from(name).to_raw(),
             ))
         }
+        .ok_or(Error::AttributeNotFound(name.into()))
     }
 
     /// Checks if the operation has a attribute with the given name.
     pub fn has_attribute(&self, name: &str) -> bool {
-        self.attribute(name).is_some()
+        self.attribute(name).is_ok()
     }
 
     /// Sets the attribute with the given name to the given attribute.
@@ -547,14 +548,14 @@ mod tests {
         assert!(operation.has_attribute("foo"));
         assert_eq!(
             operation.attribute("foo").map(|a| a.to_string()),
-            Some("\"bar\"".into())
+            Ok("\"bar\"".into())
         );
         assert!(operation.remove_attribute("foo").is_ok());
         assert!(operation.remove_attribute("foo").is_err());
         operation.set_attribute("foo", &StringAttribute::new(&context, "foo").into());
         assert_eq!(
             operation.attribute("foo").map(|a| a.to_string()),
-            Some("\"foo\"".into())
+            Ok("\"foo\"".into())
         );
         assert_eq!(
             operation.attributes().next(),

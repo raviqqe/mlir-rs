@@ -22,7 +22,7 @@ fn single() {
         region_test::single(r1, location)
     };
 
-    assert!(op.default_region().first_block().is_some());
+    assert!(op.default_region().unwrap().first_block().is_some());
 }
 
 #[test]
@@ -51,7 +51,7 @@ fn variadic_after_single() {
 
     assert_eq!(op.operation().to_string(), op2.operation().to_string());
 
-    assert!(op.default_region().first_block().is_none());
+    assert!(op.default_region().unwrap().first_block().is_none());
     assert_eq!(op.other_regions().count(), 2);
     assert!(op.other_regions().next().unwrap().first_block().is_some());
     assert!(op.other_regions().nth(1).unwrap().first_block().is_none());

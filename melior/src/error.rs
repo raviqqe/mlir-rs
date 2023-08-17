@@ -1,4 +1,5 @@
 use std::{
+    convert::Infallible,
     error,
     fmt::{self, Display, Formatter},
     str::Utf8Error,
@@ -15,6 +16,7 @@ pub enum Error {
         value: String,
     },
     InvokeFunction,
+    OperandNotFound(&'static str),
     OperationResultExpected(String),
     PositionOutOfBounds {
         name: &'static str,
@@ -22,10 +24,12 @@ pub enum Error {
         index: usize,
     },
     ParsePassPipeline(String),
+    ResultNotFound(&'static str),
     RunPass,
     TypeExpected(&'static str, String),
     UnknownDiagnosticSeverity(u32),
     Utf8(Utf8Error),
+    Infallible,
 }
 
 impl Display for Error {
@@ -44,6 +48,9 @@ impl Display for Error {
                 write!(formatter, "element of {type} type expected: {value}")
             }
             Self::InvokeFunction => write!(formatter, "failed to invoke JIT-compiled function"),
+            Self::OperandNotFound(name) => {
+                write!(formatter, "operand {name} not found")
+            }
             Self::OperationResultExpected(value) => {
                 write!(formatter, "operation result expected: {value}")
             }
@@ -52,6 +59,9 @@ impl Display for Error {
             }
             Self::PositionOutOfBounds { name, value, index } => {
                 write!(formatter, "{name} position {index} out of bounds: {value}")
+            }
+            Self::ResultNotFound(name) => {
+                write!(formatter, "result {name} not found")
             }
             Self::RunPass => write!(formatter, "failed to run pass"),
             Self::TypeExpected(r#type, actual) => {
@@ -63,6 +73,9 @@ impl Display for Error {
             Self::Utf8(error) => {
                 write!(formatter, "{}", error)
             }
+            Self::Infallible => {
+                write!(formatter, "infallible")
+            }
         }
     }
 }
@@ -72,5 +85,11 @@ impl error::Error for Error {}
 impl From<Utf8Error> for Error {
     fn from(error: Utf8Error) -> Self {
         Self::Utf8(error)
+    }
+}
+
+impl From<Infallible> for Error {
+    fn from(_: Infallible) -> Self {
+        Self::Infallible
     }
 }

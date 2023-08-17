@@ -19,6 +19,12 @@ impl<'a> OperationField<'a> {
                     .variadic_info
                     .as_ref()
                     .expect("operands and results need variadic info");
+                let error_variant = match &self.kind {
+                    FieldKind::Operand(_) => quote!(OperandNotFound),
+                    FieldKind::Result(_) => quote!(ResultNotFound),
+                    _ => unreachable!(),
+                };
+                let name = self.name;
 
                 Some(match variadic_kind {
                     VariadicKind::Simple {
@@ -32,9 +38,9 @@ impl<'a> OperationField<'a> {
                                 // elements.
                                 quote! {
                                   if self.operation.#count() < #len {
-                                    None
+                                    Err(::melior::Error::#error_variant(#name))
                                   } else {
-                                    self.operation.#kind_ident(#index).ok()
+                                    self.operation.#kind_ident(#index)
                                   }
                                 }
                             } else {
@@ -43,22 +49,20 @@ impl<'a> OperationField<'a> {
                                 // singular elements from the number of elements.
                                 quote! {
                                   let group_length = self.operation.#count() - #len + 1;
-                                  self.operation.#plural().skip(#index).take(group_length)
+                                  Ok(self.operation.#plural().skip(#index).take(group_length))
                                 }
                             }
                         } else if *seen_variable_length {
                             // Single element after variable length group
                             // Compute the length of that variable group and take the next element
-                            let error = format!("operation should have this {}", kind);
                             quote! {
                                 let group_length = self.operation.#count() - #len + 1;
-                                self.operation.#kind_ident(#index + group_length - 1).expect(#error)
+                                self.operation.#kind_ident(#index + group_length - 1)
                             }
                         } else {
                             // All elements so far are singular
-                            let error = format!("operation should have this {}", kind);
                             quote! {
-                                self.operation.#kind_ident(#index).expect(#error)
+                                self.operation.#kind_ident(#index)
                             }
                         }
                     }
@@ -67,7 +71,6 @@ impl<'a> OperationField<'a> {
                         num_preceding_simple,
                         num_preceding_variadic,
                     } => {
-                        let error = format!("operation should have this {}", kind);
                         let compute_start_length = quote! {
                             let total_var_len = self.operation.#count() - #num_variable_length + 1;
                             let group_len = total_var_len / #num_variable_length;
@@ -75,51 +78,46 @@ impl<'a> OperationField<'a> {
                         };
                         let get_elements = if constraint.is_variable_length() {
                             quote! {
-                                self.operation.#plural().skip(start).take(group_len)
+                                Ok(self.operation.#plural().skip(start).take(group_len))
                             }
                         } else {
                             quote! {
-                                self.operation.#kind_ident(start).expect(#error)
+                                self.operation.#kind_ident(start)
                             }
                         };
 
                         quote! { #compute_start_length #get_elements }
                     }
                     VariadicKind::AttrSized {} => {
-                        let error = format!("operation should have this {}", kind);
                         let attribute_name = format!("{}_segment_sizes", kind);
-                        let attribute_missing_error =
-                            format!("operation has {} attribute", attribute_name);
                         let compute_start_length = quote! {
                             let attribute =
                                 ::melior::ir::attribute::DenseI32ArrayAttribute::<'c>::try_from(
                                     self.operation
-                                        .attribute(#attribute_name)
-                                        .expect(#attribute_missing_error)
-                                ).expect("is a DenseI32ArrayAttribute");
+                                        .attribute(#attribute_name)?
+                                )?;
                             let start = (0..#index)
-                                .map(|index| attribute.element(index)
-                                .expect("has segment size"))
+                                .map(|index| attribute.element(index))
+                                .collect::<Result<Vec<_>, _>>()?
+                                .into_iter()
                                 .sum::<i32>() as usize;
-                            let group_len = attribute
-                                .element(#index)
-                                .expect("has segment size") as usize;
+                            let group_len = attribute.element(#index)? as usize;
                         };
                         let get_elements = if !constraint.is_variable_length() {
                             quote! {
-                                self.operation.#kind_ident(start).expect(#error)
+                                self.operation.#kind_ident(start)
                             }
                         } else if constraint.is_optional() {
                             quote! {
                                 if group_len == 0 {
-                                    None
+                                    Err(::melior::Error::#error_variant(#name))
                                 } else {
-                                    self.operation.#kind_ident(start).ok()
+                                    self.operation.#kind_ident(start)
                                 }
                             }
                         } else {
                             quote! {
-                                self.operation.#plural().skip(start).take(group_len)
+                                Ok(self.operation.#plural().skip(start).take(group_len))
                             }
                         };
 
@@ -140,7 +138,7 @@ impl<'a> OperationField<'a> {
                     }
                 } else {
                     quote! {
-                        self.operation.successor(#index).expect("operation should have this successor")
+                        self.operation.successor(#index)
                     }
                 })
             }
@@ -155,30 +153,20 @@ impl<'a> OperationField<'a> {
                     }
                 } else {
                     quote! {
-                        self.operation.region(#index).expect("operation should have this region")
+                        self.operation.region(#index)
                     }
                 })
             }
             FieldKind::Attribute(constraint) => {
                 let name = &self.name;
-                let attribute_error = format!("operation should have attribute {}", name);
-                let type_error = format!("{} should be a {}", name, constraint.storage_type());
 
                 Some(if constraint.is_unit() {
                     quote! { self.operation.attribute(#name).is_some() }
-                } else if constraint.is_optional() {
-                    quote! {
-                        self.operation
-                            .attribute(#name)
-                            .map(|attribute| attribute.try_into().expect(#type_error))
-                    }
                 } else {
                     quote! {
-                        self.operation
-                            .attribute(#name)
-                            .expect(#attribute_error)
-                            .try_into()
-                            .expect(#type_error)
+                        Ok(self.operation
+                            .attribute(#name)?
+                            .try_into()?)
                     }
                 })
             }
@@ -192,7 +180,7 @@ impl<'a> OperationField<'a> {
 
                 if constraint.is_unit() || constraint.is_optional() {
                     Some(quote! {
-                      let _ = self.operation.remove_attribute(#name);
+                      self.operation.remove_attribute(#name)
                     })
                 } else {
                     None
@@ -239,7 +227,7 @@ impl<'a> OperationField<'a> {
             let ident = sanitize_name_snake(&format!("remove_{}", self.name));
             self.remover_impl().map_or(quote!(), |body| {
                 quote! {
-                    pub fn #ident(&mut self) {
+                    pub fn #ident(&mut self) -> Result<(), ::melior::Error> {
                         #body
                     }
                 }

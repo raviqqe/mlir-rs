@@ -76,10 +76,11 @@ impl<'a> OperationField<'a> {
         let (param_type, return_type) = {
             if ac.is_unit() {
                 (quote! { bool }, quote! { bool })
-            } else if ac.is_optional() {
-                (quote! { #kind_type<'c> }, quote! { Option<#kind_type<'c>> })
             } else {
-                (quote! { #kind_type<'c> }, quote! { #kind_type<'c> })
+                (
+                    quote! { #kind_type<'c> },
+                    quote! { Result<#kind_type<'c>, ::melior::Error> },
+                )
             }
         };
         let sanitized = sanitize_name_snake(name);
@@ -108,7 +109,7 @@ impl<'a> OperationField<'a> {
             } else {
                 (
                     quote! { ::melior::ir::Region<'c> },
-                    quote! { ::melior::ir::RegionRef<'c, '_> },
+                    quote! { Result<::melior::ir::RegionRef<'c, '_>, ::melior::Error> },
                 )
             }
         };
@@ -142,7 +143,7 @@ impl<'a> OperationField<'a> {
             } else {
                 (
                     quote! { &::melior::ir::Block<'c> },
-                    quote! { ::melior::ir::BlockRef<'c, '_> },
+                    quote! { Result<::melior::ir::BlockRef<'c, '_>, ::melior::Error> },
                 )
             }
         };
@@ -201,16 +202,19 @@ impl<'a> OperationField<'a> {
                 if tc.is_optional() {
                     (
                         quote! { #param_kind_type },
-                        quote! { Option<#return_kind_type> },
+                        quote! { Result<#return_kind_type, ::melior::Error> },
                     )
                 } else {
                     (
                         quote! { &[#param_kind_type] },
-                        quote! { impl Iterator<Item = #return_kind_type> },
+                        quote! { Result<impl Iterator<Item = #return_kind_type>, ::melior::Error> },
                     )
                 }
             } else {
-                (param_kind_type, return_kind_type)
+                (
+                    param_kind_type,
+                    quote!(Result<#return_kind_type, ::melior::Error>),
+                )
             }
         };
 
