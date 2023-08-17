@@ -18,7 +18,7 @@ use syn::parse_macro_input;
 /// # Examples
 ///
 /// ```rust
-/// dialect! {
+/// melior_macro::dialect! {
 ///     name: "func",
 ///     tablegen: r#"include "mlir/Dialect/Func/IR/FuncOps.td""#
 /// }
