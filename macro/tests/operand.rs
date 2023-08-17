@@ -1,7 +1,6 @@
-use melior::ir::{Block, Location, Type};
-
 mod utility;
 
+use melior::ir::{Block, Location, Type};
 use utility::*;
 
 melior_macro::dialect! {
