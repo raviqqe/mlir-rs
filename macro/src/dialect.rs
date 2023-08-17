@@ -153,12 +153,12 @@ pub fn generate_dialect(mut input: DialectMacroInput) -> Result<TokenStream, Box
     if let Some(source) = &input.tablegen {
         td_parser = td_parser
             .add_source(source)
-            .map_err(|e| syn::Error::new(Span::call_site(), format!("{}", e)))?;
+            .map_err(|error| syn::Error::new(Span::call_site(), format!("{}", error)))?;
     }
     if let Some(file) = &input.td_file {
         td_parser = td_parser
             .add_source_file(file)
-            .map_err(|e| syn::Error::new(Span::call_site(), format!("{}", e)))?;
+            .map_err(|error| syn::Error::new(Span::call_site(), format!("{}", error)))?;
     }
     for include in &input.includes {
         td_parser = td_parser.add_include_path(include);
