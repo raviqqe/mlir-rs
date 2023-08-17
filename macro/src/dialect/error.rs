@@ -1,5 +1,8 @@
 use proc_macro2::Span;
-use std::fmt::{self, Display, Formatter};
+use std::{
+    error,
+    fmt::{self, Display, Formatter},
+};
 use tblgen::{
     error::{SourceError, TableGenError},
     SourceInfo,
@@ -34,7 +37,7 @@ impl Display for Error {
     }
 }
 
-impl std::error::Error for Error {}
+impl error::Error for Error {}
 
 impl From<SourceError<ExpectedSuperClassError>> for Error {
     fn from(value: SourceError<ExpectedSuperClassError>) -> Self {
@@ -57,7 +60,7 @@ impl From<syn::Error> for Error {
 impl From<Error> for syn::Error {
     fn from(value: Error) -> Self {
         match value {
-            Error::Syn(e) => e,
+            Error::Syn(error) => error,
             _ => syn::Error::new(Span::call_site(), format!("{}", value)),
         }
     }
@@ -67,9 +70,13 @@ impl From<Error> for syn::Error {
 pub struct ExpectedSuperClassError(pub String);
 
 impl Display for ExpectedSuperClassError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "expected this record to be a subclass of {}", self.0)
+    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
+        write!(
+            formatter,
+            "expected this record to be a subclass of {}",
+            self.0
+        )
     }
 }
 
-impl std::error::Error for ExpectedSuperClassError {}
+impl error::Error for ExpectedSuperClassError {}
