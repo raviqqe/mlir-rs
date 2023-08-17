@@ -156,7 +156,7 @@ impl<'a> OperationField<'a> {
             }
             FieldKind::Attribute(constraint) => {
                 let name = &self.name;
-                let attr_error = format!("operation should have attribute {}", name);
+                let attribute_error = format!("operation should have attribute {}", name);
                 let type_error = format!("{} should be a {}", name, constraint.storage_type());
                 Some(if constraint.is_unit() {
                     quote! { self.operation.attribute(#name).is_some() }
@@ -170,7 +170,7 @@ impl<'a> OperationField<'a> {
                     quote! {
                         self.operation
                             .attribute(#name)
-                            .expect(#attr_error)
+                            .expect(#attribute_error)
                             .try_into()
                             .expect(#type_error)
                     }
