@@ -1,4 +1,4 @@
-use std::io;
+use std::{error::Error, io};
 
 use comrak::{arena_tree::NodeEdge, format_commonmark, nodes::NodeValue, parse_document, Arena};
 use convert_case::{Case, Casing};
@@ -33,7 +33,7 @@ pub fn sanitize_name(name: &str) -> Ident {
     syn::parse_str::<Ident>(&name).unwrap_or(format_ident!("r#{}", name))
 }
 
-pub fn sanitize_documentation(string: &str) -> Result<String, io::Error> {
+pub fn sanitize_documentation(string: &str) -> Result<String, Box<dyn Error>> {
     let mut arena = Arena::new();
     let node = parse_document(&mut arena, string, &Default::default());
 
@@ -55,11 +55,11 @@ pub fn sanitize_documentation(string: &str) -> Result<String, io::Error> {
         }
     }
 
-    let mut string = String::new();
+    let mut buffer = vec![];
 
-    format_commonmark(node, &Default::default(), &mut string)?;
+    format_commonmark(node, &Default::default(), &mut buffer)?;
 
-    Ok(string)
+    Ok(String::from_utf8(buffer)?)
 }
 
 static NAME_PATTERN: Lazy<Regex> = Lazy::new(|| {
