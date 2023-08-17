@@ -86,14 +86,15 @@ impl<'a> OperationField<'a> {
                     }
                     VariadicKind::AttrSized {} => {
                         let error = format!("operation should have this {}", kind);
-                        let attr_name = format!("{}_segment_sizes", kind);
-                        let attr_missing_error = format!("operation has {} attribute", attr_name);
+                        let attribute_name = format!("{}_segment_sizes", kind);
+                        let attribute_missing_error =
+                            format!("operation has {} attribute", attribute_name);
                         let compute_start_length = quote! {
                             let attribute =
                                 ::melior::ir::attribute::DenseI32ArrayAttribute::<'c>::try_from(
                                     self.operation
-                                        .attribute(#attr_name)
-                                        .expect(#attr_missing_error)
+                                        .attribute(#attribute_name)
+                                        .expect(#attribute_missing_error)
                                 ).expect("is a DenseI32ArrayAttribute");
                             let start = (0..#index)
                                 .map(|index| attribute.element(index)
@@ -129,6 +130,7 @@ impl<'a> OperationField<'a> {
                     .seq_info
                     .as_ref()
                     .expect("successors need sequence info");
+
                 Some(if constraint.is_variadic() {
                     // Only the last successor can be variadic
                     quote! {
@@ -143,6 +145,7 @@ impl<'a> OperationField<'a> {
             FieldKind::Region(constraint) => {
                 let SequenceInfo { index, .. } =
                     self.seq_info.as_ref().expect("regions need sequence info");
+
                 Some(if constraint.is_variadic() {
                     // Only the last region can be variadic
                     quote! {
@@ -158,13 +161,14 @@ impl<'a> OperationField<'a> {
                 let name = &self.name;
                 let attribute_error = format!("operation should have attribute {}", name);
                 let type_error = format!("{} should be a {}", name, constraint.storage_type());
+
                 Some(if constraint.is_unit() {
                     quote! { self.operation.attribute(#name).is_some() }
                 } else if constraint.is_optional() {
                     quote! {
                         self.operation
                             .attribute(#name)
-                            .map(|a| a.try_into().expect(#type_error))
+                            .map(|attribute| attribute.try_into().expect(#type_error))
                     }
                 } else {
                     quote! {
