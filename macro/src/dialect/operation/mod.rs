@@ -1,6 +1,7 @@
 mod accessors;
 mod builder;
 
+use self::builder::OperationBuilder;
 use crate::{
     dialect::{
         error::{Error, ExpectedSuperClassError},
@@ -13,8 +14,6 @@ use crate::{
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, ToTokens, TokenStreamExt};
 use tblgen::{error::WithLocation, record::Record};
-
-use self::builder::OperationBuilder;
 
 #[derive(Debug, Clone, Copy)]
 pub enum FieldKind<'a> {
