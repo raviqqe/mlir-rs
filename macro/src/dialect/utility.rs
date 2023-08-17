@@ -38,7 +38,7 @@ mod tests {
     fn sanitize_code_block() {
         assert_eq!(
             &sanitize_documentation("```\nfoo\n```").unwrap(),
-            "```text\nfoo\n```"
+            "``` text\nfoo\n```"
         );
     }
 
@@ -46,7 +46,7 @@ mod tests {
     fn sanitize_code_blocks() {
         assert_eq!(
             &sanitize_documentation("```\nfoo\n```\n```\nbar\n```").unwrap(),
-            "```text\nfoo\n```\n```text\nbar\n```"
+            "``` text\nfoo\n```\n```text \nbar\n```"
         );
     }
 }
