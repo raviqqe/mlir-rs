@@ -1,4 +1,5 @@
-//! Experimental dialect operations and their builders generated automatically from TableGen files.
+//! Experimental dialect operations and their builders generated automatically
+//! from TableGen files.
 
 melior_macro::dialect! {
     name: "affine",
