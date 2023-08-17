@@ -26,10 +26,10 @@ impl Error {
 impl Display for Error {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         match self {
-            Error::Syn(error) => write!(formatter, "failed to parse macro input: {error}"),
-            Error::TableGen(error) => write!(formatter, "invalid ODS input: {error}"),
-            Error::ExpectedSuperClass(error) => write!(formatter, "invalid ODS input: {error}"),
-            Error::ParseError => write!(formatter, "error parsing TableGen source"),
+            Self::Syn(error) => write!(formatter, "failed to parse macro input: {error}"),
+            Self::TableGen(error) => write!(formatter, "invalid ODS input: {error}"),
+            Self::ExpectedSuperClass(error) => write!(formatter, "invalid ODS input: {error}"),
+            Self::ParseError => write!(formatter, "error parsing TableGen source"),
         }
     }
 }
