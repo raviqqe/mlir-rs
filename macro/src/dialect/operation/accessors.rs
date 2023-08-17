@@ -222,21 +222,21 @@ impl<'a> OperationField<'a> {
     pub fn accessors(&self) -> TokenStream {
         let setter = {
             let set_fn_ident = sanitize_name_snake(&format!("set_{}", self.name));
-            self.setter_impl().map_or(quote!(), |imp| {
+            self.setter_impl().map_or(quote!(), |body| {
                 let param_type = &self.param_type;
                 quote! {
                     pub fn #set_fn_ident(&mut self, value: #param_type) {
-                        #imp
+                        #body
                     }
                 }
             })
         };
         let remover = {
             let remove_fn_ident = sanitize_name_snake(&format!("remove_{}", self.name));
-            self.remover_impl().map_or(quote!(), |imp| {
+            self.remover_impl().map_or(quote!(), |body| {
                 quote! {
                     pub fn #remove_fn_ident(&mut self) {
-                        #imp
+                        #body
                     }
                 }
             })
@@ -244,10 +244,10 @@ impl<'a> OperationField<'a> {
         let getter = {
             let get_fn_ident = &self.sanitized;
             let return_type = &self.return_type;
-            self.getter_impl().map_or(quote!(), |imp| {
+            self.getter_impl().map_or(quote!(), |body| {
                 quote! {
                     pub fn #get_fn_ident(&self) -> #return_type {
-                        #imp
+                        #body
                     }
                 }
             })
