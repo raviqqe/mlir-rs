@@ -124,12 +124,12 @@ impl<'a> OperationField<'a> {
                     }
                 })
             }
-            FieldKind::Successor(s) => {
+            FieldKind::Successor(constraint) => {
                 let SequenceInfo { index, .. } = self
                     .seq_info
                     .as_ref()
                     .expect("successors need sequence info");
-                Some(if s.is_variadic() {
+                Some(if constraint.is_variadic() {
                     // Only the last successor can be variadic
                     quote! {
                         self.operation.successors().skip(#index)
@@ -140,10 +140,10 @@ impl<'a> OperationField<'a> {
                     }
                 })
             }
-            FieldKind::Region(r) => {
+            FieldKind::Region(constraint) => {
                 let SequenceInfo { index, .. } =
                     self.seq_info.as_ref().expect("regions need sequence info");
-                Some(if r.is_variadic() {
+                Some(if constraint.is_variadic() {
                     // Only the last region can be variadic
                     quote! {
                         self.operation.regions().skip(#index)
@@ -154,22 +154,22 @@ impl<'a> OperationField<'a> {
                     }
                 })
             }
-            FieldKind::Attribute(a) => {
-                let n = &self.name;
-                let attr_error = format!("operation should have attribute {}", n);
-                let type_error = format!("{} should be a {}", n, a.storage_type());
-                Some(if a.is_unit() {
-                    quote! { self.operation.attribute(#n).is_some() }
-                } else if a.is_optional() {
+            FieldKind::Attribute(constraint) => {
+                let name = &self.name;
+                let attr_error = format!("operation should have attribute {}", name);
+                let type_error = format!("{} should be a {}", name, constraint.storage_type());
+                Some(if constraint.is_unit() {
+                    quote! { self.operation.attribute(#name).is_some() }
+                } else if constraint.is_optional() {
                     quote! {
                         self.operation
-                            .attribute(#n)
+                            .attribute(#name)
                             .map(|a| a.try_into().expect(#type_error))
                     }
                 } else {
                     quote! {
                         self.operation
-                            .attribute(#n)
+                            .attribute(#name)
                             .expect(#attr_error)
                             .try_into()
                             .expect(#type_error)
@@ -181,12 +181,12 @@ impl<'a> OperationField<'a> {
 
     fn remover_impl(&self) -> Option<TokenStream> {
         match &self.kind {
-            FieldKind::Attribute(a) => {
-                let n = &self.name;
+            FieldKind::Attribute(constraint) => {
+                let name = &self.name;
 
-                if a.is_unit() || a.is_optional() {
+                if constraint.is_unit() || constraint.is_optional() {
                     Some(quote! {
-                      let _ = self.operation.remove_attribute(#n);
+                      let _ = self.operation.remove_attribute(#name);
                     })
                 } else {
                     None
@@ -198,10 +198,10 @@ impl<'a> OperationField<'a> {
 
     fn setter_impl(&self) -> Option<TokenStream> {
         match &self.kind {
-            FieldKind::Attribute(a) => {
+            FieldKind::Attribute(constraint) => {
                 let n = &self.name;
 
-                Some(if a.is_unit() {
+                Some(if constraint.is_unit() {
                     quote! {
                         if value {
                           self.operation.set_attribute(#n, Attribute::unit(&self.operation.context()));
