@@ -74,4 +74,24 @@ mod tests {
         assert_eq!(map_name("float_8_e_5_m_2"), "float8e5m2");
         assert_eq!(map_name("float_8_e_4_m_3_fn"), "float8e4m3fn");
     }
+
+    mod sanitize_documentation {
+        use super::*;
+
+        #[test]
+        fn sanitize_code_block() {
+            assert_eq!(
+                &sanitize_documentation("```\nfoo\n```"),
+                "```text\nfoo\n```"
+            );
+        }
+
+        #[test]
+        fn sanitize_code_blocks() {
+            assert_eq!(
+                &sanitize_documentation("```\nfoo\n```\n```\nbar\n```"),
+                "```text\nfoo\n```\n```text\nbar\n```"
+            );
+        }
+    }
 }
