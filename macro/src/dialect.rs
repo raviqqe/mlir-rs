@@ -1,5 +1,3 @@
-extern crate proc_macro;
-
 mod error;
 mod operation;
 mod types;
@@ -37,11 +35,13 @@ fn dialect_module<'a>(
         })
         .collect::<Result<Vec<_>, _>>()?;
 
-    let mut doc = format!("`{}` dialect.\n\n", name);
-    doc.push_str(&unindent::unindent(
-        dialect.str_value("description").unwrap_or(""),
-    ));
+    let doc = format!(
+        "`{}` dialect.\n\n{}",
+        name,
+        unindent::unindent(dialect.str_value("description").unwrap_or(""),)
+    );
     let name = sanitize_name_snake(name);
+
     Ok(quote! {
         #[doc = #doc]
         pub mod #name {
