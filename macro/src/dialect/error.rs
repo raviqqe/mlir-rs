@@ -1,4 +1,3 @@
-use proc_macro2::Span;
 use std::{
     error,
     fmt::{self, Display, Formatter},
@@ -54,15 +53,6 @@ impl From<SourceError<TableGenError>> for Error {
 impl From<syn::Error> for Error {
     fn from(error: syn::Error) -> Self {
         Self::Syn(error)
-    }
-}
-
-impl From<Error> for syn::Error {
-    fn from(error: Error) -> Self {
-        match error {
-            Error::Syn(error) => error,
-            _ => syn::Error::new(Span::call_site(), format!("{}", error)),
-        }
     }
 }
 
