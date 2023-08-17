@@ -58,10 +58,10 @@ impl From<syn::Error> for Error {
 }
 
 impl From<Error> for syn::Error {
-    fn from(value: Error) -> Self {
-        match value {
+    fn from(error: Error) -> Self {
+        match error {
             Error::Syn(error) => error,
-            _ => syn::Error::new(Span::call_site(), format!("{}", value)),
+            _ => syn::Error::new(Span::call_site(), format!("{}", error)),
         }
     }
 }
