@@ -12,6 +12,7 @@
     "canonicalizer",
     "cmpi",
     "codegen",
+    "commonmark",
     "comrak",
     "dashmap",
     "dealloc",
