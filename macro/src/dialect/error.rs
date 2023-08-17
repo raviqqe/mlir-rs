@@ -1,6 +1,5 @@
-use std::fmt::Display;
-
 use proc_macro2::Span;
+use std::fmt::{self, Display, Formatter};
 use tblgen::{
     error::{SourceError, TableGenError},
     SourceInfo,
@@ -17,20 +16,20 @@ pub enum Error {
 impl Error {
     pub fn add_source_info(self, info: SourceInfo) -> Self {
         match self {
-            Self::TableGen(e) => e.add_source_info(info).into(),
-            Self::ExpectedSuperClass(e) => e.add_source_info(info).into(),
-            _ => self,
+            Self::TableGen(error) => error.add_source_info(info).into(),
+            Self::ExpectedSuperClass(error) => error.add_source_info(info).into(),
+            Self::Syn(_) | Self::ParseError => self,
         }
     }
 }
 
 impl Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         match self {
-            Error::Syn(e) => write!(f, "failed to parse macro input: {e}"),
-            Error::TableGen(e) => write!(f, "invalid ODS input: {e}"),
-            Error::ExpectedSuperClass(e) => write!(f, "invalid ODS input: {e}"),
-            Error::ParseError => write!(f, "error parsing TableGen source"),
+            Error::Syn(error) => write!(formatter, "failed to parse macro input: {error}"),
+            Error::TableGen(error) => write!(formatter, "invalid ODS input: {error}"),
+            Error::ExpectedSuperClass(error) => write!(formatter, "invalid ODS input: {error}"),
+            Error::ParseError => write!(formatter, "error parsing TableGen source"),
         }
     }
 }
