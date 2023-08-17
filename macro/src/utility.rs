@@ -30,13 +30,13 @@ pub fn sanitize_name(name: &str) -> Ident {
     syn::parse_str::<Ident>(&name).unwrap_or(format_ident!("r#{}", name))
 }
 
-static PATTERN: Lazy<Regex> = Lazy::new(|| {
+static NAME_PATTERN: Lazy<Regex> = Lazy::new(|| {
     Regex::new(r#"(bf_16|f_16|f_32|f_64|i_8|i_16|i_32|i_64|float_8_e_[0-9]_m_[0-9](_fn)?)"#)
         .unwrap()
 });
 
 pub fn map_name(name: &str) -> String {
-    PATTERN
+    NAME_PATTERN
         .replace_all(name, |captures: &Captures| {
             captures.get(0).unwrap().as_str().replace('_', "")
         })
