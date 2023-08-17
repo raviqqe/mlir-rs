@@ -12,6 +12,7 @@ use tblgen::{
 #[derive(Debug)]
 pub enum Error {
     ExpectedSuperClass(SourceError<ExpectedSuperClassError>),
+    InvalidTrait(SourceError<InvalidTraitError>),
     Io(io::Error),
     ParseError,
     Syn(syn::Error),
@@ -24,6 +25,7 @@ impl Error {
         match self {
             Self::TableGen(error) => error.add_source_info(info).into(),
             Self::ExpectedSuperClass(error) => error.add_source_info(info).into(),
+            Self::InvalidTrait(error) => error.add_source_info(info).into(),
             Self::Io(_) | Self::ParseError | Self::Syn(_) | Self::Utf8(_) => self,
         }
     }
@@ -33,6 +35,7 @@ impl Display for Error {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         match self {
             Self::ExpectedSuperClass(error) => write!(formatter, "invalid ODS input: {error}"),
+            Self::InvalidTrait(error) => write!(formatter, "invalid ODS input: {error}"),
             Self::Io(error) => write!(formatter, "{error}"),
             Self::ParseError => write!(formatter, "error parsing TableGen source"),
             Self::Syn(error) => write!(formatter, "failed to parse macro input: {error}"),
@@ -47,6 +50,12 @@ impl error::Error for Error {}
 impl From<SourceError<ExpectedSuperClassError>> for Error {
     fn from(error: SourceError<ExpectedSuperClassError>) -> Self {
         Self::ExpectedSuperClass(error)
+    }
+}
+
+impl From<SourceError<InvalidTraitError>> for Error {
+    fn from(error: SourceError<InvalidTraitError>) -> Self {
+        Self::InvalidTrait(error)
     }
 }
 
@@ -88,3 +97,14 @@ impl Display for ExpectedSuperClassError {
 }
 
 impl error::Error for ExpectedSuperClassError {}
+
+#[derive(Debug)]
+pub struct InvalidTraitError;
+
+impl Display for InvalidTraitError {
+    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
+        write!(formatter, "record is not a supported trait")
+    }
+}
+
+impl error::Error for InvalidTraitError {}

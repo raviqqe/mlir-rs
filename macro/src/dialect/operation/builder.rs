@@ -205,7 +205,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
         let methods = self.methods(field_names.as_slice(), phantoms.as_slice());
 
         let new = {
-            let name_str = self.operation.name();
+            let name_str = &self.operation.full_name;
             let iter_all_no = self.type_state.iter_all_no();
             let phantoms = phantoms.clone();
             quote! {
@@ -274,7 +274,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
 
     pub fn default_constructor(&self) -> TokenStream {
         let class_name = format_ident!("{}", &self.operation.class_name);
-        let name = sanitize_name_snake(&self.operation.short_name());
+        let name = sanitize_name_snake(self.operation.short_name);
         let mut args = self
             .operation
             .fields

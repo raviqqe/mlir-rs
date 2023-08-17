@@ -1,6 +1,8 @@
 use once_cell::sync::Lazy;
 use std::{collections::HashMap, ops::Deref};
-use tblgen::record::Record;
+use tblgen::{error::WithLocation, record::Record};
+
+use super::error::{Error, InvalidTraitError};
 
 macro_rules! prefixed_string {
     ($prefix:literal, $name:ident) => {
@@ -207,30 +209,28 @@ pub struct Trait<'a> {
 }
 
 impl<'a> Trait<'a> {
-    pub fn new(def: Record<'a>) -> Self {
-        Self {
+    pub fn new(def: Record<'a>) -> Result<Self, Error> {
+        Ok(Self {
             def,
             kind: if def.subclass_of("PredTrait") {
                 TraitKind::Pred {}
             } else if def.subclass_of("InterfaceTrait") {
                 TraitKind::Interface {
-                    name: Self::name(def),
+                    name: Self::name(def)?,
                 }
             } else if def.subclass_of("NativeTrait") {
                 TraitKind::Native {
-                    name: Self::name(def),
+                    name: Self::name(def)?,
                     is_structural: def.subclass_of("StructuralOpTrait"),
                 }
             } else if def.subclass_of("GenInternalTrait") {
                 TraitKind::Internal {
-                    name: def
-                        .string_value("trait")
-                        .expect("trait def has trait value"),
+                    name: def.string_value("trait")?,
                 }
             } else {
-                unreachable!("invalid trait")
+                return Err(InvalidTraitError.with_location(def).into());
             },
-        }
+        })
     }
 
     pub fn has_name(&self, expected_name: &str) -> bool {
@@ -242,19 +242,17 @@ impl<'a> Trait<'a> {
         }
     }
 
-    fn name(def: Record) -> String {
-        let r#trait = def
-            .string_value("trait")
-            .expect("trait def has trait value");
+    fn name(def: Record) -> Result<String, Error> {
+        let r#trait = def.string_value("trait")?;
 
         if let Some(namespace) = def
             .string_value("cppNamespace")
             .ok()
             .filter(|namespace| !namespace.is_empty())
         {
-            format!("{}::{}", namespace, r#trait)
+            Ok(format!("{}::{}", namespace, r#trait))
         } else {
-            r#trait
+            Ok(r#trait)
         }
     }
 

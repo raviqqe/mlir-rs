@@ -230,8 +230,9 @@ impl<'a> OperationField<'a> {
 
 #[derive(Debug, Clone)]
 pub struct Operation<'a> {
-    def: Record<'a>,
     pub(crate) dialect: Record<'a>,
+    pub(crate) short_name: &'a str,
+    pub(crate) full_name: String,
     pub(crate) class_name: &'a str,
     pub(crate) fields: Vec<OperationField<'a>>,
     pub(crate) can_infer_type: bool,
@@ -256,7 +257,7 @@ impl<'a> Operation<'a> {
                     if trait_def.subclass_of("Interface") {
                         work_list.push(trait_def.list_value("baseInterfaces")?);
                     }
-                    traits.push(Trait::new(trait_def))
+                    traits.push(Trait::new(trait_def)?)
                 }
             }
         }
@@ -466,15 +467,14 @@ impl<'a> Operation<'a> {
             .chain(derived_attrs)
             .collect::<Result<Vec<_>, _>>()?;
 
-        let name = def.name().unwrap();
+        let name = def.name()?;
         let class_name = if !name.contains('_') {
             // Class name with a leading underscore and without dialect prefix
             name
         } else if !name.starts_with('_') {
             // Class name without dialect prefix
             let mut split = name.split('_');
-            split.next();
-            split.next().unwrap()
+            split.nth(1).expect("string contains separator '_'")
         } else {
             name
         };
@@ -486,8 +486,15 @@ impl<'a> Operation<'a> {
                 || t.has_name("::mlir::InferTypeOpInterface::Trait") && regions_dag.num_args() == 0
         });
 
-        let short_name = def.string_value("opName").expect("operation has name");
-        let summary = def.str_value("summary").unwrap_or(&short_name);
+        let short_name = def.str_value("opName")?;
+        let dialect_name = dialect.string_value("name")?;
+        let full_name = if !dialect_name.is_empty() {
+            format!("{}.{}", dialect_name, short_name)
+        } else {
+            short_name.into()
+        };
+
+        let summary = def.str_value("summary").unwrap_or(short_name);
         let description = def.str_value("description").unwrap_or("");
 
         let summary = if !summary.is_empty() {
@@ -503,8 +510,9 @@ impl<'a> Operation<'a> {
         let description = unindent::unindent(description);
 
         Ok(Self {
-            def,
             dialect,
+            short_name,
+            full_name,
             class_name,
             fields,
             can_infer_type,
@@ -512,29 +520,12 @@ impl<'a> Operation<'a> {
             description,
         })
     }
-
-    fn short_name(&self) -> String {
-        self.def.string_value("opName").expect("operation has name")
-    }
-
-    fn name(&self) -> String {
-        let op_name = self.def.string_value("opName").expect("operation has name");
-        let dialect_name = self
-            .dialect
-            .string_value("name")
-            .expect("dialect name is string");
-        if !dialect_name.is_empty() {
-            format!("{}.{}", dialect_name, op_name)
-        } else {
-            op_name
-        }
-    }
 }
 
 impl<'a> ToTokens for Operation<'a> {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         let class_name = format_ident!("{}", &self.class_name);
-        let name = self.name();
+        let name = &self.full_name;
         let accessors = self.fields.iter().map(|field| field.accessors());
         let builder = OperationBuilder::new(self);
         let builder_tokens = builder.builder();
