@@ -213,10 +213,10 @@ impl<'a> OperationField<'a> {
                 (param_kind_type, return_kind_type)
             }
         };
-        let sanitized = sanitize_name_snake(name);
+
         Self {
             name,
-            sanitized,
+            sanitized: sanitize_name_snake(name),
             param_type,
             return_type,
             optional: tc.is_optional(),
