@@ -1,5 +1,5 @@
 use once_cell::sync::Lazy;
-use std::collections::HashMap;
+use std::{collections::HashMap, ops::Deref};
 use tblgen::record::Record;
 
 macro_rules! prefixed_string {
@@ -63,7 +63,7 @@ impl<'a> RegionConstraint<'a> {
     }
 }
 
-impl<'a> std::ops::Deref for RegionConstraint<'a> {
+impl<'a> Deref for RegionConstraint<'a> {
     type Target = Record<'a>;
 
     fn deref(&self) -> &Self::Target {
@@ -85,7 +85,7 @@ impl<'a> SuccessorConstraint<'a> {
     }
 }
 
-impl<'a> std::ops::Deref for SuccessorConstraint<'a> {
+impl<'a> Deref for SuccessorConstraint<'a> {
     type Target = Record<'a>;
 
     fn deref(&self) -> &Self::Target {
@@ -119,8 +119,9 @@ impl<'a> TypeConstraint<'a> {
     }
 }
 
-impl<'a> std::ops::Deref for TypeConstraint<'a> {
+impl<'a> Deref for TypeConstraint<'a> {
     type Target = Record<'a>;
+
     fn deref(&self) -> &Self::Target {
         &self.0
     }
@@ -182,8 +183,9 @@ impl<'a> AttributeConstraint<'a> {
     }
 }
 
-impl<'a> std::ops::Deref for AttributeConstraint<'a> {
+impl<'a> Deref for AttributeConstraint<'a> {
     type Target = Record<'a>;
+
     fn deref(&self) -> &Self::Target {
         &self.0
     }
