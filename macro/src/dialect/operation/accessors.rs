@@ -96,7 +96,7 @@ impl<'a> OperationField<'a> {
                                         .expect(#attr_missing_error)
                                 ).expect("is a DenseI32ArrayAttribute");
                             let start = (0..#index)
-                                .map(|i| attribute.element(i)
+                                .map(|index| attribute.element(index)
                                 .expect("has segment size"))
                                 .sum::<i32>() as usize;
                             let group_len = attribute
