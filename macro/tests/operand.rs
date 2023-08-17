@@ -49,14 +49,8 @@ fn variadic_after_single() {
     );
 
     assert_eq!(op.first().unwrap(), block.argument(0).unwrap().into());
-    assert_eq!(
-        op.others().unwrap().next(),
-        Some(block.argument(2).unwrap().into())
-    );
-    assert_eq!(
-        op.others().unwrap().nth(1),
-        Some(block.argument(1).unwrap().into())
-    );
+    assert_eq!(op.others().next(), Some(block.argument(2).unwrap().into()));
+    assert_eq!(op.others().nth(1), Some(block.argument(1).unwrap().into()));
     assert_eq!(op.operation().operand_count(), 3);
-    assert_eq!(op.others().unwrap().count(), 2);
+    assert_eq!(op.others().count(), 2);
 }

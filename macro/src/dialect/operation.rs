@@ -207,7 +207,11 @@ impl<'a> OperationField<'a> {
                 } else {
                     (
                         quote! { &[#param_kind_type] },
-                        quote! { Result<impl Iterator<Item = #return_kind_type>, ::melior::Error> },
+                        if let VariadicKind::AttrSized {} = variadic_info {
+                            quote! { Result<impl Iterator<Item = #return_kind_type>, ::melior::Error> }
+                        } else {
+                            quote! { impl Iterator<Item = #return_kind_type> }
+                        },
                     )
                 }
             } else {

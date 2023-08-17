@@ -49,7 +49,7 @@ impl<'a> OperationField<'a> {
                                 // singular elements from the number of elements.
                                 quote! {
                                   let group_length = self.operation.#count() - #len + 1;
-                                  Ok(self.operation.#plural().skip(#index).take(group_length))
+                                  self.operation.#plural().skip(#index).take(group_length)
                                 }
                             }
                         } else if *seen_variable_length {
@@ -78,7 +78,7 @@ impl<'a> OperationField<'a> {
                         };
                         let get_elements = if constraint.is_variable_length() {
                             quote! {
-                                Ok(self.operation.#plural().skip(start).take(group_len))
+                                self.operation.#plural().skip(start).take(group_len)
                             }
                         } else {
                             quote! {
