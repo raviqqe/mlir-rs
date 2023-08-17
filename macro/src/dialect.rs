@@ -152,11 +152,13 @@ pub fn generate_dialect(mut input: DialectMacroInput) -> Result<TokenStream, Box
             .add_source(source)
             .map_err(|error| syn::Error::new(Span::call_site(), format!("{}", error)))?;
     }
+
     if let Some(file) = &input.td_file {
         td_parser = td_parser
             .add_source_file(file)
             .map_err(|error| syn::Error::new(Span::call_site(), format!("{}", error)))?;
     }
+
     for include in &input.includes {
         td_parser = td_parser.add_include_path(include);
     }
@@ -172,11 +174,7 @@ pub fn generate_dialect(mut input: DialectMacroInput) -> Result<TokenStream, Box
 
     let dialect_def = keeper
         .all_derived_definitions("Dialect")
-        .find_map(|def| {
-            def.str_value("name")
-                .ok()
-                .and_then(|name| (name == input.name).then_some(def))
-        })
+        .find(|def| def.str_value("name") == Ok(&input.name))
         .ok_or_else(|| syn::Error::new(Span::call_site(), "dialect not found"))?;
     let dialect = dialect_module(&input.name, dialect_def, &keeper)
         .map_err(|error| error.add_source_info(keeper.source_info()))?;
