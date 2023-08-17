@@ -57,6 +57,7 @@ impl<'a> RegionConstraint<'a> {
     pub fn new(record: Record<'a>) -> Self {
         Self(record)
     }
+
     pub fn is_variadic(&self) -> bool {
         self.0.subclass_of("VariadicRegion")
     }
@@ -64,6 +65,7 @@ impl<'a> RegionConstraint<'a> {
 
 impl<'a> std::ops::Deref for RegionConstraint<'a> {
     type Target = Record<'a>;
+
     fn deref(&self) -> &Self::Target {
         &self.0
     }
@@ -77,6 +79,7 @@ impl<'a> SuccessorConstraint<'a> {
     pub fn new(record: Record<'a>) -> Self {
         Self(record)
     }
+
     pub fn is_variadic(&self) -> bool {
         self.0.subclass_of("VariadicSuccessor")
     }
@@ -84,6 +87,7 @@ impl<'a> SuccessorConstraint<'a> {
 
 impl<'a> std::ops::Deref for SuccessorConstraint<'a> {
     type Target = Record<'a>;
+
     fn deref(&self) -> &Self::Target {
         &self.0
     }
@@ -101,12 +105,15 @@ impl<'a> TypeConstraint<'a> {
     pub fn is_optional(&self) -> bool {
         self.0.subclass_of("Optional")
     }
+
     pub fn is_variadic(&self) -> bool {
         self.0.subclass_of("Variadic")
     }
+
     pub fn is_variadic_of_variadic(&self) -> bool {
         self.0.subclass_of("VariadicOfVariadic")
     }
+
     pub fn is_variable_length(&self) -> bool {
         self.is_variadic() || self.is_optional()
     }
