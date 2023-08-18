@@ -29,7 +29,6 @@ pub enum Error {
     TypeExpected(&'static str, String),
     UnknownDiagnosticSeverity(u32),
     Utf8(Utf8Error),
-    Infallible,
 }
 
 impl Display for Error {
@@ -73,9 +72,6 @@ impl Display for Error {
             Self::Utf8(error) => {
                 write!(formatter, "{}", error)
             }
-            Self::Infallible => {
-                write!(formatter, "infallible")
-            }
         }
     }
 }
@@ -90,6 +86,6 @@ impl From<Utf8Error> for Error {
 
 impl From<Infallible> for Error {
     fn from(_: Infallible) -> Self {
-        Self::Infallible
+        unreachable!()
     }
 }
