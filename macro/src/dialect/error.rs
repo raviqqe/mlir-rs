@@ -14,7 +14,7 @@ pub enum Error {
     ExpectedSuperClass(SourceError<ExpectedSuperClassError>),
     InvalidTrait(SourceError<InvalidTraitError>),
     Io(io::Error),
-    ParseError,
+    Parse(tblgen::Error),
     Syn(syn::Error),
     TableGen(tblgen::Error),
     Utf8(FromUtf8Error),
@@ -26,7 +26,7 @@ impl Error {
             Self::TableGen(error) => error.add_source_info(info).into(),
             Self::ExpectedSuperClass(error) => error.add_source_info(info).into(),
             Self::InvalidTrait(error) => error.add_source_info(info).into(),
-            Self::Io(_) | Self::ParseError | Self::Syn(_) | Self::Utf8(_) => self,
+            Self::Io(_) | Self::Parse(_) | Self::Syn(_) | Self::Utf8(_) => self,
         }
     }
 }
@@ -37,7 +37,7 @@ impl Display for Error {
             Self::ExpectedSuperClass(error) => write!(formatter, "invalid ODS input: {error}"),
             Self::InvalidTrait(error) => write!(formatter, "invalid ODS input: {error}"),
             Self::Io(error) => write!(formatter, "{error}"),
-            Self::ParseError => write!(formatter, "error parsing TableGen source"),
+            Self::Parse(error) => write!(formatter, "{error}"),
             Self::Syn(error) => write!(formatter, "failed to parse macro input: {error}"),
             Self::TableGen(error) => write!(formatter, "invalid ODS input: {error}"),
             Self::Utf8(error) => write!(formatter, "{error}"),
