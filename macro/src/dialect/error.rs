@@ -28,7 +28,6 @@ impl Error {
             Self::InvalidTrait(error) => error.add_source_info(info).into(),
             Self::Parse(error) => error.add_source_info(info).into(),
             Self::Io(_) | Self::Syn(_) | Self::Utf8(_) => self,
-
         }
     }
 }
@@ -39,7 +38,7 @@ impl Display for Error {
             Self::ExpectedSuperClass(error) => write!(formatter, "invalid ODS input: {error}"),
             Self::InvalidTrait(error) => write!(formatter, "invalid ODS input: {error}"),
             Self::Io(error) => write!(formatter, "{error}"),
-            Self::Parse(error) => write!(formatter, "{error}"),
+            Self::Parse(error) => write!(formatter, "failed to parse TableGen source: {error}"),
             Self::Syn(error) => write!(formatter, "failed to parse macro input: {error}"),
             Self::TableGen(error) => write!(formatter, "invalid ODS input: {error}"),
             Self::Utf8(error) => write!(formatter, "{error}"),
