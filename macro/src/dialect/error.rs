@@ -26,7 +26,9 @@ impl Error {
             Self::TableGen(error) => error.add_source_info(info).into(),
             Self::ExpectedSuperClass(error) => error.add_source_info(info).into(),
             Self::InvalidTrait(error) => error.add_source_info(info).into(),
-            Self::Io(_) | Self::Parse(_) | Self::Syn(_) | Self::Utf8(_) => self,
+            Self::Parse(error) => error.add_source_info(info).into(),
+            Self::Io(_) | Self::Syn(_) | Self::Utf8(_) => self,
+
         }
     }
 }
