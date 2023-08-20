@@ -10,7 +10,7 @@ pub fn sanitize_name_snake(name: &str) -> Ident {
     sanitize_name(&name.to_case(Case::Snake))
 }
 
-pub fn sanitize_name(name: &str) -> Ident {
+fn sanitize_name(name: &str) -> Ident {
     // Replace any "." with "_"
     let mut name = name.replace('.', "_");
 
