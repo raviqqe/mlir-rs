@@ -35,14 +35,16 @@ pub fn sanitize_documentation(string: &str) -> Result<String, Error> {
     let node = parse_document(&arena, string, &Default::default());
 
     for node in node.traverse() {
-        if let NodeEdge::Start(node) = node {
-            let mut ast = node.data.borrow_mut();
+        let NodeEdge::Start(node) = node else {
+            continue;
+        };
+        let mut ast = node.data.borrow_mut();
+        let NodeValue::CodeBlock(block) = &mut ast.value else {
+            continue;
+        };
 
-            if let NodeValue::CodeBlock(block) = &mut ast.value {
-                if block.info.is_empty() {
-                    block.info = "text".into();
-                }
-            }
+        if block.info.is_empty() {
+            block.info = "text".into();
         }
     }
 
