@@ -3,12 +3,13 @@ mod operation;
 mod types;
 mod utility;
 
+use self::error::Error;
 use self::utility::{sanitize_documentation, sanitize_snake_case_name};
 use operation::Operation;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::{format_ident, quote};
-use std::{env, error::Error, fmt::Display, path::Path, process::Command, str};
+use std::{env, fmt::Display, path::Path, process::Command, str};
 use syn::{bracketed, parse::Parse, punctuated::Punctuated, LitStr, Token};
 use tblgen::{record::Record, record_keeper::RecordKeeper, TableGenParser};
 
@@ -18,7 +19,7 @@ fn dialect_module(
     name: &str,
     dialect: Record,
     record_keeper: &RecordKeeper,
-) -> Result<proc_macro2::TokenStream, error::Error> {
+) -> Result<proc_macro2::TokenStream, Error> {
     let operations = record_keeper
         .all_derived_definitions("Op")
         .map(Operation::from_def)
@@ -108,7 +109,9 @@ impl Parse for DialectMacroInput {
     }
 }
 
-pub fn generate_dialect(input: DialectMacroInput) -> Result<TokenStream, Box<dyn Error>> {
+pub fn generate_dialect(
+    input: DialectMacroInput,
+) -> Result<TokenStream, Box<dyn std::error::Error>> {
     let mut td_parser = TableGenParser::new();
 
     if let Some(source) = &input.tablegen {
@@ -124,7 +127,7 @@ pub fn generate_dialect(input: DialectMacroInput) -> Result<TokenStream, Box<dyn
         td_parser = td_parser.add_include_path(include);
     }
 
-    let keeper = td_parser.parse().map_err(error::Error::Parse)?;
+    let keeper = td_parser.parse().map_err(Error::Parse)?;
 
     let dialect_def = keeper
         .all_derived_definitions("Dialect")
@@ -136,7 +139,7 @@ pub fn generate_dialect(input: DialectMacroInput) -> Result<TokenStream, Box<dyn
     Ok(quote! { #dialect }.into())
 }
 
-fn llvm_config(argument: &str) -> Result<String, Box<dyn Error>> {
+fn llvm_config(argument: &str) -> Result<String, Box<dyn std::error::Error>> {
     let prefix = env::var(format!("MLIR_SYS_{}0_PREFIX", LLVM_MAJOR_VERSION))
         .map(|path| Path::new(&path).join("bin"))
         .unwrap_or_default();
