@@ -4,7 +4,7 @@ use convert_case::{Case, Casing};
 use proc_macro2::Ident;
 use quote::format_ident;
 
-static RESERVED_NAMES: &[&str] = &["name", "operation", "builder"];
+const RESERVED_NAMES: &[&str] = &["name", "operation", "builder"];
 
 pub fn sanitize_snake_case_name(name: &str) -> Ident {
     sanitize_name(&name.to_case(Case::Snake))
