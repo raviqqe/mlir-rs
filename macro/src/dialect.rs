@@ -114,13 +114,13 @@ pub fn generate_dialect(input: DialectMacroInput) -> Result<TokenStream, Box<dyn
     if let Some(source) = &input.tablegen {
         td_parser = td_parser
             .add_source(source)
-            .map_err(|error| create_syn_error(error))?;
+            .map_err(create_syn_error)?;
     }
 
     if let Some(file) = &input.td_file {
         td_parser = td_parser
             .add_source_file(file)
-            .map_err(|error| create_syn_error(error))?;
+            .map_err(create_syn_error)?;
     }
 
     // spell-checker: disable-next-line
