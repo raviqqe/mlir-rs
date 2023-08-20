@@ -8,7 +8,7 @@ use operation::Operation;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::{format_ident, quote};
-use std::{env, error::Error, path::Path, process::Command, str};
+use std::{env, error::Error, fmt::Display, path::Path, process::Command, str};
 use syn::{bracketed, parse::Parse, punctuated::Punctuated, LitStr, Token};
 use tblgen::{record::Record, record_keeper::RecordKeeper, TableGenParser};
 
@@ -114,13 +114,13 @@ pub fn generate_dialect(input: DialectMacroInput) -> Result<TokenStream, Box<dyn
     if let Some(source) = &input.tablegen {
         td_parser = td_parser
             .add_source(source)
-            .map_err(|error| syn::Error::new(Span::call_site(), format!("{}", error)))?;
+            .map_err(|error| create_syn_error(error))?;
     }
 
     if let Some(file) = &input.td_file {
         td_parser = td_parser
             .add_source_file(file)
-            .map_err(|error| syn::Error::new(Span::call_site(), format!("{}", error)))?;
+            .map_err(|error| create_syn_error(error))?;
     }
 
     // spell-checker: disable-next-line
@@ -133,7 +133,7 @@ pub fn generate_dialect(input: DialectMacroInput) -> Result<TokenStream, Box<dyn
     let dialect_def = keeper
         .all_derived_definitions("Dialect")
         .find(|def| def.str_value("name") == Ok(&input.name))
-        .ok_or_else(|| syn::Error::new(Span::call_site(), "dialect not found"))?;
+        .ok_or_else(|| create_syn_error("dialect not found"))?;
     let dialect = dialect_module(&input.name, dialect_def, &keeper)
         .map_err(|error| error.add_source_info(keeper.source_info()))?;
 
@@ -160,4 +160,8 @@ fn llvm_config(argument: &str) -> Result<String, Box<dyn Error>> {
     )?
     .trim()
     .to_string())
+}
+
+fn create_syn_error(error: impl Display) -> syn::Error {
+    syn::Error::new(Span::call_site(), format!("{}", error))
 }
