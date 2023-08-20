@@ -2,15 +2,10 @@ mod accessors;
 mod builder;
 
 use self::builder::OperationBuilder;
-use super::utility::sanitize_documentation;
-use crate::{
-    dialect::{
-        error::{Error, ExpectedSuperClassError},
-        types::{
-            AttributeConstraint, RegionConstraint, SuccessorConstraint, Trait, TypeConstraint,
-        },
-    },
-    utility::sanitize_name_snake,
+use super::utility::{sanitize_documentation, sanitize_snake_case_name};
+use crate::dialect::{
+    error::{Error, ExpectedSuperClassError},
+    types::{AttributeConstraint, RegionConstraint, SuccessorConstraint, Trait, TypeConstraint},
 };
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, ToTokens, TokenStreamExt};
@@ -219,7 +214,7 @@ impl<'a> OperationField<'a> {
     pub fn new(name: &'a str, kind: FieldKind<'a>) -> Self {
         Self {
             name,
-            sanitized_name: sanitize_name_snake(name),
+            sanitized_name: sanitize_snake_case_name(name),
             kind,
         }
     }

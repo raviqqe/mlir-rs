@@ -6,7 +6,7 @@ use quote::format_ident;
 
 static RESERVED_NAMES: &[&str] = &["name", "operation", "builder"];
 
-pub fn sanitize_name_snake(name: &str) -> Ident {
+pub fn sanitize_snake_case_name(name: &str) -> Ident {
     sanitize_name(&name.to_case(Case::Snake))
 }
 
@@ -57,6 +57,21 @@ pub fn sanitize_documentation(string: &str) -> Result<String, Error> {
 mod tests {
     use super::*;
     use pretty_assertions::assert_eq;
+
+    #[test]
+    fn sanitize_name_with_dot() {
+        assert_eq!(sanitize_snake_case_name("foo.bar"), "foo_bar");
+    }
+
+    #[test]
+    fn sanitize_name_with_dot_and_underscore() {
+        assert_eq!(sanitize_snake_case_name("foo.bar_baz"), "foo_bar_baz");
+    }
+
+    #[test]
+    fn sanitize_reserved_name() {
+        assert_eq!(sanitize_snake_case_name("builder"), "_builder");
+    }
 
     #[test]
     fn sanitize_code_block() {

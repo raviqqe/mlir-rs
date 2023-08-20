@@ -1,5 +1,4 @@
-use super::{FieldKind, Operation, OperationField};
-use crate::utility::sanitize_name_snake;
+use super::{super::utility::sanitize_snake_case_name, FieldKind, Operation, OperationField};
 use convert_case::{Case, Casing};
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
@@ -96,7 +95,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
     ) -> impl Iterator<Item = TokenStream> + 'a {
         let builder_ident = format_ident!("{}Builder", self.operation.class_name);
         self.operation.fields.iter().map(move |field| {
-            let name = sanitize_name_snake(field.name);
+            let name = sanitize_snake_case_name(field.name);
             let st = &field.kind.param_type();
             let args = quote! { #name: #st };
             let add = format_ident!("add_{}s", field.kind.as_str());
@@ -179,7 +178,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
         let field_names = self
             .type_state
             .iter()
-            .map(|f| sanitize_name_snake(&f.field_name))
+            .map(|f| sanitize_snake_case_name(&f.field_name))
             .collect::<Vec<_>>();
 
         let fields = self
@@ -270,7 +269,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
 
     pub fn default_constructor(&self) -> TokenStream {
         let class_name = format_ident!("{}", &self.operation.class_name);
-        let name = sanitize_name_snake(self.operation.short_name);
+        let name = sanitize_snake_case_name(self.operation.short_name);
         let mut args = Self::required_fields(self.operation)
             .map(|field| {
                 let param_type = &field.kind.param_type();

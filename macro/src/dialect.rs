@@ -3,8 +3,7 @@ mod operation;
 mod types;
 mod utility;
 
-use self::utility::sanitize_documentation;
-use crate::utility::sanitize_name_snake;
+use self::utility::{sanitize_documentation, sanitize_snake_case_name};
 use operation::Operation;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
@@ -34,7 +33,7 @@ fn dialect_module(
             dialect.str_value("description").unwrap_or(""),
         ))?
     );
-    let name = sanitize_name_snake(name);
+    let name = sanitize_snake_case_name(name);
 
     Ok(quote! {
         #[doc = #doc]

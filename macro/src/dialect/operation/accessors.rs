@@ -1,5 +1,7 @@
-use super::{ElementKind, FieldKind, OperationField, SequenceInfo, VariadicKind};
-use crate::utility::sanitize_name_snake;
+use super::{
+    super::utility::sanitize_snake_case_name, ElementKind, FieldKind, OperationField, SequenceInfo,
+    VariadicKind,
+};
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 
@@ -208,7 +210,7 @@ impl<'a> OperationField<'a> {
 
     pub fn accessors(&self) -> TokenStream {
         let setter = {
-            let ident = sanitize_name_snake(&format!("set_{}", self.name));
+            let ident = sanitize_snake_case_name(&format!("set_{}", self.name));
             self.setter_impl().map_or(quote!(), |body| {
                 let param_type = &self.kind.param_type();
                 quote! {
@@ -219,7 +221,7 @@ impl<'a> OperationField<'a> {
             })
         };
         let remover = {
-            let ident = sanitize_name_snake(&format!("remove_{}", self.name));
+            let ident = sanitize_snake_case_name(&format!("remove_{}", self.name));
             self.remover_impl().map_or(quote!(), |body| {
                 quote! {
                     pub fn #ident(&mut self) -> Result<(), ::melior::Error> {
