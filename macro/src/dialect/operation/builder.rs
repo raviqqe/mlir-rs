@@ -178,7 +178,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
         let field_names = self
             .type_state
             .iter()
-            .map(|f| sanitize_snake_case_name(&f.field_name))
+            .map(|field| sanitize_snake_case_name(&field.field_name))
             .collect::<Vec<_>>();
 
         let fields = self
