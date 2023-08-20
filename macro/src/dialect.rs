@@ -3,8 +3,10 @@ mod operation;
 mod types;
 mod utility;
 
-use self::error::Error;
-use self::utility::{sanitize_documentation, sanitize_snake_case_name};
+use self::{
+    error::Error,
+    utility::{sanitize_documentation, sanitize_snake_case_name},
+};
 use operation::Operation;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
