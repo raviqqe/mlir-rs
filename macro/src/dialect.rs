@@ -124,9 +124,7 @@ pub fn generate_dialect(input: DialectMacroInput) -> Result<TokenStream, Box<dyn
         td_parser = td_parser.add_include_path(include);
     }
 
-    let keeper = td_parser
-        .parse()
-        .map_err(|error| error::Error::Parse(error))?;
+    let keeper = td_parser.parse()?;
 
     let dialect_def = keeper
         .all_derived_definitions("Dialect")
