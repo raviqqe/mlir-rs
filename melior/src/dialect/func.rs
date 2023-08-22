@@ -228,4 +228,38 @@ mod tests {
         assert!(module.as_operation().verify());
         insta::assert_display_snapshot!(module.as_operation());
     }
+
+    #[test]
+    fn compile_external_function() {
+        let context = create_test_context();
+
+        let location = Location::unknown(&context);
+        let module = Module::new(location);
+
+        let integer_type = Type::index(&context);
+
+        let function = {
+            let block = Block::new(&[(integer_type, location)]);
+
+            block.append_operation(r#return(&[block.argument(0).unwrap().into()], location));
+
+            let region = Region::new();
+            region.append_block(block);
+
+            external_func(
+                &context,
+                StringAttribute::new(&context, "foo"),
+                TypeAttribute::new(
+                    FunctionType::new(&context, &[integer_type], &[integer_type]).into(),
+                ),
+                &[],
+                Location::unknown(&context),
+            )
+        };
+
+        module.body().append_operation(function);
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
 }
