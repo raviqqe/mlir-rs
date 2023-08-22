@@ -71,23 +71,6 @@ pub fn func<'c>(
         .build()
 }
 
-/// Create a `func.func` operation without a region. This function is typically used for external function definition.
-pub fn external_func<'c>(
-    context: &'c Context,
-    name: StringAttribute<'c>,
-    r#type: TypeAttribute<'c>,
-    attributes: &[(Identifier<'c>, Attribute<'c>)],
-    location: Location<'c>,
-) -> Operation<'c> {
-    OperationBuilder::new("func.func", location)
-        .add_attributes(&[
-            (Identifier::new(context, "sym_name"), name.into()),
-            (Identifier::new(context, "function_type"), r#type.into()),
-        ])
-        .add_attributes(attributes)
-        .build()
-}
-
 /// Create a `func.return` operation.
 pub fn r#return<'c>(operands: &[Value<'c, '_>], location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("func.return", location)
