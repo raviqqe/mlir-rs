@@ -101,6 +101,7 @@ mod tests {
     use crate::{
         ir::{Block, Module, Type},
         test::create_test_context,
+        StringRef,
     };
 
     #[test]
@@ -238,24 +239,19 @@ mod tests {
 
         let integer_type = Type::index(&context);
 
-        let function = {
-            let block = Block::new(&[(integer_type, location)]);
-
-            block.append_operation(r#return(&[block.argument(0).unwrap().into()], location));
-
-            let region = Region::new();
-            region.append_block(block);
-
-            external_func(
-                &context,
-                StringAttribute::new(&context, "foo"),
-                TypeAttribute::new(
-                    FunctionType::new(&context, &[integer_type], &[integer_type]).into(),
-                ),
-                &[],
-                Location::unknown(&context),
-            )
-        };
+        let function = func(
+            &context,
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(
+                FunctionType::new(&context, &[integer_type], &[integer_type]).into(),
+            ),
+            Region::new(),
+            &[(
+                Identifier::new(&context, "sym_visibility"),
+                StringAttribute::new(&context, "public").into(),
+            )],
+            Location::unknown(&context),
+        );
 
         module.body().append_operation(function);
 
