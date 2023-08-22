@@ -84,7 +84,6 @@ mod tests {
     use crate::{
         ir::{Block, Module, Type},
         test::create_test_context,
-        StringRef,
     };
 
     #[test]
