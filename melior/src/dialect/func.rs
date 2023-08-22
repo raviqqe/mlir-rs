@@ -231,7 +231,7 @@ mod tests {
             Region::new(),
             &[(
                 Identifier::new(&context, "sym_visibility"),
-                StringAttribute::new(&context, "public").into(),
+                StringAttribute::new(&context, "private").into(),
             )],
             Location::unknown(&context),
         );
