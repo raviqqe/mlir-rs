@@ -94,6 +94,7 @@ impl<'a> OperationField<'a> {
                             let start = (0..#index)
                                 .map(|index| attribute.element(index))
                                 .collect::<Result<Vec<_>, _>>()?
+                                .into_iter()
                                 .sum::<i32>() as usize;
                             let group_len = attribute.element(#index)? as usize;
                         };
