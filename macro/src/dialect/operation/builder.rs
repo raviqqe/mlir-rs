@@ -38,10 +38,13 @@ impl TypeStateList {
         self.0.iter().map(|item| &item.any)
     }
 
-    pub fn iter_any_without(&self, field_name: String) -> impl Iterator<Item = &Ident> {
-        self.0.iter().filter_map(move |i| {
-            if i.field_name != field_name {
-                Some(&i.any)
+    pub fn iter_any_without<'a>(
+        &'a self,
+        field_name: &'a str,
+    ) -> impl Iterator<Item = &Ident> + '_ {
+        self.0.iter().filter_map(move |item| {
+            if item.field_name != field_name {
+                Some(&item.any)
             } else {
                 None
             }
@@ -69,11 +72,11 @@ impl TypeStateList {
     }
 
     pub fn iter_yes(&self) -> impl Iterator<Item = &Ident> {
-        self.0.iter().map(|i| &i.yes)
+        self.0.iter().map(|item| &item.yes)
     }
 
     pub fn iter_no(&self) -> impl Iterator<Item = &Ident> {
-        self.0.iter().map(|i| &i.no)
+        self.0.iter().map(|item| &item.no)
     }
 }
 
@@ -154,7 +157,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
                 quote!()
             } else {
                 let iter_any_without =
-                    self.type_state.iter_any_without(field.name.to_string());
+                    self.type_state.iter_any_without(field.name);
                 let iter_set_yes = self.type_state.iter_set_yes(field.name.to_string());
                 let iter_set_no = self.type_state.iter_set_no(field.name.to_string());
                 quote! {
