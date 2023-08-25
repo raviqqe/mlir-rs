@@ -1,6 +1,6 @@
 use super::{
-    super::error::Error, super::utility::sanitize_snake_case_name, ElementKind, FieldKind,
-    OperationField, SequenceInfo, VariadicKind,
+    super::{error::Error, utility::sanitize_snake_case_name},
+    ElementKind, FieldKind, OperationField, SequenceInfo, VariadicKind,
 };
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
