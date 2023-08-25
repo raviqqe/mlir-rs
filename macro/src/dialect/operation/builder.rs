@@ -278,19 +278,19 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
     pub fn default_constructor(&self) -> Result<TokenStream, Error> {
         let class_name = format_ident!("{}", &self.operation.class_name);
         let name = sanitize_snake_case_name(self.operation.short_name);
-        let mut arguments = Self::required_fields(self.operation)
+        let arguments = Self::required_fields(self.operation)
             .map(|field| {
                 let parameter_type = &field.kind.parameter_type()?;
                 let parameter_name = &field.sanitized_name;
 
                 Ok(quote! { #parameter_name: #parameter_type })
             })
+            .chain([Ok(quote! { location: ::melior::ir::Location<'c> })])
             .collect::<Result<Vec<_>, Error>>()?;
         let builder_calls = Self::required_fields(self.operation).map(|field| {
             let parameter_name = &field.sanitized_name;
             quote! { .#parameter_name(#parameter_name) }
         });
-        arguments.push(quote! { location: ::melior::ir::Location<'c> });
 
         let doc = format!("Creates a new {}", self.operation.summary);
 
