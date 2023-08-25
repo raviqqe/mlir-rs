@@ -154,7 +154,7 @@ impl<'a> AttributeConstraint<'a> {
     pub fn has_default_value(&self) -> bool {
         self.0
             .string_value("defaultValue")
-            .map(|s| !s.is_empty())
+            .map(|string| !string.is_empty())
             .unwrap_or(false)
     }
 }
