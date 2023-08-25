@@ -227,12 +227,13 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
         let build = {
             let iter_yes = self.type_state.iter_yes();
             let class_name = format_ident!("{}", &self.operation.class_name);
-            let error = format!("should be a valid {}", class_name);
+            let error = format!("should be a valid {class_name}");
             let maybe_infer = if self.operation.can_infer_type {
                 quote! { .enable_result_type_inference() }
             } else {
                 quote! {}
             };
+
             quote! {
                 impl<'c> #builder_ident<'c, #(#iter_yes),*> {
                     pub fn build(self) -> #class_name<'c> {
