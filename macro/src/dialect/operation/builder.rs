@@ -107,11 +107,6 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
             let add = format_ident!("add_{}s", field.kind.as_str());
 
             let add_args = {
-                let mlir_ident = {
-                    let name = &field.name;
-                    quote! { ::melior::ir::Identifier::new(self.context, #name) }
-                };
-
                 // Argument types can be singular and variadic, but add functions in melior
                 // are always variadic, so we need to create a slice or vec for singular
                 // arguments
@@ -124,7 +119,9 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
                         }
                     }
                     FieldKind::Attribute { .. } => {
-                        quote! { &[(#mlir_ident, #name.into())] }
+                        let name_string = &field.name;
+
+                        quote! { &[(::melior::ir::Identifier::new(self.context, #name_string), #name.into())] }
                     }
                     FieldKind::Successor { constraint, .. } => {
                         if constraint.is_variadic() {
