@@ -78,8 +78,8 @@ impl<'a> FieldKind<'a> {
         )
     }
 
-    pub fn param_type(&self) -> Type {
-        match self {
+    pub fn param_type(&self) -> Result<Type, Error> {
+        Ok(match self {
             Self::Element {
                 kind, constraint, ..
             } => {
@@ -101,7 +101,7 @@ impl<'a> FieldKind<'a> {
                 if constraint.is_unit() {
                     parse_quote!(bool)
                 } else {
-                    let r#type: Type = syn::parse_str(constraint.storage_type())
+                    let r#type: Type = syn::parse_str(constraint.storage_type()?)
                         .expect("storage type strings are valid");
                     parse_quote!(#r#type<'c>)
                 }
@@ -122,7 +122,7 @@ impl<'a> FieldKind<'a> {
                     r#type
                 }
             }
-        }
+        })
     }
 
     fn create_result_type(r#type: Type) -> Type {
@@ -133,8 +133,8 @@ impl<'a> FieldKind<'a> {
         parse_quote!(impl Iterator<Item = #r#type>)
     }
 
-    pub fn return_type(&self) -> Type {
-        match self {
+    pub fn return_type(&self) -> Result<Type, Error> {
+        Ok(match self {
             Self::Element {
                 kind,
                 constraint,
@@ -161,7 +161,7 @@ impl<'a> FieldKind<'a> {
                 if constraint.is_unit() {
                     parse_quote!(bool)
                 } else {
-                    Self::create_result_type(self.param_type())
+                    Self::create_result_type(self.param_type()?)
                 }
             }
             Self::Successor { constraint, .. } => {
@@ -180,7 +180,7 @@ impl<'a> FieldKind<'a> {
                     Self::create_result_type(r#type)
                 }
             }
-        }
+        })
     }
 }
 
@@ -641,9 +641,9 @@ impl<'a> ToTokens for Operation<'a> {
         let name = &self.full_name;
         let accessors = self.fields().map(|field| field.accessors());
         let builder = OperationBuilder::new(self);
-        let builder_tokens = builder.builder();
+        let builder_tokens = builder.builder().expect("valid builder");
         let builder_fn = builder.create_op_builder_fn();
-        let default_constructor = builder.default_constructor();
+        let default_constructor = builder.default_constructor().expect("valid constructor");
         let summary = &self.summary;
         let description =
             sanitize_documentation(&self.description).expect("valid Markdown documentation");

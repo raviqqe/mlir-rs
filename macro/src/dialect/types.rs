@@ -1,6 +1,6 @@
 use super::error::{Error, OdsError};
 use once_cell::sync::Lazy;
-use std::{collections::HashMap, ops::Deref};
+use std::collections::HashMap;
 use tblgen::{error::WithLocation, record::Record};
 
 macro_rules! prefixed_string {
@@ -21,7 +21,7 @@ macro_rules! melior_attribute {
     };
 }
 
-pub static ATTRIBUTE_TYPES: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
+static ATTRIBUTE_TYPES: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
     let mut map = HashMap::new();
 
     macro_rules! initialize_attributes {
@@ -63,14 +63,6 @@ impl<'a> RegionConstraint<'a> {
     }
 }
 
-impl<'a> Deref for RegionConstraint<'a> {
-    type Target = Record<'a>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
 #[derive(Debug, Clone, Copy)]
 pub struct SuccessorConstraint<'a>(Record<'a>);
 
@@ -81,14 +73,6 @@ impl<'a> SuccessorConstraint<'a> {
 
     pub fn is_variadic(&self) -> bool {
         self.0.subclass_of("VariadicSuccessor")
-    }
-}
-
-impl<'a> Deref for SuccessorConstraint<'a> {
-    type Target = Record<'a>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
     }
 }
 
@@ -118,14 +102,6 @@ impl<'a> TypeConstraint<'a> {
     }
 }
 
-impl<'a> Deref for TypeConstraint<'a> {
-    type Target = Record<'a>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
 #[derive(Debug, Clone, Copy)]
 pub struct AttributeConstraint<'a>(Record<'a>);
 
@@ -140,12 +116,12 @@ impl<'a> AttributeConstraint<'a> {
     }
 
     #[allow(unused)]
-    pub fn is_type_attr(&self) -> bool {
+    pub fn is_type(&self) -> bool {
         self.0.subclass_of("TypeAttrBase")
     }
 
     #[allow(unused)]
-    pub fn is_symbol_ref_attr(&self) -> bool {
+    pub fn is_symbol_ref(&self) -> bool {
         self.0.name() == Ok("SymbolRefAttr")
             || self.0.name() == Ok("FlatSymbolRefAttr")
             || self.0.subclass_of("SymbolRefAttr")
@@ -153,7 +129,7 @@ impl<'a> AttributeConstraint<'a> {
     }
 
     #[allow(unused)]
-    pub fn is_enum_attr(&self) -> bool {
+    pub fn is_enum(&self) -> bool {
         self.0.subclass_of("EnumAttrInfo")
     }
 
@@ -161,13 +137,11 @@ impl<'a> AttributeConstraint<'a> {
         self.0.bit_value("isOptional").unwrap_or(false)
     }
 
-    pub fn storage_type(&self) -> &'static str {
-        self.0
-            .string_value("storageType")
-            .ok()
-            .and_then(|v| ATTRIBUTE_TYPES.get(v.as_str().trim()))
+    pub fn storage_type(&self) -> Result<&'static str, Error> {
+        Ok(ATTRIBUTE_TYPES
+            .get(self.0.string_value("storageType")?.as_str().trim())
             .copied()
-            .unwrap_or(melior_attribute!(Attribute))
+            .unwrap_or(melior_attribute!(Attribute)))
     }
 
     pub fn is_unit(&self) -> bool {
@@ -180,37 +154,27 @@ impl<'a> AttributeConstraint<'a> {
     pub fn has_default_value(&self) -> bool {
         self.0
             .string_value("defaultValue")
-            .map(|s| !s.is_empty())
+            .map(|string| !string.is_empty())
             .unwrap_or(false)
-    }
-}
-
-impl<'a> Deref for AttributeConstraint<'a> {
-    type Target = Record<'a>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
     }
 }
 
 #[derive(Debug, Clone)]
 pub enum TraitKind {
-    Native { name: String, is_structural: bool },
+    Native { name: String, structural: bool },
     Pred {},
     Internal { name: String },
     Interface { name: String },
 }
 
 #[derive(Debug, Clone)]
-pub struct Trait<'a> {
+pub struct Trait {
     kind: TraitKind,
-    def: Record<'a>,
 }
 
-impl<'a> Trait<'a> {
-    pub fn new(def: Record<'a>) -> Result<Self, Error> {
+impl Trait {
+    pub fn new(def: Record) -> Result<Self, Error> {
         Ok(Self {
-            def,
             kind: if def.subclass_of("PredTrait") {
                 TraitKind::Pred {}
             } else if def.subclass_of("InterfaceTrait") {
@@ -220,7 +184,7 @@ impl<'a> Trait<'a> {
             } else if def.subclass_of("NativeTrait") {
                 TraitKind::Native {
                     name: Self::name(def)?,
-                    is_structural: def.subclass_of("StructuralOpTrait"),
+                    structural: def.subclass_of("StructuralOpTrait"),
                 }
             } else if def.subclass_of("GenInternalTrait") {
                 TraitKind::Internal {
@@ -243,28 +207,12 @@ impl<'a> Trait<'a> {
 
     fn name(def: Record) -> Result<String, Error> {
         let r#trait = def.string_value("trait")?;
+        let namespace = def.string_value("cppNamespace")?;
 
-        if let Some(namespace) = def
-            .string_value("cppNamespace")
-            .ok()
-            .filter(|namespace| !namespace.is_empty())
-        {
-            Ok(format!("{}::{}", namespace, r#trait))
+        Ok(if namespace.is_empty() {
+            r#trait
         } else {
-            Ok(r#trait)
-        }
-    }
-
-    #[allow(unused)]
-    pub fn kind(&self) -> &TraitKind {
-        &self.kind
-    }
-}
-
-impl<'a> Deref for Trait<'a> {
-    type Target = Record<'a>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.def
+            format!("{namespace}::{trait}")
+        })
     }
 }

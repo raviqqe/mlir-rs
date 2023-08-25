@@ -1,6 +1,6 @@
 use super::{
-    super::utility::sanitize_snake_case_name, ElementKind, FieldKind, OperationField, SequenceInfo,
-    VariadicKind,
+    super::{error::Error, utility::sanitize_snake_case_name},
+    ElementKind, FieldKind, OperationField, SequenceInfo, VariadicKind,
 };
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
@@ -208,17 +208,20 @@ impl<'a> OperationField<'a> {
         })
     }
 
-    pub fn accessors(&self) -> TokenStream {
+    pub fn accessors(&self) -> Result<TokenStream, Error> {
         let setter = {
             let ident = sanitize_snake_case_name(&format!("set_{}", self.name));
-            self.setter_impl().map_or(quote!(), |body| {
-                let param_type = &self.kind.param_type();
+            if let Some(body) = self.setter_impl() {
+                let param_type = &self.kind.param_type()?;
+
                 quote! {
                     pub fn #ident(&mut self, value: #param_type) {
                         #body
                     }
                 }
-            })
+            } else {
+                quote!()
+            }
         };
         let remover = {
             let ident = sanitize_snake_case_name(&format!("remove_{}", self.name));
@@ -232,7 +235,7 @@ impl<'a> OperationField<'a> {
         };
         let getter = {
             let ident = &self.sanitized_name;
-            let return_type = &self.kind.return_type();
+            let return_type = &self.kind.return_type()?;
             self.getter_impl().map_or(quote!(), |body| {
                 quote! {
                     pub fn #ident(&self) -> #return_type {
@@ -241,10 +244,11 @@ impl<'a> OperationField<'a> {
                 }
             })
         };
-        quote! {
+
+        Ok(quote! {
             #getter
             #setter
             #remover
-        }
+        })
     }
 }
