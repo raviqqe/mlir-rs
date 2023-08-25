@@ -163,7 +163,7 @@ impl<'a> AttributeConstraint<'a> {
 
 #[derive(Debug, Clone)]
 pub enum TraitKind {
-    Native { name: String, is_structural: bool },
+    Native { name: String, structural: bool },
     Pred {},
     Internal { name: String },
     Interface { name: String },
@@ -186,7 +186,7 @@ impl Trait {
             } else if def.subclass_of("NativeTrait") {
                 TraitKind::Native {
                     name: Self::name(def)?,
-                    is_structural: def.subclass_of("StructuralOpTrait"),
+                    structural: def.subclass_of("StructuralOpTrait"),
                 }
             } else if def.subclass_of("GenInternalTrait") {
                 TraitKind::Internal {
