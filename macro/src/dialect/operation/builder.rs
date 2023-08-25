@@ -34,11 +34,11 @@ impl TypeStateList {
         self.0.iter()
     }
 
-    pub fn iter_all_any(&self) -> impl Iterator<Item = &Ident> {
+    pub fn iter_any(&self) -> impl Iterator<Item = &Ident> {
         self.0.iter().map(|i| &i.t)
     }
 
-    pub fn iter_all_any_without(&self, field_name: String) -> impl Iterator<Item = &Ident> {
+    pub fn iter_any_without(&self, field_name: String) -> impl Iterator<Item = &Ident> {
         self.0.iter().filter_map(move |i| {
             if i.field_name != field_name {
                 Some(&i.t)
@@ -68,11 +68,11 @@ impl TypeStateList {
         })
     }
 
-    pub fn iter_all_yes(&self) -> impl Iterator<Item = &Ident> {
+    pub fn iter_yes(&self) -> impl Iterator<Item = &Ident> {
         self.0.iter().map(|i| &i.yes)
     }
 
-    pub fn iter_all_no(&self) -> impl Iterator<Item = &Ident> {
+    pub fn iter_no(&self) -> impl Iterator<Item = &Ident> {
         self.0.iter().map(|i| &i.no)
     }
 }
@@ -141,10 +141,10 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
             };
 
             Ok(if field.kind.is_optional() {
-                let iter_all_any = self.type_state.iter_all_any().collect::<Vec<_>>();
+                let iter_any = self.type_state.iter_any().collect::<Vec<_>>();
                 quote! {
-                    impl<'c, #(#iter_all_any),*> #builder_ident<'c, #(#iter_all_any),*> {
-                        pub fn #name(mut self, #argument) -> #builder_ident<'c, #(#iter_all_any),*> {
+                    impl<'c, #(#iter_any),*> #builder_ident<'c, #(#iter_any),*> {
+                        pub fn #name(mut self, #argument) -> #builder_ident<'c, #(#iter_any),*> {
                             self.builder = self.builder.#add(#add_args);
                             self
                         }
@@ -153,12 +153,12 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
             } else if field.kind.is_result() && self.operation.can_infer_type {
                 quote!()
             } else {
-                let iter_all_any_without =
-                    self.type_state.iter_all_any_without(field.name.to_string());
+                let iter_any_without =
+                    self.type_state.iter_any_without(field.name.to_string());
                 let iter_set_yes = self.type_state.iter_set_yes(field.name.to_string());
                 let iter_set_no = self.type_state.iter_set_no(field.name.to_string());
                 quote! {
-                    impl<'c, #(#iter_all_any_without),*> #builder_ident<'c, #(#iter_set_no),*> {
+                    impl<'c, #(#iter_any_without),*> #builder_ident<'c, #(#iter_set_no),*> {
                         pub fn #name(mut self, #argument) -> #builder_ident<'c, #(#iter_set_yes),*> {
                             self.builder = self.builder.#add(#add_args);
                             let Self { context, mut builder, #(#field_names),* } = self;
@@ -186,7 +186,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
 
         let fields = self
             .type_state
-            .iter_all_any()
+            .iter_any()
             .zip(field_names.iter())
             .map(|(g, n)| {
                 Some(quote! {
@@ -206,10 +206,10 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
 
         let new = {
             let name = &self.operation.full_name;
-            let iter_all_no = self.type_state.iter_all_no();
+            let iter_no = self.type_state.iter_no();
             let phantoms = phantoms.clone();
             quote! {
-                impl<'c> #builder_ident<'c, #(#iter_all_no),*> {
+                impl<'c> #builder_ident<'c, #(#iter_no),*> {
                     pub fn new(location: ::melior::ir::Location<'c>) -> Self {
                         Self {
                             context: unsafe { location.context().to_ref() },
@@ -222,7 +222,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
         };
 
         let build = {
-            let iter_all_yes = self.type_state.iter_all_yes();
+            let iter_yes = self.type_state.iter_yes();
             let class_name = format_ident!("{}", &self.operation.class_name);
             let err = format!("should be a valid {}", class_name);
             let maybe_infer = if self.operation.can_infer_type {
@@ -231,7 +231,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
                 quote! {}
             };
             quote! {
-                impl<'c> #builder_ident<'c, #(#iter_all_yes),*> {
+                impl<'c> #builder_ident<'c, #(#iter_yes),*> {
                     pub fn build(self) -> #class_name<'c> {
                         self.builder #maybe_infer.build().try_into().expect(#err)
                     }
@@ -240,13 +240,13 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
         };
 
         let doc = format!("Builder for {}", self.operation.summary);
-        let iter_all_any = self.type_state.iter_all_any();
+        let iter_any = self.type_state.iter_any();
 
         Ok(quote! {
             #type_state_structs
 
             #[doc = #doc]
-            pub struct #builder_ident <'c, #(#iter_all_any),* > {
+            pub struct #builder_ident <'c, #(#iter_any),* > {
                 #[doc(hidden)]
                 builder: ::melior::ir::operation::OperationBuilder<'c>,
                 #[doc(hidden)]
@@ -264,9 +264,9 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
 
     pub fn create_op_builder_fn(&self) -> TokenStream {
         let builder_ident = format_ident!("{}Builder", self.operation.class_name);
-        let iter_all_no = self.type_state.iter_all_no();
+        let iter_no = self.type_state.iter_no();
         quote! {
-            pub fn builder(location: ::melior::ir::Location<'c>) -> #builder_ident<'c, #(#iter_all_no),*> {
+            pub fn builder(location: ::melior::ir::Location<'c>) -> #builder_ident<'c, #(#iter_no),*> {
                 #builder_ident::new(location)
             }
         }
