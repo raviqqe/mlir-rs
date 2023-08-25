@@ -90,8 +90,8 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
         }
     }
 
-    pub fn methods<'a, 's: 'a>(
-        &'s self,
+    pub fn methods<'a>(
+        &'a self,
         field_names: &'a [Ident],
         phantoms: &'a [TokenStream],
     ) -> impl Iterator<Item = Result<TokenStream, Error>> + 'a {
