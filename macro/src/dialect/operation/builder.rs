@@ -100,7 +100,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
         self.operation.fields().map(move |field| {
             let name = sanitize_snake_case_name(field.name);
             let param_type = &field.kind.param_type()?;
-            let args = quote! { #name: #param_type };
+            let argument = quote! { #name: #param_type };
             let add = format_ident!("add_{}s", field.kind.as_str());
 
             let add_args = {
@@ -144,7 +144,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
                 let iter_all_any = self.type_state.iter_all_any().collect::<Vec<_>>();
                 quote! {
                     impl<'c, #(#iter_all_any),*> #builder_ident<'c, #(#iter_all_any),*> {
-                        pub fn #name(mut self, #args) -> #builder_ident<'c, #(#iter_all_any),*> {
+                        pub fn #name(mut self, #argument) -> #builder_ident<'c, #(#iter_all_any),*> {
                             self.builder = self.builder.#add(#add_args);
                             self
                         }
@@ -159,7 +159,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
                 let iter_set_no = self.type_state.iter_set_no(field.name.to_string());
                 quote! {
                     impl<'c, #(#iter_all_any_without),*> #builder_ident<'c, #(#iter_set_no),*> {
-                        pub fn #name(mut self, #args) -> #builder_ident<'c, #(#iter_set_yes),*> {
+                        pub fn #name(mut self, #argument) -> #builder_ident<'c, #(#iter_set_yes),*> {
                             self.builder = self.builder.#add(#add_args);
                             let Self { context, mut builder, #(#field_names),* } = self;
                             #builder_ident {
