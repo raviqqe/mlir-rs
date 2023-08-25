@@ -413,7 +413,8 @@ impl<'a> Operation<'a> {
             for value in trait_def.iter() {
                 let trait_def: Record = value
                     .try_into()
-                    .map_err(|e: tblgen::Error| e.set_location(def))?;
+                    .map_err(|error: tblgen::Error| error.set_location(def))?;
+
                 if trait_def.subclass_of("TraitList") {
                     work_list.push(trait_def.list_value("traits")?);
                 } else {
@@ -437,7 +438,7 @@ impl<'a> Operation<'a> {
             .map(|(name, arg)| {
                 let mut arg_def: Record = arg
                     .try_into()
-                    .map_err(|e: tblgen::Error| e.set_location(def))?;
+                    .map_err(|error: tblgen::Error| error.set_location(def))?;
 
                 if arg_def.subclass_of("OpVariable") {
                     arg_def = arg_def.def_value("constraint")?;
