@@ -8,10 +8,10 @@ use quote::{format_ident, quote};
 
 #[derive(Debug)]
 struct TypeStateItem {
-    pub(crate) field_name: String,
-    pub(crate) yes: Ident,
-    pub(crate) no: Ident,
-    pub(crate) t: Ident,
+    field_name: String,
+    yes: Ident,
+    no: Ident,
+    t: Ident,
 }
 
 impl TypeStateItem {
@@ -35,7 +35,7 @@ impl TypeStateList {
     }
 
     pub fn iter_any(&self) -> impl Iterator<Item = &Ident> {
-        self.0.iter().map(|i| &i.t)
+        self.0.iter().map(|item| &item.t)
     }
 
     pub fn iter_any_without(&self, field_name: String) -> impl Iterator<Item = &Ident> {
