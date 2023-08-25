@@ -192,10 +192,10 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
             .iter_any()
             .zip(&field_names)
             .map(|(r#type, name)| {
-                Some(quote! {
+                quote! {
                     #[doc(hidden)]
                     #name: ::std::marker::PhantomData<#r#type>
-                })
+                }
             });
 
         let phantoms = field_names
