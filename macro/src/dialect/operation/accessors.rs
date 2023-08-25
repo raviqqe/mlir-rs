@@ -198,7 +198,7 @@ impl<'a> OperationField<'a> {
                 if value {
                   self.operation.set_attribute(#name, Attribute::unit(&self.operation.context()));
                 } else {
-                  let _ = self.operation.remove_attribute(#name);
+                  self.operation.remove_attribute(#name)
                 }
             }
         } else {
