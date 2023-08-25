@@ -607,7 +607,7 @@ impl<'a> Operation<'a> {
                     || r#trait.has_name("::mlir::InferTypeOpInterface::Trait") && regions.is_empty()
             }),
             summary: {
-                let summary = def.str_value("summary").unwrap_or(short_name);
+                let summary = def.str_value("summary")?;
 
                 if summary.is_empty() {
                     format!("[`{short_name}`]({class_name}) operation")
