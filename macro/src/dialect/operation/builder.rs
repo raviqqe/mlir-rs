@@ -193,7 +193,6 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
             .zip(&field_names)
             .map(|(r#type, name)| {
                 quote! {
-                    #[doc(hidden)]
                     #name: ::std::marker::PhantomData<#r#type>
                 }
             });
@@ -251,9 +250,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
 
             #[doc = #doc]
             pub struct #builder_ident <'c, #(#iter_any),* > {
-                #[doc(hidden)]
                 builder: ::melior::ir::operation::OperationBuilder<'c>,
-                #[doc(hidden)]
                 context: &'c ::melior::Context,
                 #(#fields),*
             }
