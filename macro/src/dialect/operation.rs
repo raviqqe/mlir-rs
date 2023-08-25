@@ -639,7 +639,9 @@ impl<'a> ToTokens for Operation<'a> {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         let class_name = format_ident!("{}", &self.class_name);
         let name = &self.full_name;
-        let accessors = self.fields().map(|field| field.accessors());
+        let accessors = self
+            .fields()
+            .map(|field| field.accessors().expect("valid accessors"));
         let builder = OperationBuilder::new(self);
         let builder_tokens = builder.builder().expect("valid builder");
         let builder_fn = builder.create_op_builder_fn();
