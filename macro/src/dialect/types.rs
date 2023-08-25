@@ -116,12 +116,12 @@ impl<'a> AttributeConstraint<'a> {
     }
 
     #[allow(unused)]
-    pub fn is_type_attr(&self) -> bool {
+    pub fn is_type_attribute(&self) -> bool {
         self.0.subclass_of("TypeAttrBase")
     }
 
     #[allow(unused)]
-    pub fn is_symbol_ref_attr(&self) -> bool {
+    pub fn is_symbol_ref_attribute(&self) -> bool {
         self.0.name() == Ok("SymbolRefAttr")
             || self.0.name() == Ok("FlatSymbolRefAttr")
             || self.0.subclass_of("SymbolRefAttr")
@@ -129,7 +129,7 @@ impl<'a> AttributeConstraint<'a> {
     }
 
     #[allow(unused)]
-    pub fn is_enum_attr(&self) -> bool {
+    pub fn is_enum_attribute(&self) -> bool {
         self.0.subclass_of("EnumAttrInfo")
     }
 
