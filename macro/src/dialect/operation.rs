@@ -470,7 +470,7 @@ impl<'a> Operation<'a> {
         Ok(Self::collect_elements(
             arguments
                 .filter(|(_, arg_def)| arg_def.subclass_of("TypeConstraint"))
-                .map(|(n, arg_def)| (*n, TypeConstraint::new(*arg_def)))
+                .map(|(name, arg_def)| (*name, TypeConstraint::new(*arg_def)))
                 .collect::<Vec<_>>()
                 .iter(),
             ElementKind::Operand,
@@ -501,12 +501,12 @@ impl<'a> Operation<'a> {
             elements
                 .enumerate()
                 .zip(variadic_iter)
-                .map(|((i, (n, tc)), variadic_kind)| {
+                .map(|((index, (name, constraint)), variadic_kind)| {
                     OperationField::new_element(
-                        n,
-                        *tc,
+                        name,
+                        *constraint,
                         kind,
-                        SequenceInfo { index: i, len },
+                        SequenceInfo { index, len },
                         variadic_kind,
                     )
                 })
