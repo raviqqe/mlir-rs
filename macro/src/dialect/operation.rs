@@ -278,7 +278,7 @@ pub struct OperationField<'a> {
 }
 
 impl<'a> OperationField<'a> {
-    pub fn new(name: &'a str, kind: FieldKind<'a>) -> Self {
+    fn new(name: &'a str, kind: FieldKind<'a>) -> Self {
         Self {
             name,
             sanitized_name: sanitize_snake_case_name(name),
@@ -286,11 +286,11 @@ impl<'a> OperationField<'a> {
         }
     }
 
-    pub fn new_attribute(name: &'a str, constraint: AttributeConstraint<'a>) -> Self {
+    fn new_attribute(name: &'a str, constraint: AttributeConstraint<'a>) -> Self {
         Self::new(name, FieldKind::Attribute { constraint })
     }
 
-    pub fn new_region(
+    fn new_region(
         name: &'a str,
         constraint: RegionConstraint<'a>,
         sequence_info: SequenceInfo,
@@ -304,7 +304,7 @@ impl<'a> OperationField<'a> {
         )
     }
 
-    pub fn new_successor(
+    fn new_successor(
         name: &'a str,
         constraint: SuccessorConstraint<'a>,
         sequence_info: SequenceInfo,
@@ -557,7 +557,7 @@ impl<'a> Operation<'a> {
     pub fn from_def(def: Record<'a>) -> Result<Self, Error> {
         let dialect = def.def_value("opDialect")?;
         let traits = Self::collect_traits(def)?;
-        let has_trait = |r#trait: &str| traits.iter().any(|t| t.has_name(r#trait));
+        let has_trait = |name: &str| traits.iter().any(|r#trait| r#trait.has_name(name));
 
         let successors = Self::collect_successors(def)?;
         let regions = Self::collect_regions(def)?;
