@@ -160,11 +160,19 @@ impl<'a> AttributeConstraint<'a> {
 }
 
 #[derive(Debug, Clone)]
-pub enum TraitKind {
-    Native { name: String, structural: bool },
+enum TraitKind {
+    Native {
+        name: String,
+        #[allow(unused)]
+        structural: bool,
+    },
     Pred {},
-    Internal { name: String },
-    Interface { name: String },
+    Internal {
+        name: String,
+    },
+    Interface {
+        name: String,
+    },
 }
 
 #[derive(Debug, Clone)]
