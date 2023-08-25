@@ -278,7 +278,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
     pub fn default_constructor(&self) -> Result<TokenStream, Error> {
         let class_name = format_ident!("{}", &self.operation.class_name);
         let name = sanitize_snake_case_name(self.operation.short_name);
-        let mut args = Self::required_fields(self.operation)
+        let mut arguments = Self::required_fields(self.operation)
             .map(|field| {
                 let param_type = &field.kind.param_type()?;
                 let param_name = &field.sanitized_name;
@@ -290,14 +290,14 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
             let param_name = &field.sanitized_name;
             quote! { .#param_name(#param_name) }
         });
-        args.push(quote! { location: ::melior::ir::Location<'c> });
+        arguments.push(quote! { location: ::melior::ir::Location<'c> });
 
         let doc = format!("Creates a new {}", self.operation.summary);
 
         Ok(quote! {
             #[allow(clippy::too_many_arguments)]
             #[doc = #doc]
-            pub fn #name<'c>(#(#args),*) -> #class_name<'c> {
+            pub fn #name<'c>(#(#arguments),*) -> #class_name<'c> {
                 #class_name::builder(location)#(#builder_calls)*.build()
             }
         })
