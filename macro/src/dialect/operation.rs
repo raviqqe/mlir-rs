@@ -377,7 +377,7 @@ impl<'a> Operation<'a> {
                     SuccessorConstraint::new(
                         value
                             .try_into()
-                            .map_err(|e: tblgen::Error| e.set_location(def))?,
+                            .map_err(|error: tblgen::Error| error.set_location(def))?,
                     ),
                     SequenceInfo { index, len },
                 ))
@@ -391,12 +391,13 @@ impl<'a> Operation<'a> {
         regions_dag
             .args()
             .enumerate()
-            .map(|(index, (name, v))| {
+            .map(|(index, (name, value))| {
                 Ok(OperationField::new_region(
                     name,
                     RegionConstraint::new(
-                        v.try_into()
-                            .map_err(|e: tblgen::Error| e.set_location(def))?,
+                        value
+                            .try_into()
+                            .map_err(|error: tblgen::Error| error.set_location(def))?,
                     ),
                     SequenceInfo { index, len },
                 ))
