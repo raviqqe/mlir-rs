@@ -78,16 +78,15 @@ impl TypeStateList {
 }
 
 pub struct OperationBuilder<'o, 'c> {
-    pub(crate) operation: &'c Operation<'o>,
+    operation: &'c Operation<'o>,
     type_state: TypeStateList,
 }
 
 impl<'o, 'c> OperationBuilder<'o, 'c> {
     pub fn new(operation: &'c Operation<'o>) -> Self {
-        let type_state = Self::create_type_state(operation);
         Self {
             operation,
-            type_state,
+            type_state: Self::create_type_state(operation),
         }
     }
 
