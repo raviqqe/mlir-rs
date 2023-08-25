@@ -455,28 +455,27 @@ impl<'a> Operation<'a> {
         attr_sized: bool,
     ) -> Result<(Vec<OperationField>, usize), Error> {
         Self::collect_elements(
-            Self::dag_constraints(def, "results")?
+            &Self::dag_constraints(def, "results")?
                 .into_iter()
                 .map(|(name, constraint)| (name, TypeConstraint::new(constraint)))
-                .collect::<Vec<_>>()
-                .iter(),
+                .collect::<Vec<_>>(),
             ElementKind::Result,
             same_size,
             attr_sized,
         )
     }
 
-    fn collect_operands<'b, 'c: 'a + 'b>(
-        arguments: impl Iterator<Item = &'b (&'c str, Record<'c>)>,
+    fn collect_operands(
+        arguments: &[(&'a str, Record<'a>)],
         same_size: bool,
         attr_sized: bool,
     ) -> Result<Vec<OperationField<'a>>, Error> {
         Ok(Self::collect_elements(
-            arguments
+            &arguments
+                .iter()
                 .filter(|(_, arg_def)| arg_def.subclass_of("TypeConstraint"))
                 .map(|(name, arg_def)| (*name, TypeConstraint::new(*arg_def)))
-                .collect::<Vec<_>>()
-                .iter(),
+                .collect::<Vec<_>>(),
             ElementKind::Operand,
             same_size,
             attr_sized,
@@ -484,25 +483,25 @@ impl<'a> Operation<'a> {
         .0)
     }
 
-    fn collect_elements<'b, 'c: 'a + 'b>(
-        elements: impl Iterator<Item = &'b (&'c str, TypeConstraint<'c>)> + Clone,
+    fn collect_elements(
+        elements: &[(&'a str, TypeConstraint<'a>)],
         kind: ElementKind,
         same_size: bool,
         attr_sized: bool,
     ) -> Result<(Vec<OperationField<'a>>, usize), Error> {
-        let len = elements.clone().count();
         let num_variable_length = elements
-            .clone()
-            .filter(|res| res.1.has_variable_length())
+            .iter()
+            .filter(|(_, constraint)| constraint.has_variable_length())
             .count();
         let variadic_iter = VariadicKindIter::new(
-            elements.clone().map(|(_, constraint)| constraint),
+            elements.iter().map(|(_, constraint)| constraint),
             num_variable_length,
             same_size,
             attr_sized,
         );
         Ok((
             elements
+                .iter()
                 .enumerate()
                 .zip(variadic_iter)
                 .map(|((index, (name, constraint)), variadic_kind)| {
@@ -510,7 +509,10 @@ impl<'a> Operation<'a> {
                         name,
                         *constraint,
                         kind,
-                        SequenceInfo { index, len },
+                        SequenceInfo {
+                            index,
+                            len: elements.len(),
+                        },
                         variadic_kind,
                     )
                 })
@@ -519,10 +521,11 @@ impl<'a> Operation<'a> {
         ))
     }
 
-    fn collect_attributes<'b, 'c: 'a + 'b>(
-        arguments: impl Iterator<Item = &'b (&'c str, Record<'c>)>,
+    fn collect_attributes(
+        arguments: &[(&'a str, Record<'a>)],
     ) -> Result<Vec<OperationField<'a>>, Error> {
         arguments
+            .iter()
             .filter(|(_, arg_def)| arg_def.subclass_of("Attr"))
             .map(|(name, arg_def)| {
                 // TODO: Replace assert! with Result
@@ -597,12 +600,12 @@ impl<'a> Operation<'a> {
             class_name,
             successors: Self::collect_successors(def)?,
             operands: Self::collect_operands(
-                arguments.iter(),
+                &arguments,
                 has_trait("::mlir::OpTrait::SameVariadicOperandSize"),
                 has_trait("::mlir::OpTrait::AttrSizedOperandSegments"),
             )?,
             results,
-            attributes: Self::collect_attributes(arguments.iter())?,
+            attributes: Self::collect_attributes(&arguments)?,
             derived_attributes: Self::collect_derived_attributes(def)?,
             can_infer_type: traits.iter().any(|r#trait| {
                 (r#trait.has_name("::mlir::OpTrait::FirstAttrDerivedResultType")
