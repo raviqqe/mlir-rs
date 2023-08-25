@@ -618,7 +618,7 @@ impl<'a> Operation<'a> {
                     )
                 }
             },
-            description: unindent::unindent(def.str_value("description").unwrap_or("")),
+            description: unindent::unindent(def.str_value("description")?),
             regions,
         })
     }
