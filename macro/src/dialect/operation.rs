@@ -343,15 +343,15 @@ pub struct Operation<'a> {
     pub(crate) short_name: &'a str,
     pub(crate) full_name: String,
     pub(crate) class_name: &'a str,
+    pub(crate) summary: String,
+    pub(crate) can_infer_type: bool,
+    description: String,
     regions: Vec<OperationField<'a>>,
     successors: Vec<OperationField<'a>>,
     results: Vec<OperationField<'a>>,
     operands: Vec<OperationField<'a>>,
     attributes: Vec<OperationField<'a>>,
     derived_attributes: Vec<OperationField<'a>>,
-    pub(crate) can_infer_type: bool,
-    pub(crate) summary: String,
-    description: String,
 }
 
 impl<'a> Operation<'a> {
