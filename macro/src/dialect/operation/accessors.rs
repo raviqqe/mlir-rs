@@ -28,27 +28,24 @@ impl<'a> OperationField<'a> {
                     VariadicKind::Simple {
                         seen_variable_length,
                     } => {
-                        // At most one variable length group
-                        if constraint.has_variable_length() {
-                            if constraint.is_optional() {
-                                // Optional element, and some singular elements.
-                                // Only present if the amount of groups is at least the number of
-                                // elements.
-                                quote! {
-                                  if self.operation.#count() < #len {
-                                    Err(::melior::Error::#error_variant(#name))
-                                  } else {
-                                    self.operation.#kind_ident(#index)
-                                  }
-                                }
-                            } else {
-                                // A variable length group
-                                // Length computed by subtracting the amount of other
-                                // singular elements from the number of elements.
-                                quote! {
-                                  let group_length = self.operation.#count() - #len + 1;
-                                  self.operation.#plural().skip(#index).take(group_length)
-                                }
+                        if constraint.is_optional() {
+                            // Optional element, and some singular elements.
+                            // Only present if the amount of groups is at least the number of
+                            // elements.
+                            quote! {
+                              if self.operation.#count() < #len {
+                                Err(::melior::Error::#error_variant(#name))
+                              } else {
+                                self.operation.#kind_ident(#index)
+                              }
+                            }
+                        } else if constraint.is_variadic() {
+                            // A variable length group
+                            // Length computed by subtracting the amount of other
+                            // singular elements from the number of elements.
+                            quote! {
+                              let group_length = self.operation.#count() - #len + 1;
+                              self.operation.#plural().skip(#index).take(group_length)
                             }
                         } else if *seen_variable_length {
                             // Single element after variable length group
