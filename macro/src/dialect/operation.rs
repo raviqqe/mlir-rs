@@ -559,26 +559,13 @@ impl<'a> Operation<'a> {
         let traits = Self::collect_traits(def)?;
         let has_trait = |name: &str| traits.iter().any(|r#trait| r#trait.has_name(name));
 
-        let successors = Self::collect_successors(def)?;
+        let arguments = Self::dag_constraints(def, "arguments")?;
         let regions = Self::collect_regions(def)?;
-
         let (results, num_variable_length_results) = Self::collect_results(
             def,
             has_trait("::mlir::OpTrait::SameVariadicResultSize"),
             has_trait("::mlir::OpTrait::AttrSizedResultSegments"),
         )?;
-
-        let arguments = Self::dag_constraints(def, "arguments")?;
-
-        let operands = Self::collect_operands(
-            arguments.iter(),
-            has_trait("::mlir::OpTrait::SameVariadicOperandSize"),
-            has_trait("::mlir::OpTrait::AttrSizedOperandSegments"),
-        )?;
-
-        let attributes = Self::collect_attributes(arguments.iter())?;
-
-        let derived_attributes = Self::collect_derived_attributes(def)?;
 
         let name = def.name()?;
         let class_name = if name.contains('_') && !name.starts_with('_') {
@@ -589,49 +576,50 @@ impl<'a> Operation<'a> {
         } else {
             name
         };
-
-        let can_infer_type = traits.iter().any(|r#trait| {
-            (r#trait.has_name("::mlir::OpTrait::FirstAttrDerivedResultType")
-                || r#trait.has_name("::mlir::OpTrait::SameOperandsAndResultType"))
-                && num_variable_length_results == 0
-                || r#trait.has_name("::mlir::InferTypeOpInterface::Trait") && regions.is_empty()
-        });
-
         let short_name = def.str_value("opName")?;
-        let dialect_name = dialect.string_value("name")?;
-        let full_name = if !dialect_name.is_empty() {
-            format!("{}.{}", dialect_name, short_name)
-        } else {
-            short_name.into()
-        };
-
-        let summary = def.str_value("summary").unwrap_or(short_name);
-        let summary = if !summary.is_empty() {
-            format!(
-                "[`{}`]({}) operation: {}",
-                short_name,
-                class_name,
-                summary[0..1].to_uppercase() + &summary[1..]
-            )
-        } else {
-            format!("[`{}`]({}) operation", short_name, class_name)
-        };
-        let description = unindent::unindent(def.str_value("description").unwrap_or(""));
 
         Ok(Self {
             dialect,
             short_name,
-            full_name,
+            full_name: {
+                let dialect_name = dialect.string_value("name")?;
+
+                if dialect_name.is_empty() {
+                    short_name.into()
+                } else {
+                    format!("{dialect_name}.{short_name}")
+                }
+            },
             class_name,
-            regions,
-            successors,
-            operands,
+            successors: Self::collect_successors(def)?,
+            operands: Self::collect_operands(
+                arguments.iter(),
+                has_trait("::mlir::OpTrait::SameVariadicOperandSize"),
+                has_trait("::mlir::OpTrait::AttrSizedOperandSegments"),
+            )?,
             results,
-            attributes,
-            derived_attributes,
-            can_infer_type,
-            summary,
-            description,
+            attributes: Self::collect_attributes(arguments.iter())?,
+            derived_attributes: Self::collect_derived_attributes(def)?,
+            can_infer_type: traits.iter().any(|r#trait| {
+                (r#trait.has_name("::mlir::OpTrait::FirstAttrDerivedResultType")
+                    || r#trait.has_name("::mlir::OpTrait::SameOperandsAndResultType"))
+                    && num_variable_length_results == 0
+                    || r#trait.has_name("::mlir::InferTypeOpInterface::Trait") && regions.is_empty()
+            }),
+            summary: {
+                let summary = def.str_value("summary").unwrap_or(short_name);
+
+                if summary.is_empty() {
+                    format!("[`{short_name}`]({class_name}) operation")
+                } else {
+                    format!(
+                        "[`{short_name}`]({class_name}) operation: {}",
+                        summary[0..1].to_uppercase() + &summary[1..]
+                    )
+                }
+            },
+            description: unindent::unindent(def.str_value("description").unwrap_or("")),
+            regions,
         })
     }
 }
