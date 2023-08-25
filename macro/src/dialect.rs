@@ -131,12 +131,15 @@ pub fn generate_dialect(
 
     let keeper = td_parser.parse().map_err(Error::Parse)?;
 
-    let dialect_def = keeper
-        .all_derived_definitions("Dialect")
-        .find(|def| def.str_value("name") == Ok(&input.name))
-        .ok_or_else(|| create_syn_error("dialect not found"))?;
-    let dialect = dialect_module(&input.name, dialect_def, &keeper)
-        .map_err(|error| error.add_source_info(keeper.source_info()))?;
+    let dialect = dialect_module(
+        &input.name,
+        keeper
+            .all_derived_definitions("Dialect")
+            .find(|def| def.str_value("name") == Ok(&input.name))
+            .ok_or_else(|| create_syn_error("dialect not found"))?,
+        &keeper,
+    )
+    .map_err(|error| error.add_source_info(keeper.source_info()))?;
 
     Ok(quote! { #dialect }.into())
 }
