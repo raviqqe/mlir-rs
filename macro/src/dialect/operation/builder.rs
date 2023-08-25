@@ -100,8 +100,8 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
 
         self.operation.fields.iter().map(move |field| {
             let name = sanitize_snake_case_name(field.name);
-            let st = &field.kind.param_type()?;
-            let args = quote! { #name: #st };
+            let param_type = &field.kind.param_type()?;
+            let args = quote! { #name: #param_type };
             let add = format_ident!("add_{}s", field.kind.as_str());
 
             let add_args = {
