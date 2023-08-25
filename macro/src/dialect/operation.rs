@@ -409,8 +409,8 @@ impl<'a> Operation<'a> {
         let mut work_list: Vec<_> = vec![def.list_value("traits")?];
         let mut traits = Vec::new();
         while let Some(trait_def) = work_list.pop() {
-            for v in trait_def.iter() {
-                let trait_def: Record = v
+            for value in trait_def.iter() {
+                let trait_def: Record = value
                     .try_into()
                     .map_err(|e: tblgen::Error| e.set_location(def))?;
                 if trait_def.subclass_of("TraitList") {
