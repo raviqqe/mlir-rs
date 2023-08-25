@@ -11,7 +11,7 @@ struct TypeStateItem {
     field_name: String,
     yes: Ident,
     no: Ident,
-    t: Ident,
+    any: Ident,
 }
 
 impl TypeStateItem {
@@ -21,7 +21,7 @@ impl TypeStateItem {
             field_name: field_name.to_string(),
             yes: format_ident!("{}__Yes__{}", class_name, new_field_name),
             no: format_ident!("{}__No__{}", class_name, new_field_name),
-            t: format_ident!("{}__Any__{}", class_name, new_field_name),
+            any: format_ident!("{}__Any__{}", class_name, new_field_name),
         }
     }
 }
@@ -35,13 +35,13 @@ impl TypeStateList {
     }
 
     pub fn iter_any(&self) -> impl Iterator<Item = &Ident> {
-        self.0.iter().map(|item| &item.t)
+        self.0.iter().map(|item| &item.any)
     }
 
     pub fn iter_any_without(&self, field_name: String) -> impl Iterator<Item = &Ident> {
         self.0.iter().filter_map(move |i| {
             if i.field_name != field_name {
-                Some(&i.t)
+                Some(&i.any)
             } else {
                 None
             }
@@ -53,7 +53,7 @@ impl TypeStateList {
             if item.field_name == field_name {
                 &item.yes
             } else {
-                &item.t
+                &item.any
             }
         })
     }
@@ -63,7 +63,7 @@ impl TypeStateList {
             if item.field_name == field_name {
                 &item.no
             } else {
-                &item.t
+                &item.any
             }
         })
     }
