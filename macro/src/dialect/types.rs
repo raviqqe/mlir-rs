@@ -147,7 +147,7 @@ impl<'a> AttributeConstraint<'a> {
     pub fn is_unit(&self) -> bool {
         self.0
             .string_value("storageType")
-            .map(|v| v == mlir_attribute!(UnitAttr))
+            .map(|string| string == mlir_attribute!(UnitAttr))
             .unwrap_or(false)
     }
 
