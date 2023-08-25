@@ -496,7 +496,7 @@ impl<'a> Operation<'a> {
             .filter(|res| res.1.has_variable_length())
             .count();
         let variadic_iter = VariadicKindIter::new(
-            elements.clone().map(|(_, tc)| tc),
+            elements.clone().map(|(_, constraint)| constraint),
             num_variable_length,
             same_size,
             attr_sized,
