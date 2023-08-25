@@ -8,7 +8,7 @@ use self::{
     error::Error,
     utility::{sanitize_documentation, sanitize_snake_case_name},
 };
-pub use input::DialectMacroInput;
+pub use input::DialectInput;
 use operation::Operation;
 use proc_macro::TokenStream;
 use proc_macro2::Span;
@@ -18,9 +18,7 @@ use tblgen::{record::Record, record_keeper::RecordKeeper, TableGenParser};
 
 const LLVM_MAJOR_VERSION: usize = 16;
 
-pub fn generate_dialect(
-    input: DialectMacroInput,
-) -> Result<TokenStream, Box<dyn std::error::Error>> {
+pub fn generate_dialect(input: DialectInput) -> Result<TokenStream, Box<dyn std::error::Error>> {
     let mut td_parser = TableGenParser::new();
 
     if let Some(source) = input.tablegen() {

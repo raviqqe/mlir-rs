@@ -3,14 +3,14 @@ use quote::format_ident;
 use std::ops::Deref;
 use syn::{bracketed, parse::Parse, punctuated::Punctuated, LitStr, Token};
 
-pub struct DialectMacroInput {
+pub struct DialectInput {
     name: String,
     tablegen: Option<String>,
     td_file: Option<String>,
     includes: Vec<String>,
 }
 
-impl DialectMacroInput {
+impl DialectInput {
     pub fn name(&self) -> &str {
         &self.name
     }
@@ -28,7 +28,7 @@ impl DialectMacroInput {
     }
 }
 
-impl Parse for DialectMacroInput {
+impl Parse for DialectInput {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
         let mut name = None;
         let mut tablegen = None;
