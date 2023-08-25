@@ -198,10 +198,10 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
                 })
             });
 
-        let phantoms: Vec<_> = field_names
+        let phantoms = field_names
             .iter()
             .map(|n| quote! { #n: ::std::marker::PhantomData })
-            .collect();
+            .collect::<Vec<_>>();
 
         let methods = self
             .methods(&field_names, phantoms.as_slice())
