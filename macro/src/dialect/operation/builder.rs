@@ -95,7 +95,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
         field_names: &'a [Ident],
         phantoms: &'a [TokenStream],
     ) -> impl Iterator<Item = Result<TokenStream, Error>> + 'a {
-        let builder_ident = format_ident!("{}Builder", self.operation.class_name);
+        let builder_ident = self.builder_identifier();
 
         self.operation.fields().map(move |field| {
             let name = sanitize_snake_case_name(field.name);
@@ -176,7 +176,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
 
     pub fn builder(&self) -> Result<TokenStream, Error> {
         let type_state_structs = self.type_state_structs();
-        let builder_ident = format_ident!("{}Builder", self.operation.class_name);
+        let builder_ident = self.builder_identifier();
 
         let field_names = self
             .type_state
@@ -263,7 +263,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
     }
 
     pub fn create_op_builder_fn(&self) -> TokenStream {
-        let builder_ident = format_ident!("{}Builder", self.operation.class_name);
+        let builder_ident = self.builder_identifier();
         let iter_no = self.type_state.iter_no();
         quote! {
             pub fn builder(location: ::melior::ir::Location<'c>) -> #builder_ident<'c, #(#iter_no),*> {
@@ -314,6 +314,10 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
                 .map(|field| TypeStateItem::new(operation.class_name, field.name))
                 .collect(),
         )
+    }
+
+    fn builder_identifier(&self) -> Ident {
+        format_ident!("{}Builder", self.operation.class_name)
     }
 
     fn type_state_structs(&self) -> TokenStream {
