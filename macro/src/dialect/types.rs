@@ -137,13 +137,11 @@ impl<'a> AttributeConstraint<'a> {
         self.0.bit_value("isOptional").unwrap_or(false)
     }
 
-    pub fn storage_type(&self) -> &'static str {
-        self.0
-            .string_value("storageType")
-            .ok()
-            .and_then(|v| ATTRIBUTE_TYPES.get(v.as_str().trim()))
+    pub fn storage_type(&self) -> Result<&'static str, Error> {
+        Ok(ATTRIBUTE_TYPES
+            .get(self.0.string_value("storageType")?.as_str().trim())
             .copied()
-            .unwrap_or(melior_attribute!(Attribute))
+            .unwrap_or(melior_attribute!(Attribute)))
     }
 
     pub fn is_unit(&self) -> bool {

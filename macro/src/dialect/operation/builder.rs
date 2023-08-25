@@ -1,4 +1,7 @@
-use super::{super::utility::sanitize_snake_case_name, FieldKind, Operation, OperationField};
+use super::{
+    super::{error::Error, utility::sanitize_snake_case_name},
+    FieldKind, Operation, OperationField,
+};
 use convert_case::{Case, Casing};
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
@@ -92,11 +95,12 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
         &'s self,
         field_names: &'a [Ident],
         phantoms: &'a [TokenStream],
-    ) -> impl Iterator<Item = TokenStream> + 'a {
+    ) -> impl Iterator<Item = Result<TokenStream, Error>> + 'a {
         let builder_ident = format_ident!("{}Builder", self.operation.class_name);
+
         self.operation.fields.iter().map(move |field| {
             let name = sanitize_snake_case_name(field.name);
-            let st = &field.kind.param_type();
+            let st = &field.kind.param_type()?;
             let args = quote! { #name: #st };
             let add = format_ident!("add_{}s", field.kind.as_str());
 
@@ -137,7 +141,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
                 }
             };
 
-            if field.kind.is_optional() {
+            Ok(if field.kind.is_optional() {
                 let iter_all_any = self.type_state.iter_all_any().collect::<Vec<_>>();
                 quote! {
                     impl<'c, #(#iter_all_any),*> #builder_ident<'c, #(#iter_all_any),*> {
@@ -167,11 +171,11 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
                         }
                     }
                 }
-            }
+            })
         })
     }
 
-    pub fn builder(&self) -> TokenStream {
+    pub fn builder(&self) -> Result<TokenStream, Error> {
         let type_state_structs = self.type_state_structs();
         let builder_ident = format_ident!("{}Builder", self.operation.class_name);
 
@@ -197,7 +201,9 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
             .map(|n| quote! { #n: ::std::marker::PhantomData })
             .collect();
 
-        let methods = self.methods(field_names.as_slice(), phantoms.as_slice());
+        let methods = self
+            .methods(field_names.as_slice(), phantoms.as_slice())
+            .collect::<Result<Vec<_>, _>>()?;
 
         let new = {
             let name_str = &self.operation.full_name;
@@ -237,7 +243,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
         let doc = format!("Builder for {}", self.operation.summary);
         let iter_all_any = self.type_state.iter_all_any();
 
-        quote! {
+        Ok(quote! {
             #type_state_structs
 
             #[doc = #doc]
@@ -254,7 +260,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
             #(#methods)*
 
             #build
-        }
+        })
     }
 
     pub fn create_op_builder_fn(&self) -> TokenStream {
@@ -267,16 +273,17 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
         }
     }
 
-    pub fn default_constructor(&self) -> TokenStream {
+    pub fn default_constructor(&self) -> Result<TokenStream, Error> {
         let class_name = format_ident!("{}", &self.operation.class_name);
         let name = sanitize_snake_case_name(self.operation.short_name);
         let mut args = Self::required_fields(self.operation)
             .map(|field| {
-                let param_type = &field.kind.param_type();
+                let param_type = &field.kind.param_type()?;
                 let param_name = &field.sanitized_name;
-                quote! { #param_name: #param_type }
+
+                Ok(quote! { #param_name: #param_type })
             })
-            .collect::<Vec<_>>();
+            .collect::<Result<Vec<_>, Error>>()?;
         let builder_calls = Self::required_fields(self.operation).map(|field| {
             let param_name = &field.sanitized_name;
             quote! { .#param_name(#param_name) }
@@ -284,13 +291,14 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
         args.push(quote! { location: ::melior::ir::Location<'c> });
 
         let doc = format!("Creates a new {}", self.operation.summary);
-        quote! {
+
+        Ok(quote! {
             #[allow(clippy::too_many_arguments)]
             #[doc = #doc]
             pub fn #name<'c>(#(#args),*) -> #class_name<'c> {
                 #class_name::builder(location)#(#builder_calls)*.build()
             }
-        }
+        })
     }
 
     fn required_fields<'a, 'b>(
