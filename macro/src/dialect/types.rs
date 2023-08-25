@@ -220,9 +220,4 @@ impl Trait {
             Ok(r#trait)
         }
     }
-
-    #[allow(unused)]
-    pub fn kind(&self) -> &TraitKind {
-        &self.kind
-    }
 }
