@@ -640,8 +640,7 @@ impl<'a> ToTokens for Operation<'a> {
         let class_name = format_ident!("{}", &self.class_name);
         let name = &self.full_name;
         let accessors = self
-            .fields
-            .iter()
+            .fields()
             .map(|field| field.accessors().expect("valid accessors"));
         let builder = OperationBuilder::new(self);
         let builder_tokens = builder.builder().expect("valid builder");
