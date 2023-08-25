@@ -371,14 +371,15 @@ impl<'a> Operation<'a> {
         successors_dag
             .args()
             .enumerate()
-            .map(|(i, (n, v))| {
+            .map(|(index, (name, value))| {
                 Ok(OperationField::new_successor(
-                    n,
+                    name,
                     SuccessorConstraint::new(
-                        v.try_into()
+                        value
+                            .try_into()
                             .map_err(|e: tblgen::Error| e.set_location(def))?,
                     ),
-                    SequenceInfo { index: i, len },
+                    SequenceInfo { index, len },
                 ))
             })
             .collect()
@@ -390,14 +391,14 @@ impl<'a> Operation<'a> {
         regions_dag
             .args()
             .enumerate()
-            .map(|(i, (n, v))| {
+            .map(|(index, (name, v))| {
                 Ok(OperationField::new_region(
-                    n,
+                    name,
                     RegionConstraint::new(
                         v.try_into()
                             .map_err(|e: tblgen::Error| e.set_location(def))?,
                     ),
-                    SequenceInfo { index: i, len },
+                    SequenceInfo { index, len },
                 ))
             })
             .collect()
