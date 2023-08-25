@@ -29,7 +29,7 @@ impl<'a> OperationField<'a> {
                         seen_variable_length,
                     } => {
                         // At most one variable length group
-                        if constraint.is_variable_length() {
+                        if constraint.has_variable_length() {
                             if constraint.is_optional() {
                                 // Optional element, and some singular elements.
                                 // Only present if the amount of groups is at least the number of
@@ -74,7 +74,7 @@ impl<'a> OperationField<'a> {
                             let group_len = total_var_len / #num_variable_length;
                             let start = #num_preceding_simple + #num_preceding_variadic * group_len;
                         };
-                        let get_elements = if constraint.is_variable_length() {
+                        let get_elements = if constraint.has_variable_length() {
                             quote! {
                                 self.operation.#plural().skip(start).take(group_len)
                             }
@@ -101,7 +101,7 @@ impl<'a> OperationField<'a> {
                                 .sum::<i32>() as usize;
                             let group_len = attribute.element(#index)? as usize;
                         };
-                        let get_elements = if !constraint.is_variable_length() {
+                        let get_elements = if !constraint.has_variable_length() {
                             quote! {
                                 self.operation.#kind_ident(start)
                             }

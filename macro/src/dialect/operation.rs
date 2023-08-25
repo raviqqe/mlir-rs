@@ -249,7 +249,7 @@ impl<'a: 'b, 'b, I: Iterator<Item = &'b TypeConstraint<'a>>> Iterator for Variad
             VariadicKind::Simple {
                 seen_variable_length,
             } => {
-                if constraint.is_variable_length() {
+                if constraint.has_variable_length() {
                     *seen_variable_length = true;
                 }
             }
@@ -258,7 +258,7 @@ impl<'a: 'b, 'b, I: Iterator<Item = &'b TypeConstraint<'a>>> Iterator for Variad
                 num_preceding_variadic,
                 ..
             } => {
-                if constraint.is_variable_length() {
+                if constraint.has_variable_length() {
                     *num_preceding_variadic += 1;
                 } else {
                     *num_preceding_simple += 1;
@@ -489,7 +489,7 @@ impl<'a> Operation<'a> {
         let len = elements.clone().count();
         let num_variable_length = elements
             .clone()
-            .filter(|res| res.1.is_variable_length())
+            .filter(|res| res.1.has_variable_length())
             .count();
         let variadic_iter = VariadicKindIter::new(
             elements.clone().map(|(_, tc)| tc),
