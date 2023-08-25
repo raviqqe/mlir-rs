@@ -4,7 +4,7 @@ mod builder;
 use self::builder::OperationBuilder;
 use super::utility::{sanitize_documentation, sanitize_snake_case_name};
 use crate::dialect::{
-    error::{Error, ExpectedSuperClassError},
+    error::{Error, OdsError},
     types::{AttributeConstraint, RegionConstraint, SuccessorConstraint, Trait, TypeConstraint},
 };
 use proc_macro2::{Ident, TokenStream};
@@ -506,7 +506,7 @@ impl<'a> Operation<'a> {
                         def.subclass_of("DerivedAttr")
                             .then_some(())
                             .ok_or_else(|| {
-                                ExpectedSuperClassError("DerivedAttr".into()).with_location(def)
+                                OdsError::ExpectedSuperClass("DerivedAttr").with_location(def)
                             })?;
                         return Ok(Some(OperationField::new_attribute(
                             def.name()?,

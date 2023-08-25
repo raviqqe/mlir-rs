@@ -1,8 +1,7 @@
+use super::error::{Error, OdsError};
 use once_cell::sync::Lazy;
 use std::{collections::HashMap, ops::Deref};
 use tblgen::{error::WithLocation, record::Record};
-
-use super::error::{Error, InvalidTraitError};
 
 macro_rules! prefixed_string {
     ($prefix:literal, $name:ident) => {
@@ -228,7 +227,7 @@ impl<'a> Trait<'a> {
                     name: def.string_value("trait")?,
                 }
             } else {
-                return Err(InvalidTraitError.with_location(def).into());
+                return Err(OdsError::InvalidTrait.with_location(def).into());
             },
         })
     }

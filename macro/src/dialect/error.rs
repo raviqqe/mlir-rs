@@ -77,7 +77,7 @@ impl From<FromUtf8Error> for Error {
 
 #[derive(Debug)]
 pub enum OdsError {
-    ExpectedSuperClass(String),
+    ExpectedSuperClass(&'static str),
     InvalidTrait,
 }
 
