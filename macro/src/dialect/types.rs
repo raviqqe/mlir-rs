@@ -1,6 +1,6 @@
 use super::error::{Error, OdsError};
 use once_cell::sync::Lazy;
-use std::{collections::HashMap, ops::Deref};
+use std::collections::HashMap;
 use tblgen::{error::WithLocation, record::Record};
 
 macro_rules! prefixed_string {
@@ -21,7 +21,7 @@ macro_rules! melior_attribute {
     };
 }
 
-pub static ATTRIBUTE_TYPES: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
+static ATTRIBUTE_TYPES: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
     let mut map = HashMap::new();
 
     macro_rules! initialize_attributes {
@@ -63,14 +63,6 @@ impl<'a> RegionConstraint<'a> {
     }
 }
 
-impl<'a> Deref for RegionConstraint<'a> {
-    type Target = Record<'a>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
 #[derive(Debug, Clone, Copy)]
 pub struct SuccessorConstraint<'a>(Record<'a>);
 
@@ -81,14 +73,6 @@ impl<'a> SuccessorConstraint<'a> {
 
     pub fn is_variadic(&self) -> bool {
         self.0.subclass_of("VariadicSuccessor")
-    }
-}
-
-impl<'a> Deref for SuccessorConstraint<'a> {
-    type Target = Record<'a>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
     }
 }
 
@@ -115,14 +99,6 @@ impl<'a> TypeConstraint<'a> {
 
     pub fn is_variable_length(&self) -> bool {
         self.is_variadic() || self.is_optional()
-    }
-}
-
-impl<'a> Deref for TypeConstraint<'a> {
-    type Target = Record<'a>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
     }
 }
 
@@ -185,14 +161,6 @@ impl<'a> AttributeConstraint<'a> {
     }
 }
 
-impl<'a> Deref for AttributeConstraint<'a> {
-    type Target = Record<'a>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
 #[derive(Debug, Clone)]
 pub enum TraitKind {
     Native { name: String, is_structural: bool },
@@ -202,15 +170,13 @@ pub enum TraitKind {
 }
 
 #[derive(Debug, Clone)]
-pub struct Trait<'a> {
+pub struct Trait {
     kind: TraitKind,
-    def: Record<'a>,
 }
 
-impl<'a> Trait<'a> {
-    pub fn new(def: Record<'a>) -> Result<Self, Error> {
+impl Trait {
+    pub fn new(def: Record) -> Result<Self, Error> {
         Ok(Self {
-            def,
             kind: if def.subclass_of("PredTrait") {
                 TraitKind::Pred {}
             } else if def.subclass_of("InterfaceTrait") {
@@ -258,13 +224,5 @@ impl<'a> Trait<'a> {
     #[allow(unused)]
     pub fn kind(&self) -> &TraitKind {
         &self.kind
-    }
-}
-
-impl<'a> Deref for Trait<'a> {
-    type Target = Record<'a>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.def
     }
 }
