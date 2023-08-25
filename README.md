@@ -10,26 +10,9 @@ represented by the type system in Rust.
 
 This crate is a wrapper of [the MLIR C API](https://mlir.llvm.org/docs/CAPI/).
 
-## Safety
-
-Although Melior aims to be completely type safe, some part of the current API is
-not.
-
-- Access to operations, types, or attributes that belong to dialects not
-  loaded in contexts can lead to runtime errors or segmentation faults in
-  the worst case.
-  - Fix plan: Load all dialects by default on creation of contexts, and
-    provide unsafe constructors of contexts for advanced users.
-- IR object references returned from functions that move ownership of
-  arguments might get invalidated later.
-  - This is because we need to borrow `&self` rather than `&mut self` to
-    return such references.
-  - e.g. `Region::append_block()`
-  - Fix plan: Use dynamic check, such as `RefCell`, for the objects.
-
 ## Examples
 
-## Building a function to add integers
+### Building a function to add integers
 
 ```rust
 use melior::{
@@ -112,6 +95,23 @@ Contribution is welcome! But, Melior is still in the alpha stage as well as the 
 - `mlir<X>Get<Y>` functions are renamed as follows:
   - If the resulting objects refer to `&self`, they are named `<X>::as_<Y>`.
   - Otherwise, they are named just `<X>::<Y>` and may have arguments, such as position indices.
+
+### Safety
+
+Although Melior aims to be completely type safe, some part of the current API is
+not.
+
+- Access to operations, types, or attributes that belong to dialects not
+  loaded in contexts can lead to runtime errors or segmentation faults in
+  the worst case.
+  - Fix plan: Load all dialects by default on creation of contexts, and
+    provide unsafe constructors of contexts for advanced users.
+- IR object references returned from functions that move ownership of
+  arguments might get invalidated later.
+  - This is because we need to borrow `&self` rather than `&mut self` to
+    return such references.
+  - e.g. `Region::append_block()`
+  - Fix plan: Use dynamic check, such as `RefCell`, for the objects.
 
 ## References
 
