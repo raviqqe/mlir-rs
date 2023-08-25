@@ -590,11 +590,11 @@ impl<'a> Operation<'a> {
             name
         };
 
-        let can_infer_type = traits.iter().any(|t| {
-            (t.has_name("::mlir::OpTrait::FirstAttrDerivedResultType")
-                || t.has_name("::mlir::OpTrait::SameOperandsAndResultType"))
+        let can_infer_type = traits.iter().any(|r#trait| {
+            (r#trait.has_name("::mlir::OpTrait::FirstAttrDerivedResultType")
+                || r#trait.has_name("::mlir::OpTrait::SameOperandsAndResultType"))
                 && num_variable_length_results == 0
-                || t.has_name("::mlir::InferTypeOpInterface::Trait") && regions.is_empty()
+                || r#trait.has_name("::mlir::InferTypeOpInterface::Trait") && regions.is_empty()
         });
 
         let short_name = def.str_value("opName")?;
