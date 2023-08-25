@@ -147,7 +147,7 @@ impl<'a> AttributeConstraint<'a> {
     pub fn is_unit(&self) -> bool {
         self.0
             .string_value("storageType")
-            .map(|v| v == mlir_attribute!(UnitAttr))
+            .map(|string| string == mlir_attribute!(UnitAttr))
             .unwrap_or(false)
     }
 
@@ -160,11 +160,19 @@ impl<'a> AttributeConstraint<'a> {
 }
 
 #[derive(Debug, Clone)]
-pub enum TraitKind {
-    Native { name: String, structural: bool },
+enum TraitKind {
+    Native {
+        name: String,
+        #[allow(unused)]
+        structural: bool,
+    },
     Pred {},
-    Internal { name: String },
-    Interface { name: String },
+    Internal {
+        name: String,
+    },
+    Interface {
+        name: String,
+    },
 }
 
 #[derive(Debug, Clone)]
