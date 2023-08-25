@@ -106,36 +106,39 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
             let argument = quote! { #name: #parameter_type };
             let add = format_ident!("add_{}s", field.kind.as_str());
 
-            let add_args = {
-                // Argument types can be singular and variadic, but add functions in melior
-                // are always variadic, so we need to create a slice or vec for singular
-                // arguments
-                match &field.kind {
-                    FieldKind::Element { constraint, .. } => {
-                        if constraint.has_variable_length() && !constraint.is_optional() {
-                            quote! { #name }
-                        } else {
-                            quote! { &[#name] }
-                        }
+            // Argument types can be singular and variadic, but add functions in melior
+            // are always variadic, so we need to create a slice or vec for singular
+            // arguments
+            let add_arguments = match &field.kind {
+                FieldKind::Element { constraint, .. } => {
+                    if constraint.has_variable_length() && !constraint.is_optional() {
+                        quote! { #name }
+                    } else {
+                        quote! { &[#name] }
                     }
-                    FieldKind::Attribute { .. } => {
-                        let name_string = &field.name;
+                }
+                FieldKind::Attribute { .. } => {
+                    let name_string = &field.name;
 
-                        quote! { &[(::melior::ir::Identifier::new(self.context, #name_string), #name.into())] }
+                    quote! {
+                        &[(
+                            ::melior::ir::Identifier::new(self.context, #name_string),
+                            #name.into(),
+                        )]
                     }
-                    FieldKind::Successor { constraint, .. } => {
-                        if constraint.is_variadic() {
-                            quote! { #name }
-                        } else {
-                            quote! { &[#name] }
-                        }
+                }
+                FieldKind::Successor { constraint, .. } => {
+                    if constraint.is_variadic() {
+                        quote! { #name }
+                    } else {
+                        quote! { &[#name] }
                     }
-                    FieldKind::Region { constraint, .. } => {
-                        if constraint.is_variadic() {
-                            quote! { #name }
-                        } else {
-                            quote! { vec![#name] }
-                        }
+                }
+                FieldKind::Region { constraint, .. } => {
+                    if constraint.is_variadic() {
+                        quote! { #name }
+                    } else {
+                        quote! { vec![#name] }
                     }
                 }
             };
@@ -145,7 +148,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
                 quote! {
                     impl<'c, #(#iter_any),*> #builder_ident<'c, #(#iter_any),*> {
                         pub fn #name(mut self, #argument) -> #builder_ident<'c, #(#iter_any),*> {
-                            self.builder = self.builder.#add(#add_args);
+                            self.builder = self.builder.#add(#add_arguments);
                             self
                         }
                     }
@@ -160,7 +163,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
                 quote! {
                     impl<'c, #(#iter_any_without),*> #builder_ident<'c, #(#iter_set_no),*> {
                         pub fn #name(mut self, #argument) -> #builder_ident<'c, #(#iter_set_yes),*> {
-                            self.builder = self.builder.#add(#add_args);
+                            self.builder = self.builder.#add(#add_arguments);
                             let Self { context, mut builder, #(#field_names),* } = self;
                             #builder_ident {
                                 context,
