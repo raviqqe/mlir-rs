@@ -210,14 +210,16 @@ impl Trait {
     fn name(def: Record) -> Result<String, Error> {
         let r#trait = def.string_value("trait")?;
 
-        if let Some(namespace) = def
-            .string_value("cppNamespace")
-            .ok()
-            .filter(|namespace| !namespace.is_empty())
-        {
-            Ok(format!("{}::{}", namespace, r#trait))
-        } else {
-            Ok(r#trait)
-        }
+        Ok(
+            if let Some(namespace) = def
+                .string_value("cppNamespace")
+                .ok()
+                .filter(|namespace| !namespace.is_empty())
+            {
+                format!("{namespace}::{trait}")
+            } else {
+                r#trait
+            },
+        )
     }
 }
