@@ -187,12 +187,16 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
             .map(|field| sanitize_snake_case_name(&field.field_name))
             .collect::<Vec<_>>();
 
-        let fields = self.type_state.iter_any().zip(&field_names).map(|(g, n)| {
-            Some(quote! {
-                #[doc(hidden)]
-                #n: ::std::marker::PhantomData<#g>
-            })
-        });
+        let fields = self
+            .type_state
+            .iter_any()
+            .zip(&field_names)
+            .map(|(r#type, name)| {
+                Some(quote! {
+                    #[doc(hidden)]
+                    #name: ::std::marker::PhantomData<#r#type>
+                })
+            });
 
         let phantoms: Vec<_> = field_names
             .iter()
