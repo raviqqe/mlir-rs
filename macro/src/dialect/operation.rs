@@ -406,8 +406,9 @@ impl<'a> Operation<'a> {
     }
 
     fn collect_traits(def: Record<'a>) -> Result<Vec<Trait>, Error> {
-        let mut work_list: Vec<_> = vec![def.list_value("traits")?];
+        let mut work_list = vec![def.list_value("traits")?];
         let mut traits = Vec::new();
+
         while let Some(trait_def) = work_list.pop() {
             for value in trait_def.iter() {
                 let trait_def: Record = value
@@ -423,6 +424,7 @@ impl<'a> Operation<'a> {
                 }
             }
         }
+
         Ok(traits)
     }
 
