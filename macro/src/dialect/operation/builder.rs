@@ -106,8 +106,8 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
 
             let add_args = {
                 let mlir_ident = {
-                    let name_str = &field.name;
-                    quote! { ::melior::ir::Identifier::new(self.context, #name_str) }
+                    let name = &field.name;
+                    quote! { ::melior::ir::Identifier::new(self.context, #name) }
                 };
 
                 // Argument types can be singular and variadic, but add functions in melior
@@ -206,7 +206,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
             .collect::<Result<Vec<_>, _>>()?;
 
         let new = {
-            let name_str = &self.operation.full_name;
+            let name = &self.operation.full_name;
             let iter_all_no = self.type_state.iter_all_no();
             let phantoms = phantoms.clone();
             quote! {
@@ -214,7 +214,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
                     pub fn new(location: ::melior::ir::Location<'c>) -> Self {
                         Self {
                             context: unsafe { location.context().to_ref() },
-                            builder: ::melior::ir::operation::OperationBuilder::new(#name_str, location),
+                            builder: ::melior::ir::operation::OperationBuilder::new(#name, location),
                             #(#phantoms),*
                         }
                     }
