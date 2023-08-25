@@ -51,7 +51,7 @@ impl TypeStateList {
         })
     }
 
-    pub fn iter_set_yes(&self, field_name: String) -> impl Iterator<Item = &Ident> {
+    pub fn iter_set_yes<'a>(&'a self, field_name: &'a str) -> impl Iterator<Item = &Ident> + '_ {
         self.0.iter().map(move |item| {
             if item.field_name == field_name {
                 &item.yes
@@ -61,7 +61,7 @@ impl TypeStateList {
         })
     }
 
-    pub fn iter_set_no(&self, field_name: String) -> impl Iterator<Item = &Ident> {
+    pub fn iter_set_no<'a>(&'a self, field_name: &'a str) -> impl Iterator<Item = &Ident> + '_ {
         self.0.iter().map(move |item| {
             if item.field_name == field_name {
                 &item.no
@@ -158,8 +158,8 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
             } else {
                 let iter_any_without =
                     self.type_state.iter_any_without(field.name);
-                let iter_set_yes = self.type_state.iter_set_yes(field.name.to_string());
-                let iter_set_no = self.type_state.iter_set_no(field.name.to_string());
+                let iter_set_yes = self.type_state.iter_set_yes(field.name);
+                let iter_set_no = self.type_state.iter_set_no(field.name);
                 quote! {
                     impl<'c, #(#iter_any_without),*> #builder_ident<'c, #(#iter_set_no),*> {
                         pub fn #name(mut self, #argument) -> #builder_ident<'c, #(#iter_set_yes),*> {
