@@ -78,7 +78,7 @@ impl<'a> FieldKind<'a> {
         )
     }
 
-    pub fn param_type(&self) -> Result<Type, Error> {
+    pub fn parameter_type(&self) -> Result<Type, Error> {
         Ok(match self {
             Self::Element {
                 kind, constraint, ..
@@ -161,7 +161,7 @@ impl<'a> FieldKind<'a> {
                 if constraint.is_unit() {
                     parse_quote!(bool)
                 } else {
-                    Self::create_result_type(self.param_type()?)
+                    Self::create_result_type(self.parameter_type()?)
                 }
             }
             Self::Successor { constraint, .. } => {

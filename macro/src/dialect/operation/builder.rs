@@ -102,8 +102,8 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
 
         self.operation.fields().map(move |field| {
             let name = sanitize_snake_case_name(field.name);
-            let param_type = &field.kind.param_type()?;
-            let argument = quote! { #name: #param_type };
+            let parameter_type = &field.kind.parameter_type()?;
+            let argument = quote! { #name: #parameter_type };
             let add = format_ident!("add_{}s", field.kind.as_str());
 
             let add_args = {
@@ -280,15 +280,15 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
         let name = sanitize_snake_case_name(self.operation.short_name);
         let mut arguments = Self::required_fields(self.operation)
             .map(|field| {
-                let param_type = &field.kind.param_type()?;
-                let param_name = &field.sanitized_name;
+                let parameter_type = &field.kind.parameter_type()?;
+                let parameter_name = &field.sanitized_name;
 
-                Ok(quote! { #param_name: #param_type })
+                Ok(quote! { #parameter_name: #parameter_type })
             })
             .collect::<Result<Vec<_>, Error>>()?;
         let builder_calls = Self::required_fields(self.operation).map(|field| {
-            let param_name = &field.sanitized_name;
-            quote! { .#param_name(#param_name) }
+            let parameter_name = &field.sanitized_name;
+            quote! { .#parameter_name(#parameter_name) }
         });
         arguments.push(quote! { location: ::melior::ir::Location<'c> });
 

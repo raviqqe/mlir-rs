@@ -212,10 +212,10 @@ impl<'a> OperationField<'a> {
         let setter = {
             let ident = sanitize_snake_case_name(&format!("set_{}", self.name));
             if let Some(body) = self.setter_impl() {
-                let param_type = &self.kind.param_type()?;
+                let parameter_type = &self.kind.parameter_type()?;
 
                 quote! {
-                    pub fn #ident(&mut self, value: #param_type) {
+                    pub fn #ident(&mut self, value: #parameter_type) {
                         #body
                     }
                 }
