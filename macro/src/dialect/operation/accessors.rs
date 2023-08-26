@@ -208,6 +208,7 @@ impl<'a> OperationField<'a> {
     pub fn accessors(&self) -> Result<TokenStream, Error> {
         let setter = {
             let ident = sanitize_snake_case_name(&format!("set_{}", self.name))?;
+
             if let Some(body) = self.setter_impl()? {
                 let parameter_type = &self.kind.parameter_type()?;
 
@@ -222,7 +223,7 @@ impl<'a> OperationField<'a> {
         };
         let remover = {
             let ident = sanitize_snake_case_name(&format!("remove_{}", self.name))?;
-            self.remover_impl().map_or(quote!(), |body| {
+            self.remover_impl()?.map(|body| {
                 quote! {
                     pub fn #ident(&mut self) -> Result<(), ::melior::Error> {
                         #body
@@ -233,7 +234,7 @@ impl<'a> OperationField<'a> {
         let getter = {
             let ident = &self.sanitized_name;
             let return_type = &self.kind.return_type()?;
-            self.getter_impl().map_or(quote!(), |body| {
+            self.getter_impl()?.map(|body| {
                 quote! {
                     pub fn #ident(&self) -> #return_type {
                         #body
