@@ -487,7 +487,7 @@ impl<'a> Operation<'a> {
                     }
                 }
                 VariadicKind::AttrSized {} => {}
-            };
+            }
         }
 
         Ok((fields, num_variable_length))
