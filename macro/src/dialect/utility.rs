@@ -6,7 +6,7 @@ use quote::format_ident;
 
 const RESERVED_NAMES: &[&str] = &["name", "operation", "builder"];
 
-pub fn sanitize_snake_case_name(name: &str) -> Ident {
+pub fn sanitize_snake_case_name(name: &str) -> Result<Ident, Error> {
     sanitize_name(&name.to_case(Case::Snake))
 }
 

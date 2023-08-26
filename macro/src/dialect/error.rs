@@ -11,6 +11,7 @@ use tblgen::{
 
 #[derive(Debug)]
 pub enum Error {
+    InvalidIdentifier(String),
     Io(io::Error),
     Ods(SourceError<OdsError>),
     Parse(tblgen::Error),
@@ -25,7 +26,7 @@ impl Error {
             Self::TableGen(error) => error.add_source_info(info).into(),
             Self::Ods(error) => error.add_source_info(info).into(),
             Self::Parse(error) => Self::Parse(error.add_source_info(info)),
-            Self::Io(_) | Self::Syn(_) | Self::Utf8(_) => self,
+            Self::InvalidIdentifier(_) | Self::Io(_) | Self::Syn(_) | Self::Utf8(_) => self,
         }
     }
 }
@@ -33,6 +34,9 @@ impl Error {
 impl Display for Error {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         match self {
+            Self::InvalidIdentifier(identifier) => {
+                write!(formatter, "invalid identifier: {identifier}")
+            }
             Self::Io(error) => write!(formatter, "{error}"),
             Self::Ods(error) => write!(formatter, "invalid ODS input: {error}"),
             Self::Parse(error) => write!(formatter, "failed to parse TableGen source: {error}"),
