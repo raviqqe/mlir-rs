@@ -223,51 +223,10 @@ impl VariadicKind {
     }
 }
 
-struct VariadicKindIter<I> {
-    current: VariadicKind,
-    iter: I,
-}
-
-impl<'a: 'b, 'b, I: Iterator<Item = &'b TypeConstraint<'a>>> VariadicKindIter<I> {
-    pub fn new(iter: I, num_variable_length: usize, same_size: bool, attr_sized: bool) -> Self {
-        Self {
-            iter,
-            current: VariadicKind::new(num_variable_length, same_size, attr_sized),
-        }
-    }
-}
-
 impl<'a: 'b, 'b, I: Iterator<Item = &'b TypeConstraint<'a>>> Iterator for VariadicKindIter<I> {
     type Item = VariadicKind;
 
-    fn next(&mut self) -> Option<Self::Item> {
-        let Some(constraint) = self.iter.next() else {
-            return None;
-        };
-        let original = self.current.clone();
-        match &mut self.current {
-            VariadicKind::Simple {
-                seen_variable_length,
-            } => {
-                if constraint.has_variable_length() {
-                    *seen_variable_length = true;
-                }
-            }
-            VariadicKind::SameSize {
-                num_preceding_simple,
-                num_preceding_variadic,
-                ..
-            } => {
-                if constraint.has_variable_length() {
-                    *num_preceding_variadic += 1;
-                } else {
-                    *num_preceding_simple += 1;
-                }
-            }
-            VariadicKind::AttrSized {} => {}
-        };
-        Some(original)
-    }
+    fn next(&mut self) -> Option<Self::Item> {}
 }
 
 #[derive(Debug, Clone)]
@@ -485,7 +444,7 @@ impl<'a> Operation<'a> {
 
     fn collect_elements(
         elements: &[(&'a str, TypeConstraint<'a>)],
-        kind: ElementKind,
+        element_kind: ElementKind,
         same_size: bool,
         attr_sized: bool,
     ) -> Result<(Vec<OperationField<'a>>, usize), Error> {
@@ -493,32 +452,45 @@ impl<'a> Operation<'a> {
             .iter()
             .filter(|(_, constraint)| constraint.has_variable_length())
             .count();
+        let mut variadic_kind = VariadicKind::new(num_variable_length, same_size, attr_sized);
+        let mut fields = vec![];
 
-        Ok((
-            elements
-                .iter()
-                .enumerate()
-                .zip(VariadicKindIter::new(
-                    elements.iter().map(|(_, constraint)| constraint),
-                    num_variable_length,
-                    same_size,
-                    attr_sized,
-                ))
-                .map(|((index, (name, constraint)), variadic_kind)| {
-                    OperationField::new_element(
-                        name,
-                        *constraint,
-                        kind,
-                        SequenceInfo {
-                            index,
-                            len: elements.len(),
-                        },
-                        variadic_kind,
-                    )
-                })
-                .collect::<Result<Vec<_>, _>>()?,
-            num_variable_length,
-        ))
+        for (index, (name, constraint)) in elements.iter().enumerate() {
+            fields.push(OperationField::new_element(
+                name,
+                *constraint,
+                element_kind,
+                SequenceInfo {
+                    index,
+                    len: elements.len(),
+                },
+                variadic_kind,
+            )?);
+
+            match &mut variadic_kind {
+                VariadicKind::Simple {
+                    seen_variable_length,
+                } => {
+                    if constraint.has_variable_length() {
+                        *seen_variable_length = true;
+                    }
+                }
+                VariadicKind::SameSize {
+                    num_preceding_simple,
+                    num_preceding_variadic,
+                    ..
+                } => {
+                    if constraint.has_variable_length() {
+                        *num_preceding_variadic += 1;
+                    } else {
+                        *num_preceding_simple += 1;
+                    }
+                }
+                VariadicKind::AttrSized {} => {}
+            };
+        }
+
+        Ok((fields, num_variable_length))
     }
 
     fn collect_attributes(
