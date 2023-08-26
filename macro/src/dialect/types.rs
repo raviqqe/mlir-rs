@@ -1,7 +1,10 @@
 use super::error::{Error, OdsError};
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
-use tblgen::{error::WithLocation, record::Record};
+use tblgen::{
+    error::{TableGenError, WithLocation},
+    record::Record,
+};
 
 macro_rules! prefixed_string {
     ($prefix:literal, $name:ident) => {
@@ -149,7 +152,17 @@ impl<'a> AttributeConstraint<'a> {
     }
 
     pub fn has_default_value(&self) -> Result<bool, Error> {
-        Ok(!self.0.string_value("defaultValue")?.is_empty())
+        Ok(!match self.0.string_value("defaultValue") {
+            Ok(value) => value,
+            Err(error) => {
+                if !matches!(error.error(), TableGenError::InitConversion { .. }) {
+                    return Err(error.into());
+                }
+
+                "".into()
+            }
+        }
+        .is_empty())
     }
 }
 
