@@ -101,8 +101,7 @@ impl<'a> FieldKind<'a> {
                 if constraint.is_unit()? {
                     parse_quote!(bool)
                 } else {
-                    let r#type: Type = syn::parse_str(constraint.storage_type()?)
-                        .expect("storage type strings are valid");
+                    let r#type: Type = syn::parse_str(constraint.storage_type()?)?;
                     parse_quote!(#r#type<'c>)
                 }
             }
@@ -536,11 +535,11 @@ impl<'a> Operation<'a> {
         )?;
 
         let name = def.name()?;
-        let class_name = if name.contains('_') && !name.starts_with('_') {
+        let class_name = if name.starts_with('_') {
+            name
+        } else if let Some(name) = name.split('_').nth(1) {
             // Trim dialect prefix from name
-            name.split('_')
-                .nth(1)
-                .expect("string contains separator '_'")
+            name
         } else {
             name
         };
