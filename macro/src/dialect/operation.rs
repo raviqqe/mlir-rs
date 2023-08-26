@@ -223,7 +223,7 @@ impl VariadicKind {
     }
 }
 
-pub struct VariadicKindIter<I> {
+struct VariadicKindIter<I> {
     current: VariadicKind,
     iter: I,
 }
@@ -493,17 +493,17 @@ impl<'a> Operation<'a> {
             .iter()
             .filter(|(_, constraint)| constraint.has_variable_length())
             .count();
-        let variadic_iter = VariadicKindIter::new(
-            elements.iter().map(|(_, constraint)| constraint),
-            num_variable_length,
-            same_size,
-            attr_sized,
-        );
+
         Ok((
             elements
                 .iter()
                 .enumerate()
-                .zip(variadic_iter)
+                .zip(VariadicKindIter::new(
+                    elements.iter().map(|(_, constraint)| constraint),
+                    num_variable_length,
+                    same_size,
+                    attr_sized,
+                ))
                 .map(|((index, (name, constraint)), variadic_kind)| {
                     OperationField::new_element(
                         name,
