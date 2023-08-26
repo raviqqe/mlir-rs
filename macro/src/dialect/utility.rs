@@ -62,12 +62,15 @@ mod tests {
 
     #[test]
     fn sanitize_name_with_dot() {
-        assert_eq!(sanitize_snake_case_name("foo.bar"), "foo_bar");
+        assert_eq!(sanitize_snake_case_name("foo.bar").unwrap(), "foo_bar");
     }
 
     #[test]
     fn sanitize_name_with_dot_and_underscore() {
-        assert_eq!(sanitize_snake_case_name("foo.bar_baz"), "foo_bar_baz");
+        assert_eq!(
+            sanitize_snake_case_name("foo.bar_baz").unwrap(),
+            "foo_bar_baz"
+        );
     }
 
     #[test]

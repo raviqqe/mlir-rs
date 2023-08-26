@@ -278,15 +278,15 @@ pub struct OperationField<'a> {
 }
 
 impl<'a> OperationField<'a> {
-    fn new(name: &'a str, kind: FieldKind<'a>) -> Self {
-        Self {
+    fn new(name: &'a str, kind: FieldKind<'a>) -> Result<Self, Error> {
+        Ok(Self {
             name,
-            sanitized_name: sanitize_snake_case_name(name),
+            sanitized_name: sanitize_snake_case_name(name)?,
             kind,
-        }
+        })
     }
 
-    fn new_attribute(name: &'a str, constraint: AttributeConstraint<'a>) -> Self {
+    fn new_attribute(name: &'a str, constraint: AttributeConstraint<'a>) -> Result<Self, Error> {
         Self::new(name, FieldKind::Attribute { constraint })
     }
 
@@ -294,7 +294,7 @@ impl<'a> OperationField<'a> {
         name: &'a str,
         constraint: RegionConstraint<'a>,
         sequence_info: SequenceInfo,
-    ) -> Self {
+    ) -> Result<Self, Error> {
         Self::new(
             name,
             FieldKind::Region {
@@ -308,7 +308,7 @@ impl<'a> OperationField<'a> {
         name: &'a str,
         constraint: SuccessorConstraint<'a>,
         sequence_info: SequenceInfo,
-    ) -> Self {
+    ) -> Result<Self, Error> {
         Self::new(
             name,
             FieldKind::Successor {
@@ -324,7 +324,7 @@ impl<'a> OperationField<'a> {
         kind: ElementKind,
         sequence_info: SequenceInfo,
         variadic_kind: VariadicKind,
-    ) -> Self {
+    ) -> Result<Self, Error> {
         Self::new(
             name,
             FieldKind::Element {
@@ -516,7 +516,7 @@ impl<'a> Operation<'a> {
                         variadic_kind,
                     )
                 })
-                .collect::<Vec<_>>(),
+                .collect::<Result<Vec<_>, _>>()?,
             num_variable_length,
         ))
     }
@@ -529,12 +529,9 @@ impl<'a> Operation<'a> {
             .filter(|(_, arg_def)| arg_def.subclass_of("Attr"))
             .map(|(name, arg_def)| {
                 // TODO: Replace assert! with Result
-                assert!(!name.is_empty());
                 assert!(!arg_def.subclass_of("DerivedAttr"));
-                Ok(OperationField::new_attribute(
-                    name,
-                    AttributeConstraint::new(*arg_def),
-                ))
+
+                OperationField::new_attribute(name, AttributeConstraint::new(*arg_def))
             })
             .collect()
     }

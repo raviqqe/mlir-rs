@@ -68,7 +68,7 @@ fn dialect_module(
             dialect.str_value("description").unwrap_or(""),
         ))?
     );
-    let name = sanitize_snake_case_name(name);
+    let name = sanitize_snake_case_name(name)?;
 
     Ok(quote! {
         #[doc = #doc]
