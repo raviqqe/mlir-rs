@@ -372,7 +372,7 @@ impl<'a> Operation<'a> {
             .args()
             .enumerate()
             .map(|(index, (name, value))| {
-                Ok(OperationField::new_successor(
+                OperationField::new_successor(
                     name,
                     SuccessorConstraint::new(
                         value
@@ -380,7 +380,7 @@ impl<'a> Operation<'a> {
                             .map_err(|error: tblgen::Error| error.set_location(def))?,
                     ),
                     SequenceInfo { index, len },
-                ))
+                )
             })
             .collect()
     }
@@ -392,7 +392,7 @@ impl<'a> Operation<'a> {
             .args()
             .enumerate()
             .map(|(index, (name, value))| {
-                Ok(OperationField::new_region(
+                OperationField::new_region(
                     name,
                     RegionConstraint::new(
                         value
@@ -400,7 +400,7 @@ impl<'a> Operation<'a> {
                             .map_err(|error: tblgen::Error| error.set_location(def))?,
                     ),
                     SequenceInfo { index, len },
-                ))
+                )
             })
             .collect()
     }

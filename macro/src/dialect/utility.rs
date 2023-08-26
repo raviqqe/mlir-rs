@@ -75,7 +75,7 @@ mod tests {
 
     #[test]
     fn sanitize_reserved_name() {
-        assert_eq!(sanitize_snake_case_name("builder"), "_builder");
+        assert_eq!(sanitize_snake_case_name("builder").unwrap(), "_builder");
     }
 
     #[test]

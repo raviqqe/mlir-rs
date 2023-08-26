@@ -101,7 +101,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
         let builder_ident = self.builder_identifier();
 
         self.operation.fields().map(move |field| {
-            let name = sanitize_snake_case_name(field.name);
+            let name = sanitize_snake_case_name(field.name)?;
             let parameter_type = field.kind.parameter_type()?;
             let argument = quote! { #name: #parameter_type };
             let add = format_ident!("add_{}s", field.kind.as_str());
@@ -185,7 +185,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
             .type_state
             .iter()
             .map(|field| sanitize_snake_case_name(&field.field_name))
-            .collect::<Vec<_>>();
+            .collect::<Result<Vec<_>, _>>()?;
 
         let fields = self
             .type_state
@@ -199,7 +199,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
 
         let phantoms = field_names
             .iter()
-            .map(|n| quote! { #n: ::std::marker::PhantomData })
+            .map(|name| quote! { #name: ::std::marker::PhantomData })
             .collect::<Vec<_>>();
 
         let methods = self
@@ -275,7 +275,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
 
     pub fn default_constructor(&self) -> Result<TokenStream, Error> {
         let class_name = format_ident!("{}", &self.operation.class_name);
-        let name = sanitize_snake_case_name(self.operation.short_name);
+        let name = sanitize_snake_case_name(self.operation.short_name)?;
         let arguments = Self::required_fields(self.operation)
             .map(|field| {
                 let parameter_type = &field.kind.parameter_type()?;
