@@ -10,7 +10,7 @@ pub fn sanitize_snake_case_name(name: &str) -> Ident {
     sanitize_name(&name.to_case(Case::Snake))
 }
 
-fn sanitize_name(name: &str) -> Ident {
+fn sanitize_name(name: &str) -> Result<Ident, Error> {
     // Replace any "." with "_"
     let mut name = name.replace('.', "_");
 
@@ -19,7 +19,7 @@ fn sanitize_name(name: &str) -> Ident {
         || name
             .chars()
             .next()
-            .expect("name has at least one char")
+            .ok_or_else(|| Error::InvalidIdentifier(name.clone()))?
             .is_numeric()
     {
         name = format!("_{}", name);
@@ -27,7 +27,7 @@ fn sanitize_name(name: &str) -> Ident {
 
     // Try to parse the string as an ident, and prefix the identifier
     // with "r#" if it is not a valid identifier.
-    syn::parse_str::<Ident>(&name).unwrap_or(format_ident!("r#{}", name))
+    Ok(syn::parse_str::<Ident>(&name).unwrap_or(format_ident!("r#{}", name)))
 }
 
 pub fn sanitize_documentation(string: &str) -> Result<String, Error> {
