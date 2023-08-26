@@ -101,8 +101,7 @@ impl<'a> FieldKind<'a> {
                 if constraint.is_unit()? {
                     parse_quote!(bool)
                 } else {
-                    let r#type: Type = syn::parse_str(constraint.storage_type()?)
-                        .expect("storage type strings are valid");
+                    let r#type: Type = syn::parse_str(constraint.storage_type()?)?;
                     parse_quote!(#r#type<'c>)
                 }
             }
