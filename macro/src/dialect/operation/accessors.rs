@@ -6,8 +6,8 @@ use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 
 impl<'a> OperationField<'a> {
-    fn getter_impl(&self) -> Option<TokenStream> {
-        match &self.kind {
+    fn getter_impl(&self) -> Result<Option<TokenStream>, Error> {
+        Ok(match &self.kind {
             FieldKind::Element {
                 kind,
                 constraint,
@@ -153,7 +153,7 @@ impl<'a> OperationField<'a> {
             FieldKind::Attribute { constraint } => {
                 let name = &self.name;
 
-                Some(if constraint.is_unit() {
+                Some(if constraint.is_unit()? {
                     quote! { self.operation.attribute(#name).is_some() }
                 } else {
                     quote! {
@@ -164,15 +164,15 @@ impl<'a> OperationField<'a> {
                     }
                 })
             }
-        }
+        })
     }
 
-    fn remover_impl(&self) -> Option<TokenStream> {
-        match &self.kind {
+    fn remover_impl(&self) -> Result<Option<TokenStream>, Error> {
+        Ok(match &self.kind {
             FieldKind::Attribute { constraint } => {
                 let name = &self.name;
 
-                if constraint.is_unit() || constraint.is_optional() {
+                if constraint.is_unit()? || constraint.is_optional() {
                     Some(quote! {
                       self.operation.remove_attribute(#name)
                     })
@@ -181,16 +181,16 @@ impl<'a> OperationField<'a> {
                 }
             }
             _ => None,
-        }
+        })
     }
 
-    fn setter_impl(&self) -> Option<TokenStream> {
+    fn setter_impl(&self) -> Result<Option<TokenStream>, Error> {
         let FieldKind::Attribute { constraint } = &self.kind else {
-            return None;
+            return Ok(None);
         };
         let name = &self.name;
 
-        Some(if constraint.is_unit() {
+        Ok(Some(if constraint.is_unit()? {
             quote! {
                 if value {
                   self.operation.set_attribute(#name, Attribute::unit(&self.operation.context()));
@@ -202,13 +202,13 @@ impl<'a> OperationField<'a> {
             quote! {
                 self.operation.set_attribute(#name, &value.into());
             }
-        })
+        }))
     }
 
     pub fn accessors(&self) -> Result<TokenStream, Error> {
         let setter = {
             let ident = sanitize_snake_case_name(&format!("set_{}", self.name))?;
-            if let Some(body) = self.setter_impl() {
+            if let Some(body) = self.setter_impl()? {
                 let parameter_type = &self.kind.parameter_type()?;
 
                 quote! {
