@@ -633,7 +633,7 @@ impl<'a> ToTokens for Operation<'a> {
         let accessors = self
             .fields()
             .map(|field| field.accessors().expect("valid accessors"));
-        let builder = OperationBuilder::new(self);
+        let builder = OperationBuilder::new(self).expect("valid builder generator");
         let builder_tokens = builder.builder().expect("valid builder");
         let builder_fn = builder.create_op_builder_fn();
         let default_constructor = builder.default_constructor().expect("valid constructor");
