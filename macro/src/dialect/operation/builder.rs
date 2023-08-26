@@ -288,8 +288,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
             .collect::<Result<Vec<_>, Error>>()?;
         let builder_calls = Self::required_fields(self.operation)
             .map(|field| {
-                let field = field?;
-                let parameter_name = &field.sanitized_name;
+                let parameter_name = &field?.sanitized_name;
 
                 Ok(quote! { .#parameter_name(#parameter_name) })
             })
