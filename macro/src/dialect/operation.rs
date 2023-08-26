@@ -545,15 +545,13 @@ impl<'a> Operation<'a> {
                 def.subclass_of("Attr").then_some(def)
             })
             .map(|def| {
-                def.subclass_of("DerivedAttr")
-                    .then_some(())
-                    .ok_or_else(|| {
-                        OdsError::ExpectedSuperClass("DerivedAttr").with_location(def)
-                    })?;
-                Ok(OperationField::new_attribute(
-                    def.name()?,
-                    AttributeConstraint::new(def),
-                ))
+                if def.subclass_of("DerivedAttr") {
+                    OperationField::new_attribute(def.name()?, AttributeConstraint::new(def))
+                } else {
+                    Err(OdsError::ExpectedSuperClass("DerivedAttr")
+                        .with_location(def)
+                        .into())
+                }
             })
             .collect()
     }
