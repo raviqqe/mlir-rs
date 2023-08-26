@@ -311,7 +311,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
     ) -> impl Iterator<Item = Result<&'a OperationField<'b>, Error>> {
         operation
             .fields()
-            .filter(|field| (!field.kind.is_result() || !operation.can_infer_type))
+            .filter(|field| !field.kind.is_result() || !operation.can_infer_type)
             .filter_map(|field| match field.kind.is_optional() {
                 Ok(optional) => (!optional).then_some(Ok(field)),
                 Err(error) => Some(Err(error)),
