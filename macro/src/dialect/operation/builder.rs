@@ -143,7 +143,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
                 }
             };
 
-            Ok(if field.kind.is_optional() {
+            Ok(if field.kind.is_optional()? {
                 let iter_any = self.type_state.iter_any().collect::<Vec<_>>();
                 quote! {
                     impl<'c, #(#iter_any),*> #builder_ident<'c, #(#iter_any),*> {
@@ -303,18 +303,18 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
 
     fn required_fields<'a, 'b>(
         operation: &'a Operation<'b>,
-    ) -> impl Iterator<Item = &'a OperationField<'b>> {
+    ) -> impl Iterator<Item = Result<&'a OperationField<'b>, Error>> {
         operation.fields().filter(|field| {
             !field.kind.is_optional() && (!field.kind.is_result() || !operation.can_infer_type)
         })
     }
 
-    fn create_type_state(operation: &'c Operation<'o>) -> TypeStateList {
-        TypeStateList(
+    fn create_type_state(operation: &'c Operation<'o>) -> Result<TypeStateList, Error> {
+        Ok(TypeStateList(
             Self::required_fields(operation)
-                .map(|field| TypeStateItem::new(operation.class_name, field.name))
-                .collect(),
-        )
+                .map(|field| Ok::<_, Error>(TypeStateItem::new(operation.class_name, field?.name)))
+                .collect::<Result<_, _>>()?,
+        ))
     }
 
     fn builder_identifier(&self) -> Ident {

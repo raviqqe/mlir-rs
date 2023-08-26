@@ -58,14 +58,14 @@ impl<'a> FieldKind<'a> {
         }
     }
 
-    pub fn is_optional(&self) -> bool {
-        match self {
+    pub fn is_optional(&self) -> Result<bool, Error> {
+        Ok(match self {
             Self::Element { constraint, .. } => constraint.is_optional(),
             Self::Attribute { constraint, .. } => {
-                constraint.is_optional() || constraint.has_default_value()
+                constraint.is_optional() || constraint.has_default_value()?
             }
             Self::Successor { .. } | Self::Region { .. } => false,
-        }
+        })
     }
 
     pub fn is_result(&self) -> bool {
@@ -98,7 +98,7 @@ impl<'a> FieldKind<'a> {
                 }
             }
             Self::Attribute { constraint } => {
-                if constraint.is_unit() {
+                if constraint.is_unit()? {
                     parse_quote!(bool)
                 } else {
                     let r#type: Type = syn::parse_str(constraint.storage_type()?)
@@ -158,7 +158,7 @@ impl<'a> FieldKind<'a> {
                 }
             }
             Self::Attribute { constraint } => {
-                if constraint.is_unit() {
+                if constraint.is_unit()? {
                     parse_quote!(bool)
                 } else {
                     Self::create_result_type(self.parameter_type()?)
