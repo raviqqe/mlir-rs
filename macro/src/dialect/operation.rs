@@ -223,12 +223,6 @@ impl VariadicKind {
     }
 }
 
-impl<'a: 'b, 'b, I: Iterator<Item = &'b TypeConstraint<'a>>> Iterator for VariadicKindIter<I> {
-    type Item = VariadicKind;
-
-    fn next(&mut self) -> Option<Self::Item> {}
-}
-
 #[derive(Debug, Clone)]
 pub struct OperationField<'a> {
     pub(crate) name: &'a str,
@@ -464,7 +458,7 @@ impl<'a> Operation<'a> {
                     index,
                     len: elements.len(),
                 },
-                variadic_kind,
+                variadic_kind.clone(),
             )?);
 
             match &mut variadic_kind {
