@@ -144,18 +144,12 @@ impl<'a> AttributeConstraint<'a> {
             .unwrap_or(melior_attribute!(Attribute)))
     }
 
-    pub fn is_unit(&self) -> bool {
-        self.0
-            .string_value("storageType")
-            .map(|string| string == mlir_attribute!(UnitAttr))
-            .unwrap_or(false)
+    pub fn is_unit(&self) -> Result<bool, Error> {
+        Ok(self.0.string_value("storageType")? == mlir_attribute!(UnitAttr))
     }
 
-    pub fn has_default_value(&self) -> bool {
-        self.0
-            .string_value("defaultValue")
-            .map(|string| !string.is_empty())
-            .unwrap_or(false)
+    pub fn has_default_value(&self) -> Result<bool, Error> {
+        Ok(!self.0.string_value("defaultValue")?.is_empty())
     }
 }
 
