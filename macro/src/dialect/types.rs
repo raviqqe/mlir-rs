@@ -155,6 +155,7 @@ impl<'a> AttributeConstraint<'a> {
         Ok(!match self.0.string_value("defaultValue") {
             Ok(value) => value,
             Err(error) => {
+                // `defaultValue` can be uninitialized.
                 if !matches!(error.error(), TableGenError::InitConversion { .. }) {
                     return Err(error.into());
                 }
