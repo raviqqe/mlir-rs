@@ -152,18 +152,17 @@ impl<'a> AttributeConstraint<'a> {
     }
 
     pub fn has_default_value(&self) -> Result<bool, Error> {
-        Ok(!match self.0.string_value("defaultValue") {
-            Ok(value) => value,
+        Ok(match self.0.string_value("defaultValue") {
+            Ok(value) => !value.is_empty(),
             Err(error) => {
                 // `defaultValue` can be uninitialized.
                 if !matches!(error.error(), TableGenError::InitConversion { .. }) {
                     return Err(error.into());
                 }
 
-                "".into()
+                false
             }
-        }
-        .is_empty())
+        })
     }
 }
 
