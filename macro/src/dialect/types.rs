@@ -136,8 +136,8 @@ impl<'a> AttributeConstraint<'a> {
         self.0.subclass_of("EnumAttrInfo")
     }
 
-    pub fn is_optional(&self) -> bool {
-        self.0.bit_value("isOptional").unwrap_or(false)
+    pub fn is_optional(&self) -> Result<bool, Error> {
+        Ok(self.0.bit_value("isOptional")?)
     }
 
     pub fn storage_type(&self) -> Result<&'static str, Error> {

@@ -172,7 +172,7 @@ impl<'a> OperationField<'a> {
             FieldKind::Attribute { constraint } => {
                 let name = &self.name;
 
-                if constraint.is_unit()? || constraint.is_optional() {
+                if constraint.is_unit()? || constraint.is_optional()? {
                     Some(quote! {
                       self.operation.remove_attribute(#name)
                     })

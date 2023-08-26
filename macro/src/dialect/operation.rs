@@ -62,7 +62,7 @@ impl<'a> FieldKind<'a> {
         Ok(match self {
             Self::Element { constraint, .. } => constraint.is_optional(),
             Self::Attribute { constraint, .. } => {
-                constraint.is_optional() || constraint.has_default_value()?
+                constraint.is_optional()? || constraint.has_default_value()?
             }
             Self::Successor { .. } | Self::Region { .. } => false,
         })
