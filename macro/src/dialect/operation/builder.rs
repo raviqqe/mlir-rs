@@ -262,7 +262,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
         }
     }
 
-    fn create_new_fn<'a>(&self, phantoms: &'a [TokenStream]) -> TokenStream {
+    fn create_new_fn(&self, phantoms: &[TokenStream]) -> TokenStream {
         let builder_ident = self.builder_identifier();
         let name = &self.operation.full_name;
         let arguments_unset = self.type_state.arguments_all_unset();
