@@ -21,6 +21,9 @@ use std::marker::PhantomData;
 #[cfg(feature = "ods-dialects")]
 pub mod ods;
 
+#[doc(hidden)]
+pub mod ods_support;
+
 /// A dialect.
 #[derive(Clone, Copy, Debug)]
 pub struct Dialect<'c> {
