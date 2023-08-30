@@ -1,6 +1,12 @@
 //! Experimental dialect operations and their builders generated automatically
 //! from TableGen files.
 
+#[doc(hidden)]
+pub mod __private {
+    pub struct Set;
+    pub struct Unset;
+}
+
 melior_macro::dialect! {
     name: "affine",
     tablegen: r#"include "mlir/Dialect/Affine/IR/AffineOps.td""#

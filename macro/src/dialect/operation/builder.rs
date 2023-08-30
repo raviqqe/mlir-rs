@@ -37,8 +37,8 @@ impl TypeStateList {
     pub fn new(items: Vec<TypeStateItem>) -> Self {
         Self {
             items,
-            unset: syn::parse2(quote!(::melior::dialect::ods_support::Unset)).unwrap(),
-            set: syn::parse2(quote!(::melior::dialect::ods_support::Set)).unwrap(),
+            unset: syn::parse2(quote!(::melior::dialect::ods::__private::Unset)).unwrap(),
+            set: syn::parse2(quote!(::melior::dialect::ods::__private::Set)).unwrap(),
         }
     }
 
