@@ -4,7 +4,6 @@ use super::{
     super::{error::Error, utility::sanitize_snake_case_name},
     FieldKind, Operation, OperationField,
 };
-use convert_case::{Case, Casing};
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 use syn::GenericArgument;
@@ -16,10 +15,10 @@ struct TypeStateItem {
 }
 
 impl TypeStateItem {
-    pub fn new(field_name: String) -> Self {
+    pub fn new(index: usize, field_name: String) -> Self {
         Self {
             generic_param: {
-                let ident = format_ident!("__{}", field_name.to_case(Case::Snake));
+                let ident = format_ident!("T{}", index);
                 syn::parse2(quote!(#ident)).expect("Ident is a valid GenericArgument")
             },
             field_name,
@@ -74,26 +73,11 @@ impl TypeStateList {
         })
     }
 
-    pub fn arguments_set<'a>(
+    pub fn arguments_all<'a>(
         &'a self,
-        field_name: &'a str,
+        argument: &'a GenericArgument,
     ) -> impl Iterator<Item = &GenericArgument> + '_ {
-        self.arguments_replace(field_name, &self.set)
-    }
-
-    pub fn arguments_unset<'a>(
-        &'a self,
-        field_name: &'a str,
-    ) -> impl Iterator<Item = &GenericArgument> + '_ {
-        self.arguments_replace(field_name, &self.unset)
-    }
-
-    pub fn arguments_all_set(&self) -> impl Iterator<Item = &GenericArgument> {
-        repeat(&self.set).take(self.items.len())
-    }
-
-    pub fn arguments_all_unset(&self) -> impl Iterator<Item = &GenericArgument> {
-        repeat(&self.unset).take(self.items.len())
+        repeat(argument).take(self.items.len())
     }
 }
 
@@ -174,8 +158,8 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
                 quote!()
             } else {
                 let parameters = self.type_state.parameters_without(field.name);
-                let arguments_set = self.type_state.arguments_set(field.name);
-                let arguments_unset = self.type_state.arguments_unset(field.name);
+                let arguments_set = self.type_state.arguments_replace(field.name, &self.type_state.set);
+                let arguments_unset = self.type_state.arguments_replace(field.name, &self.type_state.unset);
                 quote! {
                     impl<'c, #(#parameters),*> #builder_ident<'c, #(#arguments_unset),*> {
                         pub fn #name(mut self, #argument) -> #builder_ident<'c, #(#arguments_set),*> {
@@ -244,7 +228,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
 
     fn create_build_fn(&self) -> TokenStream {
         let builder_ident = self.builder_identifier();
-        let arguments_set = self.type_state.arguments_all_set();
+        let arguments_set = self.type_state.arguments_all(&self.type_state.set);
         let class_name = format_ident!("{}", &self.operation.class_name);
         let error = format!("should be a valid {class_name}");
         let maybe_infer = if self.operation.can_infer_type {
@@ -265,7 +249,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
     fn create_new_fn(&self, phantoms: &[TokenStream]) -> TokenStream {
         let builder_ident = self.builder_identifier();
         let name = &self.operation.full_name;
-        let arguments_unset = self.type_state.arguments_all_unset();
+        let arguments_unset = self.type_state.arguments_all(&self.type_state.unset);
 
         quote! {
             impl<'c> #builder_ident<'c, #(#arguments_unset),*> {
@@ -282,7 +266,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
 
     pub fn create_op_builder_fn(&self) -> TokenStream {
         let builder_ident = self.builder_identifier();
-        let arguments_unset = self.type_state.arguments_all_unset();
+        let arguments_unset = self.type_state.arguments_all(&self.type_state.unset);
         quote! {
             pub fn builder(
                 location: ::melior::ir::Location<'c>
@@ -339,7 +323,8 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
     fn create_type_state(operation: &'c Operation<'o>) -> Result<TypeStateList, Error> {
         Ok(TypeStateList::new(
             Self::required_fields(operation)
-                .map(|field| Ok(TypeStateItem::new(field?.name.to_string())))
+                .enumerate()
+                .map(|(index, field)| Ok(TypeStateItem::new(index, field?.name.to_string())))
                 .collect::<Result<_, Error>>()?,
         ))
     }
