@@ -41,7 +41,7 @@ impl TypeStateList {
         }
     }
 
-    pub fn items(&self) -> impl Iterator<Item = &TypeStateItem> {
+    fn items(&self) -> impl Iterator<Item = &TypeStateItem> {
         self.items.iter()
     }
 
