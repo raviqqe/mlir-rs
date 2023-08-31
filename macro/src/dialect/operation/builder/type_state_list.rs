@@ -50,7 +50,10 @@ impl TypeStateList {
         })
     }
 
-    pub fn arguments_all<'a>(&'a self, set: bool) -> impl Iterator<Item = &GenericArgument> + '_ {
+    pub fn arguments_all_set<'a>(
+        &'a self,
+        set: bool,
+    ) -> impl Iterator<Item = &GenericArgument> + '_ {
         repeat(self.set_argument(set)).take(self.items.len())
     }
 

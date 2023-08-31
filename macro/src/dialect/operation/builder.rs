@@ -157,7 +157,7 @@ impl<'o> OperationBuilder<'o> {
 
     fn create_build_fn(&self) -> TokenStream {
         let builder_ident = self.builder_identifier();
-        let arguments = self.type_state.arguments_all(true);
+        let arguments = self.type_state.arguments_all_set(true);
         let class_name = format_ident!("{}", &self.operation.class_name);
         let error = format!("should be a valid {class_name}");
         let maybe_infer = self
@@ -177,7 +177,7 @@ impl<'o> OperationBuilder<'o> {
     fn create_new_fn(&self, phantoms: &[TokenStream]) -> TokenStream {
         let builder_ident = self.builder_identifier();
         let name = &self.operation.full_name;
-        let arguments = self.type_state.arguments_all(false);
+        let arguments = self.type_state.arguments_all_set(false);
 
         quote! {
             impl<'c> #builder_ident<'c, #(#arguments),*> {
@@ -194,7 +194,7 @@ impl<'o> OperationBuilder<'o> {
 
     pub fn create_op_builder_fn(&self) -> TokenStream {
         let builder_ident = self.builder_identifier();
-        let arguments = self.type_state.arguments_all(false);
+        let arguments = self.type_state.arguments_all_set(false);
         quote! {
             pub fn builder(
                 location: ::melior::ir::Location<'c>
