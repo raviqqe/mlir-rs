@@ -157,17 +157,16 @@ impl<'o> OperationBuilder<'o> {
 
     fn create_build_fn(&self) -> TokenStream {
         let builder_ident = self.builder_identifier();
-        let arguments_set = self.type_state.arguments_all(true);
+        let arguments = self.type_state.arguments_all(true);
         let class_name = format_ident!("{}", &self.operation.class_name);
         let error = format!("should be a valid {class_name}");
-        let maybe_infer = if self.operation.can_infer_type {
-            quote! { .enable_result_type_inference() }
-        } else {
-            quote! {}
-        };
+        let maybe_infer = self
+            .operation
+            .can_infer_type
+            .then_some(quote! { .enable_result_type_inference() });
 
         quote! {
-            impl<'c> #builder_ident<'c, #(#arguments_set),*> {
+            impl<'c> #builder_ident<'c, #(#arguments),*> {
                 pub fn build(self) -> #class_name<'c> {
                     self.builder #maybe_infer.build().try_into().expect(#error)
                 }
@@ -178,10 +177,10 @@ impl<'o> OperationBuilder<'o> {
     fn create_new_fn(&self, phantoms: &[TokenStream]) -> TokenStream {
         let builder_ident = self.builder_identifier();
         let name = &self.operation.full_name;
-        let arguments_unset = self.type_state.arguments_all(false);
+        let arguments = self.type_state.arguments_all(false);
 
         quote! {
-            impl<'c> #builder_ident<'c, #(#arguments_unset),*> {
+            impl<'c> #builder_ident<'c, #(#arguments),*> {
                 pub fn new(location: ::melior::ir::Location<'c>) -> Self {
                     Self {
                         context: unsafe { location.context().to_ref() },
@@ -195,11 +194,11 @@ impl<'o> OperationBuilder<'o> {
 
     pub fn create_op_builder_fn(&self) -> TokenStream {
         let builder_ident = self.builder_identifier();
-        let arguments_unset = self.type_state.arguments_all(false);
+        let arguments = self.type_state.arguments_all(false);
         quote! {
             pub fn builder(
                 location: ::melior::ir::Location<'c>
-            ) -> #builder_ident<'c, #(#arguments_unset),*> {
+            ) -> #builder_ident<'c, #(#arguments),*> {
                 #builder_ident::new(location)
             }
         }
