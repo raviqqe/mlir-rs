@@ -1,11 +1,10 @@
-use std::iter::repeat;
-
 use super::{
     super::{error::Error, utility::sanitize_snake_case_name},
     FieldKind, Operation, OperationField,
 };
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
+use std::iter::repeat;
 use syn::GenericArgument;
 
 #[derive(Debug)]
