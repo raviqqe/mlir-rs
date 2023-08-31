@@ -109,8 +109,8 @@ impl<'o> OperationBuilder<'o> {
     pub fn builder(&self) -> Result<TokenStream, Error> {
         let field_names = self
             .type_state
-            .items()
-            .map(|field| sanitize_snake_case_name(&field.field_name()))
+            .field_names()
+            .map(sanitize_snake_case_name)
             .collect::<Result<Vec<_>, _>>()?;
 
         let phantom_fields =
