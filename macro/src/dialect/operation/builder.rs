@@ -87,8 +87,8 @@ impl<'o> OperationBuilder<'o> {
                 quote!()
             } else {
                 let parameters = self.type_state.parameters_without(field.name);
-                let arguments_set = self.type_state.arguments_replace(field.name, &self.type_state.set());
-                let arguments_unset = self.type_state.arguments_replace(field.name, &self.type_state.unset());
+                let arguments_set = self.type_state.arguments_set(field.name, true);
+                let arguments_unset = self.type_state.arguments_set(field.name, false);
                 quote! {
                     impl<'c, #(#parameters),*> #builder_ident<'c, #(#arguments_unset),*> {
                         pub fn #name(mut self, #argument) -> #builder_ident<'c, #(#arguments_set),*> {
@@ -157,7 +157,7 @@ impl<'o> OperationBuilder<'o> {
 
     fn create_build_fn(&self) -> TokenStream {
         let builder_ident = self.builder_identifier();
-        let arguments_set = self.type_state.arguments_all(&self.type_state.set());
+        let arguments_set = self.type_state.arguments_all(true);
         let class_name = format_ident!("{}", &self.operation.class_name);
         let error = format!("should be a valid {class_name}");
         let maybe_infer = if self.operation.can_infer_type {
@@ -178,7 +178,7 @@ impl<'o> OperationBuilder<'o> {
     fn create_new_fn(&self, phantoms: &[TokenStream]) -> TokenStream {
         let builder_ident = self.builder_identifier();
         let name = &self.operation.full_name;
-        let arguments_unset = self.type_state.arguments_all(&self.type_state.unset());
+        let arguments_unset = self.type_state.arguments_all(false);
 
         quote! {
             impl<'c> #builder_ident<'c, #(#arguments_unset),*> {
@@ -195,7 +195,7 @@ impl<'o> OperationBuilder<'o> {
 
     pub fn create_op_builder_fn(&self) -> TokenStream {
         let builder_ident = self.builder_identifier();
-        let arguments_unset = self.type_state.arguments_all(&self.type_state.unset());
+        let arguments_unset = self.type_state.arguments_all(false);
         quote! {
             pub fn builder(
                 location: ::melior::ir::Location<'c>

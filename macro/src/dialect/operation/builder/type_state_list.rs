@@ -23,14 +23,6 @@ impl TypeStateList {
         self.items.iter()
     }
 
-    pub fn unset(&self) -> &GenericArgument {
-        &self.unset
-    }
-
-    pub fn set(&self) -> &GenericArgument {
-        &self.set
-    }
-
     pub fn parameters(&self) -> impl Iterator<Item = &GenericArgument> {
         self.items().map(|item| item.generic_param())
     }
@@ -44,24 +36,29 @@ impl TypeStateList {
             .map(|item| item.generic_param())
     }
 
-    pub fn arguments_replace<'a>(
+    pub fn arguments_set<'a>(
         &'a self,
         field_name: &'a str,
-        argument: &'a GenericArgument,
+        set: bool,
     ) -> impl Iterator<Item = &GenericArgument> + '_ {
         self.items().map(move |item| {
             if item.field_name() == field_name {
-                argument
+                self.set_argument(set)
             } else {
                 item.generic_param()
             }
         })
     }
 
-    pub fn arguments_all<'a>(
-        &'a self,
-        argument: &'a GenericArgument,
-    ) -> impl Iterator<Item = &GenericArgument> + '_ {
-        repeat(argument).take(self.items.len())
+    pub fn arguments_all<'a>(&'a self, set: bool) -> impl Iterator<Item = &GenericArgument> + '_ {
+        repeat(self.set_argument(set)).take(self.items.len())
+    }
+
+    fn set_argument(&self, set: bool) -> &GenericArgument {
+        if set {
+            &self.set
+        } else {
+            &self.unset
+        }
     }
 }
