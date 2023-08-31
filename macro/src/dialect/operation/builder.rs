@@ -10,13 +10,13 @@ use super::{
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 
-pub struct OperationBuilder<'o, 'c> {
-    operation: &'c Operation<'o>,
+pub struct OperationBuilder<'o> {
+    operation: &'o Operation<'o>,
     type_state: TypeStateList,
 }
 
-impl<'o, 'c> OperationBuilder<'o, 'c> {
-    pub fn new(operation: &'c Operation<'o>) -> Result<Self, Error> {
+impl<'o> OperationBuilder<'o> {
+    pub fn new(operation: &'o Operation<'o>) -> Result<Self, Error> {
         Ok(Self {
             operation,
             type_state: Self::create_type_state(operation)?,
@@ -249,7 +249,7 @@ impl<'o, 'c> OperationBuilder<'o, 'c> {
             })
     }
 
-    fn create_type_state(operation: &'c Operation<'o>) -> Result<TypeStateList, Error> {
+    fn create_type_state(operation: &'o Operation<'o>) -> Result<TypeStateList, Error> {
         Ok(TypeStateList::new(
             Self::required_fields(operation)
                 .enumerate()
