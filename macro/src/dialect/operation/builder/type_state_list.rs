@@ -30,7 +30,7 @@ impl TypeStateList {
     pub fn parameters_without<'a>(
         &'a self,
         field_name: &'a str,
-    ) -> impl Iterator<Item = &GenericArgument> + '_ {
+    ) -> impl Iterator<Item = &GenericArgument> {
         self.items
             .iter()
             .filter(move |item| item.field_name() != field_name)
@@ -41,7 +41,7 @@ impl TypeStateList {
         &'a self,
         field_name: &'a str,
         set: bool,
-    ) -> impl Iterator<Item = &GenericArgument> + '_ {
+    ) -> impl Iterator<Item = &GenericArgument> {
         self.items.iter().map(move |item| {
             if item.field_name() == field_name {
                 self.set_argument(set)
@@ -51,10 +51,7 @@ impl TypeStateList {
         })
     }
 
-    pub fn arguments_all_set<'a>(
-        &'a self,
-        set: bool,
-    ) -> impl Iterator<Item = &GenericArgument> + '_ {
+    pub fn arguments_all_set(&self, set: bool) -> impl Iterator<Item = &GenericArgument> {
         repeat(self.set_argument(set)).take(self.items.len())
     }
 

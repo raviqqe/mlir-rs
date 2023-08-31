@@ -1,8 +1,7 @@
 mod type_state_item;
 mod type_state_list;
 
-use self::type_state_item::TypeStateItem;
-use self::type_state_list::TypeStateList;
+use self::{type_state_item::TypeStateItem, type_state_list::TypeStateList};
 use super::{
     super::{error::Error, utility::sanitize_snake_case_name},
     FieldKind, Operation, OperationField,
