@@ -11,7 +11,7 @@ pub mod sparse_tensor;
 pub mod transform;
 
 pub use self::{
-    external::{create_external, ExternalPass},
+    external::{create_external, ExternalPass, ExternalPassHandle},
     manager::PassManager,
     operation_manager::OperationPassManager,
 };
