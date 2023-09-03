@@ -14,7 +14,7 @@ use std::{marker::PhantomData, mem::transmute, ptr::drop_in_place};
 
 #[derive(Clone, Copy, Debug)]
 pub struct ExternalPass<'a> {
-    pub raw: MlirExternalPass,
+    raw: MlirExternalPass,
     _reference: PhantomData<&'a MlirExternalPass>,
 }
 
