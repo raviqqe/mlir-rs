@@ -21,7 +21,7 @@ quote = "1"
 regex = "1.9.5"
 syn = { version = "2", features = ["full"] }
 tblgen = { version = "0.3.0", features = ["llvm16-0"] }
-unindent = "0.2.2"
+unindent = "0.2.3"
 
 [dev-dependencies]
 melior = { path = "../melior", features = ["ods-dialects"] }
