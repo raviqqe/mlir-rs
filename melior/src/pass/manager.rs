@@ -6,7 +6,7 @@ use crate::{
 use mlir_sys::{
     mlirPassManagerAddOwnedPass, mlirPassManagerCreate, mlirPassManagerDestroy,
     mlirPassManagerEnableIRPrinting, mlirPassManagerEnableVerifier,
-    mlirPassManagerGetAsOpPassManager, mlirPassManagerGetNestedUnder, mlirPassManagerRun,
+    mlirPassManagerGetAsOpPassManager, mlirPassManagerGetNestedUnder, mlirPassManagerRunOnOp,
     MlirPassManager,
 };
 use std::marker::PhantomData;
@@ -54,8 +54,9 @@ impl<'c> PassManager<'c> {
 
     /// Runs passes added to a pass manager against a module.
     pub fn run(&self, module: &mut Module) -> Result<(), Error> {
-        let result =
-            LogicalResult::from_raw(unsafe { mlirPassManagerRun(self.raw, module.to_raw()) });
+        let result = LogicalResult::from_raw(unsafe {
+            mlirPassManagerRunOnOp(self.raw, module.as_operation().to_raw())
+        });
 
         if result.is_success() {
             Ok(())
