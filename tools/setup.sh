@@ -2,7 +2,7 @@
 
 set -e
 
-llvm_version=16
+llvm_version=17
 
 if [ -n "$CI" ]; then
   brew install --overwrite python@3.11
