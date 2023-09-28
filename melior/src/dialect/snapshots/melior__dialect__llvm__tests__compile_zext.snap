@@ -1,0 +1,11 @@
+---
+source: melior/src/dialect/llvm.rs
+expression: module.as_operation()
+---
+module attributes {llvm.data_layout = ""} {
+  llvm.func @foo(%arg0: i64) -> i128 {
+    %0 = llvm.zext %arg0 : i64 to i128
+    llvm.return %0 : i128
+  }
+}
+

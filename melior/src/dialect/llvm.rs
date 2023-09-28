@@ -3,9 +3,11 @@
 use crate::{
     ir::{
         attribute::{
-            DenseI32ArrayAttribute, DenseI64ArrayAttribute, StringAttribute, TypeAttribute,
+            DenseI32ArrayAttribute, DenseI64ArrayAttribute, IntegerAttribute, StringAttribute,
+            TypeAttribute,
         },
         operation::OperationBuilder,
+        r#type::IntegerType,
         Attribute, Identifier, Location, Operation, Region, Type, Value,
     },
     Context,
@@ -221,6 +223,114 @@ pub fn call_intrinsic<'c>(
         .add_operands(args)
         .add_attributes(&[(Identifier::new(context, "intrin"), intrin.into())])
         .add_results(results)
+        .build()
+}
+
+/// Creates a `llvm.intr.ctlz` operation.
+pub fn intr_ctlz<'c>(
+    context: &'c Context,
+    value: Value<'c, '_>,
+    is_zero_poison: bool,
+    result_type: Type<'c>,
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new("llvm.intr.ctlz", location)
+        .add_attributes(&[(
+            Identifier::new(context, "is_zero_poison"),
+            IntegerAttribute::new(is_zero_poison.into(), IntegerType::new(context, 1).into())
+                .into(),
+        )])
+        .add_operands(&[value])
+        .add_results(&[result_type])
+        .build()
+}
+
+/// Creates a `llvm.intr.ctlz` operation.
+pub fn intr_cttz<'c>(
+    context: &'c Context,
+    value: Value<'c, '_>,
+    is_zero_poison: bool,
+    result_type: Type<'c>,
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new("llvm.intr.cttz", location)
+        .add_attributes(&[(
+            Identifier::new(context, "is_zero_poison"),
+            IntegerAttribute::new(is_zero_poison.into(), IntegerType::new(context, 1).into())
+                .into(),
+        )])
+        .add_operands(&[value])
+        .add_results(&[result_type])
+        .build()
+}
+
+/// Creates a `llvm.intr.ctlz` operation.
+pub fn intr_ctpop<'c>(
+    value: Value<'c, '_>,
+    result_type: Type<'c>,
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new("llvm.intr.ctpop", location)
+        .add_operands(&[value])
+        .add_results(&[result_type])
+        .build()
+}
+
+/// Creates a `llvm.intr.bswap` operation.
+pub fn intr_bswap<'c>(
+    value: Value<'c, '_>,
+    result_type: Type<'c>,
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new("llvm.intr.bswap", location)
+        .add_operands(&[value])
+        .add_results(&[result_type])
+        .build()
+}
+
+/// Creates a `llvm.intr.bitreverse` operation.
+pub fn intr_bitreverse<'c>(
+    value: Value<'c, '_>,
+    result_type: Type<'c>,
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new("llvm.intr.bitreverse", location)
+        .add_operands(&[value])
+        .add_results(&[result_type])
+        .build()
+}
+
+/// Creates a `llvm.intr.abs` operation.
+pub fn intr_abs<'c>(
+    context: &'c Context,
+    value: Value<'c, '_>,
+    is_int_min_poison: bool,
+    result_type: Type<'c>,
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new("llvm.intr.abs", location)
+        .add_attributes(&[(
+            Identifier::new(context, "is_int_min_poison"),
+            IntegerAttribute::new(
+                is_int_min_poison.into(),
+                IntegerType::new(context, 1).into(),
+            )
+            .into(),
+        )])
+        .add_operands(&[value])
+        .add_results(&[result_type])
+        .build()
+}
+
+/// Creates a `llvm.zext` operation.
+pub fn zext<'c>(
+    value: Value<'c, '_>,
+    result_type: Type<'c>,
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new("llvm.zext", location)
+        .add_operands(&[value])
+        .add_results(&[result_type])
         .build()
 }
 
@@ -734,6 +844,314 @@ mod tests {
                 let block = Block::new(&[(struct_type, location)]);
 
                 block.append_operation(r#return(Some(block.argument(0).unwrap().into()), location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            &[],
+            location,
+        ));
+
+        convert_module(&context, &mut module);
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
+    fn compile_intr_ctlz() {
+        let context = create_test_context();
+
+        let location = Location::unknown(&context);
+        let mut module = Module::new(location);
+        let integer_type = IntegerType::new(&context, 64).into();
+
+        module.body().append_operation(func::func(
+            &context,
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(
+                FunctionType::new(&context, &[integer_type], &[integer_type]).into(),
+            ),
+            {
+                let block = Block::new(&[(integer_type, location)]);
+
+                let res = block
+                    .append_operation(intr_ctlz(
+                        &context,
+                        block.argument(0).unwrap().into(),
+                        true,
+                        integer_type,
+                        location,
+                    ))
+                    .result(0)
+                    .unwrap()
+                    .into();
+
+                block.append_operation(func::r#return(&[res], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            &[],
+            location,
+        ));
+
+        convert_module(&context, &mut module);
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
+    fn compile_intr_cttz() {
+        let context = create_test_context();
+
+        let location = Location::unknown(&context);
+        let mut module = Module::new(location);
+        let integer_type = IntegerType::new(&context, 64).into();
+
+        module.body().append_operation(func::func(
+            &context,
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(
+                FunctionType::new(&context, &[integer_type], &[integer_type]).into(),
+            ),
+            {
+                let block = Block::new(&[(integer_type, location)]);
+
+                let res = block
+                    .append_operation(intr_cttz(
+                        &context,
+                        block.argument(0).unwrap().into(),
+                        true,
+                        integer_type,
+                        location,
+                    ))
+                    .result(0)
+                    .unwrap()
+                    .into();
+
+                block.append_operation(func::r#return(&[res], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            &[],
+            location,
+        ));
+
+        convert_module(&context, &mut module);
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
+    fn compile_intr_ctpop() {
+        let context = create_test_context();
+
+        let location = Location::unknown(&context);
+        let mut module = Module::new(location);
+        let integer_type = IntegerType::new(&context, 64).into();
+
+        module.body().append_operation(func::func(
+            &context,
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(
+                FunctionType::new(&context, &[integer_type], &[integer_type]).into(),
+            ),
+            {
+                let block = Block::new(&[(integer_type, location)]);
+
+                let res = block
+                    .append_operation(intr_ctpop(
+                        block.argument(0).unwrap().into(),
+                        integer_type,
+                        location,
+                    ))
+                    .result(0)
+                    .unwrap()
+                    .into();
+
+                block.append_operation(func::r#return(&[res], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            &[],
+            location,
+        ));
+
+        convert_module(&context, &mut module);
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
+    fn compile_intr_bswap() {
+        let context = create_test_context();
+
+        let location = Location::unknown(&context);
+        let mut module = Module::new(location);
+        let integer_type = IntegerType::new(&context, 64).into();
+
+        module.body().append_operation(func::func(
+            &context,
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(
+                FunctionType::new(&context, &[integer_type], &[integer_type]).into(),
+            ),
+            {
+                let block = Block::new(&[(integer_type, location)]);
+
+                let res = block
+                    .append_operation(intr_bswap(
+                        block.argument(0).unwrap().into(),
+                        integer_type,
+                        location,
+                    ))
+                    .result(0)
+                    .unwrap()
+                    .into();
+
+                block.append_operation(func::r#return(&[res], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            &[],
+            location,
+        ));
+
+        convert_module(&context, &mut module);
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
+    fn compile_intr_bitreverse() {
+        let context = create_test_context();
+
+        let location = Location::unknown(&context);
+        let mut module = Module::new(location);
+        let integer_type = IntegerType::new(&context, 64).into();
+
+        module.body().append_operation(func::func(
+            &context,
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(
+                FunctionType::new(&context, &[integer_type], &[integer_type]).into(),
+            ),
+            {
+                let block = Block::new(&[(integer_type, location)]);
+
+                let res = block
+                    .append_operation(intr_bitreverse(
+                        block.argument(0).unwrap().into(),
+                        integer_type,
+                        location,
+                    ))
+                    .result(0)
+                    .unwrap()
+                    .into();
+
+                block.append_operation(func::r#return(&[res], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            &[],
+            location,
+        ));
+
+        convert_module(&context, &mut module);
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
+    fn compile_intr_abs() {
+        let context = create_test_context();
+
+        let location = Location::unknown(&context);
+        let mut module = Module::new(location);
+        let integer_type = IntegerType::new(&context, 64).into();
+
+        module.body().append_operation(func::func(
+            &context,
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(
+                FunctionType::new(&context, &[integer_type], &[integer_type]).into(),
+            ),
+            {
+                let block = Block::new(&[(integer_type, location)]);
+
+                let res = block
+                    .append_operation(intr_abs(
+                        &context,
+                        block.argument(0).unwrap().into(),
+                        true,
+                        integer_type,
+                        location,
+                    ))
+                    .result(0)
+                    .unwrap()
+                    .into();
+
+                block.append_operation(func::r#return(&[res], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            &[],
+            location,
+        ));
+
+        convert_module(&context, &mut module);
+
+        assert!(module.as_operation().verify());
+        insta::assert_display_snapshot!(module.as_operation());
+    }
+
+    #[test]
+    fn compile_zext() {
+        let context = create_test_context();
+
+        let location = Location::unknown(&context);
+        let mut module = Module::new(location);
+        let integer_type = IntegerType::new(&context, 64).into();
+        let integer_double_type = IntegerType::new(&context, 128).into();
+
+        module.body().append_operation(func::func(
+            &context,
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(
+                FunctionType::new(&context, &[integer_type], &[integer_double_type]).into(),
+            ),
+            {
+                let block = Block::new(&[(integer_type, location)]);
+
+                let res = block
+                    .append_operation(zext(
+                        block.argument(0).unwrap().into(),
+                        integer_double_type,
+                        location,
+                    ))
+                    .result(0)
+                    .unwrap()
+                    .into();
+
+                block.append_operation(func::r#return(&[res], location));
 
                 let region = Region::new();
                 region.append_block(block);
