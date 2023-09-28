@@ -84,7 +84,8 @@ pub fn conversion_passes(stream: TokenStream) -> TokenStream {
     convert_result(pass::generate(identifiers.identifiers(), |mut name| {
         name = name.strip_prefix("Conversion").unwrap();
         name = name.strip_prefix("Convert").unwrap_or(name);
-        name.strip_suffix("ConversionPass").unwrap_or(name).into()
+        name = name.strip_suffix("ConversionPass").unwrap_or(name);
+        name.strip_suffix("Pass").unwrap_or(name).into()
     }))
 }
 
