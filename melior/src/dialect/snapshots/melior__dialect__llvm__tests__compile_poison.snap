@@ -4,7 +4,7 @@ expression: module.as_operation()
 ---
 module attributes {llvm.data_layout = ""} {
   llvm.func @foo(%arg0: !llvm.struct<(i64)>) {
-    %0 = "llvm.mlir.poison"() : () -> !llvm.struct<(i64)>
+    %0 = llvm.mlir.poison : !llvm.struct<(i64)>
     llvm.return
   }
 }

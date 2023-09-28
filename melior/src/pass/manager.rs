@@ -202,7 +202,7 @@ mod tests {
 
         assert_eq!(
             manager.as_operation_pass_manager().to_string(),
-            "builtin.module(func.func(print-op-stats{json=false}))"
+            "any(func.func(print-op-stats{json=false}))"
         );
         assert_eq!(
             function_manager.to_string(),
