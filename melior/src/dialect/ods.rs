@@ -13,7 +13,7 @@ melior_macro::dialect! {
 }
 melior_macro::dialect! {
     name: "amdgpu",
-    tablegen: r#"include "mlir/Dialect/AMDGPU/AMDGPU.td""#
+    tablegen: r#"include "mlir/Dialect/AMDGPU/IR/AMDGPU.td""#
 }
 melior_macro::dialect! {
     name: "arith",
