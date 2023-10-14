@@ -27,6 +27,8 @@ use std::{
 #[derive(Debug)]
 pub struct Context {
     raw: MlirContext,
+    // We need to pass null-terminated strings to functions in the MLIR API although
+    // Rust's strings are not.
     string_cache: DashMap<CString, ()>,
 }
 
@@ -86,7 +88,9 @@ impl Context {
 
     /// Returns `true` if a given operation is registered in a context.
     pub fn is_registered_operation(&self, name: &str) -> bool {
-        unsafe { mlirContextIsRegisteredOperation(self.raw, StringRef::from(name).to_raw()) }
+        unsafe {
+            mlirContextIsRegisteredOperation(self.raw, StringRef::from_str(self, name).to_raw())
+        }
     }
 
     /// Converts a context into a raw object.
@@ -123,6 +127,15 @@ impl Context {
     /// Detaches a diagnostic handler.
     pub fn detach_diagnostic_handler(&self, id: DiagnosticHandlerId) {
         unsafe { mlirContextDetachDiagnosticHandler(self.to_raw(), id.to_raw()) }
+    }
+
+    pub(crate) fn create_c_string(&self, string: &str) -> &CString {
+        let entry = self
+            .string_cache
+            .entry(CString::new(string).unwrap())
+            .or_insert_with(Default::default);
+
+        entry.key()
     }
 }
 

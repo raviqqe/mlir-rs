@@ -1,4 +1,4 @@
-use crate::{ir::Module, logical_result::LogicalResult, string_ref::StringRef, Error};
+use crate::{ir::Module, logical_result::LogicalResult, string_ref::StringRef, Context, Error};
 use mlir_sys::{
     mlirExecutionEngineCreate, mlirExecutionEngineDestroy, mlirExecutionEngineDumpToObjectFile,
     mlirExecutionEngineInvokePacked, mlirExecutionEngineRegisterSymbol, MlirExecutionEngine,
@@ -11,8 +11,9 @@ pub struct ExecutionEngine {
 
 impl ExecutionEngine {
     /// Creates an execution engine.
-    pub fn new(
-        module: &Module,
+    pub fn new<'c>(
+        context: &'c Context,
+        module: &Module<'c>,
         optimization_level: usize,
         shared_library_paths: &[&str],
         enable_object_dump: bool,
@@ -25,7 +26,7 @@ impl ExecutionEngine {
                     shared_library_paths.len() as i32,
                     shared_library_paths
                         .iter()
-                        .map(|&string| StringRef::from(string).to_raw())
+                        .map(|&string| StringRef::from_str(context, string).to_raw())
                         .collect::<Vec<_>>()
                         .as_ptr(),
                     enable_object_dump,
@@ -105,12 +106,12 @@ mod tests {
         pass_manager.add_pass(pass::conversion::create_func_to_llvm());
 
         pass_manager
-            .nested_under("func.func")
+            .nested_under(&context, "func.func")
             .add_pass(pass::conversion::create_arith_to_llvm());
 
         assert_eq!(pass_manager.run(&mut module), Ok(()));
 
-        let engine = ExecutionEngine::new(&module, 2, &[], false);
+        let engine = ExecutionEngine::new(&context, &module, 2, &[], false);
 
         let mut argument = 42;
         let mut result = -1;
@@ -153,11 +154,12 @@ mod tests {
         pass_manager.add_pass(pass::conversion::create_func_to_llvm());
 
         pass_manager
-            .nested_under("func.func")
+            .nested_under(&context, "func.func")
             .add_pass(pass::conversion::create_arith_to_llvm());
 
         assert_eq!(pass_manager.run(&mut module), Ok(()));
 
-        ExecutionEngine::new(&module, 2, &[], true).dump_to_object_file("/tmp/melior/test.o");
+        ExecutionEngine::new(&context, &module, 2, &[], true)
+            .dump_to_object_file("/tmp/melior/test.o");
     }
 }

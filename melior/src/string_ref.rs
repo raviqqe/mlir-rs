@@ -1,16 +1,10 @@
-use dashmap::DashMap;
+use crate::Context;
 use mlir_sys::{mlirStringRefCreateFromCString, mlirStringRefEqual, MlirStringRef};
-use once_cell::sync::Lazy;
 use std::{
-    ffi::CString,
     marker::PhantomData,
     slice,
     str::{self, Utf8Error},
 };
-
-// We need to pass null-terminated strings to functions in the MLIR API although
-// Rust's strings are not.
-static STRING_CACHE: Lazy<DashMap<CString, ()>> = Lazy::new(Default::default);
 
 /// A string reference.
 // https://mlir.llvm.org/docs/CAPI/#stringref
@@ -18,14 +12,20 @@ static STRING_CACHE: Lazy<DashMap<CString, ()>> = Lazy::new(Default::default);
 // TODO The documentation says string refs do not have to be null-terminated.
 // But it looks like some functions do not handle strings not null-terminated?
 #[derive(Clone, Copy, Debug)]
-pub struct StringRef<'a> {
+pub struct StringRef<'c> {
     raw: MlirStringRef,
-    _parent: PhantomData<&'a ()>,
+    _parent: PhantomData<&'c Context>,
 }
 
-impl<'a> StringRef<'a> {
+impl<'c> StringRef<'c> {
+    pub fn from_str(context: &'c Context, string: &str) -> Self {
+        let string = context.create_c_string(string).as_ptr();
+
+        unsafe { Self::from_raw(mlirStringRefCreateFromCString(string)) }
+    }
+
     /// Converts a string reference into a `str`.
-    pub fn as_str(&self) -> Result<&'a str, Utf8Error> {
+    pub fn as_str(&self) -> Result<&'c str, Utf8Error> {
         unsafe {
             let bytes = slice::from_raw_parts(self.raw.data as *mut u8, self.raw.length);
 
@@ -63,32 +63,37 @@ impl<'a> PartialEq for StringRef<'a> {
 
 impl<'a> Eq for StringRef<'a> {}
 
-impl From<&str> for StringRef<'static> {
-    fn from(string: &str) -> Self {
-        let entry = STRING_CACHE
-            .entry(CString::new(string).unwrap())
-            .or_insert_with(Default::default);
-
-        unsafe { Self::from_raw(mlirStringRefCreateFromCString(entry.key().as_ptr())) }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn equal() {
-        assert_eq!(StringRef::from("foo"), StringRef::from("foo"));
+        let context = Context::new();
+
+        assert_eq!(
+            StringRef::from_str(&context, "foo"),
+            StringRef::from_str(&context, "foo")
+        );
     }
 
     #[test]
     fn equal_str() {
-        assert_eq!(StringRef::from("foo").as_str().unwrap(), "foo");
+        let context = Context::new();
+
+        assert_eq!(
+            StringRef::from_str(&context, "foo").as_str().unwrap(),
+            "foo"
+        );
     }
 
     #[test]
     fn not_equal() {
-        assert_ne!(StringRef::from("foo"), StringRef::from("bar"));
+        let context = Context::new();
+
+        assert_ne!(
+            StringRef::from_str(&context, "foo"),
+            StringRef::from_str(&context, "bar")
+        );
     }
 }
