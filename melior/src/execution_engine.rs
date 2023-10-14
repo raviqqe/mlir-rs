@@ -45,7 +45,7 @@ impl ExecutionEngine {
     /// function might result in undefined behavior.
     pub unsafe fn invoke_packed(
         &self,
-        context: &'c Context,
+        context: &Context,
         name: &str,
         arguments: &mut [*mut ()],
     ) -> Result<(), Error> {
@@ -69,7 +69,7 @@ impl ExecutionEngine {
     /// This function makes a pointer accessible to the execution engine. If a
     /// given pointer is invalid or misaligned, calling this function might
     /// result in undefined behavior.
-    pub unsafe fn register_symbol(&self, context: &'c Context, name: &str, ptr: *mut ()) {
+    pub unsafe fn register_symbol(&self, context: &Context, name: &str, ptr: *mut ()) {
         mlirExecutionEngineRegisterSymbol(
             self.raw,
             StringRef::from_str(context, name).to_raw(),
@@ -78,7 +78,7 @@ impl ExecutionEngine {
     }
 
     /// Dumps a module to an object file.
-    pub fn dump_to_object_file(&self, context: &'c Context, path: &str) {
+    pub fn dump_to_object_file(&self, context: &Context, path: &str) {
         unsafe {
             mlirExecutionEngineDumpToObjectFile(
                 self.raw,

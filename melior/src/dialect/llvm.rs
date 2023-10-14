@@ -137,7 +137,7 @@ pub fn nullptr<'c>(
 }
 
 /// Creates a `llvm.unreachable` operation.
-pub fn unreachable(context: &'c Context, location: Location) -> Operation {
+pub fn unreachable<'c>(context: &'c Context, location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new(context, "llvm.unreachable", location).build()
 }
 
@@ -287,6 +287,7 @@ pub fn intr_cttz<'c>(
 
 /// Creates a `llvm.intr.ctlz` operation.
 pub fn intr_ctpop<'c>(
+    context: &'c Context,
     value: Value<'c, '_>,
     result_type: Type<'c>,
     location: Location<'c>,

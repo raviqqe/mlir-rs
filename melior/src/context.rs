@@ -56,7 +56,7 @@ impl Context {
         unsafe {
             Dialect::from_raw(mlirContextGetOrLoadDialect(
                 self.raw,
-                StringRef::from(name).to_raw(),
+                StringRef::from_str(&self, name).to_raw(),
             ))
         }
     }
@@ -130,12 +130,10 @@ impl Context {
     }
 
     pub(crate) fn create_c_string(&self, string: &str) -> &CString {
-        let entry = self
-            .string_cache
+        self.string_cache
             .entry(CString::new(string).unwrap())
-            .or_insert_with(Default::default);
-
-        entry.key()
+            .or_insert_with(Default::default)
+            .key()
     }
 }
 
