@@ -16,8 +16,6 @@ use mlir_sys::{
 use std::{
     ffi::{c_void, CString},
     marker::PhantomData,
-    mem::transmute,
-    ops::Deref,
 };
 
 /// A context of IR, dialects, and passes.
@@ -56,7 +54,7 @@ impl Context {
         unsafe {
             Dialect::from_raw(mlirContextGetOrLoadDialect(
                 self.raw,
-                StringRef::from_str(&self, name).to_raw(),
+                StringRef::from_str(self, name).to_raw(),
             ))
         }
     }

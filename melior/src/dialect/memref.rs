@@ -62,7 +62,7 @@ fn allocate<'c>(
     alignment: Option<IntegerAttribute<'c>>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    let mut builder = OperationBuilder::new(&context, name, location);
+    let mut builder = OperationBuilder::new(context, name, location);
 
     builder = builder.add_attributes(&[(
         Identifier::new(context, "operand_segment_sizes"),
@@ -86,7 +86,7 @@ pub fn cast<'c>(
     r#type: MemRefType<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(&context, "memref.cast", location)
+    OperationBuilder::new(context, "memref.cast", location)
         .add_operands(&[value])
         .add_results(&[r#type.into()])
         .build()
@@ -123,7 +123,7 @@ pub fn get_global<'c>(
     r#type: MemRefType<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(&context, "memref.get_global", location)
+    OperationBuilder::new(context, "memref.get_global", location)
         .add_attributes(&[(
             Identifier::new(context, "name"),
             FlatSymbolRefAttribute::new(context, name).into(),
@@ -188,7 +188,7 @@ pub fn load<'c>(
     indices: &[Value<'c, '_>],
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(&context, "memref.load", location)
+    OperationBuilder::new(context, "memref.load", location)
         .add_operands(&[memref])
         .add_operands(indices)
         .enable_result_type_inference()
@@ -201,7 +201,7 @@ pub fn rank<'c>(
     value: Value<'c, '_>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(&context, "memref.rank", location)
+    OperationBuilder::new(context, "memref.rank", location)
         .add_operands(&[value])
         .enable_result_type_inference()
         .build()
@@ -215,7 +215,7 @@ pub fn store<'c>(
     indices: &[Value<'c, '_>],
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(&context, "memref.store", location)
+    OperationBuilder::new(context, "memref.store", location)
         .add_operands(&[value, memref])
         .add_operands(indices)
         .build()
@@ -267,7 +267,7 @@ mod tests {
             let block = Block::new(&[]);
 
             build_block(&block);
-            block.append_operation(func::r#return(&context, &[], location));
+            block.append_operation(func::r#return(context, &[], location));
 
             let region = Region::new();
             region.append_block(block);

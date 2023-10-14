@@ -17,7 +17,7 @@ pub fn constant<'c>(
     value: IntegerAttribute<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(&context, "index.constant", location)
+    OperationBuilder::new(context, "index.constant", location)
         .add_attributes(&[(Identifier::new(context, "value"), value.into())])
         .enable_result_type_inference()
         .build()
@@ -31,7 +31,7 @@ pub fn cmp<'c>(
     rhs: Value<'c, '_>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(&context, "index.cmp", location)
+    OperationBuilder::new(context, "index.cmp", location)
         .add_attributes(&[(
             Identifier::new(context, "pred"),
             Attribute::parse(
@@ -105,7 +105,7 @@ mod tests {
         let name = name.as_string_ref().as_str().unwrap();
 
         block.append_operation(func::r#return(
-            &context,
+            context,
             &[block.append_operation(operation).result(0).unwrap().into()],
             location,
         ));

@@ -165,6 +165,7 @@ impl<'c, F: FnMut(OperationRef<'c, '_>, ExternalPass<'_>) + Clone> RunExternalPa
 ///     &[],
 /// );
 /// ```
+#[allow(clippy::too_many_arguments)]
 pub fn create_external<'c, T: RunExternalPass<'c>>(
     context: &'c Context,
     pass: T,
@@ -224,7 +225,7 @@ mod tests {
             TypeAttribute::new(FunctionType::new(context, &[], &[]).into()),
             {
                 let block = Block::new(&[]);
-                block.append_operation(func::r#return(&context, &[], location));
+                block.append_operation(func::r#return(context, &[], location));
 
                 let region = Region::new();
                 region.append_block(block);

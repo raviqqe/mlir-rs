@@ -242,7 +242,7 @@ mod tests {
             rhs: Value<'c, '_>,
         ) -> Value<'c, 'a> {
             block
-                .append_operation(arith::addi(&context, lhs, rhs, Location::unknown(context)))
+                .append_operation(arith::addi(context, lhs, rhs, Location::unknown(context)))
                 .result(0)
                 .unwrap()
                 .into()

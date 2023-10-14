@@ -1,5 +1,5 @@
 use criterion::{criterion_group, criterion_main, Bencher, Criterion};
-use melior::StringRef;
+use melior::{Context, StringRef};
 
 const ITERATION_COUNT: usize = 1000000;
 
@@ -10,19 +10,22 @@ fn generate_strings() -> Vec<String> {
 }
 
 fn string_ref_create(bencher: &mut Bencher) {
+    let context = Context::new();
     let strings = generate_strings();
 
     bencher.iter(|| {
         for string in &strings {
-            let _ = StringRef::from(string.as_str());
+            let _ = StringRef::from_str(&context, string.as_str());
         }
     });
 }
 
 fn string_ref_create_cached(bencher: &mut Bencher) {
+    let context = Context::new();
+
     bencher.iter(|| {
         for _ in 0..ITERATION_COUNT {
-            let _ = StringRef::from("foo");
+            let _ = StringRef::from_str(&context, "foo");
         }
     });
 }

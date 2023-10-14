@@ -23,7 +23,7 @@ impl<'c> StringRef<'c> {
         let string = context
             .string_cache()
             .entry(CString::new(string).unwrap())
-            .or_insert_with(Default::default)
+            .or_default()
             .key()
             .as_ptr();
 
