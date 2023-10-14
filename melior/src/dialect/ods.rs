@@ -199,7 +199,7 @@ mod tests {
                 .into(),
             );
 
-            block.append_operation(&context, func::r#return(&[], location));
+            block.append_operation(func::r#return(&context, &[], location));
         });
     }
 
