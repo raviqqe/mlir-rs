@@ -129,11 +129,8 @@ impl Context {
         unsafe { mlirContextDetachDiagnosticHandler(self.to_raw(), id.to_raw()) }
     }
 
-    pub(crate) fn create_c_string(&self, string: &str) -> &CString {
-        self.string_cache
-            .entry(CString::new(string).unwrap())
-            .or_insert_with(Default::default)
-            .key()
+    pub(crate) fn string_cache(&self) -> &DashMap<CString, ()> {
+        &self.string_cache
     }
 }
 
