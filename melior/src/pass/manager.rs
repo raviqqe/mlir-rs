@@ -216,6 +216,7 @@ mod tests {
         let manager = PassManager::new(&context);
 
         insta::assert_display_snapshot!(parse_pass_pipeline(
+            &context,
             manager.as_operation_pass_manager(),
             "builtin.module(func.func(print-op-stats{json=false}),\
                 func.func(print-op-stats{json=false}))"
@@ -226,6 +227,7 @@ mod tests {
 
         assert_eq!(
             parse_pass_pipeline(
+                &context,
                 manager.as_operation_pass_manager(),
                 "builtin.module(func.func(print-op-stats{json=false}),\
                 func.func(print-op-stats{json=false}))"

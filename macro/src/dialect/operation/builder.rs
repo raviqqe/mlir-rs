@@ -183,7 +183,7 @@ impl<'o> OperationBuilder<'o> {
                 pub fn new(location: ::melior::ir::Location<'c>) -> Self {
                     Self {
                         context: location.context(),
-                        builder: ::melior::ir::operation::OperationBuilder::new(#name, location),
+                        builder: ::melior::ir::operation::OperationBuilder::new(&context, #name, location),
                         #(#phantoms),*
                     }
                 }

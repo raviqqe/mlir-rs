@@ -170,13 +170,14 @@ mod tests {
                 );
 
                 let add = loop_block.append_operation(arith::addf(
+                    &context,
                     lhs.result(0).unwrap().into(),
                     rhs.result(0).unwrap().into(),
                     location,
                 ));
 
                 loop_block.append_operation(
-                    OperationBuilder::new("memref.store", location)
+                    OperationBuilder::new(&context, "memref.store", location)
                         .add_operands(&[
                             add.result(0).unwrap().into(),
                             function_block.argument(0).unwrap().into(),
@@ -241,7 +242,7 @@ mod tests {
             rhs: Value<'c, '_>,
         ) -> Value<'c, 'a> {
             block
-                .append_operation(arith::addi(lhs, rhs, Location::unknown(context)))
+                .append_operation(arith::addi(&context, lhs, rhs, Location::unknown(context)))
                 .result(0)
                 .unwrap()
                 .into()
