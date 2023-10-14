@@ -220,7 +220,7 @@ mod tests {
             TypeAttribute::new(FunctionType::new(context, &[], &[]).into()),
             {
                 let block = Block::new(&[]);
-                block.append_operation(func::r#return(&[], location));
+                block.append_operation(func::r#return(&context, &[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -276,6 +276,7 @@ mod tests {
         impl TestPass {
             fn create(self) -> Pass {
                 create_external(
+                    &context,
                     self,
                     TypeId::create(&TEST_PASS),
                     "test pass",

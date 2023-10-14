@@ -90,7 +90,7 @@ mod tests {
         let location = Location::unknown(&context);
         let index_type = Type::index(&context);
 
-        let operation = OperationBuilder::new("arith.constant", location)
+        let operation = OperationBuilder::new(&context, "arith.constant", location)
             .add_results(&[index_type])
             .add_attributes(&[(
                 Identifier::new(&context, "value"),
@@ -107,7 +107,7 @@ mod tests {
         let location = Location::unknown(&context);
         let r#type = Type::index(&context);
 
-        let operation = OperationBuilder::new("arith.constant", location)
+        let operation = OperationBuilder::new(&context, "arith.constant", location)
             .add_results(&[r#type])
             .add_attributes(&[(
                 Identifier::new(&context, "value"),

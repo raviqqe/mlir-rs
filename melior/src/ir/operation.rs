@@ -452,8 +452,9 @@ mod tests {
         let context = create_test_context();
         context.set_allow_unregistered_dialects(true);
         let block = Block::new(&[]);
-        let operation = block
-            .append_operation(OperationBuilder::new(&context, "foo", Location::unknown(&context)).build());
+        let operation = block.append_operation(
+            OperationBuilder::new(&context, "foo", Location::unknown(&context)).build(),
+        );
 
         assert_eq!(operation.block().as_deref(), Some(&block));
     }
@@ -550,16 +551,20 @@ mod tests {
                 StringAttribute::new(&context, "bar").into(),
             )])
             .build();
-        assert!(operation.has_attribute("foo"));
+        assert!(operation.has_attribute(&context, "foo"));
         assert_eq!(
-            operation.attribute("foo").map(|a| a.to_string()),
+            operation.attribute(&context, "foo").map(|a| a.to_string()),
             Ok("\"bar\"".into())
         );
-        assert!(operation.remove_attribute("foo").is_ok());
-        assert!(operation.remove_attribute("foo").is_err());
-        operation.set_attribute("foo", &StringAttribute::new(&context, "foo").into());
+        assert!(operation.remove_attribute(&context, "foo").is_ok());
+        assert!(operation.remove_attribute(&context, "foo").is_err());
+        operation.set_attribute(
+            &context,
+            "foo",
+            &StringAttribute::new(&context, "foo").into(),
+        );
         assert_eq!(
-            operation.attribute("foo").map(|a| a.to_string()),
+            operation.attribute(&context, "foo").map(|a| a.to_string()),
             Ok("\"foo\"".into())
         );
         assert_eq!(

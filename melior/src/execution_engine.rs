@@ -133,6 +133,7 @@ mod tests {
         assert_eq!(
             unsafe {
                 engine.invoke_packed(
+                    &context,
                     "add",
                     &mut [
                         &mut argument as *mut i32 as *mut (),
@@ -174,6 +175,6 @@ mod tests {
         assert_eq!(pass_manager.run(&mut module), Ok(()));
 
         ExecutionEngine::new(&context, &module, 2, &[], true)
-            .dump_to_object_file("/tmp/melior/test.o");
+            .dump_to_object_file(&context, "/tmp/melior/test.o");
     }
 }
