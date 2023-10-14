@@ -105,6 +105,7 @@ mod tests {
         let name = name.as_string_ref().as_str().unwrap();
 
         block.append_operation(func::r#return(
+            &context,
             &[block.append_operation(operation).result(0).unwrap().into()],
             location,
         ));
@@ -180,6 +181,7 @@ mod tests {
                 &context,
                 |block| {
                     casts(
+                        &context,
                         block.argument(0).unwrap().into(),
                         IntegerType::new(&context, 64).into(),
                         Location::unknown(&context),
@@ -201,6 +203,7 @@ mod tests {
                 &context,
                 |block| {
                     castu(
+                        &context,
                         block.argument(0).unwrap().into(),
                         IntegerType::new(&context, 64).into(),
                         Location::unknown(&context),

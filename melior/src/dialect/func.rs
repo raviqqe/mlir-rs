@@ -118,7 +118,7 @@ mod tests {
                     .result(0)
                     .unwrap()
                     .into();
-                block.append_operation(r#return(&[value], location));
+                block.append_operation(r#return(&context, &[value], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -158,6 +158,7 @@ mod tests {
                 ));
                 let value = block
                     .append_operation(call_indirect(
+                        &context,
                         function.result(0).unwrap().into(),
                         &[block.argument(0).unwrap().into()],
                         &[index_type],
@@ -166,7 +167,7 @@ mod tests {
                     .result(0)
                     .unwrap()
                     .into();
-                block.append_operation(r#return(&[value], location));
+                block.append_operation(r#return(&context, &[value], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -194,7 +195,11 @@ mod tests {
         let function = {
             let block = Block::new(&[(integer_type, location)]);
 
-            block.append_operation(r#return(&[block.argument(0).unwrap().into()], location));
+            block.append_operation(r#return(
+                &context,
+                &[block.argument(0).unwrap().into()],
+                location,
+            ));
 
             let region = Region::new();
             region.append_block(block);

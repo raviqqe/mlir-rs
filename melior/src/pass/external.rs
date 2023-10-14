@@ -274,9 +274,9 @@ mod tests {
         }
 
         impl TestPass {
-            fn create(self) -> Pass {
+            fn into_pass(self, context: &Context) -> Pass {
                 create_external(
-                    &context,
+                    context,
                     self,
                     TypeId::create(&TEST_PASS),
                     "test pass",
@@ -294,7 +294,7 @@ mod tests {
         let pass_manager = PassManager::new(&context);
 
         let test_pass = TestPass { value: 10 };
-        pass_manager.add_pass(test_pass.create());
+        pass_manager.add_pass(test_pass.into_pass(&context));
         pass_manager.run(&mut module).unwrap();
     }
 
