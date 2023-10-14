@@ -14,7 +14,7 @@ impl<'c> FlatSymbolRefAttribute<'c> {
         unsafe {
             Self::from_raw(mlirFlatSymbolRefAttrGet(
                 context.to_raw(),
-                StringRef::from(symbol).to_raw(),
+                StringRef::from_str(context, symbol).to_raw(),
             ))
         }
     }

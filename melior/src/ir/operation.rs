@@ -184,37 +184,42 @@ impl<'c> Operation<'c> {
     }
 
     /// Gets a attribute with the given name.
-    pub fn attribute(&self, name: &str) -> Result<Attribute<'c>, Error> {
+    pub fn attribute(&self, context: &'c Context, name: &str) -> Result<Attribute<'c>, Error> {
         unsafe {
             Attribute::from_option_raw(mlirOperationGetAttributeByName(
                 self.raw,
-                StringRef::from(name).to_raw(),
+                StringRef::from_str(context, name).to_raw(),
             ))
         }
         .ok_or(Error::AttributeNotFound(name.into()))
     }
 
     /// Checks if the operation has a attribute with the given name.
-    pub fn has_attribute(&self, name: &str) -> bool {
-        self.attribute(name).is_ok()
+    pub fn has_attribute(&self, context: &'c Context, name: &str) -> bool {
+        self.attribute(context, name).is_ok()
     }
 
     /// Sets the attribute with the given name to the given attribute.
-    pub fn set_attribute(&mut self, name: &str, attribute: &Attribute<'c>) {
+    pub fn set_attribute(&mut self, context: &'c Context, name: &str, attribute: &Attribute<'c>) {
         unsafe {
             mlirOperationSetAttributeByName(
                 self.raw,
-                StringRef::from(name).to_raw(),
+                StringRef::from_str(context, name).to_raw(),
                 attribute.to_raw(),
             )
         }
     }
 
     /// Removes the attribute with the given name.
-    pub fn remove_attribute(&mut self, name: &str) -> Result<(), Error> {
-        unsafe { mlirOperationRemoveAttributeByName(self.raw, StringRef::from(name).to_raw()) }
-            .then_some(())
-            .ok_or(Error::AttributeNotFound(name.into()))
+    pub fn remove_attribute(&mut self, context: &'c Context, name: &str) -> Result<(), Error> {
+        unsafe {
+            mlirOperationRemoveAttributeByName(
+                self.raw,
+                StringRef::from_str(context, name).to_raw(),
+            )
+        }
+        .then_some(())
+        .ok_or(Error::AttributeNotFound(name.into()))
     }
 
     /// Gets the next operation in the same block.

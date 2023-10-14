@@ -13,23 +13,25 @@ pub fn generate_binary(dialect: &Ident, names: &[Ident]) -> Result<TokenStream, 
         stream.extend(TokenStream::from(quote! {
             #[doc = #document]
             pub fn #name<'c>(
+                context: &'c Context,
                 lhs: crate::ir::Value<'c, '_>,
                 rhs: crate::ir::Value<'c, '_>,
                 location: crate::ir::Location<'c>,
             ) -> crate::ir::Operation<'c> {
-                binary_operator(#operation_name, lhs, rhs, location)
+                binary_operator(context, #operation_name, lhs, rhs, location)
             }
         }));
     }
 
     stream.extend(TokenStream::from(quote! {
         fn binary_operator<'c>(
+            context: &'c Context,
             name: &str,
             lhs: crate::ir::Value<'c, '_>,
             rhs: crate::ir::Value<'c, '_>,
             location: crate::ir::Location<'c>,
         ) -> crate::ir::Operation<'c> {
-            crate::ir::operation::OperationBuilder::new(name, location)
+            crate::ir::operation::OperationBuilder::new(context, name, location)
                 .add_operands(&[lhs, rhs])
                 .enable_result_type_inference()
                 .build()
@@ -49,21 +51,23 @@ pub fn generate_unary(dialect: &Ident, names: &[Ident]) -> Result<TokenStream, B
         stream.extend(TokenStream::from(quote! {
             #[doc = #document]
             pub fn #name<'c>(
+                context: &'c Context,
                 value: crate::ir::Value<'c, '_>,
                 location: crate::ir::Location<'c>,
             ) -> crate::ir::Operation<'c> {
-                unary_operator(#operation_name, value, location)
+                unary_operator(context, #operation_name, value, location)
             }
         }));
     }
 
     stream.extend(TokenStream::from(quote! {
         fn unary_operator<'c>(
+            context: &'c Context,
             name: &str,
             value: crate::ir::Value<'c, '_>,
             location: crate::ir::Location<'c>,
         ) -> crate::ir::Operation<'c> {
-            crate::ir::operation::OperationBuilder::new(name, location)
+            crate::ir::operation::OperationBuilder::new(context, name, location)
                 .add_operands(&[value])
                 .enable_result_type_inference()
                 .build()
@@ -86,23 +90,25 @@ pub fn generate_typed_unary(
         stream.extend(TokenStream::from(quote! {
             #[doc = #document]
             pub fn #name<'c>(
+                context: &'c Context,
                 value: crate::ir::Value<'c, '_>,
                 r#type: crate::ir::Type<'c>,
                 location: crate::ir::Location<'c>,
             ) -> crate::ir::Operation<'c> {
-                typed_unary_operator(#operation_name, value, r#type, location)
+                typed_unary_operator(context, #operation_name, value, r#type, location)
             }
         }));
     }
 
     stream.extend(TokenStream::from(quote! {
         fn typed_unary_operator<'c>(
+            context: &'c Context,
             name: &str,
             value: crate::ir::Value<'c, '_>,
             r#type: crate::ir::Type<'c>,
             location: crate::ir::Location<'c>,
         ) -> crate::ir::Operation<'c> {
-            crate::ir::operation::OperationBuilder::new(name, location)
+            crate::ir::operation::OperationBuilder::new(context, name, location)
                 .add_operands(&[value])
                 .add_results(&[r#type])
                 .build()

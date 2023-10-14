@@ -43,10 +43,15 @@ impl ExecutionEngine {
     /// This function modifies memory locations pointed by the `arguments`
     /// argument. If those pointers are invalid or misaligned, calling this
     /// function might result in undefined behavior.
-    pub unsafe fn invoke_packed(&self, name: &str, arguments: &mut [*mut ()]) -> Result<(), Error> {
+    pub unsafe fn invoke_packed(
+        &self,
+        context: &'c Context,
+        name: &str,
+        arguments: &mut [*mut ()],
+    ) -> Result<(), Error> {
         let result = LogicalResult::from_raw(mlirExecutionEngineInvokePacked(
             self.raw,
-            StringRef::from(name).to_raw(),
+            StringRef::from_str(context, name).to_raw(),
             arguments.as_mut_ptr() as _,
         ));
 
@@ -64,13 +69,22 @@ impl ExecutionEngine {
     /// This function makes a pointer accessible to the execution engine. If a
     /// given pointer is invalid or misaligned, calling this function might
     /// result in undefined behavior.
-    pub unsafe fn register_symbol(&self, name: &str, ptr: *mut ()) {
-        mlirExecutionEngineRegisterSymbol(self.raw, StringRef::from(name).to_raw(), ptr as _);
+    pub unsafe fn register_symbol(&self, context: &'c Context, name: &str, ptr: *mut ()) {
+        mlirExecutionEngineRegisterSymbol(
+            self.raw,
+            StringRef::from_str(context, name).to_raw(),
+            ptr as _,
+        );
     }
 
     /// Dumps a module to an object file.
-    pub fn dump_to_object_file(&self, path: &str) {
-        unsafe { mlirExecutionEngineDumpToObjectFile(self.raw, StringRef::from(path).to_raw()) }
+    pub fn dump_to_object_file(&self, context: &'c Context, path: &str) {
+        unsafe {
+            mlirExecutionEngineDumpToObjectFile(
+                self.raw,
+                StringRef::from_str(context, path).to_raw(),
+            )
+        }
     }
 }
 

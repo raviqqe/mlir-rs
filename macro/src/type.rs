@@ -1,6 +1,5 @@
 use crate::utility::map_name;
 use convert_case::{Case, Casing};
-
 use proc_macro::TokenStream;
 use proc_macro2::Ident;
 use quote::quote;

@@ -17,11 +17,11 @@ pub struct Identifier<'c> {
 
 impl<'c> Identifier<'c> {
     /// Creates an identifier.
-    pub fn new(context: &Context, name: &str) -> Self {
+    pub fn new(context: &'c Context, name: &str) -> Self {
         unsafe {
             Self::from_raw(mlirIdentifierGet(
                 context.to_raw(),
-                StringRef::from(name).to_raw(),
+                StringRef::from_str(context, name).to_raw(),
             ))
         }
     }

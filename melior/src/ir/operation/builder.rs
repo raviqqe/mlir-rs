@@ -20,10 +20,13 @@ pub struct OperationBuilder<'c> {
 
 impl<'c> OperationBuilder<'c> {
     /// Creates an operation builder.
-    pub fn new(name: &str, location: Location<'c>) -> Self {
+    pub fn new(context: &'c Context, name: &str, location: Location<'c>) -> Self {
         Self {
             raw: unsafe {
-                mlirOperationStateGet(StringRef::from(name).to_raw(), location.to_raw())
+                mlirOperationStateGet(
+                    StringRef::from_str(context, name).to_raw(),
+                    location.to_raw(),
+                )
             },
             _context: Default::default(),
         }

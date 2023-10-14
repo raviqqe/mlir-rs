@@ -33,13 +33,17 @@ pub fn register_all_passes() {
 }
 
 /// Parses a pass pipeline.
-pub fn parse_pass_pipeline(manager: pass::OperationPassManager, source: &str) -> Result<(), Error> {
+pub fn parse_pass_pipeline(
+    context: &Context,
+    manager: pass::OperationPassManager,
+    source: &str,
+) -> Result<(), Error> {
     let mut error_message = None;
 
     let result = LogicalResult::from_raw(unsafe {
         mlirParsePassPipeline(
             manager.to_raw(),
-            StringRef::from(source).to_raw(),
+            StringRef::from_str(context, source).to_raw(),
             Some(handle_parse_error),
             &mut error_message as *mut _ as *mut _,
         )

@@ -4,7 +4,7 @@ use super::Pass;
 use crate::{
     dialect::DialectHandle,
     ir::{r#type::TypeId, OperationRef},
-    ContextRef, StringRef,
+    Context, ContextRef, StringRef,
 };
 use mlir_sys::{
     mlirCreateExternalPass, mlirExternalPassSignalFailure, MlirContext, MlirExternalPass,
@@ -162,6 +162,7 @@ impl<'c, F: FnMut(OperationRef<'c, '_>, ExternalPass<'_>) + Clone> RunExternalPa
 /// );
 /// ```
 pub fn create_external<'c, T: RunExternalPass<'c>>(
+    context: &'c Context,
     pass: T,
     pass_id: TypeId,
     name: &str,
@@ -173,10 +174,10 @@ pub fn create_external<'c, T: RunExternalPass<'c>>(
     unsafe {
         Pass::from_raw(mlirCreateExternalPass(
             pass_id.to_raw(),
-            StringRef::from(name).to_raw(),
-            StringRef::from(argument).to_raw(),
-            StringRef::from(description).to_raw(),
-            StringRef::from(op_name).to_raw(),
+            StringRef::from_str(context, name).to_raw(),
+            StringRef::from_str(context, argument).to_raw(),
+            StringRef::from_str(context, description).to_raw(),
+            StringRef::from_str(context, op_name).to_raw(),
             dependent_dialects.len() as isize,
             dependent_dialects.as_ptr() as _,
             MlirExternalPassCallbacks {

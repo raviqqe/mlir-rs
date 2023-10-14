@@ -30,7 +30,7 @@ pub fn extract_value<'c>(
     result_type: Type<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("llvm.extractvalue", location)
+    OperationBuilder::new(context, "llvm.extractvalue", location)
         .add_attributes(&[(Identifier::new(context, "position"), position.into())])
         .add_operands(&[container])
         .add_results(&[result_type])
@@ -46,7 +46,7 @@ pub fn get_element_ptr<'c>(
     result_type: Type<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("llvm.getelementptr", location)
+    OperationBuilder::new(context, "llvm.getelementptr", location)
         .add_attributes(&[
             (
                 Identifier::new(context, "rawConstantIndices"),
@@ -71,7 +71,7 @@ pub fn get_element_ptr_dynamic<'c, const N: usize>(
     result_type: Type<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("llvm.getelementptr", location)
+    OperationBuilder::new(context, "llvm.getelementptr", location)
         .add_attributes(&[
             (
                 Identifier::new(context, "rawConstantIndices"),
@@ -96,7 +96,7 @@ pub fn insert_value<'c>(
     value: Value<'c, '_>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("llvm.insertvalue", location)
+    OperationBuilder::new(context, "llvm.insertvalue", location)
         .add_attributes(&[(Identifier::new(context, "position"), position.into())])
         .add_operands(&[container, value])
         .enable_result_type_inference()
@@ -104,36 +104,53 @@ pub fn insert_value<'c>(
 }
 
 /// Creates a `llvm.mlir.undef` operation.
-pub fn undef<'c>(result_type: Type<'c>, location: Location<'c>) -> Operation<'c> {
-    OperationBuilder::new("llvm.mlir.undef", location)
+pub fn undef<'c>(
+    context: &'c Context,
+    result_type: Type<'c>,
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new(context, "llvm.mlir.undef", location)
         .add_results(&[result_type])
         .build()
 }
 
 /// Creates a `llvm.mlir.poison` operation.
-pub fn poison<'c>(result_type: Type<'c>, location: Location<'c>) -> Operation<'c> {
-    OperationBuilder::new("llvm.mlir.poison", location)
+pub fn poison<'c>(
+    context: &'c Context,
+    result_type: Type<'c>,
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new(context, "llvm.mlir.poison", location)
         .add_results(&[result_type])
         .build()
 }
 
 /// Creates a `llvm.mlir.null` operation. A null pointer.
-pub fn nullptr<'c>(ptr_type: Type<'c>, location: Location<'c>) -> Operation<'c> {
-    OperationBuilder::new("llvm.mlir.null", location)
+pub fn nullptr<'c>(
+    context: &'c Context,
+    ptr_type: Type<'c>,
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new(context, "llvm.mlir.null", location)
         .add_results(&[ptr_type])
         .build()
 }
 
 /// Creates a `llvm.unreachable` operation.
-pub fn unreachable(location: Location) -> Operation {
-    OperationBuilder::new("llvm.unreachable", location).build()
+pub fn unreachable(context: &'c Context, location: Location) -> Operation {
+    OperationBuilder::new(context, "llvm.unreachable", location).build()
 }
 
 /// Creates a `llvm.bitcast` operation.
-pub fn bitcast<'c>(arg: Value<'c, '_>, res: Type<'c>, location: Location<'c>) -> Operation<'c> {
-    OperationBuilder::new("llvm.bitcast", location)
-        .add_operands(&[arg])
-        .add_results(&[res])
+pub fn bitcast<'c>(
+    context: &'c Context,
+    argument: Value<'c, '_>,
+    result: Type<'c>,
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new(context, "llvm.bitcast", location)
+        .add_operands(&[argument])
+        .add_results(&[result])
         .build()
 }
 
@@ -145,7 +162,7 @@ pub fn alloca<'c>(
     location: Location<'c>,
     extra_options: AllocaOptions<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("llvm.alloca", location)
+    OperationBuilder::new(context, "llvm.alloca", location)
         .add_operands(&[array_size])
         .add_attributes(&extra_options.into_attributes(context))
         .add_results(&[ptr_type])
@@ -160,7 +177,7 @@ pub fn store<'c>(
     location: Location<'c>,
     extra_options: LoadStoreOptions<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("llvm.store", location)
+    OperationBuilder::new(context, "llvm.store", location)
         .add_operands(&[value, addr])
         .add_attributes(&extra_options.into_attributes(context))
         .build()
@@ -174,7 +191,7 @@ pub fn load<'c>(
     location: Location<'c>,
     extra_options: LoadStoreOptions<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("llvm.load", location)
+    OperationBuilder::new(context, "llvm.load", location)
         .add_operands(&[addr])
         .add_attributes(&extra_options.into_attributes(context))
         .add_results(&[r#type])
@@ -190,7 +207,7 @@ pub fn func<'c>(
     attributes: &[(Identifier<'c>, Attribute<'c>)],
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("llvm.func", location)
+    OperationBuilder::new(context, "llvm.func", location)
         .add_attributes(&[
             (Identifier::new(context, "sym_name"), name.into()),
             (Identifier::new(context, "function_type"), r#type.into()),
@@ -201,8 +218,12 @@ pub fn func<'c>(
 }
 
 // Creates a `llvm.return` operation.
-pub fn r#return<'c>(value: Option<Value<'c, '_>>, location: Location<'c>) -> Operation<'c> {
-    let mut builder = OperationBuilder::new("llvm.return", location);
+pub fn r#return<'c>(
+    context: &'c Context,
+    value: Option<Value<'c, '_>>,
+    location: Location<'c>,
+) -> Operation<'c> {
+    let mut builder = OperationBuilder::new(context, "llvm.return", location);
 
     if let Some(value) = value {
         builder = builder.add_operands(&[value]);
@@ -219,7 +240,7 @@ pub fn call_intrinsic<'c>(
     results: &[Type<'c>],
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("llvm.call_intrinsic", location)
+    OperationBuilder::new(context, "llvm.call_intrinsic", location)
         .add_operands(args)
         .add_attributes(&[(Identifier::new(context, "intrin"), intrin.into())])
         .add_results(results)
@@ -234,7 +255,7 @@ pub fn intr_ctlz<'c>(
     result_type: Type<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("llvm.intr.ctlz", location)
+    OperationBuilder::new(context, "llvm.intr.ctlz", location)
         .add_attributes(&[(
             Identifier::new(context, "is_zero_poison"),
             IntegerAttribute::new(is_zero_poison.into(), IntegerType::new(context, 1).into())
@@ -253,7 +274,7 @@ pub fn intr_cttz<'c>(
     result_type: Type<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("llvm.intr.cttz", location)
+    OperationBuilder::new(context, "llvm.intr.cttz", location)
         .add_attributes(&[(
             Identifier::new(context, "is_zero_poison"),
             IntegerAttribute::new(is_zero_poison.into(), IntegerType::new(context, 1).into())
@@ -270,7 +291,7 @@ pub fn intr_ctpop<'c>(
     result_type: Type<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("llvm.intr.ctpop", location)
+    OperationBuilder::new(context, "llvm.intr.ctpop", location)
         .add_operands(&[value])
         .add_results(&[result_type])
         .build()
@@ -278,11 +299,12 @@ pub fn intr_ctpop<'c>(
 
 /// Creates a `llvm.intr.bswap` operation.
 pub fn intr_bswap<'c>(
+    context: &'c Context,
     value: Value<'c, '_>,
     result_type: Type<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("llvm.intr.bswap", location)
+    OperationBuilder::new(context, "llvm.intr.bswap", location)
         .add_operands(&[value])
         .add_results(&[result_type])
         .build()
@@ -290,11 +312,12 @@ pub fn intr_bswap<'c>(
 
 /// Creates a `llvm.intr.bitreverse` operation.
 pub fn intr_bitreverse<'c>(
+    context: &'c Context,
     value: Value<'c, '_>,
     result_type: Type<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("llvm.intr.bitreverse", location)
+    OperationBuilder::new(context, "llvm.intr.bitreverse", location)
         .add_operands(&[value])
         .add_results(&[result_type])
         .build()
@@ -308,7 +331,7 @@ pub fn intr_abs<'c>(
     result_type: Type<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("llvm.intr.abs", location)
+    OperationBuilder::new(context, "llvm.intr.abs", location)
         .add_attributes(&[(
             Identifier::new(context, "is_int_min_poison"),
             IntegerAttribute::new(
@@ -324,11 +347,12 @@ pub fn intr_abs<'c>(
 
 /// Creates a `llvm.zext` operation.
 pub fn zext<'c>(
+    context: &'c Context,
     value: Value<'c, '_>,
     result_type: Type<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("llvm.zext", location)
+    OperationBuilder::new(context, "llvm.zext", location)
         .add_operands(&[value])
         .add_results(&[result_type])
         .build()
