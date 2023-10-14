@@ -19,10 +19,10 @@ fn single() {
         let block = Block::new(&[]);
         let r1 = Region::new();
         r1.append_block(block);
-        region_test::single(r1, location)
+        region_test::single(&context, r1, location)
     };
 
-    assert!(op.default_region().unwrap().first_block().is_some());
+    assert!(op.default_region(&context).unwrap().first_block().is_some());
 }
 
 #[test]
@@ -36,14 +36,14 @@ fn variadic_after_single() {
         let block = Block::new(&[]);
         let (r1, r2, r3) = (Region::new(), Region::new(), Region::new());
         r2.append_block(block);
-        region_test::variadic(r1, vec![r2, r3], location)
+        region_test::variadic(&context, r1, vec![r2, r3], location)
     };
 
     let op2 = {
         let block = Block::new(&[]);
         let (r1, r2, r3) = (Region::new(), Region::new(), Region::new());
         r2.append_block(block);
-        region_test::VariadicOp::builder(location)
+        region_test::VariadicOp::builder(&context, location)
             .default_region(r1)
             .other_regions(vec![r2, r3])
             .build()
@@ -51,8 +51,18 @@ fn variadic_after_single() {
 
     assert_eq!(op.operation().to_string(), op2.operation().to_string());
 
-    assert!(op.default_region().unwrap().first_block().is_none());
-    assert_eq!(op.other_regions().count(), 2);
-    assert!(op.other_regions().next().unwrap().first_block().is_some());
-    assert!(op.other_regions().nth(1).unwrap().first_block().is_none());
+    assert!(op.default_region(&context).unwrap().first_block().is_none());
+    assert_eq!(op.other_regions(&context).count(), 2);
+    assert!(op
+        .other_regions(&context)
+        .next()
+        .unwrap()
+        .first_block()
+        .is_some());
+    assert!(op
+        .other_regions(&context)
+        .nth(1)
+        .unwrap()
+        .first_block()
+        .is_none());
 }

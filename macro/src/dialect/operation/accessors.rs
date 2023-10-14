@@ -89,7 +89,7 @@ impl<'a> OperationField<'a> {
                             let attribute =
                                 ::melior::ir::attribute::DenseI32ArrayAttribute::<'c>::try_from(
                                     self.operation
-                                        .attribute(#attribute_name)?
+                                        .attribute(context, #attribute_name)?
                                 )?;
                             let start = (0..#index)
                                 .map(|index| attribute.element(index))
