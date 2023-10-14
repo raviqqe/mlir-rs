@@ -18,7 +18,7 @@ pub fn call<'c>(
     result_types: &[Type<'c>],
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("func.call", location)
+    OperationBuilder::new(context, "func.call", location)
         .add_attributes(&[(Identifier::new(context, "callee"), function.into())])
         .add_operands(arguments)
         .add_results(result_types)
@@ -27,12 +27,13 @@ pub fn call<'c>(
 
 /// Create a `func.call_indirect` operation.
 pub fn call_indirect<'c>(
+    context: &'c Context,
     function: Value<'c, '_>,
     arguments: &[Value<'c, '_>],
     result_types: &[Type<'c>],
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("func.call_indirect", location)
+    OperationBuilder::new(context, "func.call_indirect", location)
         .add_operands(&[function])
         .add_operands(arguments)
         .add_results(result_types)
@@ -46,7 +47,7 @@ pub fn constant<'c>(
     r#type: FunctionType<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("func.constant", location)
+    OperationBuilder::new(context, "func.constant", location)
         .add_attributes(&[(Identifier::new(context, "value"), function.into())])
         .add_results(&[r#type.into()])
         .build()
@@ -61,7 +62,7 @@ pub fn func<'c>(
     attributes: &[(Identifier<'c>, Attribute<'c>)],
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("func.func", location)
+    OperationBuilder::new(context, "func.func", location)
         .add_attributes(&[
             (Identifier::new(context, "sym_name"), name.into()),
             (Identifier::new(context, "function_type"), r#type.into()),
@@ -72,8 +73,12 @@ pub fn func<'c>(
 }
 
 /// Create a `func.return` operation.
-pub fn r#return<'c>(operands: &[Value<'c, '_>], location: Location<'c>) -> Operation<'c> {
-    OperationBuilder::new("func.return", location)
+pub fn r#return<'c>(
+    context: &'c Context,
+    operands: &[Value<'c, '_>],
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new(context, "func.return", location)
         .add_operands(operands)
         .build()
 }

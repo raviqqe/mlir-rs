@@ -19,7 +19,7 @@ pub fn assert<'c>(
     message: &str,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("cf.assert", location)
+    OperationBuilder::new(context, "cf.assert", location)
         .add_attributes(&[(
             Identifier::new(context, "msg"),
             StringAttribute::new(context, message).into(),
@@ -30,11 +30,12 @@ pub fn assert<'c>(
 
 /// Creates a `cf.br` operation.
 pub fn br<'c>(
+    context: &'c Context,
     successor: &Block<'c>,
     destination_operands: &[Value<'c, '_>],
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("cf.br", location)
+    OperationBuilder::new(context, "cf.br", location)
         .add_operands(destination_operands)
         .add_successors(&[successor])
         .build()
@@ -50,7 +51,7 @@ pub fn cond_br<'c>(
     false_successor_operands: &[Value<'c, '_>],
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new("cf.cond_br", location)
+    OperationBuilder::new(context, "cf.cond_br", location)
         .add_attributes(&[(
             Identifier::new(context, "operand_segment_sizes"),
             DenseI32ArrayAttribute::new(
@@ -89,7 +90,7 @@ pub fn switch<'c>(
         .chain(case_destinations.iter().copied())
         .unzip();
 
-    Ok(OperationBuilder::new("cf.switch", location)
+    Ok(OperationBuilder::new(context, "cf.switch", location)
         .add_attributes(&[
             (
                 Identifier::new(context, "case_values"),
@@ -183,7 +184,7 @@ mod tests {
 
                 block.append_operation(assert(&context, operand, "assert message", location));
 
-                block.append_operation(func::r#return(&[], location));
+                block.append_operation(func::r#return(&context, &[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -222,9 +223,9 @@ mod tests {
                     .result(0)
                     .unwrap();
 
-                block.append_operation(br(&dest_block, &[operand.into()], location));
+                block.append_operation(br(&context, &dest_block, &[operand.into()], location));
 
-                dest_block.append_operation(func::r#return(&[], location));
+                dest_block.append_operation(func::r#return(&context, &[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -289,8 +290,8 @@ mod tests {
                     location,
                 ));
 
-                true_block.append_operation(func::r#return(&[], location));
-                false_block.append_operation(func::r#return(&[], location));
+                true_block.append_operation(func::r#return(&context, &[], location));
+                false_block.append_operation(func::r#return(&context, &[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -348,9 +349,9 @@ mod tests {
                     .unwrap(),
                 );
 
-                default_block.append_operation(func::r#return(&[], location));
-                first_block.append_operation(func::r#return(&[], location));
-                second_block.append_operation(func::r#return(&[], location));
+                default_block.append_operation(func::r#return(&context, &[], location));
+                first_block.append_operation(func::r#return(&context, &[], location));
+                second_block.append_operation(func::r#return(&context, &[], location));
 
                 let region = Region::new();
                 region.append_block(block);
