@@ -31,7 +31,7 @@ pub fn generate_binary(dialect: &Ident, names: &[Ident]) -> Result<TokenStream, 
             rhs: crate::ir::Value<'c, '_>,
             location: crate::ir::Location<'c>,
         ) -> crate::ir::Operation<'c> {
-            crate::ir::operation::OperationBuilder::new(&context, context, name, location)
+            crate::ir::operation::OperationBuilder::new(&context, name, location)
                 .add_operands(&[lhs, rhs])
                 .enable_result_type_inference()
                 .build()
@@ -67,7 +67,7 @@ pub fn generate_unary(dialect: &Ident, names: &[Ident]) -> Result<TokenStream, B
             value: crate::ir::Value<'c, '_>,
             location: crate::ir::Location<'c>,
         ) -> crate::ir::Operation<'c> {
-            crate::ir::operation::OperationBuilder::new(&context, context, name, location)
+            crate::ir::operation::OperationBuilder::new(&context, name, location)
                 .add_operands(&[value])
                 .enable_result_type_inference()
                 .build()
@@ -108,7 +108,7 @@ pub fn generate_typed_unary(
             r#type: crate::ir::Type<'c>,
             location: crate::ir::Location<'c>,
         ) -> crate::ir::Operation<'c> {
-            crate::ir::operation::OperationBuilder::new(&context, context, name, location)
+            crate::ir::operation::OperationBuilder::new(&context, name, location)
                 .add_operands(&[value])
                 .add_results(&[r#type])
                 .build()
