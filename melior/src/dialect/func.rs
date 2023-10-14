@@ -47,7 +47,7 @@ pub fn constant<'c>(
     r#type: FunctionType<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(&context, context, "func.constant", location)
+    OperationBuilder::new(&context, "func.constant", location)
         .add_attributes(&[(Identifier::new(context, "value"), function.into())])
         .add_results(&[r#type.into()])
         .build()
@@ -62,7 +62,7 @@ pub fn func<'c>(
     attributes: &[(Identifier<'c>, Attribute<'c>)],
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(&context, context, "func.func", location)
+    OperationBuilder::new(&context, "func.func", location)
         .add_attributes(&[
             (Identifier::new(context, "sym_name"), name.into()),
             (Identifier::new(context, "function_type"), r#type.into()),
@@ -78,7 +78,7 @@ pub fn r#return<'c>(
     operands: &[Value<'c, '_>],
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(&context, context, "func.return", location)
+    OperationBuilder::new(&context, "func.return", location)
         .add_operands(operands)
         .build()
 }

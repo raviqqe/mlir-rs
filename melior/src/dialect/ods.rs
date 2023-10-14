@@ -192,6 +192,7 @@ mod tests {
 
             block.append_operation(
                 llvm::alloca(
+                    &context,
                     dialect::llvm::r#type::pointer(i64_type.into(), 0).into(),
                     alloca_size,
                     location,
