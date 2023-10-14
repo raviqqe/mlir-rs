@@ -267,7 +267,7 @@ mod tests {
             let block = Block::new(&[]);
 
             build_block(&block);
-            block.append_operation(func::r#return(&[], location));
+            block.append_operation(func::r#return(&context, &[], location));
 
             let region = Region::new();
             region.append_block(block);
@@ -302,7 +302,11 @@ mod tests {
                 None,
                 location,
             ));
-            block.append_operation(dealloc(memref.result(0).unwrap().into(), location));
+            block.append_operation(dealloc(
+                &context,
+                memref.result(0).unwrap().into(),
+                location,
+            ));
         })
     }
 
@@ -364,6 +368,7 @@ mod tests {
             ));
 
             block.append_operation(cast(
+                &context,
                 memref.result(0).unwrap().into(),
                 Type::parse(&context, "memref<?xf64>")
                     .unwrap()
@@ -396,6 +401,7 @@ mod tests {
             ));
 
             block.append_operation(dim(
+                &context,
                 memref.result(0).unwrap().into(),
                 index.result(0).unwrap().into(),
                 location,
@@ -429,7 +435,7 @@ mod tests {
                 let block = Block::new(&[]);
 
                 block.append_operation(get_global(&context, "foo", mem_ref_type, location));
-                block.append_operation(func::r#return(&[], location));
+                block.append_operation(func::r#return(&context, &[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -510,7 +516,12 @@ mod tests {
                 None,
                 location,
             ));
-            block.append_operation(load(memref.result(0).unwrap().into(), &[], location));
+            block.append_operation(load(
+                &context,
+                memref.result(0).unwrap().into(),
+                &[],
+                location,
+            ));
         })
     }
 
@@ -536,6 +547,7 @@ mod tests {
             ));
 
             block.append_operation(load(
+                &context,
                 memref.result(0).unwrap().into(),
                 &[index.result(0).unwrap().into()],
                 location,
@@ -557,7 +569,7 @@ mod tests {
                 None,
                 location,
             ));
-            block.append_operation(rank(memref.result(0).unwrap().into(), location));
+            block.append_operation(rank(&context, memref.result(0).unwrap().into(), location));
         })
     }
 
@@ -583,6 +595,7 @@ mod tests {
             ));
 
             block.append_operation(store(
+                &context,
                 value.result(0).unwrap().into(),
                 memref.result(0).unwrap().into(),
                 &[],
@@ -619,6 +632,7 @@ mod tests {
             ));
 
             block.append_operation(store(
+                &context,
                 value.result(0).unwrap().into(),
                 memref.result(0).unwrap().into(),
                 &[index.result(0).unwrap().into()],

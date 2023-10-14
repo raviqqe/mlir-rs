@@ -421,7 +421,7 @@ mod tests {
                     location,
                 ));
 
-                block.append_operation(func::r#return(&[], location));
+                block.append_operation(func::r#return(&context, &[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -462,7 +462,7 @@ mod tests {
                     location,
                 ));
 
-                block.append_operation(func::r#return(&[], location));
+                block.append_operation(func::r#return(&context, &[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -513,7 +513,7 @@ mod tests {
                     location,
                 ));
 
-                block.append_operation(func::r#return(&[], location));
+                block.append_operation(func::r#return(&context, &[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -562,7 +562,7 @@ mod tests {
                     location,
                 ));
 
-                block.append_operation(func::r#return(&[], location));
+                block.append_operation(func::r#return(&context, &[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -594,9 +594,9 @@ mod tests {
             {
                 let block = Block::new(&[(struct_type, location)]);
 
-                block.append_operation(undef(struct_type, location));
+                block.append_operation(undef(&context, struct_type, location));
 
-                block.append_operation(func::r#return(&[], location));
+                block.append_operation(func::r#return(&context, &[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -628,9 +628,9 @@ mod tests {
             {
                 let block = Block::new(&[(struct_type, location)]);
 
-                block.append_operation(poison(struct_type, location));
+                block.append_operation(poison(&context, struct_type, location));
 
-                block.append_operation(func::r#return(&[], location));
+                block.append_operation(func::r#return(&context, &[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -670,7 +670,7 @@ mod tests {
                     AllocaOptions::new().elem_type(Some(TypeAttribute::new(integer_type))),
                 ));
 
-                block.append_operation(func::r#return(&[], location));
+                block.append_operation(func::r#return(&context, &[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -710,7 +710,7 @@ mod tests {
                     Default::default(),
                 ));
 
-                block.append_operation(func::r#return(&[], location));
+                block.append_operation(func::r#return(&context, &[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -750,7 +750,7 @@ mod tests {
                     Default::default(),
                 ));
 
-                block.append_operation(func::r#return(&[], location));
+                block.append_operation(func::r#return(&context, &[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -793,7 +793,7 @@ mod tests {
                         .nontemporal(true),
                 ));
 
-                block.append_operation(func::r#return(&[], location));
+                block.append_operation(func::r#return(&context, &[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -851,7 +851,7 @@ mod tests {
             {
                 let block = Block::new(&[]);
 
-                block.append_operation(r#return(None, location));
+                block.append_operation(r#return(&context, None, location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -868,7 +868,11 @@ mod tests {
             {
                 let block = Block::new(&[(struct_type, location)]);
 
-                block.append_operation(r#return(Some(block.argument(0).unwrap().into()), location));
+                block.append_operation(r#return(
+                    &context,
+                    Some(block.argument(0).unwrap().into()),
+                    location,
+                ));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -913,7 +917,7 @@ mod tests {
                     .unwrap()
                     .into();
 
-                block.append_operation(func::r#return(&[res], location));
+                block.append_operation(func::r#return(&context, &[res], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -958,7 +962,7 @@ mod tests {
                     .unwrap()
                     .into();
 
-                block.append_operation(func::r#return(&[res], location));
+                block.append_operation(func::r#return(&context, &[res], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -993,6 +997,7 @@ mod tests {
 
                 let res = block
                     .append_operation(intr_ctpop(
+                        &context,
                         block.argument(0).unwrap().into(),
                         integer_type,
                         location,
@@ -1001,7 +1006,7 @@ mod tests {
                     .unwrap()
                     .into();
 
-                block.append_operation(func::r#return(&[res], location));
+                block.append_operation(func::r#return(&context, &[res], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -1036,6 +1041,7 @@ mod tests {
 
                 let res = block
                     .append_operation(intr_bswap(
+                        &context,
                         block.argument(0).unwrap().into(),
                         integer_type,
                         location,
@@ -1044,7 +1050,7 @@ mod tests {
                     .unwrap()
                     .into();
 
-                block.append_operation(func::r#return(&[res], location));
+                block.append_operation(func::r#return(&context, &[res], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -1079,6 +1085,7 @@ mod tests {
 
                 let res = block
                     .append_operation(intr_bitreverse(
+                        &context,
                         block.argument(0).unwrap().into(),
                         integer_type,
                         location,
@@ -1087,7 +1094,7 @@ mod tests {
                     .unwrap()
                     .into();
 
-                block.append_operation(func::r#return(&[res], location));
+                block.append_operation(func::r#return(&context, &[res], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -1132,7 +1139,7 @@ mod tests {
                     .unwrap()
                     .into();
 
-                block.append_operation(func::r#return(&[res], location));
+                block.append_operation(func::r#return(&context, &[res], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -1168,6 +1175,7 @@ mod tests {
 
                 let res = block
                     .append_operation(zext(
+                        &context,
                         block.argument(0).unwrap().into(),
                         integer_double_type,
                         location,
@@ -1176,7 +1184,7 @@ mod tests {
                     .unwrap()
                     .into();
 
-                block.append_operation(func::r#return(&[res], location));
+                block.append_operation(func::r#return(&context, &[res], location));
 
                 let region = Region::new();
                 region.append_block(block);
