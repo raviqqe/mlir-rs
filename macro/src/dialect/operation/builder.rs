@@ -142,7 +142,7 @@ impl<'o> OperationBuilder<'o> {
             #[doc = #doc]
             pub struct #builder_ident <'c, #(#iter_arguments),* > {
                 builder: ::melior::ir::operation::OperationBuilder<'c>,
-                context: ::melior::ContextRef<'c>,
+                context: &'c ::melior::Context,
                 #(#phantom_fields),*
             }
 
@@ -180,9 +180,9 @@ impl<'o> OperationBuilder<'o> {
 
         quote! {
             impl<'c> #builder_ident<'c, #(#arguments),*> {
-                pub fn new(location: ::melior::ir::Location<'c>) -> Self {
+                pub fn new(context: &'c ::melior::Context, location: ::melior::ir::Location<'c>) -> Self {
                     Self {
-                        context: location.context(),
+                        context,
                         builder: ::melior::ir::operation::OperationBuilder::new(&context, #name, location),
                         #(#phantoms),*
                     }
