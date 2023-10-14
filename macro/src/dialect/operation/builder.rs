@@ -51,7 +51,7 @@ impl<'o> OperationBuilder<'o> {
 
                     quote! {
                         &[(
-                            ::melior::ir::Identifier::new(unsafe { self.context.to_ref() }, #name_string),
+                            ::melior::ir::Identifier::new(self.context, #name_string),
                             #name.into(),
                         )]
                     }

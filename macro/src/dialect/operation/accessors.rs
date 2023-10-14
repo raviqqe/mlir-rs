@@ -154,11 +154,11 @@ impl<'a> OperationField<'a> {
                 let name = &self.name;
 
                 Some(if constraint.is_unit()? {
-                    quote! { self.operation.attribute(#name).is_some() }
+                    quote! { self.operation.attribute(context, #name).is_some() }
                 } else {
                     quote! {
                         self.operation
-                            .attribute(#name)?
+                            .attribute(context, #name)?
                             .try_into()
                             .map_err(::melior::Error::from)
                     }
@@ -174,7 +174,7 @@ impl<'a> OperationField<'a> {
 
                 if constraint.is_unit()? || constraint.is_optional()? {
                     Some(quote! {
-                      self.operation.remove_attribute(#name)
+                      self.operation.remove_attribute(context, #name)
                     })
                 } else {
                     None
@@ -193,14 +193,14 @@ impl<'a> OperationField<'a> {
         Ok(Some(if constraint.is_unit()? {
             quote! {
                 if value {
-                  self.operation.set_attribute(#name, Attribute::unit(&self.operation.context()));
+                  self.operation.set_attribute(context, #name, Attribute::unit(&self.operation.context()));
                 } else {
-                  self.operation.remove_attribute(#name)
+                  self.operation.remove_attribute(context, #name)
                 }
             }
         } else {
             quote! {
-                self.operation.set_attribute(#name, &value.into());
+                self.operation.set_attribute(context, #name, &value.into());
             }
         }))
     }
@@ -213,7 +213,7 @@ impl<'a> OperationField<'a> {
                 let parameter_type = &self.kind.parameter_type()?;
 
                 quote! {
-                    pub fn #ident(&mut self, value: #parameter_type) {
+                    pub fn #ident(&mut self, context: &'c ::melior::Context, value: #parameter_type) {
                         #body
                     }
                 }
@@ -225,7 +225,7 @@ impl<'a> OperationField<'a> {
             let ident = sanitize_snake_case_name(&format!("remove_{}", self.name))?;
             self.remover_impl()?.map(|body| {
                 quote! {
-                    pub fn #ident(&mut self) -> Result<(), ::melior::Error> {
+                    pub fn #ident(&mut self, context: &'c ::melior::Context) -> Result<(), ::melior::Error> {
                         #body
                     }
                 }
@@ -236,7 +236,7 @@ impl<'a> OperationField<'a> {
             let return_type = &self.kind.return_type()?;
             self.getter_impl()?.map(|body| {
                 quote! {
-                    pub fn #ident(&self) -> #return_type {
+                    pub fn #ident(&self, context: &'c ::melior::Context) -> #return_type {
                         #body
                     }
                 }
