@@ -140,6 +140,7 @@ impl<'c, F: FnMut(OperationRef<'c, '_>, ExternalPass<'_>) + Clone> RunExternalPa
 ///
 /// ```
 /// use melior::{
+///     Context,
 ///     ir::{r#type::TypeId, OperationRef},
 ///     pass::{create_external, ExternalPass},
 /// };
@@ -149,7 +150,10 @@ impl<'c, F: FnMut(OperationRef<'c, '_>, ExternalPass<'_>) + Clone> RunExternalPa
 ///
 /// static EXAMPLE_PASS: PassId = PassId;
 ///
+/// let context = Context::new();
+///
 /// create_external(
+///     &context,
 ///     |operation: OperationRef, _pass: ExternalPass| {
 ///         operation.dump();
 ///     },
@@ -237,11 +241,12 @@ mod tests {
         static TEST_PASS: PassId = PassId;
 
         #[derive(Clone, Debug)]
-        struct TestPass {
+        struct TestPass<'c> {
+            context: &'c Context,
             value: i32,
         }
 
-        impl<'c> RunExternalPass<'c> for TestPass {
+        impl<'c> RunExternalPass<'c> for TestPass<'c> {
             fn construct(&mut self) {
                 assert_eq!(self.value, 10);
             }
@@ -268,12 +273,12 @@ mod tests {
                         .first_operation()
                         .expect("body has a function")
                         .name()
-                        == Identifier::new(&operation.context(), "func.func")
+                        == Identifier::new(self.context, "func.func")
                 );
             }
         }
 
-        impl TestPass {
+        impl<'c> TestPass<'c> {
             fn into_pass(self, context: &Context) -> Pass {
                 create_external(
                     context,
@@ -293,7 +298,10 @@ mod tests {
         let mut module = create_module(&context);
         let pass_manager = PassManager::new(&context);
 
-        let test_pass = TestPass { value: 10 };
+        let test_pass = TestPass {
+            context: &context,
+            value: 10,
+        };
         pass_manager.add_pass(test_pass.into_pass(&context));
         pass_manager.run(&mut module).unwrap();
     }
@@ -320,7 +328,7 @@ mod tests {
                         .first_operation()
                         .expect("body has a function")
                         .name()
-                        == Identifier::new(&operation.context(), "func.func")
+                        == Identifier::new(&context, "func.func")
                 );
                 pass.signal_failure();
             },

@@ -42,12 +42,13 @@ module.body().append_operation(func::func(
         let block = Block::new(&[(index_type, location), (index_type, location)]);
 
         let sum = block.append_operation(arith::addi(
+            &context,
             block.argument(0).unwrap().into(),
             block.argument(1).unwrap().into(),
             location
         ));
 
-        block.append_operation(func::r#return(&[sum.result(0).unwrap().into()], location));
+        block.append_operation(func::r#return(&context, &[sum.result(0).unwrap().into()], location));
 
         let region = Region::new();
         region.append_block(block);
