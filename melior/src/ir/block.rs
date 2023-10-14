@@ -421,8 +421,9 @@ mod tests {
         context.set_allow_unregistered_dialects(true);
         let block = Block::new(&[]);
 
-        let operation = block
-            .append_operation(OperationBuilder::new(&context, "foo", Location::unknown(&context)).build());
+        let operation = block.append_operation(
+            OperationBuilder::new(&context, "foo", Location::unknown(&context)).build(),
+        );
 
         assert_eq!(block.first_operation(), Some(operation));
     }
@@ -440,7 +441,9 @@ mod tests {
         context.set_allow_unregistered_dialects(true);
         let block = Block::new(&[]);
 
-        block.append_operation(OperationBuilder::new(&context, "foo", Location::unknown(&context)).build());
+        block.append_operation(
+            OperationBuilder::new(&context, "foo", Location::unknown(&context)).build(),
+        );
     }
 
     #[test]
@@ -461,8 +464,9 @@ mod tests {
         context.set_allow_unregistered_dialects(true);
         let block = Block::new(&[]);
 
-        let first_operation = block
-            .append_operation(OperationBuilder::new(&context, "foo", Location::unknown(&context)).build());
+        let first_operation = block.append_operation(
+            OperationBuilder::new(&context, "foo", Location::unknown(&context)).build(),
+        );
         let second_operation = block.insert_operation_after(
             first_operation,
             OperationBuilder::new(&context, "foo", Location::unknown(&context)).build(),
@@ -481,8 +485,9 @@ mod tests {
         context.set_allow_unregistered_dialects(true);
         let block = Block::new(&[]);
 
-        let second_operation = block
-            .append_operation(OperationBuilder::new(&context, "foo", Location::unknown(&context)).build());
+        let second_operation = block.append_operation(
+            OperationBuilder::new(&context, "foo", Location::unknown(&context)).build(),
+        );
         let first_operation = block.insert_operation_before(
             second_operation,
             OperationBuilder::new(&context, "foo", Location::unknown(&context)).build(),
