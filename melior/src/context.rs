@@ -180,7 +180,7 @@ impl<'a> PartialEq for ContextRef<'a> {
 }
 
 impl<'c, 'a> PartialEq<&'c Context> for ContextRef<'a> {
-    fn eq(&self, other: &'c Context) -> bool {
+    fn eq(&self, other: &&'c Context) -> bool {
         unsafe { mlirContextEqual(self.raw, other.raw) }
     }
 }
@@ -271,5 +271,14 @@ mod tests {
         });
 
         context.detach_diagnostic_handler(id);
+    }
+
+    #[test]
+    fn compare_contexts() {
+        let context = Context::new();
+
+        context.set_allow_unregistered_dialects(true);
+
+        assert!(context.allow_unregistered_dialects());
     }
 }
