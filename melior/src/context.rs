@@ -183,19 +183,19 @@ impl<'c> ContextRef<'c> {
     }
 }
 
-impl<'a> PartialEq for ContextRef<'a> {
+impl<'c> PartialEq for ContextRef<'c> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirContextEqual(self.raw, other.raw) }
     }
 }
 
-impl<'a> PartialEq<Context> for ContextRef<'a> {
+impl<'c> PartialEq<Context> for ContextRef<'c> {
     fn eq(&self, other: &Context) -> bool {
         self == &other.to_ref()
     }
 }
 
-impl<'a> Eq for ContextRef<'a> {}
+impl<'c> Eq for ContextRef<'c> {}
 
 #[cfg(test)]
 mod tests {
