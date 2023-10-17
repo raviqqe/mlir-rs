@@ -280,5 +280,7 @@ mod tests {
 
         assert_eq!(&one, &one);
         assert_ne!(&one, &other);
+        assert_ne!(&other, &one);
+        assert_eq!(&other, &other);
     }
 }
