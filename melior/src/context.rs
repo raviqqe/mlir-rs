@@ -299,8 +299,8 @@ mod tests {
         let one = Context::new();
         let other = Context::new();
 
-        let one_ref = unsafe { ContextRef::from_raw(one.to_raw()) };
-        let other_ref = unsafe { ContextRef::from_raw(other.to_raw()) };
+        let one_ref = one.to_ref();
+        let other_ref = other.to_ref();
 
         assert_eq!(&one, &one_ref);
         assert_eq!(&one_ref, &one);
