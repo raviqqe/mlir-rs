@@ -179,6 +179,12 @@ impl<'a> PartialEq for ContextRef<'a> {
     }
 }
 
+impl<'c, 'a> PartialEq<&'c Context> for ContextRef<'a> {
+    fn eq(&self, other: &'c Context) -> bool {
+        unsafe { mlirContextEqual(self.raw, other.raw) }
+    }
+}
+
 impl<'a> Eq for ContextRef<'a> {}
 
 #[cfg(test)]
