@@ -127,6 +127,10 @@ impl Context {
         unsafe { mlirContextDetachDiagnosticHandler(self.to_raw(), id.to_raw()) }
     }
 
+    pub(crate) fn to_ref(&self) -> ContextRef {
+        unsafe { ContextRef::from_raw(self.to_raw()) }
+    }
+
     pub(crate) fn string_cache(&self) -> &DashMap<CString, ()> {
         &self.string_cache
     }
@@ -147,6 +151,12 @@ impl Default for Context {
 impl PartialEq for Context {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirContextEqual(self.raw, other.raw) }
+    }
+}
+
+impl<'a> PartialEq<ContextRef<'a>> for Context {
+    fn eq(&self, &other: &ContextRef<'a>) -> bool {
+        self.to_ref() == other
     }
 }
 
@@ -179,9 +189,9 @@ impl<'a> PartialEq for ContextRef<'a> {
     }
 }
 
-impl<'c, 'a> PartialEq<&'c Context> for ContextRef<'a> {
-    fn eq(&self, other: &&'c Context) -> bool {
-        unsafe { mlirContextEqual(self.raw, other.raw) }
+impl<'a> PartialEq<Context> for ContextRef<'a> {
+    fn eq(&self, other: &Context) -> bool {
+        self == &other.to_ref()
     }
 }
 
@@ -279,6 +289,23 @@ mod tests {
         let other = Context::new();
 
         assert_eq!(&one, &one);
+        assert_ne!(&one, &other);
+        assert_ne!(&other, &one);
+        assert_eq!(&other, &other);
+    }
+
+    #[test]
+    fn compare_context_refs() {
+        let one = Context::new();
+        let other = Context::new();
+
+        let one_ref = unsafe { ContextRef::from_raw(one.to_raw()) };
+        let other_ref = unsafe { ContextRef::from_raw(other.to_raw()) };
+
+        assert_eq!(&one, &one_ref);
+        assert_eq!(&one_ref, &one);
+        assert_eq!(&other, &other_ref);
+        assert_eq!(&other_ref, &other);
         assert_ne!(&one, &other);
         assert_ne!(&other, &one);
         assert_eq!(&other, &other);
