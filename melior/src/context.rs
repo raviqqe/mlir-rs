@@ -275,10 +275,10 @@ mod tests {
 
     #[test]
     fn compare_contexts() {
-        let context = Context::new();
+        let one = Context::new();
+        let other = Context::new();
 
-        context.set_allow_unregistered_dialects(true);
-
-        assert!(context.allow_unregistered_dialects());
+        assert_eq!(&one, &one);
+        assert_ne!(&one, &other);
     }
 }
