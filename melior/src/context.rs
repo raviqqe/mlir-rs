@@ -304,10 +304,14 @@ mod tests {
 
         assert_eq!(&one, &one_ref);
         assert_eq!(&one_ref, &one);
+
         assert_eq!(&other, &other_ref);
         assert_eq!(&other_ref, &other);
-        assert_ne!(&one, &other);
-        assert_ne!(&other, &one);
-        assert_eq!(&other, &other);
+
+        assert_ne!(&one, &other_ref);
+        assert_ne!(&other_ref, &one);
+
+        assert_ne!(&other, &one_ref);
+        assert_ne!(&one_ref, &other);
     }
 }
