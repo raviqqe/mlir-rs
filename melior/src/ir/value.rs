@@ -96,7 +96,8 @@ mod tests {
                 Identifier::new(&context, "value"),
                 Attribute::parse(&context, "0 : index").unwrap(),
             )])
-            .build();
+            .build()
+            .unwrap();
 
         assert_eq!(operation.result(0).unwrap().r#type(), index_type);
     }
@@ -113,7 +114,8 @@ mod tests {
                 Identifier::new(&context, "value"),
                 Attribute::parse(&context, "0 : index").unwrap(),
             )])
-            .build();
+            .build()
+            .unwrap();
 
         assert!(operation.result(0).unwrap().is_operation_result());
     }
@@ -139,7 +141,8 @@ mod tests {
                 Identifier::new(&context, "value"),
                 Attribute::parse(&context, "0 : index").unwrap(),
             )])
-            .build();
+            .build()
+            .unwrap();
 
         value.result(0).unwrap().dump();
     }
@@ -156,7 +159,8 @@ mod tests {
                 Identifier::new(&context, "value"),
                 Attribute::parse(&context, "0 : index").unwrap(),
             )])
-            .build();
+            .build()
+            .unwrap();
         let result = Value::from(operation.result(0).unwrap());
 
         assert_eq!(result, result);
@@ -176,6 +180,7 @@ mod tests {
                     Attribute::parse(&context, "0 : index").unwrap(),
                 )])
                 .build()
+                .unwrap()
         };
 
         assert_ne!(
@@ -198,7 +203,8 @@ mod tests {
                 Identifier::new(&context, "value"),
                 Attribute::parse(&context, "0 : index").unwrap(),
             )])
-            .build();
+            .build()
+            .unwrap();
 
         assert_eq!(
             operation.result(0).unwrap().to_string(),
@@ -219,7 +225,8 @@ mod tests {
                 Identifier::new(&context, "value"),
                 Attribute::parse(&context, "0 : index").unwrap(),
             )])
-            .build();
+            .build()
+            .unwrap();
 
         assert_eq!(
             operation.result(0).unwrap().to_string(),
@@ -240,7 +247,8 @@ mod tests {
                 Identifier::new(&context, "value"),
                 Attribute::parse(&context, "0 : index").unwrap(),
             )])
-            .build();
+            .build()
+            .unwrap();
 
         assert_eq!(
             format!("{:?}", Value::from(operation.result(0).unwrap())),

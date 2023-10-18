@@ -35,6 +35,7 @@ pub fn extract_value<'c>(
         .add_operands(&[container])
         .add_results(&[result_type])
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `llvm.getelementptr` operation.
@@ -60,6 +61,7 @@ pub fn get_element_ptr<'c>(
         .add_operands(&[ptr])
         .add_results(&[result_type])
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `llvm.getelementptr` operation with dynamic indices.
@@ -86,6 +88,7 @@ pub fn get_element_ptr_dynamic<'c, const N: usize>(
         .add_operands(indices)
         .add_results(&[result_type])
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `llvm.insertvalue` operation.
@@ -101,6 +104,7 @@ pub fn insert_value<'c>(
         .add_operands(&[container, value])
         .enable_result_type_inference()
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `llvm.mlir.undef` operation.
@@ -112,6 +116,7 @@ pub fn undef<'c>(
     OperationBuilder::new(context, "llvm.mlir.undef", location)
         .add_results(&[result_type])
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `llvm.mlir.poison` operation.
@@ -123,6 +128,7 @@ pub fn poison<'c>(
     OperationBuilder::new(context, "llvm.mlir.poison", location)
         .add_results(&[result_type])
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `llvm.mlir.null` operation. A null pointer.
@@ -134,6 +140,7 @@ pub fn nullptr<'c>(
     OperationBuilder::new(context, "llvm.mlir.null", location)
         .add_results(&[ptr_type])
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `llvm.unreachable` operation.
@@ -152,6 +159,7 @@ pub fn bitcast<'c>(
         .add_operands(&[argument])
         .add_results(&[result])
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `llvm.alloca` operation.
@@ -167,6 +175,7 @@ pub fn alloca<'c>(
         .add_attributes(&extra_options.into_attributes(context))
         .add_results(&[ptr_type])
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `llvm.store` operation.
@@ -181,6 +190,7 @@ pub fn store<'c>(
         .add_operands(&[value, addr])
         .add_attributes(&extra_options.into_attributes(context))
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `llvm.load` operation.
@@ -196,6 +206,7 @@ pub fn load<'c>(
         .add_attributes(&extra_options.into_attributes(context))
         .add_results(&[r#type])
         .build()
+        .expect("valid operation")
 }
 
 /// Create a `llvm.func` operation.
@@ -215,6 +226,7 @@ pub fn func<'c>(
         .add_attributes(attributes)
         .add_regions(vec![region])
         .build()
+        .expect("valid operation")
 }
 
 // Creates a `llvm.return` operation.
@@ -229,7 +241,7 @@ pub fn r#return<'c>(
         builder = builder.add_operands(&[value]);
     }
 
-    builder.build()
+    builder.build().expect("valid operation")
 }
 
 /// Creates a `llvm.call_intrinsic` operation.
@@ -245,6 +257,7 @@ pub fn call_intrinsic<'c>(
         .add_attributes(&[(Identifier::new(context, "intrin"), intrin.into())])
         .add_results(results)
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `llvm.intr.ctlz` operation.
@@ -264,6 +277,7 @@ pub fn intr_ctlz<'c>(
         .add_operands(&[value])
         .add_results(&[result_type])
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `llvm.intr.ctlz` operation.
@@ -283,6 +297,7 @@ pub fn intr_cttz<'c>(
         .add_operands(&[value])
         .add_results(&[result_type])
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `llvm.intr.ctlz` operation.
@@ -296,6 +311,7 @@ pub fn intr_ctpop<'c>(
         .add_operands(&[value])
         .add_results(&[result_type])
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `llvm.intr.bswap` operation.
@@ -309,6 +325,7 @@ pub fn intr_bswap<'c>(
         .add_operands(&[value])
         .add_results(&[result_type])
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `llvm.intr.bitreverse` operation.
@@ -322,6 +339,7 @@ pub fn intr_bitreverse<'c>(
         .add_operands(&[value])
         .add_results(&[result_type])
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `llvm.intr.abs` operation.
@@ -344,6 +362,7 @@ pub fn intr_abs<'c>(
         .add_operands(&[value])
         .add_results(&[result_type])
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `llvm.zext` operation.
@@ -357,6 +376,7 @@ pub fn zext<'c>(
         .add_operands(&[value])
         .add_results(&[result_type])
         .build()
+        .expect("valid operation")
 }
 
 #[cfg(test)]

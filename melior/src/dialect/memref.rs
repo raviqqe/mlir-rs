@@ -76,7 +76,10 @@ fn allocate<'c>(
             builder.add_attributes(&[(Identifier::new(context, "alignment"), alignment.into())]);
     }
 
-    builder.add_results(&[r#type.into()]).build()
+    builder
+        .add_results(&[r#type.into()])
+        .build()
+        .expect("valid operation")
 }
 
 /// Create a `memref.cast` operation.
@@ -90,6 +93,7 @@ pub fn cast<'c>(
         .add_operands(&[value])
         .add_results(&[r#type.into()])
         .build()
+        .expect("valid operation")
 }
 
 /// Create a `memref.dealloc` operation.
@@ -101,6 +105,7 @@ pub fn dealloc<'c>(
     OperationBuilder::new(context, "memref.dealloc", location)
         .add_operands(&[value])
         .build()
+        .expect("valid operation")
 }
 
 /// Create a `memref.dim` operation.
@@ -114,6 +119,7 @@ pub fn dim<'c>(
         .add_operands(&[value, index])
         .enable_result_type_inference()
         .build()
+        .expect("valid operation")
 }
 
 /// Create a `memref.get_global` operation.
@@ -130,6 +136,7 @@ pub fn get_global<'c>(
         )])
         .add_results(&[r#type.into()])
         .build()
+        .expect("valid operation")
 }
 
 /// Create a `memref.global` operation.
@@ -178,7 +185,7 @@ pub fn global<'c>(
             builder.add_attributes(&[(Identifier::new(context, "alignment"), alignment.into())]);
     }
 
-    builder.build()
+    builder.build().expect("valid operation")
 }
 
 /// Create a `memref.load` operation.
@@ -193,6 +200,7 @@ pub fn load<'c>(
         .add_operands(indices)
         .enable_result_type_inference()
         .build()
+        .expect("valid operation")
 }
 
 /// Create a `memref.rank` operation.
@@ -205,6 +213,7 @@ pub fn rank<'c>(
         .add_operands(&[value])
         .enable_result_type_inference()
         .build()
+        .expect("valid operation")
 }
 
 /// Create a `memref.store` operation.
@@ -219,6 +228,7 @@ pub fn store<'c>(
         .add_operands(&[value, memref])
         .add_operands(indices)
         .build()
+        .expect("valid operation")
 }
 
 /// Create a `memref.realloc` operation.
@@ -243,7 +253,7 @@ pub fn realloc<'c>(
             builder.add_attributes(&[(Identifier::new(context, "alignment"), alignment.into())]);
     }
 
-    builder.build()
+    builder.build().expect("valid operation")
 }
 
 #[cfg(test)]

@@ -128,7 +128,8 @@ mod tests {
         let module = Module::from_operation(
             OperationBuilder::new(&context, "builtin.module", Location::unknown(&context))
                 .add_regions(vec![region])
-                .build(),
+                .build()
+                .unwrap(),
         )
         .unwrap();
 
@@ -141,7 +142,9 @@ mod tests {
         let context = create_test_context();
 
         assert!(Module::from_operation(
-            OperationBuilder::new(&context, "func.func", Location::unknown(&context),).build()
+            OperationBuilder::new(&context, "func.func", Location::unknown(&context),)
+                .build()
+                .unwrap()
         )
         .is_none());
     }
