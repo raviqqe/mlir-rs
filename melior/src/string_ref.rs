@@ -19,7 +19,8 @@ pub struct StringRef<'c> {
 }
 
 impl<'c> StringRef<'c> {
-    pub fn from_static_str(string: &'static str) -> Self {
+    /// Converts a string of a static liftime into a string reference.
+    pub fn from_static_str(string: &str) -> Self {
         let string = MlirStringRef {
             data: string.as_bytes().as_ptr() as *const i8,
             length: string.len(),
@@ -28,6 +29,7 @@ impl<'c> StringRef<'c> {
         unsafe { Self::from_raw(string) }
     }
 
+    /// Converts a string into a string reference in a context.
     pub fn from_str(context: &'c Context, string: &str) -> Self {
         let entry = context
             .string_cache()
