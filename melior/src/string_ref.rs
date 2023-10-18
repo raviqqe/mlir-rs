@@ -29,7 +29,7 @@ impl<'c> StringRef<'c> {
         unsafe { Self::from_raw(string) }
     }
 
-    /// Converts a string into a string reference in a context.
+    /// Converts a string into a null-terminated string reference.
     pub fn from_str(context: &'c Context, string: &str) -> Self {
         let entry = context
             .string_cache()
