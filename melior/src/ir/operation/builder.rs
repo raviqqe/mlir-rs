@@ -123,7 +123,7 @@ impl<'c> OperationBuilder<'c> {
         unsafe {
             let x = mlirOperationCreate(&mut self.raw);
 
-            if x == std::ptr::null() {
+            if x.ptr.is_null() {
                 panic!()
             }
 
