@@ -120,7 +120,15 @@ impl<'c> OperationBuilder<'c> {
 
     /// Builds an operation.
     pub fn build(mut self) -> Operation<'c> {
-        unsafe { Operation::from_raw(mlirOperationCreate(&mut self.raw)) }
+        unsafe {
+            let x = mlirOperationCreate(&mut self.raw);
+
+            if x == std::ptr::null() {
+                panic!()
+            }
+
+            Operation::from_raw(x)
+        }
     }
 }
 
