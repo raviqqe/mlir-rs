@@ -87,7 +87,6 @@ mod tests {
     };
     use indoc::indoc;
     use pretty_assertions::assert_eq;
-    use std::ffi::CString;
 
     #[test]
     fn new() {
@@ -131,18 +130,20 @@ mod tests {
 
     #[test]
     fn run_on_function() {
-        let source = CString::new(indoc!(
-            "
-            func.func @foo(%arg0 : i32) -> i32 {
-                %res = arith.addi %arg0, %arg0 : i32
-                return %res : i32
-            }
-            "
-        ))
-        .unwrap();
         let context = create_test_context();
 
-        let mut module = Module::parse(&context, &source).unwrap();
+        let mut module = Module::parse(
+            &context,
+            indoc!(
+                "
+                func.func @foo(%arg0 : i32) -> i32 {
+                    %res = arith.addi %arg0, %arg0 : i32
+                    return %res : i32
+                }
+                "
+            ),
+        )
+        .unwrap();
 
         let manager = PassManager::new(&context);
         manager.add_pass(pass::transform::create_print_op_stats());
@@ -152,8 +153,12 @@ mod tests {
 
     #[test]
     fn run_on_function_in_nested_module() {
-        let source = CString::new(indoc!(
-            "
+        let context = create_test_context();
+
+        let mut module = Module::parse(
+            &context,
+            indoc!(
+                "
                 func.func @foo(%arg0 : i32) -> i32 {
                     %res = arith.addi %arg0, %arg0 : i32
                     return %res : i32
@@ -166,11 +171,9 @@ mod tests {
                     }
                 }
                 "
-        ))
+            ),
+        )
         .unwrap();
-        let context = create_test_context();
-
-        let mut module = Module::parse(&context, &source).unwrap();
 
         let manager = PassManager::new(&context);
         manager

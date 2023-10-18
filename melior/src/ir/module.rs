@@ -7,7 +7,7 @@ use mlir_sys::{
     mlirModuleCreateEmpty, mlirModuleCreateParse, mlirModuleDestroy, mlirModuleFromOperation,
     mlirModuleGetBody, mlirModuleGetContext, mlirModuleGetOperation, MlirModule,
 };
-use std::{ffi::CStr, marker::PhantomData};
+use std::{ffi::CString, marker::PhantomData};
 
 /// A module.
 #[derive(Debug)]
@@ -23,8 +23,9 @@ impl<'c> Module<'c> {
     }
 
     /// Parses a module.
-    pub fn parse(context: &Context, source: &'c CStr) -> Option<Self> {
-        let source = StringRef::from_c_str(source);
+    pub fn parse(context: &Context, source: &str) -> Option<Self> {
+        let source = CString::new(source).unwrap();
+        let source = StringRef::from_c_str(&source);
 
         unsafe { Self::from_option_raw(mlirModuleCreateParse(context.to_raw(), source.to_raw())) }
     }
@@ -93,7 +94,6 @@ mod tests {
         ir::{operation::OperationBuilder, Block, Region},
         test::create_test_context,
     };
-    use std::ffi::CString;
 
     #[test]
     fn new() {
@@ -107,16 +107,12 @@ mod tests {
 
     #[test]
     fn parse() {
-        let source = CString::new("module{}").unwrap();
-
-        assert!(Module::parse(&Context::new(), &source).is_some());
+        assert!(Module::parse(&Context::new(), "module{}").is_some());
     }
 
     #[test]
     fn parse_none() {
-        let source = CString::new("module{").unwrap();
-
-        assert!(Module::parse(&Context::new(), &source).is_none());
+        assert!(Module::parse(&Context::new(), "module{").is_none());
     }
 
     #[test]

@@ -79,12 +79,10 @@ impl<'a> Display for Diagnostic<'a> {
 #[cfg(test)]
 mod tests {
     use crate::{ir::Module, Context};
-    use std::ffi::CString;
 
     #[test]
     fn handle_diagnostic() {
         let mut message = None;
-        let source = CString::new("foo").unwrap();
         let context = Context::new();
 
         context.attach_diagnostic_handler(|diagnostic| {
@@ -92,7 +90,7 @@ mod tests {
             true
         });
 
-        Module::parse(&context, &source);
+        Module::parse(&context, "foo");
 
         assert_eq!(
             message.unwrap(),

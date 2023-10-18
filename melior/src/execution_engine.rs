@@ -98,11 +98,13 @@ impl Drop for ExecutionEngine {
 mod tests {
     use super::*;
     use crate::{pass, test::create_test_context};
-    use std::ffi::CString;
 
     #[test]
     fn invoke_packed() {
-        let source = CString::new(
+        let context = create_test_context();
+
+        let mut module = Module::parse(
+            &context,
             r#"
             module {
                 func.func @add(%arg0 : i32) -> i32 attributes { llvm.emit_c_interface } {
@@ -113,9 +115,6 @@ mod tests {
             "#,
         )
         .unwrap();
-        let context = create_test_context();
-
-        let mut module = Module::parse(&context, &source).unwrap();
 
         let pass_manager = pass::PassManager::new(&context);
         pass_manager.add_pass(pass::conversion::create_func_to_llvm());
@@ -151,7 +150,10 @@ mod tests {
 
     #[test]
     fn dump_to_object_file() {
-        let source = CString::new(
+        let context = create_test_context();
+
+        let mut module = Module::parse(
+            &context,
             r#"
             module {
                 func.func @add(%arg0 : i32) -> i32 {
@@ -162,9 +164,7 @@ mod tests {
             "#,
         )
         .unwrap();
-        let context = create_test_context();
 
-        let mut module = Module::parse(&context, &source).unwrap();
         let pass_manager = pass::PassManager::new(&context);
         pass_manager.add_pass(pass::conversion::create_func_to_llvm());
 
