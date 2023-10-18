@@ -3,6 +3,7 @@ use crate::{
     context::Context,
     ir::{Attribute, AttributeLike, Block, Identifier, Location, Region, Type, Value},
     string_ref::StringRef,
+    Error,
 };
 use mlir_sys::{
     mlirNamedAttributeGet, mlirOperationCreate, mlirOperationStateAddAttributes,
@@ -119,8 +120,9 @@ impl<'c> OperationBuilder<'c> {
     }
 
     /// Builds an operation.
-    pub fn build(mut self) -> Option<Operation<'c>> {
+    pub fn build(mut self) -> Result<Operation<'c>, Error> {
         unsafe { Operation::from_option_raw(mlirOperationCreate(&mut self.raw)) }
+            .ok_or(Error::OperationBuild)
     }
 }
 

@@ -16,6 +16,7 @@ pub enum Error {
         value: String,
     },
     InvokeFunction,
+    OperationBuild,
     OperandNotFound(&'static str),
     OperationResultExpected(String),
     PositionOutOfBounds {
@@ -47,6 +48,9 @@ impl Display for Error {
                 write!(formatter, "element of {type} type expected: {value}")
             }
             Self::InvokeFunction => write!(formatter, "failed to invoke JIT-compiled function"),
+            Self::OperationBuild => {
+                write!(formatter, "operation build failed")
+            }
             Self::OperandNotFound(name) => {
                 write!(formatter, "operand {name} not found")
             }
