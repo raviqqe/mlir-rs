@@ -224,15 +224,7 @@ impl<'c> Operation<'c> {
 
     /// Gets the next operation in the same block.
     pub fn next_in_block(&self) -> Option<OperationRef<'c, '_>> {
-        unsafe {
-            let operation = mlirOperationGetNextInBlock(self.raw);
-
-            if operation.ptr.is_null() {
-                None
-            } else {
-                Some(OperationRef::from_raw(operation))
-            }
-        }
+        unsafe { OperationRef::from_option_raw(mlirOperationGetNextInBlock(self.raw)) }
     }
 
     /// Verifies an operation.
