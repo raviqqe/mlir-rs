@@ -25,13 +25,12 @@ impl<'c> StringRef<'c> {
             .entry(Pin::new(string.into()))
             .or_default();
         let string = entry.key();
+        let string = MlirStringRef {
+            data: string.as_bytes().as_ptr() as *const i8,
+            length: string.len(),
+        };
 
-        unsafe {
-            Self::from_raw(MlirStringRef {
-                data: string.as_bytes().as_ptr() as *const i8,
-                length: string.len(),
-            })
-        }
+        unsafe { Self::from_raw(string) }
     }
 
     /// Converts a string reference into a `str`.
