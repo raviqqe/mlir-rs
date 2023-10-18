@@ -19,7 +19,7 @@ pub struct StringRef<'c> {
 }
 
 impl<'c> StringRef<'c> {
-    /// Converts a string of a static liftime into a string reference.
+    /// Converts a string of a static lifetime into a string reference.
     pub fn from_static_str(string: &str) -> Self {
         let string = MlirStringRef {
             data: string.as_bytes().as_ptr() as *const i8,
