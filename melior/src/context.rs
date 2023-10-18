@@ -13,6 +13,7 @@ use mlir_sys::{
     mlirContextIsRegisteredOperation, mlirContextLoadAllAvailableDialects,
     mlirContextSetAllowUnregisteredDialects, MlirContext, MlirDiagnostic, MlirLogicalResult,
 };
+use std::pin::Pin;
 use std::{ffi::c_void, marker::PhantomData};
 
 /// A context of IR, dialects, and passes.
@@ -24,7 +25,7 @@ pub struct Context {
     raw: MlirContext,
     // We need to pass null-terminated strings to functions in the MLIR API although
     // Rust's strings are not.
-    string_cache: DashMap<String, ()>,
+    string_cache: DashMap<Pin<String>, ()>,
 }
 
 impl Context {
@@ -128,7 +129,7 @@ impl Context {
         unsafe { ContextRef::from_raw(self.to_raw()) }
     }
 
-    pub(crate) fn string_cache(&self) -> &DashMap<String, ()> {
+    pub(crate) fn string_cache(&self) -> &DashMap<Pin<String>, ()> {
         &self.string_cache
     }
 }

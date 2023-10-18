@@ -2,6 +2,7 @@ use crate::Context;
 use mlir_sys::{mlirStringRefEqual, MlirStringRef};
 use std::{
     marker::PhantomData,
+    pin::Pin,
     slice,
     str::{self, Utf8Error},
 };
@@ -19,7 +20,10 @@ pub struct StringRef<'c> {
 
 impl<'c> StringRef<'c> {
     pub fn from_str(context: &'c Context, string: &str) -> Self {
-        let entry = context.string_cache().entry(string.into()).or_default();
+        let entry = context
+            .string_cache()
+            .entry(Pin::new(string.into()))
+            .or_default();
         let string = entry.key();
 
         unsafe {
