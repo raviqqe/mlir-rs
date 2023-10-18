@@ -135,7 +135,8 @@ mod tests {
                         zero.result(0).unwrap().into(),
                     ])
                     .add_results(&[index_type])
-                    .build(),
+                    .build()
+                    .unwrap(),
             );
 
             let loop_block = Block::new(&[(index_type, location)]);
@@ -156,7 +157,8 @@ mod tests {
                             loop_block.argument(0).unwrap().into(),
                         ])
                         .add_results(&[f32_type])
-                        .build(),
+                        .build()
+                        .unwrap(),
                 );
 
                 let rhs = loop_block.append_operation(
@@ -166,7 +168,8 @@ mod tests {
                             loop_block.argument(0).unwrap().into(),
                         ])
                         .add_results(&[f32_type])
-                        .build(),
+                        .build()
+                        .unwrap(),
                 );
 
                 let add = loop_block.append_operation(arith::addf(
@@ -183,7 +186,8 @@ mod tests {
                             function_block.argument(0).unwrap().into(),
                             loop_block.argument(0).unwrap().into(),
                         ])
-                        .build(),
+                        .build()
+                        .unwrap(),
                 );
 
                 loop_block.append_operation(scf::r#yield(&context, &[], location));

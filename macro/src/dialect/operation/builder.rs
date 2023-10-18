@@ -231,7 +231,7 @@ impl<'o> OperationBuilder<'o> {
             #[allow(clippy::too_many_arguments)]
             #[doc = #doc]
             pub fn #name<'c>(context: &'c ::melior::Context, #(#arguments),*) -> #class_name<'c> {
-                #class_name::builder(context, location)#(#builder_calls)*.build().expect("valid operation")
+                #class_name::builder(context, location)#(#builder_calls)*.build()
             }
         })
     }
