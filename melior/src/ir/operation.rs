@@ -184,7 +184,7 @@ impl<'c> Operation<'c> {
     }
 
     /// Gets a attribute with the given name.
-    pub fn attribute(&self, context: &'c Context, name: &str) -> Result<Attribute<'c>, Error> {
+    pub fn attribute(&self, name: &str) -> Result<Attribute<'c>, Error> {
         unsafe {
             Attribute::from_option_raw(mlirOperationGetAttributeByName(
                 self.raw,
@@ -195,12 +195,12 @@ impl<'c> Operation<'c> {
     }
 
     /// Checks if the operation has a attribute with the given name.
-    pub fn has_attribute(&self, context: &'c Context, name: &str) -> bool {
-        self.attribute(context, name).is_ok()
+    pub fn has_attribute(&self, name: &str) -> bool {
+        self.attribute(name).is_ok()
     }
 
     /// Sets the attribute with the given name to the given attribute.
-    pub fn set_attribute(&mut self, context: &'c Context, name: &str, attribute: &Attribute<'c>) {
+    pub fn set_attribute(&mut self, name: &str, attribute: &Attribute<'c>) {
         unsafe {
             mlirOperationSetAttributeByName(
                 self.raw,
@@ -211,7 +211,7 @@ impl<'c> Operation<'c> {
     }
 
     /// Removes the attribute with the given name.
-    pub fn remove_attribute(&mut self, context: &'c Context, name: &str) -> Result<(), Error> {
+    pub fn remove_attribute(&mut self, name: &str) -> Result<(), Error> {
         unsafe { mlirOperationRemoveAttributeByName(self.raw, StringRef::new(name).to_raw()) }
             .then_some(())
             .ok_or(Error::AttributeNotFound(name.into()))
@@ -562,20 +562,16 @@ mod tests {
             )])
             .build()
             .unwrap();
-        assert!(operation.has_attribute(&context, "foo"));
+        assert!(operation.has_attribute("foo"));
         assert_eq!(
-            operation.attribute(&context, "foo").map(|a| a.to_string()),
+            operation.attribute("foo").map(|a| a.to_string()),
             Ok("\"bar\"".into())
         );
-        assert!(operation.remove_attribute(&context, "foo").is_ok());
-        assert!(operation.remove_attribute(&context, "foo").is_err());
-        operation.set_attribute(
-            &context,
-            "foo",
-            &StringAttribute::new(&context, "foo").into(),
-        );
+        assert!(operation.remove_attribute("foo").is_ok());
+        assert!(operation.remove_attribute("foo").is_err());
+        operation.set_attribute("foo", &StringAttribute::new(&context, "foo").into());
         assert_eq!(
-            operation.attribute(&context, "foo").map(|a| a.to_string()),
+            operation.attribute("foo").map(|a| a.to_string()),
             Ok("\"foo\"".into())
         );
         assert_eq!(

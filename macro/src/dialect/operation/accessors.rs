@@ -89,7 +89,7 @@ impl<'a> OperationField<'a> {
                             let attribute =
                                 ::melior::ir::attribute::DenseI32ArrayAttribute::<'c>::try_from(
                                     self.operation
-                                        .attribute(context, #attribute_name)?
+                                        .attribute(#attribute_name)?
                                 )?;
                             let start = (0..#index)
                                 .map(|index| attribute.element(index))
@@ -154,11 +154,11 @@ impl<'a> OperationField<'a> {
                 let name = &self.name;
 
                 Some(if constraint.is_unit()? {
-                    quote! { self.operation.attribute(context, #name).is_some() }
+                    quote! { self.operation.attribute(#name).is_some() }
                 } else {
                     quote! {
                         self.operation
-                            .attribute(context, #name)?
+                            .attribute(#name)?
                             .try_into()
                             .map_err(::melior::Error::from)
                     }
@@ -174,7 +174,7 @@ impl<'a> OperationField<'a> {
 
                 if constraint.is_unit()? || constraint.is_optional()? {
                     Some(quote! {
-                      self.operation.remove_attribute(context, #name)
+                      self.operation.remove_attribute(#name)
                     })
                 } else {
                     None
@@ -193,14 +193,14 @@ impl<'a> OperationField<'a> {
         Ok(Some(if constraint.is_unit()? {
             quote! {
                 if value {
-                  self.operation.set_attribute(context, #name, Attribute::unit(&self.operation.context()));
+                  self.operation.set_attribute(#name, Attribute::unit(&self.operation.context()));
                 } else {
-                  self.operation.remove_attribute(context, #name)
+                  self.operation.remove_attribute(#name)
                 }
             }
         } else {
             quote! {
-                self.operation.set_attribute(context, #name, &value.into());
+                self.operation.set_attribute(#name, &value.into());
             }
         }))
     }
