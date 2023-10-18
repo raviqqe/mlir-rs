@@ -14,14 +14,14 @@ use std::{
 // TODO The documentation says string refs do not have to be null-terminated.
 // But it looks like some functions do not handle strings not null-terminated?
 #[derive(Clone, Copy, Debug)]
-pub struct StringRef<'c> {
+pub struct StringRef<'a> {
     raw: MlirStringRef,
-    _parent: PhantomData<&'c Context>,
+    _parent: PhantomData<&'a str>,
 }
 
-impl<'c> StringRef<'c> {
+impl<'a> StringRef<'a> {
     /// Creates a string reference.
-    pub fn new(string: &'c str) -> Self {
+    pub fn new(string: &'a str) -> Self {
         let string = MlirStringRef {
             data: string.as_bytes().as_ptr() as *const i8,
             length: string.len(),
@@ -31,7 +31,7 @@ impl<'c> StringRef<'c> {
     }
 
     /// Converts a C-style string into a string reference.
-    pub fn from_c_str(string: &'c CStr) -> Self {
+    pub fn from_c_str(string: &'a CStr) -> Self {
         let string = MlirStringRef {
             data: string.as_ptr(),
             length: string.to_bytes_with_nul().len() - 1,
@@ -41,7 +41,7 @@ impl<'c> StringRef<'c> {
     }
 
     /// Converts a string into a null-terminated string reference.
-    pub fn from_str(context: &'c Context, string: &str) -> Self {
+    pub fn from_str(context: &'a Context, string: &str) -> Self {
         let entry = context
             .string_cache()
             .entry(Pin::new(string.into()))
@@ -55,7 +55,7 @@ impl<'c> StringRef<'c> {
     }
 
     /// Converts a string reference into a `str`.
-    pub fn as_str(&self) -> Result<&'c str, Utf8Error> {
+    pub fn as_str(&self) -> Result<&'a str, Utf8Error> {
         unsafe {
             let bytes = slice::from_raw_parts(self.raw.data as *mut u8, self.raw.length);
 

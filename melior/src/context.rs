@@ -47,7 +47,7 @@ impl Context {
     }
 
     /// Gets or loads a dialect.
-    pub fn get_or_load_dialect(&self, name: &'static str) -> Dialect {
+    pub fn get_or_load_dialect(&self, name: &str) -> Dialect {
         let name = StringRef::new(name);
 
         unsafe { Dialect::from_raw(mlirContextGetOrLoadDialect(self.raw, name.to_raw())) }
@@ -79,7 +79,7 @@ impl Context {
     }
 
     /// Returns `true` if a given operation is registered in a context.
-    pub fn is_registered_operation(&self, name: &'static str) -> bool {
+    pub fn is_registered_operation(&self, name: &str) -> bool {
         let name = StringRef::new(name);
 
         unsafe { mlirContextIsRegisteredOperation(self.raw, name.to_raw()) }

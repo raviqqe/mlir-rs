@@ -28,7 +28,7 @@ impl<'c> PassManager<'c> {
 
     /// Gets an operation pass manager for nested operations corresponding to a
     /// given name.
-    pub fn nested_under(&self, name: &'static str) -> OperationPassManager {
+    pub fn nested_under(&self, name: &str) -> OperationPassManager {
         let name = StringRef::new(name);
 
         unsafe {
