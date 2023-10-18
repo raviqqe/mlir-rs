@@ -42,7 +42,6 @@ module.body().append_operation(func::func(
         let block = Block::new(&[(index_type, location), (index_type, location)]);
 
         let sum = block.append_operation(arith::addi(
-            &context,
             block.argument(0).unwrap().into(),
             block.argument(1).unwrap().into(),
             location
