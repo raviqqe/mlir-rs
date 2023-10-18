@@ -7,7 +7,7 @@ use mlir_sys::{
     mlirModuleCreateEmpty, mlirModuleCreateParse, mlirModuleDestroy, mlirModuleFromOperation,
     mlirModuleGetBody, mlirModuleGetContext, mlirModuleGetOperation, MlirModule,
 };
-use std::{ffi::CString, marker::PhantomData};
+use std::{ffi::CString, marker::PhantomData, mem::forget};
 
 /// A module.
 #[derive(Debug)]
@@ -24,10 +24,16 @@ impl<'c> Module<'c> {
 
     /// Parses a module.
     pub fn parse(context: &Context, source: &str) -> Option<Self> {
-        let source = CString::new(source).unwrap();
-        let source = StringRef::from_c_str(&source);
+        let string = CString::new(source).unwrap();
+        let source = StringRef::from_c_str(&string);
 
-        unsafe { Self::from_option_raw(mlirModuleCreateParse(context.to_raw(), source.to_raw())) }
+        let module = unsafe {
+            Self::from_option_raw(mlirModuleCreateParse(context.to_raw(), source.to_raw()))
+        };
+
+        forget(string);
+
+        module
     }
 
     /// Converts a module into an operation.
