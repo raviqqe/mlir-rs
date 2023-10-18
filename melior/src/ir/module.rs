@@ -24,7 +24,8 @@ impl<'c> Module<'c> {
 
     /// Parses a module.
     pub fn parse(context: &Context, source: &str) -> Option<Self> {
-        let source = StringRef::from_c_str(&CString::new(source).unwrap());
+        let source = CString::new(source).unwrap();
+        let source = StringRef::from_c_str(&source);
 
         unsafe { Self::from_option_raw(mlirModuleCreateParse(context.to_raw(), source.to_raw())) }
     }
