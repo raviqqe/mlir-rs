@@ -19,11 +19,8 @@ pub struct StringRef<'c> {
 
 impl<'c> StringRef<'c> {
     pub fn from_str(context: &'c Context, string: &str) -> Self {
-        let string = context
-            .string_cache()
-            .entry(string.into())
-            .or_default()
-            .key();
+        let entry = context.string_cache().entry(string.into()).or_default();
+        let string = entry.key();
 
         unsafe {
             Self::from_raw(MlirStringRef {
