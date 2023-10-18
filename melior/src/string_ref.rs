@@ -27,7 +27,7 @@ impl<'c> StringRef<'c> {
 
         unsafe {
             Self::from_raw(MlirStringRef {
-                data: string.as_bytes().as_ptr() as *const u8,
+                data: string.as_bytes().as_ptr() as *const i8,
                 length: string.len(),
             })
         }
