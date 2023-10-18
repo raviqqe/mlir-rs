@@ -124,6 +124,7 @@ impl<'c> OperationBuilder<'c> {
             let x = mlirOperationCreate(&mut self.raw);
 
             if x.ptr.is_null() {
+                // TODO Use a result or option type.
                 panic!("failed to create an operation")
             }
 
