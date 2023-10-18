@@ -108,11 +108,7 @@ pub fn insert_value<'c>(
 }
 
 /// Creates a `llvm.mlir.undef` operation.
-pub fn undef<'c>(
-    context: &'c Context,
-    result_type: Type<'c>,
-    location: Location<'c>,
-) -> Operation<'c> {
+pub fn undef<'c>(result_type: Type<'c>, location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("llvm.mlir.undef", location)
         .add_results(&[result_type])
         .build()
@@ -120,11 +116,7 @@ pub fn undef<'c>(
 }
 
 /// Creates a `llvm.mlir.poison` operation.
-pub fn poison<'c>(
-    context: &'c Context,
-    result_type: Type<'c>,
-    location: Location<'c>,
-) -> Operation<'c> {
+pub fn poison<'c>(result_type: Type<'c>, location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("llvm.mlir.poison", location)
         .add_results(&[result_type])
         .build()
@@ -132,11 +124,7 @@ pub fn poison<'c>(
 }
 
 /// Creates a `llvm.mlir.null` operation. A null pointer.
-pub fn nullptr<'c>(
-    context: &'c Context,
-    ptr_type: Type<'c>,
-    location: Location<'c>,
-) -> Operation<'c> {
+pub fn nullptr<'c>(ptr_type: Type<'c>, location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("llvm.mlir.null", location)
         .add_results(&[ptr_type])
         .build()
@@ -144,7 +132,7 @@ pub fn nullptr<'c>(
 }
 
 /// Creates a `llvm.unreachable` operation.
-pub fn unreachable<'c>(context: &'c Context, location: Location<'c>) -> Operation<'c> {
+pub fn unreachable<'c>(location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("llvm.unreachable", location)
         .build()
         .expect("valid operation")
@@ -152,7 +140,6 @@ pub fn unreachable<'c>(context: &'c Context, location: Location<'c>) -> Operatio
 
 /// Creates a `llvm.bitcast` operation.
 pub fn bitcast<'c>(
-    context: &'c Context,
     argument: Value<'c, '_>,
     result: Type<'c>,
     location: Location<'c>,
@@ -232,11 +219,7 @@ pub fn func<'c>(
 }
 
 // Creates a `llvm.return` operation.
-pub fn r#return<'c>(
-    context: &'c Context,
-    value: Option<Value<'c, '_>>,
-    location: Location<'c>,
-) -> Operation<'c> {
+pub fn r#return<'c>(value: Option<Value<'c, '_>>, location: Location<'c>) -> Operation<'c> {
     let mut builder = OperationBuilder::new("llvm.return", location);
 
     if let Some(value) = value {
@@ -304,7 +287,6 @@ pub fn intr_cttz<'c>(
 
 /// Creates a `llvm.intr.ctlz` operation.
 pub fn intr_ctpop<'c>(
-    context: &'c Context,
     value: Value<'c, '_>,
     result_type: Type<'c>,
     location: Location<'c>,
@@ -318,7 +300,6 @@ pub fn intr_ctpop<'c>(
 
 /// Creates a `llvm.intr.bswap` operation.
 pub fn intr_bswap<'c>(
-    context: &'c Context,
     value: Value<'c, '_>,
     result_type: Type<'c>,
     location: Location<'c>,
@@ -332,7 +313,6 @@ pub fn intr_bswap<'c>(
 
 /// Creates a `llvm.intr.bitreverse` operation.
 pub fn intr_bitreverse<'c>(
-    context: &'c Context,
     value: Value<'c, '_>,
     result_type: Type<'c>,
     location: Location<'c>,
@@ -369,7 +349,6 @@ pub fn intr_abs<'c>(
 
 /// Creates a `llvm.zext` operation.
 pub fn zext<'c>(
-    context: &'c Context,
     value: Value<'c, '_>,
     result_type: Type<'c>,
     location: Location<'c>,
@@ -616,7 +595,7 @@ mod tests {
             {
                 let block = Block::new(&[(struct_type, location)]);
 
-                block.append_operation(undef(&context, struct_type, location));
+                block.append_operation(undef(struct_type, location));
 
                 block.append_operation(func::r#return(&[], location));
 
@@ -650,7 +629,7 @@ mod tests {
             {
                 let block = Block::new(&[(struct_type, location)]);
 
-                block.append_operation(poison(&context, struct_type, location));
+                block.append_operation(poison(struct_type, location));
 
                 block.append_operation(func::r#return(&[], location));
 
@@ -732,7 +711,7 @@ mod tests {
                     Default::default(),
                 ));
 
-                block.append_operation(func::r#return( &[], location));
+                block.append_operation(func::r#return(&[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -772,7 +751,7 @@ mod tests {
                     Default::default(),
                 ));
 
-                block.append_operation(func::r#return( &[], location));
+                block.append_operation(func::r#return(&[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -815,7 +794,7 @@ mod tests {
                         .nontemporal(true),
                 ));
 
-                block.append_operation(func::r#return( &[], location));
+                block.append_operation(func::r#return(&[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -873,7 +852,7 @@ mod tests {
             {
                 let block = Block::new(&[]);
 
-                block.append_operation(r#return(&context, None, location));
+                block.append_operation(r#return(None, location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -890,11 +869,7 @@ mod tests {
             {
                 let block = Block::new(&[(struct_type, location)]);
 
-                block.append_operation(r#return(
-                    &context,
-                    Some(block.argument(0).unwrap().into()),
-                    location,
-                ));
+                block.append_operation(r#return(Some(block.argument(0).unwrap().into()), location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -939,7 +914,7 @@ mod tests {
                     .unwrap()
                     .into();
 
-                block.append_operation(func::r#return( &[res], location));
+                block.append_operation(func::r#return(&[res], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -984,7 +959,7 @@ mod tests {
                     .unwrap()
                     .into();
 
-                block.append_operation(func::r#return( &[res], location));
+                block.append_operation(func::r#return(&[res], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -1019,7 +994,6 @@ mod tests {
 
                 let res = block
                     .append_operation(intr_ctpop(
-                        &context,
                         block.argument(0).unwrap().into(),
                         integer_type,
                         location,
@@ -1028,7 +1002,7 @@ mod tests {
                     .unwrap()
                     .into();
 
-                block.append_operation(func::r#return( &[res], location));
+                block.append_operation(func::r#return(&[res], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -1063,7 +1037,6 @@ mod tests {
 
                 let res = block
                     .append_operation(intr_bswap(
-                        &context,
                         block.argument(0).unwrap().into(),
                         integer_type,
                         location,
@@ -1072,7 +1045,7 @@ mod tests {
                     .unwrap()
                     .into();
 
-                block.append_operation(func::r#return( &[res], location));
+                block.append_operation(func::r#return(&[res], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -1107,7 +1080,6 @@ mod tests {
 
                 let res = block
                     .append_operation(intr_bitreverse(
-                        &context,
                         block.argument(0).unwrap().into(),
                         integer_type,
                         location,
@@ -1116,7 +1088,7 @@ mod tests {
                     .unwrap()
                     .into();
 
-                block.append_operation(func::r#return( &[res], location));
+                block.append_operation(func::r#return(&[res], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -1161,7 +1133,7 @@ mod tests {
                     .unwrap()
                     .into();
 
-                block.append_operation(func::r#return( &[res], location));
+                block.append_operation(func::r#return(&[res], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -1197,7 +1169,6 @@ mod tests {
 
                 let res = block
                     .append_operation(zext(
-                        &context,
                         block.argument(0).unwrap().into(),
                         integer_double_type,
                         location,
@@ -1206,7 +1177,7 @@ mod tests {
                     .unwrap()
                     .into();
 
-                block.append_operation(func::r#return( &[res], location));
+                block.append_operation(func::r#return(&[res], location));
 
                 let region = Region::new();
                 region.append_block(block);

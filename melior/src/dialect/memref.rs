@@ -96,11 +96,7 @@ pub fn cast<'c>(
 }
 
 /// Create a `memref.dealloc` operation.
-pub fn dealloc<'c>(
-    context: &'c Context,
-    value: Value<'c, '_>,
-    location: Location<'c>,
-) -> Operation<'c> {
+pub fn dealloc<'c>(value: Value<'c, '_>, location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("memref.dealloc", location)
         .add_operands(&[value])
         .build()
@@ -109,7 +105,6 @@ pub fn dealloc<'c>(
 
 /// Create a `memref.dim` operation.
 pub fn dim<'c>(
-    context: &'c Context,
     value: Value<'c, '_>,
     index: Value<'c, '_>,
     location: Location<'c>,
@@ -189,7 +184,6 @@ pub fn global<'c>(
 
 /// Create a `memref.load` operation.
 pub fn load<'c>(
-    context: &'c Context,
     memref: Value<'c, '_>,
     indices: &[Value<'c, '_>],
     location: Location<'c>,
@@ -203,11 +197,7 @@ pub fn load<'c>(
 }
 
 /// Create a `memref.rank` operation.
-pub fn rank<'c>(
-    context: &'c Context,
-    value: Value<'c, '_>,
-    location: Location<'c>,
-) -> Operation<'c> {
+pub fn rank<'c>(value: Value<'c, '_>, location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("memref.rank", location)
         .add_operands(&[value])
         .enable_result_type_inference()
@@ -217,7 +207,6 @@ pub fn rank<'c>(
 
 /// Create a `memref.store` operation.
 pub fn store<'c>(
-    context: &'c Context,
     value: Value<'c, '_>,
     memref: Value<'c, '_>,
     indices: &[Value<'c, '_>],
@@ -311,11 +300,7 @@ mod tests {
                 None,
                 location,
             ));
-            block.append_operation(dealloc(
-                &context,
-                memref.result(0).unwrap().into(),
-                location,
-            ));
+            block.append_operation(dealloc(memref.result(0).unwrap().into(), location));
         })
     }
 
@@ -409,7 +394,6 @@ mod tests {
             ));
 
             block.append_operation(dim(
-                &context,
                 memref.result(0).unwrap().into(),
                 index.result(0).unwrap().into(),
                 location,
@@ -524,12 +508,7 @@ mod tests {
                 None,
                 location,
             ));
-            block.append_operation(load(
-                &context,
-                memref.result(0).unwrap().into(),
-                &[],
-                location,
-            ));
+            block.append_operation(load(memref.result(0).unwrap().into(), &[], location));
         })
     }
 
@@ -555,7 +534,6 @@ mod tests {
             ));
 
             block.append_operation(load(
-                &context,
                 memref.result(0).unwrap().into(),
                 &[index.result(0).unwrap().into()],
                 location,
@@ -577,7 +555,7 @@ mod tests {
                 None,
                 location,
             ));
-            block.append_operation(rank(&context, memref.result(0).unwrap().into(), location));
+            block.append_operation(rank(memref.result(0).unwrap().into(), location));
         })
     }
 
@@ -603,7 +581,6 @@ mod tests {
             ));
 
             block.append_operation(store(
-                &context,
                 value.result(0).unwrap().into(),
                 memref.result(0).unwrap().into(),
                 &[],
@@ -640,7 +617,6 @@ mod tests {
             ));
 
             block.append_operation(store(
-                &context,
                 value.result(0).unwrap().into(),
                 memref.result(0).unwrap().into(),
                 &[index.result(0).unwrap().into()],
