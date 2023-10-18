@@ -188,7 +188,7 @@ impl<'c> Operation<'c> {
         unsafe {
             Attribute::from_option_raw(mlirOperationGetAttributeByName(
                 self.raw,
-                StringRef::from_str(context, name).to_raw(),
+                StringRef::new( name).to_raw(),
             ))
         }
         .ok_or(Error::AttributeNotFound(name.into()))
@@ -204,7 +204,7 @@ impl<'c> Operation<'c> {
         unsafe {
             mlirOperationSetAttributeByName(
                 self.raw,
-                StringRef::from_str(context, name).to_raw(),
+                StringRef::new( name).to_raw(),
                 attribute.to_raw(),
             )
         }
@@ -215,7 +215,7 @@ impl<'c> Operation<'c> {
         unsafe {
             mlirOperationRemoveAttributeByName(
                 self.raw,
-                StringRef::from_str(context, name).to_raw(),
+                StringRef::new( name).to_raw(),
             )
         }
         .then_some(())

@@ -15,7 +15,7 @@ fn string_ref_create(bencher: &mut Bencher) {
 
     bencher.iter(|| {
         for string in &strings {
-            let _ = StringRef::from_str(&context, string.as_str());
+            let _ = StringRef::new( string.as_str());
         }
     });
 }
@@ -25,7 +25,7 @@ fn string_ref_create_cached(bencher: &mut Bencher) {
 
     bencher.iter(|| {
         for _ in 0..ITERATION_COUNT {
-            let _ = StringRef::from_str(&context, "foo");
+            let _ = StringRef::new( "foo");
         }
     });
 }

@@ -11,9 +11,8 @@ pub struct ExecutionEngine {
 
 impl ExecutionEngine {
     /// Creates an execution engine.
-    pub fn new<'c>(
-        context: &'c Context,
-        module: &Module<'c>,
+    pub fn new(
+        module: &Module,
         optimization_level: usize,
         shared_library_paths: &[&str],
         enable_object_dump: bool,
@@ -26,7 +25,7 @@ impl ExecutionEngine {
                     shared_library_paths.len() as i32,
                     shared_library_paths
                         .iter()
-                        .map(|&string| StringRef::from_str(context, string).to_raw())
+                        .map(|&string| StringRef::new(string).to_raw())
                         .collect::<Vec<_>>()
                         .as_ptr(),
                     enable_object_dump,
@@ -51,7 +50,7 @@ impl ExecutionEngine {
     ) -> Result<(), Error> {
         let result = LogicalResult::from_raw(mlirExecutionEngineInvokePacked(
             self.raw,
-            StringRef::from_str(context, name).to_raw(),
+            StringRef::new(name).to_raw(),
             arguments.as_mut_ptr() as _,
         ));
 
@@ -70,21 +69,12 @@ impl ExecutionEngine {
     /// given pointer is invalid or misaligned, calling this function might
     /// result in undefined behavior.
     pub unsafe fn register_symbol(&self, context: &Context, name: &str, ptr: *mut ()) {
-        mlirExecutionEngineRegisterSymbol(
-            self.raw,
-            StringRef::from_str(context, name).to_raw(),
-            ptr as _,
-        );
+        mlirExecutionEngineRegisterSymbol(self.raw, StringRef::new(name).to_raw(), ptr as _);
     }
 
     /// Dumps a module to an object file.
     pub fn dump_to_object_file(&self, context: &Context, path: &str) {
-        unsafe {
-            mlirExecutionEngineDumpToObjectFile(
-                self.raw,
-                StringRef::from_str(context, path).to_raw(),
-            )
-        }
+        unsafe { mlirExecutionEngineDumpToObjectFile(self.raw, StringRef::new(path).to_raw()) }
     }
 }
 
@@ -125,7 +115,7 @@ mod tests {
 
         assert_eq!(pass_manager.run(&mut module), Ok(()));
 
-        let engine = ExecutionEngine::new(&context, &module, 2, &[], false);
+        let engine = ExecutionEngine::new(&module, 2, &[], false);
 
         let mut argument = 42;
         let mut result = -1;
@@ -174,7 +164,7 @@ mod tests {
 
         assert_eq!(pass_manager.run(&mut module), Ok(()));
 
-        ExecutionEngine::new(&context, &module, 2, &[], true)
+        ExecutionEngine::new(&module, 2, &[], true)
             .dump_to_object_file(&context, "/tmp/melior/test.o");
     }
 }

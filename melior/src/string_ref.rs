@@ -103,8 +103,8 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            StringRef::from_str(&context, "foo"),
-            StringRef::from_str(&context, "foo")
+            StringRef::new( "foo"),
+            StringRef::new( "foo")
         );
     }
 
@@ -113,7 +113,7 @@ mod tests {
         let context = Context::new();
 
         assert_eq!(
-            StringRef::from_str(&context, "foo").as_str().unwrap(),
+            StringRef::new( "foo").as_str().unwrap(),
             "foo"
         );
     }
@@ -123,8 +123,8 @@ mod tests {
         let context = Context::new();
 
         assert_ne!(
-            StringRef::from_str(&context, "foo"),
-            StringRef::from_str(&context, "bar")
+            StringRef::new( "foo"),
+            StringRef::new( "bar")
         );
     }
 }

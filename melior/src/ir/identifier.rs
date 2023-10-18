@@ -21,7 +21,7 @@ impl<'c> Identifier<'c> {
         unsafe {
             Self::from_raw(mlirIdentifierGet(
                 context.to_raw(),
-                StringRef::from_str(context, name).to_raw(),
+                StringRef::new( name).to_raw(),
             ))
         }
     }

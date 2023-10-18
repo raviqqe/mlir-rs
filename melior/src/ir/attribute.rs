@@ -44,7 +44,7 @@ impl<'c> Attribute<'c> {
         unsafe {
             Self::from_option_raw(mlirAttributeParseGet(
                 context.to_raw(),
-                StringRef::from_str(context, source).to_raw(),
+                StringRef::new( source).to_raw(),
             ))
         }
     }

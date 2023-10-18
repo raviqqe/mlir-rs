@@ -25,7 +25,7 @@ impl<'c> OperationBuilder<'c> {
         Self {
             raw: unsafe {
                 mlirOperationStateGet(
-                    StringRef::from_str(context, name).to_raw(),
+                    StringRef::new( name).to_raw(),
                     location.to_raw(),
                 )
             },
