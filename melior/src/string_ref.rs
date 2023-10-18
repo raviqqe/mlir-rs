@@ -41,6 +41,7 @@ impl<'a> StringRef<'a> {
     }
 
     /// Converts a string into a null-terminated string reference.
+    #[deprecated]
     pub fn from_str(context: &'a Context, string: &str) -> Self {
         let entry = context
             .string_cache()
