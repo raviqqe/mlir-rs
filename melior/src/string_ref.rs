@@ -34,7 +34,7 @@ impl<'c> StringRef<'c> {
     pub fn from_c_str(string: &'c CStr) -> Self {
         let string = MlirStringRef {
             data: string.as_ptr(),
-            length: string.to_bytes_with_nul().len(),
+            length: string.to_bytes_with_nul().len() - 1,
         };
 
         unsafe { Self::from_raw(string) }
