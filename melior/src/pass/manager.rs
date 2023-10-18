@@ -28,12 +28,11 @@ impl<'c> PassManager<'c> {
 
     /// Gets an operation pass manager for nested operations corresponding to a
     /// given name.
-    pub fn nested_under(&self, context: &'c Context, name: &str) -> OperationPassManager {
+    pub fn nested_under(&self, name: &'static str) -> OperationPassManager {
+        let name = StringRef::from_static_str(name);
+
         unsafe {
-            OperationPassManager::from_raw(mlirPassManagerGetNestedUnder(
-                self.raw,
-                StringRef::from_str(context, name).to_raw(),
-            ))
+            OperationPassManager::from_raw(mlirPassManagerGetNestedUnder(self.raw, name.to_raw()))
         }
     }
 
@@ -178,15 +177,15 @@ mod tests {
 
         let manager = PassManager::new(&context);
         manager
-            .nested_under(&context, "func.func")
+            .nested_under("func.func")
             .add_pass(pass::transform::create_print_op_stats());
 
         assert_eq!(manager.run(&mut module), Ok(()));
 
         let manager = PassManager::new(&context);
         manager
-            .nested_under(&context, "builtin.module")
-            .nested_under(&context, "func.func")
+            .nested_under("builtin.module")
+            .nested_under("func.func")
             .add_pass(pass::transform::create_print_op_stats());
 
         assert_eq!(manager.run(&mut module), Ok(()));
@@ -196,7 +195,7 @@ mod tests {
     fn print_pass_pipeline() {
         let context = create_test_context();
         let manager = PassManager::new(&context);
-        let function_manager = manager.nested_under(&context, "func.func");
+        let function_manager = manager.nested_under("func.func");
 
         function_manager.add_pass(pass::transform::create_print_op_stats());
 

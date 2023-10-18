@@ -19,6 +19,15 @@ pub struct StringRef<'c> {
 }
 
 impl<'c> StringRef<'c> {
+    pub fn from_static_str(string: &'static str) -> Self {
+        let string = MlirStringRef {
+            data: string.as_bytes().as_ptr() as *const i8,
+            length: string.len(),
+        };
+
+        unsafe { Self::from_raw(string) }
+    }
+
     pub fn from_str(context: &'c Context, string: &str) -> Self {
         let entry = context
             .string_cache()

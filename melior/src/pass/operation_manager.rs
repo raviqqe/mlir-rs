@@ -1,5 +1,5 @@
 use super::PassManager;
-use crate::{pass::Pass, string_ref::StringRef, Context};
+use crate::{pass::Pass, string_ref::StringRef};
 use mlir_sys::{
     mlirOpPassManagerAddOwnedPass, mlirOpPassManagerGetNestedUnder, mlirPrintPassPipeline,
     MlirOpPassManager, MlirStringRef,
@@ -20,13 +20,10 @@ pub struct OperationPassManager<'c, 'a> {
 impl<'c, 'a> OperationPassManager<'c, 'a> {
     /// Gets an operation pass manager for nested operations corresponding to a
     /// given name.
-    pub fn nested_under(&self, context: &'c Context, name: &str) -> Self {
-        unsafe {
-            Self::from_raw(mlirOpPassManagerGetNestedUnder(
-                self.raw,
-                StringRef::from_str(context, name).to_raw(),
-            ))
-        }
+    pub fn nested_under(&self, name: &'static str) -> Self {
+        let name = StringRef::from_static_str(name);
+
+        unsafe { Self::from_raw(mlirOpPassManagerGetNestedUnder(self.raw, name.to_raw())) }
     }
 
     /// Adds a pass.

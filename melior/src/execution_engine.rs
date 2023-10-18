@@ -120,7 +120,7 @@ mod tests {
         pass_manager.add_pass(pass::conversion::create_func_to_llvm());
 
         pass_manager
-            .nested_under(&context, "func.func")
+            .nested_under("func.func")
             .add_pass(pass::conversion::create_arith_to_llvm());
 
         assert_eq!(pass_manager.run(&mut module), Ok(()));
@@ -169,7 +169,7 @@ mod tests {
         pass_manager.add_pass(pass::conversion::create_func_to_llvm());
 
         pass_manager
-            .nested_under(&context, "func.func")
+            .nested_under("func.func")
             .add_pass(pass::conversion::create_arith_to_llvm());
 
         assert_eq!(pass_manager.run(&mut module), Ok(()));
