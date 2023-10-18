@@ -23,13 +23,11 @@ impl<'c> StringRef<'c> {
             .string_cache()
             .entry(string.into())
             .or_default()
-            .key()
-            .as_ptr();
-        string.len();
+            .key();
 
         unsafe {
             Self::from_raw(MlirStringRef {
-                data: string.as_bytes().as_ptr(),
+                data: string.as_bytes().as_ptr() as *const u8,
                 length: string.len(),
             })
         }
