@@ -1,7 +1,6 @@
 use crate::Context;
-use mlir_sys::{mlirStringRefCreateFromCString, mlirStringRefEqual, MlirStringRef};
+use mlir_sys::{mlirStringRefEqual, MlirStringRef};
 use std::{
-    ffi::CString,
     marker::PhantomData,
     slice,
     str::{self, Utf8Error},
@@ -22,12 +21,18 @@ impl<'c> StringRef<'c> {
     pub fn from_str(context: &'c Context, string: &str) -> Self {
         let string = context
             .string_cache()
-            .entry(CString::new(string).unwrap())
+            .entry(string.into())
             .or_default()
             .key()
             .as_ptr();
+        string.len();
 
-        unsafe { Self::from_raw(mlirStringRefCreateFromCString(string)) }
+        unsafe {
+            Self::from_raw(MlirStringRef {
+                data: string.as_bytes().as_ptr(),
+                length: string.len(),
+            })
+        }
     }
 
     /// Converts a string reference into a `str`.
