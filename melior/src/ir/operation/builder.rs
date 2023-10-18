@@ -124,7 +124,7 @@ impl<'c> OperationBuilder<'c> {
             let x = mlirOperationCreate(&mut self.raw);
 
             if x.ptr.is_null() {
-                panic!()
+                panic!("failed to create an operation")
             }
 
             Operation::from_raw(x)
