@@ -26,7 +26,6 @@ impl<'c> Module<'c> {
     pub fn parse(context: &Context, source: &str) -> Option<Self> {
         let source = StringRef::from_c_str(&CString::new(source).unwrap());
 
-        // TODO Should we allocate StringRef locally because sources can be big?
         unsafe { Self::from_option_raw(mlirModuleCreateParse(context.to_raw(), source.to_raw())) }
     }
 
