@@ -436,7 +436,9 @@ mod tests {
     fn new() {
         let context = create_test_context();
         context.set_allow_unregistered_dialects(true);
-        OperationBuilder::new(&context, "foo", Location::unknown(&context)).build();
+        OperationBuilder::new(&context, "foo", Location::unknown(&context))
+            .build()
+            .unwrap();
     }
 
     #[test]

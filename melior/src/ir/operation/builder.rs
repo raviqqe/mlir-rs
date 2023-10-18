@@ -139,7 +139,9 @@ mod tests {
         let context = create_test_context();
         context.set_allow_unregistered_dialects(true);
 
-        OperationBuilder::new(&context, "foo", Location::unknown(&context)).build();
+        OperationBuilder::new(&context, "foo", Location::unknown(&context))
+            .build()
+            .unwrap();
     }
 
     #[test]
@@ -154,7 +156,8 @@ mod tests {
 
         OperationBuilder::new(&context, "foo", Location::unknown(&context))
             .add_operands(&[argument])
-            .build();
+            .build()
+            .unwrap();
     }
 
     #[test]
@@ -164,7 +167,8 @@ mod tests {
 
         OperationBuilder::new(&context, "foo", Location::unknown(&context))
             .add_results(&[Type::parse(&context, "i1").unwrap()])
-            .build();
+            .build()
+            .unwrap();
     }
 
     #[test]
@@ -174,7 +178,8 @@ mod tests {
 
         OperationBuilder::new(&context, "foo", Location::unknown(&context))
             .add_regions(vec![Region::new()])
-            .build();
+            .build()
+            .unwrap();
     }
 
     #[test]
@@ -184,7 +189,8 @@ mod tests {
 
         OperationBuilder::new(&context, "foo", Location::unknown(&context))
             .add_successors(&[&Block::new(&[])])
-            .build();
+            .build()
+            .unwrap();
     }
 
     #[test]
@@ -197,7 +203,8 @@ mod tests {
                 Identifier::new(&context, "foo"),
                 Attribute::parse(&context, "unit").unwrap(),
             )])
-            .build();
+            .build()
+            .unwrap();
     }
 
     #[test]
