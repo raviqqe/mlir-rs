@@ -20,6 +20,7 @@ pub fn constant<'c>(
         .add_attributes(&[(Identifier::new(context, "value"), value)])
         .enable_result_type_inference()
         .build()
+        .expect("valid operation")
 }
 
 /// `arith.cmpf` predicate
@@ -94,6 +95,7 @@ fn cmp<'c>(
         .add_operands(&[lhs, rhs])
         .enable_result_type_inference()
         .build()
+        .expect("valid operation")
 }
 
 /// Creates an `arith.select` operation.
@@ -108,6 +110,7 @@ pub fn select<'c>(
         .add_operands(&[condition, true_value, false_value])
         .add_results(&[true_value.r#type()])
         .build()
+        .expect("valid operation")
 }
 
 melior_macro::binary_operations!(
