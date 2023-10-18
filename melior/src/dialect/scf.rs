@@ -15,7 +15,7 @@ pub fn condition<'c>(
     values: &[Value<'c, '_>],
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(context, "scf.condition", location)
+    OperationBuilder::new( "scf.condition", location)
         .add_operands(&[condition])
         .add_operands(values)
         .build()
@@ -29,7 +29,7 @@ pub fn execute_region<'c>(
     region: Region<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(context, "scf.execute_region", location)
+    OperationBuilder::new( "scf.execute_region", location)
         .add_results(result_types)
         .add_regions(vec![region])
         .build()
@@ -45,7 +45,7 @@ pub fn r#for<'c>(
     region: Region<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(context, "scf.for", location)
+    OperationBuilder::new( "scf.for", location)
         .add_operands(&[start, end, step])
         .add_regions(vec![region])
         .build()
@@ -61,7 +61,7 @@ pub fn r#if<'c>(
     else_region: Region<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(context, "scf.if", location)
+    OperationBuilder::new( "scf.if", location)
         .add_operands(&[condition])
         .add_results(result_types)
         .add_regions(vec![then_region, else_region])
@@ -78,7 +78,7 @@ pub fn index_switch<'c>(
     regions: Vec<Region<'c>>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(context, "scf.index_switch", location)
+    OperationBuilder::new( "scf.index_switch", location)
         .add_operands(&[condition])
         .add_results(result_types)
         .add_attributes(&[(Identifier::new(context, "cases"), cases.into())])
@@ -96,7 +96,7 @@ pub fn r#while<'c>(
     after_region: Region<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(context, "scf.while", location)
+    OperationBuilder::new( "scf.while", location)
         .add_operands(initial_values)
         .add_results(result_types)
         .add_regions(vec![before_region, after_region])
@@ -110,7 +110,7 @@ pub fn r#yield<'c>(
     values: &[Value<'c, '_>],
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(context, "scf.yield", location)
+    OperationBuilder::new( "scf.yield", location)
         .add_operands(values)
         .build()
         .expect("valid operation")

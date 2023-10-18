@@ -19,7 +19,7 @@ pub fn assert<'c>(
     message: &str,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(context, "cf.assert", location)
+    OperationBuilder::new( "cf.assert", location)
         .add_attributes(&[(
             Identifier::new(context, "msg"),
             StringAttribute::new(context, message).into(),
@@ -36,7 +36,7 @@ pub fn br<'c>(
     destination_operands: &[Value<'c, '_>],
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(context, "cf.br", location)
+    OperationBuilder::new( "cf.br", location)
         .add_operands(destination_operands)
         .add_successors(&[successor])
         .build()
@@ -53,7 +53,7 @@ pub fn cond_br<'c>(
     false_successor_operands: &[Value<'c, '_>],
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(context, "cf.cond_br", location)
+    OperationBuilder::new( "cf.cond_br", location)
         .add_attributes(&[(
             Identifier::new(context, "operand_segment_sizes"),
             DenseI32ArrayAttribute::new(
@@ -93,7 +93,7 @@ pub fn switch<'c>(
         .chain(case_destinations.iter().copied())
         .unzip();
 
-    Ok(OperationBuilder::new(context, "cf.switch", location)
+    Ok(OperationBuilder::new( "cf.switch", location)
         .add_attributes(&[
             (
                 Identifier::new(context, "case_values"),

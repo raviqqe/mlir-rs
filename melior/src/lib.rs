@@ -129,7 +129,7 @@ mod tests {
             ));
 
             let dim = function_block.append_operation(
-                OperationBuilder::new(&context, "memref.dim", location)
+                OperationBuilder::new( "memref.dim", location)
                     .add_operands(&[
                         function_block.argument(0).unwrap().into(),
                         zero.result(0).unwrap().into(),
@@ -151,7 +151,7 @@ mod tests {
                 let f32_type = Type::float32(&context);
 
                 let lhs = loop_block.append_operation(
-                    OperationBuilder::new(&context, "memref.load", location)
+                    OperationBuilder::new( "memref.load", location)
                         .add_operands(&[
                             function_block.argument(0).unwrap().into(),
                             loop_block.argument(0).unwrap().into(),
@@ -162,7 +162,7 @@ mod tests {
                 );
 
                 let rhs = loop_block.append_operation(
-                    OperationBuilder::new(&context, "memref.load", location)
+                    OperationBuilder::new( "memref.load", location)
                         .add_operands(&[
                             function_block.argument(1).unwrap().into(),
                             loop_block.argument(0).unwrap().into(),
@@ -180,7 +180,7 @@ mod tests {
                 ));
 
                 loop_block.append_operation(
-                    OperationBuilder::new(&context, "memref.store", location)
+                    OperationBuilder::new( "memref.store", location)
                         .add_operands(&[
                             add.result(0).unwrap().into(),
                             function_block.argument(0).unwrap().into(),

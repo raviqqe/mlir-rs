@@ -16,7 +16,7 @@ pub fn constant<'c>(
     value: Attribute<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(context, "arith.constant", location)
+    OperationBuilder::new("arith.constant", location)
         .add_attributes(&[(Identifier::new(context, "value"), value)])
         .enable_result_type_inference()
         .build()
@@ -87,7 +87,7 @@ fn cmp<'c>(
     rhs: Value<'c, '_>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(context, name, location)
+    OperationBuilder::new(name, location)
         .add_attributes(&[(
             Identifier::new(context, "predicate"),
             IntegerAttribute::new(predicate, IntegerType::new(context, 64).into()).into(),
@@ -106,7 +106,7 @@ pub fn select<'c>(
     false_value: Value<'c, '_>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(context, "arith.select", location)
+    OperationBuilder::new("arith.select", location)
         .add_operands(&[condition, true_value, false_value])
         .add_results(&[true_value.r#type()])
         .build()

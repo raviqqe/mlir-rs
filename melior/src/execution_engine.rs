@@ -42,12 +42,7 @@ impl ExecutionEngine {
     /// This function modifies memory locations pointed by the `arguments`
     /// argument. If those pointers are invalid or misaligned, calling this
     /// function might result in undefined behavior.
-    pub unsafe fn invoke_packed(
-        &self,
-        context: &Context,
-        name: &str,
-        arguments: &mut [*mut ()],
-    ) -> Result<(), Error> {
+    pub unsafe fn invoke_packed(&self, name: &str, arguments: &mut [*mut ()]) -> Result<(), Error> {
         let result = LogicalResult::from_raw(mlirExecutionEngineInvokePacked(
             self.raw,
             StringRef::new(name).to_raw(),
@@ -68,12 +63,12 @@ impl ExecutionEngine {
     /// This function makes a pointer accessible to the execution engine. If a
     /// given pointer is invalid or misaligned, calling this function might
     /// result in undefined behavior.
-    pub unsafe fn register_symbol(&self, context: &Context, name: &str, ptr: *mut ()) {
+    pub unsafe fn register_symbol(&self, name: &str, ptr: *mut ()) {
         mlirExecutionEngineRegisterSymbol(self.raw, StringRef::new(name).to_raw(), ptr as _);
     }
 
     /// Dumps a module to an object file.
-    pub fn dump_to_object_file(&self, context: &Context, path: &str) {
+    pub fn dump_to_object_file(&self, path: &str) {
         unsafe { mlirExecutionEngineDumpToObjectFile(self.raw, StringRef::new(path).to_raw()) }
     }
 }
@@ -123,7 +118,6 @@ mod tests {
         assert_eq!(
             unsafe {
                 engine.invoke_packed(
-                    &context,
                     "add",
                     &mut [
                         &mut argument as *mut i32 as *mut (),
@@ -164,7 +158,6 @@ mod tests {
 
         assert_eq!(pass_manager.run(&mut module), Ok(()));
 
-        ExecutionEngine::new(&module, 2, &[], true)
-            .dump_to_object_file(&context, "/tmp/melior/test.o");
+        ExecutionEngine::new(&module, 2, &[], true).dump_to_object_file("/tmp/melior/test.o");
     }
 }

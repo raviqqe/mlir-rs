@@ -436,7 +436,7 @@ mod tests {
     fn new() {
         let context = create_test_context();
         context.set_allow_unregistered_dialects(true);
-        OperationBuilder::new(&context, "foo", Location::unknown(&context))
+        OperationBuilder::new( "foo", Location::unknown(&context))
             .build()
             .unwrap();
     }
@@ -447,7 +447,7 @@ mod tests {
         context.set_allow_unregistered_dialects(true);
 
         assert_eq!(
-            OperationBuilder::new(&context, "foo", Location::unknown(&context),)
+            OperationBuilder::new( "foo", Location::unknown(&context),)
                 .build()
                 .unwrap()
                 .name(),
@@ -461,7 +461,7 @@ mod tests {
         context.set_allow_unregistered_dialects(true);
         let block = Block::new(&[]);
         let operation = block.append_operation(
-            OperationBuilder::new(&context, "foo", Location::unknown(&context))
+            OperationBuilder::new( "foo", Location::unknown(&context))
                 .build()
                 .unwrap(),
         );
@@ -474,7 +474,7 @@ mod tests {
         let context = create_test_context();
         context.set_allow_unregistered_dialects(true);
         assert_eq!(
-            OperationBuilder::new(&context, "foo", Location::unknown(&context))
+            OperationBuilder::new( "foo", Location::unknown(&context))
                 .build()
                 .unwrap()
                 .block(),
@@ -487,7 +487,7 @@ mod tests {
         let context = create_test_context();
         context.set_allow_unregistered_dialects(true);
         assert_eq!(
-            OperationBuilder::new(&context, "foo", Location::unknown(&context))
+            OperationBuilder::new( "foo", Location::unknown(&context))
                 .build()
                 .unwrap()
                 .result(0)
@@ -505,7 +505,7 @@ mod tests {
         let context = create_test_context();
         context.set_allow_unregistered_dialects(true);
         assert_eq!(
-            OperationBuilder::new(&context, "foo", Location::unknown(&context),)
+            OperationBuilder::new( "foo", Location::unknown(&context),)
                 .build()
                 .unwrap()
                 .region(0),
@@ -528,7 +528,7 @@ mod tests {
         let argument: Value = block.argument(0).unwrap().into();
 
         let operands = vec![argument, argument, argument];
-        let operation = OperationBuilder::new(&context, "foo", Location::unknown(&context))
+        let operation = OperationBuilder::new( "foo", Location::unknown(&context))
             .add_operands(&operands)
             .build()
             .unwrap();
@@ -544,7 +544,7 @@ mod tests {
         let context = create_test_context();
         context.set_allow_unregistered_dialects(true);
 
-        let operation = OperationBuilder::new(&context, "foo", Location::unknown(&context))
+        let operation = OperationBuilder::new( "foo", Location::unknown(&context))
             .add_regions(vec![Region::new()])
             .build()
             .unwrap();
@@ -560,7 +560,7 @@ mod tests {
         let context = create_test_context();
         context.set_allow_unregistered_dialects(true);
 
-        let mut operation = OperationBuilder::new(&context, "foo", Location::unknown(&context))
+        let mut operation = OperationBuilder::new( "foo", Location::unknown(&context))
             .add_attributes(&[(
                 Identifier::new(&context, "foo"),
                 StringAttribute::new(&context, "bar").into(),
@@ -596,7 +596,7 @@ mod tests {
     fn clone() {
         let context = create_test_context();
         context.set_allow_unregistered_dialects(true);
-        let operation = OperationBuilder::new(&context, "foo", Location::unknown(&context))
+        let operation = OperationBuilder::new( "foo", Location::unknown(&context))
             .build()
             .unwrap();
 
@@ -609,7 +609,7 @@ mod tests {
         context.set_allow_unregistered_dialects(true);
 
         assert_eq!(
-            OperationBuilder::new(&context, "foo", Location::unknown(&context),)
+            OperationBuilder::new( "foo", Location::unknown(&context),)
                 .build()
                 .unwrap()
                 .to_string(),
@@ -625,7 +625,7 @@ mod tests {
         assert_eq!(
             format!(
                 "{:?}",
-                OperationBuilder::new(&context, "foo", Location::unknown(&context))
+                OperationBuilder::new( "foo", Location::unknown(&context))
                     .build()
                     .unwrap()
             ),
@@ -639,7 +639,7 @@ mod tests {
         context.set_allow_unregistered_dialects(true);
 
         assert_eq!(
-            OperationBuilder::new(&context, "foo", Location::unknown(&context))
+            OperationBuilder::new( "foo", Location::unknown(&context))
                 .build()
                 .unwrap()
                 .to_string_with_flags(

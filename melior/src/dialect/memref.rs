@@ -62,7 +62,7 @@ fn allocate<'c>(
     alignment: Option<IntegerAttribute<'c>>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    let mut builder = OperationBuilder::new(context, name, location);
+    let mut builder = OperationBuilder::new( name, location);
 
     builder = builder.add_attributes(&[(
         Identifier::new(context, "operand_segment_sizes"),
@@ -89,7 +89,7 @@ pub fn cast<'c>(
     r#type: MemRefType<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(context, "memref.cast", location)
+    OperationBuilder::new( "memref.cast", location)
         .add_operands(&[value])
         .add_results(&[r#type.into()])
         .build()
@@ -102,7 +102,7 @@ pub fn dealloc<'c>(
     value: Value<'c, '_>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(context, "memref.dealloc", location)
+    OperationBuilder::new( "memref.dealloc", location)
         .add_operands(&[value])
         .build()
         .expect("valid operation")
@@ -115,7 +115,7 @@ pub fn dim<'c>(
     index: Value<'c, '_>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(context, "memref.dim", location)
+    OperationBuilder::new( "memref.dim", location)
         .add_operands(&[value, index])
         .enable_result_type_inference()
         .build()
@@ -129,7 +129,7 @@ pub fn get_global<'c>(
     r#type: MemRefType<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(context, "memref.get_global", location)
+    OperationBuilder::new( "memref.get_global", location)
         .add_attributes(&[(
             Identifier::new(context, "name"),
             FlatSymbolRefAttribute::new(context, name).into(),
@@ -151,7 +151,7 @@ pub fn global<'c>(
     alignment: Option<IntegerAttribute<'c>>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    let mut builder = OperationBuilder::new(context, "memref.global", location).add_attributes(&[
+    let mut builder = OperationBuilder::new( "memref.global", location).add_attributes(&[
         (
             Identifier::new(context, "sym_name"),
             StringAttribute::new(context, name).into(),
@@ -195,7 +195,7 @@ pub fn load<'c>(
     indices: &[Value<'c, '_>],
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(context, "memref.load", location)
+    OperationBuilder::new( "memref.load", location)
         .add_operands(&[memref])
         .add_operands(indices)
         .enable_result_type_inference()
@@ -209,7 +209,7 @@ pub fn rank<'c>(
     value: Value<'c, '_>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(context, "memref.rank", location)
+    OperationBuilder::new( "memref.rank", location)
         .add_operands(&[value])
         .enable_result_type_inference()
         .build()
@@ -224,7 +224,7 @@ pub fn store<'c>(
     indices: &[Value<'c, '_>],
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new(context, "memref.store", location)
+    OperationBuilder::new( "memref.store", location)
         .add_operands(&[value, memref])
         .add_operands(indices)
         .build()
@@ -240,7 +240,7 @@ pub fn realloc<'c>(
     alignment: Option<IntegerAttribute<'c>>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    let mut builder = OperationBuilder::new(context, "memref.realloc", location)
+    let mut builder = OperationBuilder::new( "memref.realloc", location)
         .add_operands(&[value])
         .add_results(&[r#type.into()]);
 
