@@ -35,6 +35,7 @@ pub fn generate_binary(dialect: &Ident, names: &[Ident]) -> Result<TokenStream, 
                 .add_operands(&[lhs, rhs])
                 .enable_result_type_inference()
                 .build()
+                .expect("valid operation")
         }
     }));
 
@@ -71,6 +72,7 @@ pub fn generate_unary(dialect: &Ident, names: &[Ident]) -> Result<TokenStream, B
                 .add_operands(&[value])
                 .enable_result_type_inference()
                 .build()
+                .expect("valid operation")
         }
     }));
 
@@ -112,6 +114,7 @@ pub fn generate_typed_unary(
                 .add_operands(&[value])
                 .add_results(&[r#type])
                 .build()
+                .expect("valid operation")
         }
     }));
 

@@ -21,6 +21,7 @@ pub fn constant<'c>(
         .add_attributes(&[(Identifier::new(context, "value"), value.into())])
         .enable_result_type_inference()
         .build()
+        .expect("valid operation")
 }
 
 /// Creates an `index.cmp` operation.
@@ -54,6 +55,7 @@ pub fn cmp<'c>(
         .add_operands(&[lhs, rhs])
         .enable_result_type_inference()
         .build()
+        .expect("valid operation")
 }
 
 melior_macro::binary_operations!(

@@ -145,7 +145,9 @@ pub fn nullptr<'c>(
 
 /// Creates a `llvm.unreachable` operation.
 pub fn unreachable<'c>(context: &'c Context, location: Location<'c>) -> Operation<'c> {
-    OperationBuilder::new(context, "llvm.unreachable", location).build()
+    OperationBuilder::new(context, "llvm.unreachable", location)
+        .build()
+        .expect("valid operation")
 }
 
 /// Creates a `llvm.bitcast` operation.
