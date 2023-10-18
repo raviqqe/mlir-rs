@@ -404,7 +404,7 @@ mod tests {
         let block = Block::new(&[]);
 
         let operation = block.append_operation(
-            OperationBuilder::new( "func.return", Location::unknown(&context))
+            OperationBuilder::new("func.return", Location::unknown(&context))
                 .build()
                 .unwrap(),
         );
@@ -424,7 +424,7 @@ mod tests {
         let block = Block::new(&[]);
 
         let operation = block.append_operation(
-            OperationBuilder::new( "foo", Location::unknown(&context))
+            OperationBuilder::new("foo", Location::unknown(&context))
                 .build()
                 .unwrap(),
         );
@@ -446,7 +446,7 @@ mod tests {
         let block = Block::new(&[]);
 
         block.append_operation(
-            OperationBuilder::new( "foo", Location::unknown(&context))
+            OperationBuilder::new("foo", Location::unknown(&context))
                 .build()
                 .unwrap(),
         );
@@ -460,7 +460,7 @@ mod tests {
 
         block.insert_operation(
             0,
-            OperationBuilder::new( "foo", Location::unknown(&context))
+            OperationBuilder::new("foo", Location::unknown(&context))
                 .build()
                 .unwrap(),
         );
@@ -473,13 +473,13 @@ mod tests {
         let block = Block::new(&[]);
 
         let first_operation = block.append_operation(
-            OperationBuilder::new( "foo", Location::unknown(&context))
+            OperationBuilder::new("foo", Location::unknown(&context))
                 .build()
                 .unwrap(),
         );
         let second_operation = block.insert_operation_after(
             first_operation,
-            OperationBuilder::new( "foo", Location::unknown(&context))
+            OperationBuilder::new("foo", Location::unknown(&context))
                 .build()
                 .unwrap(),
         );
@@ -498,13 +498,13 @@ mod tests {
         let block = Block::new(&[]);
 
         let second_operation = block.append_operation(
-            OperationBuilder::new( "foo", Location::unknown(&context))
+            OperationBuilder::new("foo", Location::unknown(&context))
                 .build()
                 .unwrap(),
         );
         let first_operation = block.insert_operation_before(
             second_operation,
-            OperationBuilder::new( "foo", Location::unknown(&context))
+            OperationBuilder::new("foo", Location::unknown(&context))
                 .build()
                 .unwrap(),
         );

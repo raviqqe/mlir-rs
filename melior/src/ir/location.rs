@@ -27,7 +27,7 @@ impl<'c> Location<'c> {
         unsafe {
             Self::from_raw(mlirLocationFileLineColGet(
                 context.to_raw(),
-                StringRef::new( filename).to_raw(),
+                StringRef::new(filename).to_raw(),
                 line as u32,
                 column as u32,
             ))
@@ -51,7 +51,7 @@ impl<'c> Location<'c> {
         unsafe {
             Self::from_raw(mlirLocationNameGet(
                 context.to_raw(),
-                StringRef::new( name).to_raw(),
+                StringRef::new(name).to_raw(),
                 child.to_raw(),
             ))
         }

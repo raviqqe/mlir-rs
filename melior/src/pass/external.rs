@@ -179,10 +179,10 @@ pub fn create_external<'c, T: RunExternalPass<'c>>(
     unsafe {
         Pass::from_raw(mlirCreateExternalPass(
             pass_id.to_raw(),
-            StringRef::new( name).to_raw(),
-            StringRef::new( argument).to_raw(),
-            StringRef::new( description).to_raw(),
-            StringRef::new( op_name).to_raw(),
+            StringRef::new(name).to_raw(),
+            StringRef::new(argument).to_raw(),
+            StringRef::new(description).to_raw(),
+            StringRef::new(op_name).to_raw(),
             dependent_dialects.len() as isize,
             dependent_dialects.as_ptr() as _,
             MlirExternalPassCallbacks {

@@ -43,7 +43,7 @@ pub fn parse_pass_pipeline(
     let result = LogicalResult::from_raw(unsafe {
         mlirParsePassPipeline(
             manager.to_raw(),
-            StringRef::new( source).to_raw(),
+            StringRef::new(source).to_raw(),
             Some(handle_parse_error),
             &mut error_message as *mut _ as *mut _,
         )

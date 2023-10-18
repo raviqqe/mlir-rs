@@ -71,7 +71,7 @@ mod tests {
         context.set_allow_unregistered_dialects(true);
 
         let r#type = Type::parse(&context, "index").unwrap();
-        let operation = OperationBuilder::new( "foo", Location::unknown(&context))
+        let operation = OperationBuilder::new("foo", Location::unknown(&context))
             .add_results(&[r#type])
             .build()
             .unwrap();

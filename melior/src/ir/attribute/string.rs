@@ -14,7 +14,7 @@ impl<'c> StringAttribute<'c> {
         unsafe {
             Self::from_raw(mlirStringAttrGet(
                 context.to_raw(),
-                StringRef::new( string).to_raw(),
+                StringRef::new(string).to_raw(),
             ))
         }
     }

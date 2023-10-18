@@ -17,7 +17,7 @@ pub fn constant<'c>(
     value: IntegerAttribute<'c>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new( "index.constant", location)
+    OperationBuilder::new("index.constant", location)
         .add_attributes(&[(Identifier::new(context, "value"), value.into())])
         .enable_result_type_inference()
         .build()
@@ -32,7 +32,7 @@ pub fn cmp<'c>(
     rhs: Value<'c, '_>,
     location: Location<'c>,
 ) -> Operation<'c> {
-    OperationBuilder::new( "index.cmp", location)
+    OperationBuilder::new("index.cmp", location)
         .add_attributes(&[(
             Identifier::new(context, "pred"),
             Attribute::parse(
