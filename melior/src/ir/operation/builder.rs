@@ -121,14 +121,14 @@ impl<'c> OperationBuilder<'c> {
     /// Builds an operation.
     pub fn build(mut self) -> Operation<'c> {
         unsafe {
-            let x = mlirOperationCreate(&mut self.raw);
+            let operation = mlirOperationCreate(&mut self.raw);
 
-            if x.ptr.is_null() {
+            if operation.ptr.is_null() {
                 // TODO Use a result or option type.
                 panic!("failed to create an operation")
             }
 
-            Operation::from_raw(x)
+            Operation::from_raw(operation)
         }
     }
 }
