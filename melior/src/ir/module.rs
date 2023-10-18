@@ -24,6 +24,7 @@ impl<'c> Module<'c> {
 
     /// Parses a module.
     pub fn parse(context: &Context, source: &str) -> Option<Self> {
+        // Somehow, we still need a null-terminated string for a source.
         let source = CString::new(source).unwrap();
         let source = StringRef::from_c_str(&source);
 
