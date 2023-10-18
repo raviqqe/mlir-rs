@@ -28,7 +28,6 @@ pub fn call<'c>(
 
 /// Create a `func.call_indirect` operation.
 pub fn call_indirect<'c>(
-    context: &'c Context,
     function: Value<'c, '_>,
     arguments: &[Value<'c, '_>],
     result_types: &[Type<'c>],
@@ -77,11 +76,7 @@ pub fn func<'c>(
 }
 
 /// Create a `func.return` operation.
-pub fn r#return<'c>(
-    context: &'c Context,
-    operands: &[Value<'c, '_>],
-    location: Location<'c>,
-) -> Operation<'c> {
+pub fn r#return<'c>(operands: &[Value<'c, '_>], location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("func.return", location)
         .add_operands(operands)
         .build()
@@ -123,7 +118,7 @@ mod tests {
                     .result(0)
                     .unwrap()
                     .into();
-                block.append_operation(r#return(&context, &[value], location));
+                block.append_operation(r#return(&[value], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -163,7 +158,6 @@ mod tests {
                 ));
                 let value = block
                     .append_operation(call_indirect(
-                        &context,
                         function.result(0).unwrap().into(),
                         &[block.argument(0).unwrap().into()],
                         &[index_type],
@@ -172,7 +166,7 @@ mod tests {
                     .result(0)
                     .unwrap()
                     .into();
-                block.append_operation(r#return(&context, &[value], location));
+                block.append_operation(r#return(&[value], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -200,11 +194,7 @@ mod tests {
         let function = {
             let block = Block::new(&[(integer_type, location)]);
 
-            block.append_operation(r#return(
-                &context,
-                &[block.argument(0).unwrap().into()],
-                location,
-            ));
+            block.append_operation(r#return(&[block.argument(0).unwrap().into()], location));
 
             let region = Region::new();
             region.append_block(block);

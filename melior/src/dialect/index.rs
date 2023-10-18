@@ -107,7 +107,6 @@ mod tests {
         let name = name.as_string_ref().as_str().unwrap();
 
         block.append_operation(func::r#return(
-            context,
             &[block.append_operation(operation).result(0).unwrap().into()],
             location,
         ));
@@ -240,11 +239,7 @@ mod tests {
                 location,
             ));
 
-            block.append_operation(func::r#return(
-                &context,
-                &[sum.result(0).unwrap().into()],
-                location,
-            ));
+            block.append_operation(func::r#return(&[sum.result(0).unwrap().into()], location));
 
             let region = Region::new();
             region.append_block(block);

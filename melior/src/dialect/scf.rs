@@ -160,7 +160,7 @@ mod tests {
                     location,
                 ));
 
-                block.append_operation(func::r#return(&context, &[], location));
+                block.append_operation(func::r#return(&[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -222,7 +222,7 @@ mod tests {
                     location,
                 ));
 
-                block.append_operation(func::r#return(&context, &[], location));
+                block.append_operation(func::r#return(&[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -304,7 +304,6 @@ mod tests {
                     ));
 
                     block.append_operation(func::r#return(
-                        &context,
                         &[result.result(0).unwrap().into()],
                         location,
                     ));
@@ -358,7 +357,7 @@ mod tests {
                         location,
                     ));
 
-                    block.append_operation(func::r#return(&context, &[], location));
+                    block.append_operation(func::r#return(&[], location));
 
                     let region = Region::new();
                     region.append_block(block);
@@ -431,7 +430,7 @@ mod tests {
                     location,
                 ));
 
-                block.append_operation(func::r#return(&context, &[], location));
+                block.append_operation(func::r#return(&[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -520,7 +519,7 @@ mod tests {
                         location,
                     ));
 
-                    block.append_operation(func::r#return(&context, &[], location));
+                    block.append_operation(func::r#return(&[], location));
 
                     let region = Region::new();
                     region.append_block(block);
@@ -607,7 +606,7 @@ mod tests {
                         location,
                     ));
 
-                    block.append_operation(func::r#return(&context, &[], location));
+                    block.append_operation(func::r#return(&[], location));
 
                     let region = Region::new();
                     region.append_block(block);
@@ -704,7 +703,7 @@ mod tests {
                         location,
                     ));
 
-                    block.append_operation(func::r#return(&context, &[], location));
+                    block.append_operation(func::r#return(&[], location));
 
                     let region = Region::new();
                     region.append_block(block);

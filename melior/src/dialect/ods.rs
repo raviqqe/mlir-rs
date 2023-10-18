@@ -200,7 +200,7 @@ mod tests {
                 .into(),
             );
 
-            block.append_operation(func::r#return(&context, &[], location));
+            block.append_operation(func::r#return(&[], location));
         });
     }
 
@@ -225,7 +225,7 @@ mod tests {
                     .into(),
             );
 
-            block.append_operation(func::r#return(&context, &[], location));
+            block.append_operation(func::r#return(&[], location));
         });
     }
 }

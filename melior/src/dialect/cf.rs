@@ -31,7 +31,6 @@ pub fn assert<'c>(
 
 /// Creates a `cf.br` operation.
 pub fn br<'c>(
-    context: &'c Context,
     successor: &Block<'c>,
     destination_operands: &[Value<'c, '_>],
     location: Location<'c>,
@@ -188,7 +187,7 @@ mod tests {
 
                 block.append_operation(assert(&context, operand, "assert message", location));
 
-                block.append_operation(func::r#return(&context, &[], location));
+                block.append_operation(func::r#return(&[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -227,9 +226,9 @@ mod tests {
                     .result(0)
                     .unwrap();
 
-                block.append_operation(br(&context, &dest_block, &[operand.into()], location));
+                block.append_operation(br(&dest_block, &[operand.into()], location));
 
-                dest_block.append_operation(func::r#return(&context, &[], location));
+                dest_block.append_operation(func::r#return(&[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -294,8 +293,8 @@ mod tests {
                     location,
                 ));
 
-                true_block.append_operation(func::r#return(&context, &[], location));
-                false_block.append_operation(func::r#return(&context, &[], location));
+                true_block.append_operation(func::r#return(&[], location));
+                false_block.append_operation(func::r#return(&[], location));
 
                 let region = Region::new();
                 region.append_block(block);
@@ -353,9 +352,9 @@ mod tests {
                     .unwrap(),
                 );
 
-                default_block.append_operation(func::r#return(&context, &[], location));
-                first_block.append_operation(func::r#return(&context, &[], location));
-                second_block.append_operation(func::r#return(&context, &[], location));
+                default_block.append_operation(func::r#return(&[], location));
+                first_block.append_operation(func::r#return(&[], location));
+                second_block.append_operation(func::r#return(&[], location));
 
                 let region = Region::new();
                 region.append_block(block);

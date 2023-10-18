@@ -1,4 +1,4 @@
-use crate::{ir::Module, logical_result::LogicalResult, string_ref::StringRef, Context, Error};
+use crate::{ir::Module, logical_result::LogicalResult, string_ref::StringRef, Error};
 use mlir_sys::{
     mlirExecutionEngineCreate, mlirExecutionEngineDestroy, mlirExecutionEngineDumpToObjectFile,
     mlirExecutionEngineInvokePacked, mlirExecutionEngineRegisterSymbol, MlirExecutionEngine,

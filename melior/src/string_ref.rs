@@ -100,22 +100,16 @@ mod tests {
 
     #[test]
     fn equal() {
-        let context = Context::new();
-
         assert_eq!(StringRef::new("foo"), StringRef::new("foo"));
     }
 
     #[test]
     fn equal_str() {
-        let context = Context::new();
-
         assert_eq!(StringRef::new("foo").as_str().unwrap(), "foo");
     }
 
     #[test]
     fn not_equal() {
-        let context = Context::new();
-
         assert_ne!(StringRef::new("foo"), StringRef::new("bar"));
     }
 }

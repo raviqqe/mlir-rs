@@ -100,7 +100,6 @@ fn cmp<'c>(
 
 /// Creates an `arith.select` operation.
 pub fn select<'c>(
-    context: &'c Context,
     condition: Value<'c, '_>,
     true_value: Value<'c, '_>,
     false_value: Value<'c, '_>,
@@ -209,7 +208,6 @@ mod tests {
         let name = name.as_string_ref().as_str().unwrap();
 
         block.append_operation(func::r#return(
-            context,
             &[block.append_operation(operation).result(0).unwrap().into()],
             location,
         ));
@@ -599,11 +597,7 @@ mod tests {
                 location,
             ));
 
-            block.append_operation(func::r#return(
-                &context,
-                &[sum.result(0).unwrap().into()],
-                location,
-            ));
+            block.append_operation(func::r#return(&[sum.result(0).unwrap().into()], location));
 
             let region = Region::new();
             region.append_block(block);
@@ -646,18 +640,13 @@ mod tests {
             ]);
 
             let val = block.append_operation(select(
-                &context,
                 block.argument(0).unwrap().into(),
                 block.argument(1).unwrap().into(),
                 block.argument(2).unwrap().into(),
                 location,
             ));
 
-            block.append_operation(func::r#return(
-                &context,
-                &[val.result(0).unwrap().into()],
-                location,
-            ));
+            block.append_operation(func::r#return(&[val.result(0).unwrap().into()], location));
 
             let region = Region::new();
             region.append_block(block);

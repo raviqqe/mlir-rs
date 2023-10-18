@@ -80,11 +80,7 @@ mod tests {
                 location,
             ));
 
-            block.append_operation(func::r#return(
-                &context,
-                &[sum.result(0).unwrap().into()],
-                location,
-            ));
+            block.append_operation(func::r#return(&[sum.result(0).unwrap().into()], location));
 
             let region = Region::new();
             region.append_block(block);
@@ -205,7 +201,7 @@ mod tests {
                 location,
             ));
 
-            function_block.append_operation(func::r#return(&context, &[], location));
+            function_block.append_operation(func::r#return(&[], location));
 
             let function_region = Region::new();
             function_region.append_block(function_block);
@@ -261,7 +257,6 @@ mod tests {
                 let block = Block::new(&[(integer_type, location), (integer_type, location)]);
 
                 block.append_operation(func::r#return(
-                    &context,
                     &[compile_add(
                         &context,
                         &block,

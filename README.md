@@ -48,7 +48,7 @@ module.body().append_operation(func::func(
             location
         ));
 
-        block.append_operation(func::r#return(&context, &[sum.result(0).unwrap().into()], location));
+        block.append_operation(func::r#return( &[sum.result(0).unwrap().into()], location));
 
         let region = Region::new();
         region.append_block(block);
