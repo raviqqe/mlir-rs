@@ -24,10 +24,9 @@ impl<'c> StringRef<'c> {
             .string_cache()
             .entry(Pin::new(string.into()))
             .or_default();
-        let string = entry.key();
         let string = MlirStringRef {
-            data: string.as_bytes().as_ptr() as *const i8,
-            length: string.len(),
+            data: entry.key().as_bytes().as_ptr() as *const i8,
+            length: entry.key().len(),
         };
 
         unsafe { Self::from_raw(string) }
