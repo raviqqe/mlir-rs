@@ -258,7 +258,6 @@ mod tests {
             &context,
             |block| {
                 negf(
-                    &context,
                     block.argument(0).unwrap().into(),
                     Location::unknown(&context),
                 )
@@ -335,7 +334,6 @@ mod tests {
                 &context,
                 |block| {
                     bitcast(
-                        &context,
                         block.argument(0).unwrap().into(),
                         float_type,
                         Location::unknown(&context),
@@ -354,7 +352,6 @@ mod tests {
                 &context,
                 |block| {
                     extf(
-                        &context,
                         block.argument(0).unwrap().into(),
                         Type::float64(&context),
                         Location::unknown(&context),
@@ -377,7 +374,6 @@ mod tests {
                 &context,
                 |block| {
                     extsi(
-                        &context,
                         block.argument(0).unwrap().into(),
                         IntegerType::new(&context, 64).into(),
                         Location::unknown(&context),
@@ -400,7 +396,6 @@ mod tests {
                 &context,
                 |block| {
                     extui(
-                        &context,
                         block.argument(0).unwrap().into(),
                         IntegerType::new(&context, 64).into(),
                         Location::unknown(&context),
@@ -423,7 +418,6 @@ mod tests {
                 &context,
                 |block| {
                     fptosi(
-                        &context,
                         block.argument(0).unwrap().into(),
                         IntegerType::new(&context, 64).into(),
                         Location::unknown(&context),
@@ -446,7 +440,6 @@ mod tests {
                 &context,
                 |block| {
                     fptoui(
-                        &context,
                         block.argument(0).unwrap().into(),
                         IntegerType::new(&context, 64).into(),
                         Location::unknown(&context),
@@ -469,7 +462,6 @@ mod tests {
                 &context,
                 |block| {
                     index_cast(
-                        &context,
                         block.argument(0).unwrap().into(),
                         IntegerType::new(&context, 64).into(),
                         Location::unknown(&context),
@@ -492,7 +484,6 @@ mod tests {
                 &context,
                 |block| {
                     index_castui(
-                        &context,
                         block.argument(0).unwrap().into(),
                         IntegerType::new(&context, 64).into(),
                         Location::unknown(&context),
@@ -515,7 +506,6 @@ mod tests {
                 &context,
                 |block| {
                     sitofp(
-                        &context,
                         block.argument(0).unwrap().into(),
                         Type::float64(&context),
                         Location::unknown(&context),
@@ -538,7 +528,6 @@ mod tests {
                 &context,
                 |block| {
                     trunci(
-                        &context,
                         block.argument(0).unwrap().into(),
                         IntegerType::new(&context, 32).into(),
                         Location::unknown(&context),
@@ -561,7 +550,6 @@ mod tests {
                 &context,
                 |block| {
                     uitofp(
-                        &context,
                         block.argument(0).unwrap().into(),
                         Type::float64(&context),
                         Location::unknown(&context),
@@ -591,7 +579,6 @@ mod tests {
             let block = Block::new(&[(integer_type, location), (integer_type, location)]);
 
             let sum = block.append_operation(addi(
-                &context,
                 block.argument(0).unwrap().into(),
                 block.argument(1).unwrap().into(),
                 location,

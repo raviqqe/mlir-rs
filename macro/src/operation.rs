@@ -17,7 +17,7 @@ pub fn generate_binary(dialect: &Ident, names: &[Ident]) -> Result<TokenStream, 
                 rhs: crate::ir::Value<'c, '_>,
                 location: crate::ir::Location<'c>,
             ) -> crate::ir::Operation<'c> {
-                binary_operator(context, #operation_name, lhs, rhs, location)
+                binary_operator(#operation_name, lhs, rhs, location)
             }
         }));
     }
@@ -53,7 +53,7 @@ pub fn generate_unary(dialect: &Ident, names: &[Ident]) -> Result<TokenStream, B
                 value: crate::ir::Value<'c, '_>,
                 location: crate::ir::Location<'c>,
             ) -> crate::ir::Operation<'c> {
-                unary_operator(context, #operation_name, value, location)
+                unary_operator(#operation_name, value, location)
             }
         }));
     }

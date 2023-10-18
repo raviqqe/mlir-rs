@@ -182,7 +182,6 @@ mod tests {
                 &context,
                 |block| {
                     casts(
-                        &context,
                         block.argument(0).unwrap().into(),
                         IntegerType::new(&context, 64).into(),
                         Location::unknown(&context),
@@ -204,7 +203,6 @@ mod tests {
                 &context,
                 |block| {
                     castu(
-                        &context,
                         block.argument(0).unwrap().into(),
                         IntegerType::new(&context, 64).into(),
                         Location::unknown(&context),
@@ -233,7 +231,6 @@ mod tests {
             let block = Block::new(&[(integer_type, location), (integer_type, location)]);
 
             let sum = block.append_operation(add(
-                &context,
                 block.argument(0).unwrap().into(),
                 block.argument(1).unwrap().into(),
                 location,

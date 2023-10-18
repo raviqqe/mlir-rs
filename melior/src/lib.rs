@@ -74,7 +74,6 @@ mod tests {
             let block = Block::new(&[(integer_type, location), (integer_type, location)]);
 
             let sum = block.append_operation(arith::addi(
-                &context,
                 block.argument(0).unwrap().into(),
                 block.argument(1).unwrap().into(),
                 location,
@@ -169,7 +168,6 @@ mod tests {
                 );
 
                 let add = loop_block.append_operation(arith::addf(
-                    &context,
                     lhs.result(0).unwrap().into(),
                     rhs.result(0).unwrap().into(),
                     location,
@@ -241,7 +239,7 @@ mod tests {
             rhs: Value<'c, '_>,
         ) -> Value<'c, 'a> {
             block
-                .append_operation(arith::addi(context, lhs, rhs, Location::unknown(context)))
+                .append_operation(arith::addi(lhs, rhs, Location::unknown(context)))
                 .result(0)
                 .unwrap()
                 .into()
