@@ -23,6 +23,7 @@ pub fn call<'c>(
         .add_operands(arguments)
         .add_results(result_types)
         .build()
+        .expect("valid operation")
 }
 
 /// Create a `func.call_indirect` operation.
@@ -38,6 +39,7 @@ pub fn call_indirect<'c>(
         .add_operands(arguments)
         .add_results(result_types)
         .build()
+        .expect("valid operation")
 }
 
 /// Create a `func.constant` operation.
@@ -51,6 +53,7 @@ pub fn constant<'c>(
         .add_attributes(&[(Identifier::new(context, "value"), function.into())])
         .add_results(&[r#type.into()])
         .build()
+        .expect("valid operation")
 }
 
 /// Create a `func.func` operation.
@@ -70,6 +73,7 @@ pub fn func<'c>(
         .add_attributes(attributes)
         .add_regions(vec![region])
         .build()
+        .expect("valid operation")
 }
 
 /// Create a `func.return` operation.
@@ -81,6 +85,7 @@ pub fn r#return<'c>(
     OperationBuilder::new(context, "func.return", location)
         .add_operands(operands)
         .build()
+        .expect("valid operation")
 }
 
 #[cfg(test)]

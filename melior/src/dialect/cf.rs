@@ -26,6 +26,7 @@ pub fn assert<'c>(
         )])
         .add_operands(&[argument])
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `cf.br` operation.
@@ -39,6 +40,7 @@ pub fn br<'c>(
         .add_operands(destination_operands)
         .add_successors(&[successor])
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `cf.cond_br` operation.
@@ -73,6 +75,7 @@ pub fn cond_br<'c>(
         )
         .add_successors(&[true_successor, false_successor])
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `cf.switch` operation.
@@ -137,7 +140,8 @@ pub fn switch<'c>(
                 .collect::<Vec<_>>(),
         )
         .add_successors(&destinations)
-        .build())
+        .build()
+        .expect("valid operation"))
 }
 
 #[cfg(test)]
