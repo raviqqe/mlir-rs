@@ -21,7 +21,7 @@ impl<'c, 'a> OperationPassManager<'c, 'a> {
     /// Gets an operation pass manager for nested operations corresponding to a
     /// given name.
     pub fn nested_under(&self, name: &'static str) -> Self {
-        let name = StringRef::from_static_str(name);
+        let name = StringRef::new(name);
 
         unsafe { Self::from_raw(mlirOpPassManagerGetNestedUnder(self.raw, name.to_raw())) }
     }

@@ -20,8 +20,8 @@ pub struct StringRef<'c> {
 }
 
 impl<'c> StringRef<'c> {
-    /// Converts a string into a string reference.
-    pub fn from_static_str(string: &'c str) -> Self {
+    /// Creates a string reference.
+    pub fn new(string: &'c str) -> Self {
         let string = MlirStringRef {
             data: string.as_bytes().as_ptr() as *const i8,
             length: string.len(),
