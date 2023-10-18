@@ -267,6 +267,19 @@ impl<'c> Operation<'c> {
         }
     }
 
+    /// Creates an optional operation from a raw object.
+    ///
+    /// # Safety
+    ///
+    /// A raw object must be valid.
+    pub unsafe fn from_option_raw(raw: MlirOperation) -> Option<Self> {
+        if raw.ptr.is_null() {
+            None
+        } else {
+            Some(Self::from_raw(raw))
+        }
+    }
+
     /// Converts an operation into a raw object.
     pub fn into_raw(self) -> MlirOperation {
         let operation = self.raw;

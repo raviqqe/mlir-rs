@@ -167,7 +167,7 @@ impl<'o> OperationBuilder<'o> {
         quote! {
             impl<'c> #builder_ident<'c, #(#arguments),*> {
                 pub fn build(self) -> #class_name<'c> {
-                    self.builder #maybe_infer.build().try_into().expect(#error)
+                    self.builder #maybe_infer.build().expect("valid operation").try_into().expect(#error)
                 }
             }
         }
@@ -231,7 +231,7 @@ impl<'o> OperationBuilder<'o> {
             #[allow(clippy::too_many_arguments)]
             #[doc = #doc]
             pub fn #name<'c>(context: &'c ::melior::Context, #(#arguments),*) -> #class_name<'c> {
-                #class_name::builder(context, location)#(#builder_calls)*.build()
+                #class_name::builder(context, location)#(#builder_calls)*.build().expect("valid operation")
             }
         })
     }

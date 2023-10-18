@@ -119,17 +119,8 @@ impl<'c> OperationBuilder<'c> {
     }
 
     /// Builds an operation.
-    pub fn build(mut self) -> Operation<'c> {
-        unsafe {
-            let operation = mlirOperationCreate(&mut self.raw);
-
-            if operation.ptr.is_null() {
-                // TODO Use a result or option type.
-                panic!("failed to create an operation")
-            }
-
-            Operation::from_raw(operation)
-        }
+    pub fn build(mut self) -> Option<Operation<'c>> {
+        unsafe { Operation::from_option_raw(mlirOperationCreate(&mut self.raw)) }
     }
 }
 
@@ -222,6 +213,7 @@ mod tests {
                 .add_operands(&[argument, argument])
                 .enable_result_type_inference()
                 .build()
+                .unwrap()
                 .result(0)
                 .unwrap()
                 .r#type(),

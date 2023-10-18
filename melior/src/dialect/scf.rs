@@ -19,6 +19,7 @@ pub fn condition<'c>(
         .add_operands(&[condition])
         .add_operands(values)
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `scf.execute_region` operation.
@@ -32,6 +33,7 @@ pub fn execute_region<'c>(
         .add_results(result_types)
         .add_regions(vec![region])
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `scf.for` operation.
@@ -47,6 +49,7 @@ pub fn r#for<'c>(
         .add_operands(&[start, end, step])
         .add_regions(vec![region])
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `scf.if` operation.
@@ -63,6 +66,7 @@ pub fn r#if<'c>(
         .add_results(result_types)
         .add_regions(vec![then_region, else_region])
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `scf.index_switch` operation.
@@ -80,6 +84,7 @@ pub fn index_switch<'c>(
         .add_attributes(&[(Identifier::new(context, "cases"), cases.into())])
         .add_regions(regions)
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `scf.while` operation.
@@ -96,6 +101,7 @@ pub fn r#while<'c>(
         .add_results(result_types)
         .add_regions(vec![before_region, after_region])
         .build()
+        .expect("valid operation")
 }
 
 /// Creates a `scf.yield` operation.
@@ -107,6 +113,7 @@ pub fn r#yield<'c>(
     OperationBuilder::new(context, "scf.yield", location)
         .add_operands(values)
         .build()
+        .expect("valid operation")
 }
 
 #[cfg(test)]
