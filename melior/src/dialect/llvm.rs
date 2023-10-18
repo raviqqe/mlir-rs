@@ -132,7 +132,7 @@ pub fn nullptr<'c>(ptr_type: Type<'c>, location: Location<'c>) -> Operation<'c> 
 }
 
 /// Creates a `llvm.unreachable` operation.
-pub fn unreachable<'c>(location: Location<'c>) -> Operation<'c> {
+pub fn unreachable(location: Location) -> Operation {
     OperationBuilder::new("llvm.unreachable", location)
         .build()
         .expect("valid operation")
