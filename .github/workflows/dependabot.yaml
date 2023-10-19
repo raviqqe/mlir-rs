@@ -1,10 +1,10 @@
-name: merge
+name: dependabot
 on: pull_request
 permissions:
   contents: write
   pull-requests: write
 jobs:
-  dependabot:
+  merge:
     runs-on: ubuntu-latest
     if: github.actor == 'dependabot[bot]'
     steps:
