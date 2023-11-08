@@ -40,21 +40,6 @@ impl<'a> StringRef<'a> {
         unsafe { Self::from_raw(string) }
     }
 
-    /// Converts a string into a null-terminated string reference.
-    #[deprecated]
-    pub fn from_str(context: &'a Context, string: &str) -> Self {
-        let entry = context
-            .string_cache()
-            .entry(Pin::new(string.into()))
-            .or_default();
-        let string = MlirStringRef {
-            data: entry.key().as_bytes().as_ptr() as *const i8,
-            length: entry.key().len(),
-        };
-
-        unsafe { Self::from_raw(string) }
-    }
-
     /// Converts a string reference into a `str`.
     pub fn as_str(&self) -> Result<&'a str, Utf8Error> {
         unsafe {
