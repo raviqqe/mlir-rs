@@ -4,7 +4,6 @@ use crate::{
     logical_result::LogicalResult,
     string_ref::StringRef,
 };
-use dashmap::DashMap;
 use mlir_sys::{
     mlirContextAppendDialectRegistry, mlirContextAttachDiagnosticHandler, mlirContextCreate,
     mlirContextDestroy, mlirContextDetachDiagnosticHandler, mlirContextEnableMultithreading,
@@ -13,7 +12,7 @@ use mlir_sys::{
     mlirContextIsRegisteredOperation, mlirContextLoadAllAvailableDialects,
     mlirContextSetAllowUnregisteredDialects, MlirContext, MlirDiagnostic, MlirLogicalResult,
 };
-use std::{ffi::c_void, marker::PhantomData, pin::Pin};
+use std::{ffi::c_void, marker::PhantomData};
 
 /// A context of IR, dialects, and passes.
 ///
