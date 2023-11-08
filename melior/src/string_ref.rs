@@ -1,9 +1,7 @@
-use crate::Context;
 use mlir_sys::{mlirStringRefEqual, MlirStringRef};
 use std::{
     ffi::CStr,
     marker::PhantomData,
-    pin::Pin,
     slice,
     str::{self, Utf8Error},
 };
