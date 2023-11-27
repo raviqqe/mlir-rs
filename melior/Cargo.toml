@@ -23,7 +23,3 @@ criterion = "0.5.1"
 indoc = "2.0.4"
 insta = "1.34.0"
 pretty_assertions = "1.4.0"
-
-[[bench]]
-name = "main"
-harness = false
