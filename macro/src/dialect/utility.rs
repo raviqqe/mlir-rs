@@ -44,6 +44,7 @@ pub fn sanitize_documentation(string: &str) -> Result<String, Error> {
         };
 
         if block.info.is_empty() {
+            // Mark them not in Rust to prevent documentation tests.
             block.info = "text".into();
         }
     }
