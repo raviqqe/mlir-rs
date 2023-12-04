@@ -1,10 +1,13 @@
 //! Async passes.
 
-melior_macro::async_passes!(
-    mlirCreateAsyncAsyncFuncToAsyncRuntime,
-    mlirCreateAsyncAsyncParallelFor,
-    mlirCreateAsyncAsyncRuntimePolicyBasedRefCounting,
-    mlirCreateAsyncAsyncRuntimeRefCounting,
-    mlirCreateAsyncAsyncRuntimeRefCountingOpt,
-    mlirCreateAsyncAsyncToAsyncRuntime,
+melior_macro::passes!(
+    "Async",
+    [
+        mlirCreateAsyncAsyncFuncToAsyncRuntime,
+        mlirCreateAsyncAsyncParallelFor,
+        mlirCreateAsyncAsyncRuntimePolicyBasedRefCounting,
+        mlirCreateAsyncAsyncRuntimeRefCounting,
+        mlirCreateAsyncAsyncRuntimeRefCountingOpt,
+        mlirCreateAsyncAsyncToAsyncRuntime,
+    ]
 );

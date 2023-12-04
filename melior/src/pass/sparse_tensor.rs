@@ -1,12 +1,15 @@
 //! Sparse tensor passes.
 
-melior_macro::sparse_tensor_passes!(
-    mlirCreateSparseTensorPostSparsificationRewrite,
-    mlirCreateSparseTensorPreSparsificationRewrite,
-    mlirCreateSparseTensorSparseBufferRewrite,
-    mlirCreateSparseTensorSparseTensorCodegen,
-    mlirCreateSparseTensorSparseTensorConversionPass,
-    mlirCreateSparseTensorSparseVectorization,
-    mlirCreateSparseTensorSparsificationPass,
-    mlirCreateSparseTensorStorageSpecifierToLLVM,
+melior_macro::passes!(
+    "SparseTensor",
+    [
+        mlirCreateSparseTensorPostSparsificationRewrite,
+        mlirCreateSparseTensorPreSparsificationRewrite,
+        mlirCreateSparseTensorSparseBufferRewrite,
+        mlirCreateSparseTensorSparseTensorCodegen,
+        mlirCreateSparseTensorSparseTensorConversionPass,
+        mlirCreateSparseTensorSparseVectorization,
+        mlirCreateSparseTensorSparsificationPass,
+        mlirCreateSparseTensorStorageSpecifierToLLVM,
+    ]
 );
