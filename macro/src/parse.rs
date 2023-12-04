@@ -3,7 +3,7 @@ use syn::{
     bracketed,
     parse::{Parse, ParseStream},
     punctuated::Punctuated,
-    Result, Token,
+    Lit, Result, Token,
 };
 
 pub struct IdentifierList {
@@ -42,6 +42,37 @@ impl DialectOperationSet {
 }
 
 impl Parse for DialectOperationSet {
+    fn parse(input: ParseStream) -> Result<Self> {
+        let dialect = Ident::parse(input)?;
+        <Token![,]>::parse(input)?;
+
+        Ok(Self {
+            dialect,
+            identifiers: {
+                let content;
+                bracketed!(content in input);
+                content.parse::<IdentifierList>()?
+            },
+        })
+    }
+}
+
+pub struct PassSet {
+    prefix: Lit,
+    identifiers: IdentifierList,
+}
+
+impl PassSet {
+    pub const fn dialect(&self) -> &Ident {
+        &self.dialect
+    }
+
+    pub fn identifiers(&self) -> &[Ident] {
+        self.identifiers.identifiers()
+    }
+}
+
+impl Parse for PassSet {
     fn parse(input: ParseStream) -> Result<Self> {
         let dialect = Ident::parse(input)?;
         <Token![,]>::parse(input)?;
