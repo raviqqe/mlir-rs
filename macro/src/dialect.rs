@@ -40,7 +40,7 @@ pub fn generate_dialect(input: DialectInput) -> Result<TokenStream, Box<dyn std:
         input.name(),
         keeper
             .all_derived_definitions("Dialect")
-            .find(|def| def.str_value("name") == Ok(input.name()))
+            .find(|definition| definition.str_value("name") == Ok(input.name()))
             .ok_or_else(|| create_syn_error("dialect not found"))?,
         &keeper,
     )
