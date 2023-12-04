@@ -5,7 +5,7 @@ use syn::{bracketed, parse::Parse, punctuated::Punctuated, LitStr, Token};
 
 pub struct DialectInput {
     name: String,
-    tablegen: Option<String>,
+    table_gen: Option<String>,
     td_file: Option<String>,
     includes: Vec<String>,
 }
@@ -15,8 +15,8 @@ impl DialectInput {
         &self.name
     }
 
-    pub fn tablegen(&self) -> Option<&str> {
-        self.tablegen.as_deref()
+    pub fn table_gen(&self) -> Option<&str> {
+        self.table_gen.as_deref()
     }
 
     pub fn td_file(&self) -> Option<&str> {
@@ -48,7 +48,7 @@ impl Parse for DialectInput {
 
         Ok(Self {
             name: name.ok_or(input.error("dialect name required"))?,
-            tablegen,
+            table_gen: tablegen,
             td_file,
             includes,
         })

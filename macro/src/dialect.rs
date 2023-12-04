@@ -19,22 +19,22 @@ use tblgen::{record::Record, record_keeper::RecordKeeper, TableGenParser};
 const LLVM_MAJOR_VERSION: usize = 17;
 
 pub fn generate_dialect(input: DialectInput) -> Result<TokenStream, Box<dyn std::error::Error>> {
-    let mut td_parser = TableGenParser::new();
+    let mut parser = TableGenParser::new();
 
-    if let Some(source) = input.tablegen() {
-        td_parser = td_parser.add_source(source).map_err(create_syn_error)?;
+    if let Some(source) = input.table_gen() {
+        parser = parser.add_source(source).map_err(create_syn_error)?;
     }
 
     if let Some(file) = input.td_file() {
-        td_parser = td_parser.add_source_file(file).map_err(create_syn_error)?;
+        parser = parser.add_source_file(file).map_err(create_syn_error)?;
     }
 
     // spell-checker: disable-next-line
     for include in input.includes().chain([&*llvm_config("--includedir")?]) {
-        td_parser = td_parser.add_include_path(include);
+        parser = parser.add_include_path(include);
     }
 
-    let keeper = td_parser.parse().map_err(Error::Parse)?;
+    let keeper = parser.parse().map_err(Error::Parse)?;
 
     let dialect = dialect_module(
         input.name(),
