@@ -31,14 +31,14 @@ impl DialectInput {
 impl Parse for DialectInput {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
         let mut name = None;
-        let mut tablegen = None;
+        let mut table_gen = None;
         let mut td_file = None;
         let mut includes = vec![];
 
         for item in Punctuated::<InputField, Token![,]>::parse_terminated(input)? {
             match item {
                 InputField::Name(field) => name = Some(field.value()),
-                InputField::TableGen(td) => tablegen = Some(td.value()),
+                InputField::TableGen(td) => table_gen = Some(td.value()),
                 InputField::TdFile(file) => td_file = Some(file.value()),
                 InputField::Includes(field) => {
                     includes = field.into_iter().map(|literal| literal.value()).collect()
@@ -48,7 +48,7 @@ impl Parse for DialectInput {
 
         Ok(Self {
             name: name.ok_or(input.error("dialect name required"))?,
-            table_gen: tablegen,
+            table_gen: table_gen,
             td_file,
             includes,
         })
@@ -70,7 +70,7 @@ impl Parse for InputField {
 
         if ident == format_ident!("name") {
             Ok(Self::Name(input.parse()?))
-        } else if ident == format_ident!("tablegen") {
+        } else if ident == format_ident!("table_gen") {
             Ok(Self::TableGen(input.parse()?))
         } else if ident == format_ident!("td_file") {
             Ok(Self::TdFile(input.parse()?))
