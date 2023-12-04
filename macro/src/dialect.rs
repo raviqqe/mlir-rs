@@ -36,7 +36,7 @@ pub fn generate_dialect(input: DialectInput) -> Result<TokenStream, Box<dyn std:
 
     let keeper = parser.parse().map_err(Error::Parse)?;
 
-    let dialect = dialect_module(
+    let dialect = generate_dialect_module(
         input.name(),
         keeper
             .all_derived_definitions("Dialect")
@@ -49,7 +49,7 @@ pub fn generate_dialect(input: DialectInput) -> Result<TokenStream, Box<dyn std:
     Ok(quote! { #dialect }.into())
 }
 
-fn dialect_module(
+fn generate_dialect_module(
     name: &str,
     dialect: Record,
     record_keeper: &RecordKeeper,
