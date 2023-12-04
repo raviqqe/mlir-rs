@@ -7,7 +7,7 @@ mod r#type;
 mod utility;
 
 use dialect::DialectInput;
-use parse::{DialectOperationSet, IdentifierList};
+use parse::{DialectOperationSet, IdentifierList, PassSet};
 use proc_macro::TokenStream;
 use quote::quote;
 use std::error::Error;
@@ -69,15 +69,6 @@ pub fn attribute_check_functions(stream: TokenStream) -> TokenStream {
 }
 
 #[proc_macro]
-pub fn async_passes(stream: TokenStream) -> TokenStream {
-    let identifiers = parse_macro_input!(stream as IdentifierList);
-
-    convert_result(pass::generate(identifiers.identifiers(), |name| {
-        name.strip_prefix("Async").unwrap().into()
-    }))
-}
-
-#[proc_macro]
 pub fn conversion_passes(stream: TokenStream) -> TokenStream {
     let identifiers = parse_macro_input!(stream as IdentifierList);
 
@@ -90,38 +81,11 @@ pub fn conversion_passes(stream: TokenStream) -> TokenStream {
 }
 
 #[proc_macro]
-pub fn gpu_passes(stream: TokenStream) -> TokenStream {
-    let identifiers = parse_macro_input!(stream as IdentifierList);
+pub fn passes(stream: TokenStream) -> TokenStream {
+    let set = parse_macro_input!(stream as PassSet);
 
-    convert_result(pass::generate(identifiers.identifiers(), |name| {
-        name.strip_prefix("GPU").unwrap().into()
-    }))
-}
-
-#[proc_macro]
-pub fn transform_passes(stream: TokenStream) -> TokenStream {
-    let identifiers = parse_macro_input!(stream as IdentifierList);
-
-    convert_result(pass::generate(identifiers.identifiers(), |name| {
-        name.strip_prefix("Transforms").unwrap().into()
-    }))
-}
-
-#[proc_macro]
-pub fn linalg_passes(stream: TokenStream) -> TokenStream {
-    let identifiers = parse_macro_input!(stream as IdentifierList);
-
-    convert_result(pass::generate(identifiers.identifiers(), |name| {
-        name.strip_prefix("Linalg").unwrap().into()
-    }))
-}
-
-#[proc_macro]
-pub fn sparse_tensor_passes(stream: TokenStream) -> TokenStream {
-    let identifiers = parse_macro_input!(stream as IdentifierList);
-
-    convert_result(pass::generate(identifiers.identifiers(), |name| {
-        name.strip_prefix("SparseTensor").unwrap().into()
+    convert_result(pass::generate(set.identifiers(), |name| {
+        name.strip_prefix(&set.prefix().value()).unwrap().into()
     }))
 }
 
