@@ -48,7 +48,7 @@ impl Parse for DialectInput {
 
         Ok(Self {
             name: name.ok_or(input.error("dialect name required"))?,
-            table_gen: table_gen,
+            table_gen,
             td_file,
             includes,
         })
