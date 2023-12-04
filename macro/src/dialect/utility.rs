@@ -14,7 +14,7 @@ fn sanitize_name(name: &str) -> Result<Ident, Error> {
     // Replace any "." with "_"
     let mut name = name.replace('.', "_");
 
-    // Add "_" suffix to avoid conflicts with existing methods
+    // Add "_" suffix to avoid conflicts with existing methods.
     if RESERVED_NAMES.contains(&name.as_str())
         || name
             .chars()
