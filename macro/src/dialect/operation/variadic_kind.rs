@@ -8,7 +8,7 @@ pub enum VariadicKind {
         preceding_simple_count: usize,
         preceding_variadic_count: usize,
     },
-    AttributeSized {},
+    AttributeSized,
 }
 
 impl VariadicKind {
