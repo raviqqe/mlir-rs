@@ -44,7 +44,7 @@ impl<'a> Operation<'a> {
 
         let arguments = Self::dag_constraints(definition, "arguments")?;
         let regions = Self::collect_regions(definition)?;
-        let (results, variable_length_results_count) = Self::collect_results(
+        let (results, unfixed_results_count) = Self::collect_results(
             definition,
             has_trait("::mlir::OpTrait::SameVariadicResultSize"),
             has_trait("::mlir::OpTrait::AttrSizedResultSegments"),
@@ -86,7 +86,7 @@ impl<'a> Operation<'a> {
             can_infer_type: traits.iter().any(|r#trait| {
                 (r#trait.has_name("::mlir::OpTrait::FirstAttrDerivedResultType")
                     || r#trait.has_name("::mlir::OpTrait::SameOperandsAndResultType"))
-                    && variable_length_results_count == 0
+                    && unfixed_results_count == 0
                     || r#trait.has_name("::mlir::InferTypeOpInterface::Trait") && regions.is_empty()
             }),
             summary: {
@@ -246,12 +246,12 @@ impl<'a> Operation<'a> {
         same_size: bool,
         attribute_sized: bool,
     ) -> Result<(Vec<OperationField<'a>>, usize), Error> {
-        let variable_length_count = elements
+        let unfixed_count = elements
             .iter()
-            .filter(|(_, constraint)| constraint.has_variable_length())
+            .filter(|(_, constraint)| constraint.has_unfixed())
             .count();
         let mut variadic_kind =
-            VariadicKind::new(variable_length_count, same_size, attribute_sized);
+            VariadicKind::new(unfixed_count, same_size, attribute_sized);
         let mut fields = vec![];
 
         for (index, (name, constraint)) in elements.iter().enumerate() {
@@ -268,10 +268,10 @@ impl<'a> Operation<'a> {
 
             match &mut variadic_kind {
                 VariadicKind::Simple {
-                    variable_length_seen: variable_length_seen,
+                    unfixed_seen: unfixed_seen,
                 } => {
-                    if constraint.has_variable_length() {
-                        *variable_length_seen = true;
+                    if constraint.has_unfixed() {
+                        *unfixed_seen = true;
                     }
                 }
                 VariadicKind::SameSize {
@@ -279,7 +279,7 @@ impl<'a> Operation<'a> {
                     preceding_variadic_count,
                     ..
                 } => {
-                    if constraint.has_variable_length() {
+                    if constraint.has_unfixed() {
                         *preceding_variadic_count += 1;
                     } else {
                         *preceding_simple_count += 1;
@@ -289,7 +289,7 @@ impl<'a> Operation<'a> {
             }
         }
 
-        Ok((fields, variable_length_count))
+        Ok((fields, unfixed_count))
     }
 
     fn collect_attributes(

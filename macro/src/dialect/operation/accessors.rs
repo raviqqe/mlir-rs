@@ -26,7 +26,7 @@ impl<'a> OperationField<'a> {
 
                 Some(match variadic_kind {
                     VariadicKind::Simple {
-                        variable_length_seen: variable_length_seen,
+                        unfixed_seen: unfixed_seen,
                     } => {
                         if constraint.is_optional() {
                             // Optional element, and some singular elements.
@@ -40,15 +40,15 @@ impl<'a> OperationField<'a> {
                               }
                             }
                         } else if constraint.is_variadic() {
-                            // A variable length group
+                            // A unfixed group
                             // Length computed by subtracting the amount of other
                             // singular elements from the number of elements.
                             quote! {
                               let group_length = self.operation.#count() - #len + 1;
                               self.operation.#plural().skip(#index).take(group_length)
                             }
-                        } else if *variable_length_seen {
-                            // Single element after variable length group
+                        } else if *unfixed_seen {
+                            // Single element after unfixed group
                             // Compute the length of that variable group and take the next element
                             quote! {
                                 let group_length = self.operation.#count() - #len + 1;
@@ -62,16 +62,16 @@ impl<'a> OperationField<'a> {
                         }
                     }
                     VariadicKind::SameSize {
-                        variable_length_count,
+                        unfixed_count,
                         preceding_simple_count,
                         preceding_variadic_count,
                     } => {
                         let compute_start_length = quote! {
-                            let total_var_len = self.operation.#count() - #variable_length_count + 1;
-                            let group_len = total_var_len / #variable_length_count;
+                            let total_var_len = self.operation.#count() - #unfixed_count + 1;
+                            let group_len = total_var_len / #unfixed_count;
                             let start = #preceding_simple_count + #preceding_variadic_count * group_len;
                         };
-                        let get_elements = if constraint.has_variable_length() {
+                        let get_elements = if constraint.has_unfixed() {
                             quote! {
                                 self.operation.#plural().skip(start).take(group_len)
                             }
@@ -98,7 +98,7 @@ impl<'a> OperationField<'a> {
                                 .sum::<i32>() as usize;
                             let group_len = attribute.element(#index)? as usize;
                         };
-                        let get_elements = if !constraint.has_variable_length() {
+                        let get_elements = if !constraint.has_unfixed() {
                             quote! {
                                 self.operation.#kind_ident(start)
                             }

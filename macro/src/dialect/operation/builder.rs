@@ -40,7 +40,7 @@ impl<'o> OperationBuilder<'o> {
             // arguments
             let add_arguments = match &field.kind {
                 FieldKind::Element { constraint, .. } => {
-                    if constraint.has_variable_length() && !constraint.is_optional() {
+                    if constraint.has_unfixed() && !constraint.is_optional() {
                         quote! { #name }
                     } else {
                         quote! { &[#name] }
