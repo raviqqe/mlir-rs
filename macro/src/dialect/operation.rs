@@ -381,6 +381,7 @@ impl<'a> Operation<'a> {
                 fn try_from(
                     operation: ::melior::ir::operation::Operation<'c>,
                 ) -> Result<Self, Self::Error> {
+                    // TODO Check an operation name.
                     Ok(Self { operation })
                 }
             }
