@@ -230,8 +230,8 @@ impl<'a> Operation<'a> {
         Ok(Self::collect_elements(
             &arguments
                 .iter()
-                .filter(|(_, arg_def)| arg_def.subclass_of("TypeConstraint"))
-                .map(|(name, arg_def)| (*name, TypeConstraint::new(*arg_def)))
+                .filter(|(_, definition)| definition.subclass_of("TypeConstraint"))
+                .map(|(name, definition)| (*name, TypeConstraint::new(*definition)))
                 .collect::<Vec<_>>(),
             ElementKind::Operand,
             same_size,
@@ -297,12 +297,12 @@ impl<'a> Operation<'a> {
     ) -> Result<Vec<OperationField<'a>>, Error> {
         arguments
             .iter()
-            .filter(|(_, arg_def)| arg_def.subclass_of("Attr"))
-            .map(|(name, arg_def)| {
+            .filter(|(_, definition)| definition.subclass_of("Attr"))
+            .map(|(name, definition)| {
                 // TODO: Replace assert! with Result
-                assert!(!arg_def.subclass_of("DerivedAttr"));
+                assert!(!definition.subclass_of("DerivedAttr"));
 
-                OperationField::new_attribute(name, AttributeConstraint::new(*arg_def))
+                OperationField::new_attribute(name, AttributeConstraint::new(*definition))
             })
             .collect()
     }
