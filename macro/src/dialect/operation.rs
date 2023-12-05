@@ -250,8 +250,7 @@ impl<'a> Operation<'a> {
             .iter()
             .filter(|(_, constraint)| constraint.has_unfixed())
             .count();
-        let mut variadic_kind =
-            VariadicKind::new(unfixed_count, same_size, attribute_sized);
+        let mut variadic_kind = VariadicKind::new(unfixed_count, same_size, attribute_sized);
         let mut fields = vec![];
 
         for (index, (name, constraint)) in elements.iter().enumerate() {
@@ -267,9 +266,7 @@ impl<'a> Operation<'a> {
             )?);
 
             match &mut variadic_kind {
-                VariadicKind::Simple {
-                    unfixed_seen: unfixed_seen,
-                } => {
+                VariadicKind::Simple { unfixed_seen } => {
                     if constraint.has_unfixed() {
                         *unfixed_seen = true;
                     }

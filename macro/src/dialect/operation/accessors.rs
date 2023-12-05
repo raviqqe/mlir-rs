@@ -25,9 +25,7 @@ impl<'a> OperationField<'a> {
                 let name = self.name;
 
                 Some(match variadic_kind {
-                    VariadicKind::Simple {
-                        unfixed_seen: unfixed_seen,
-                    } => {
+                    VariadicKind::Simple { unfixed_seen } => {
                         if constraint.is_optional() {
                             // Optional element, and some singular elements.
                             // Only present if the amount of groups is at least the number of
