@@ -162,22 +162,22 @@ impl<'a> Operation<'a> {
     }
 
     fn collect_traits(definition: Record<'a>) -> Result<Vec<Trait>, Error> {
-        let mut work_list = vec![definition.list_value("traits")?];
-        let mut traits = Vec::new();
+        let mut trait_lists = vec![definition.list_value("traits")?];
+        let mut traits = vec![];
 
-        while let Some(trait_definition) = work_list.pop() {
-            for value in trait_definition.iter() {
-                let trait_def: Record = value
+        while let Some(trait_list) = trait_lists.pop() {
+            for value in trait_list.iter() {
+                let trait_definition: Record = value
                     .try_into()
                     .map_err(|error: tblgen::Error| error.set_location(definition))?;
 
-                if trait_def.subclass_of("TraitList") {
-                    work_list.push(trait_def.list_value("traits")?);
+                if trait_definition.subclass_of("TraitList") {
+                    trait_lists.push(trait_definition.list_value("traits")?);
                 } else {
-                    if trait_def.subclass_of("Interface") {
-                        work_list.push(trait_def.list_value("baseInterfaces")?);
+                    if trait_definition.subclass_of("Interface") {
+                        trait_lists.push(trait_definition.list_value("baseInterfaces")?);
                     }
-                    traits.push(Trait::new(trait_def)?)
+                    traits.push(Trait::new(trait_definition)?)
                 }
             }
         }
@@ -209,7 +209,7 @@ impl<'a> Operation<'a> {
     fn collect_results(
         def: Record<'a>,
         same_size: bool,
-        attr_sized: bool,
+        attribute_sized: bool,
     ) -> Result<(Vec<OperationField>, usize), Error> {
         Self::collect_elements(
             &Self::dag_constraints(def, "results")?
@@ -218,14 +218,14 @@ impl<'a> Operation<'a> {
                 .collect::<Vec<_>>(),
             ElementKind::Result,
             same_size,
-            attr_sized,
+            attribute_sized,
         )
     }
 
     fn collect_operands(
         arguments: &[(&'a str, Record<'a>)],
         same_size: bool,
-        attr_sized: bool,
+        attribute_sized: bool,
     ) -> Result<Vec<OperationField<'a>>, Error> {
         Ok(Self::collect_elements(
             &arguments
@@ -235,7 +235,7 @@ impl<'a> Operation<'a> {
                 .collect::<Vec<_>>(),
             ElementKind::Operand,
             same_size,
-            attr_sized,
+            attribute_sized,
         )?
         .0)
     }
@@ -244,13 +244,13 @@ impl<'a> Operation<'a> {
         elements: &[(&'a str, TypeConstraint<'a>)],
         element_kind: ElementKind,
         same_size: bool,
-        attr_sized: bool,
+        attribute_sized: bool,
     ) -> Result<(Vec<OperationField<'a>>, usize), Error> {
         let variable_length_count = elements
             .iter()
             .filter(|(_, constraint)| constraint.has_variable_length())
             .count();
-        let mut variadic_kind = VariadicKind::new(variable_length_count, same_size, attr_sized);
+        let mut variadic_kind = VariadicKind::new(variable_length_count, same_size, attribute_sized);
         let mut fields = vec![];
 
         for (index, (name, constraint)) in elements.iter().enumerate() {
@@ -284,7 +284,7 @@ impl<'a> Operation<'a> {
                         *preceding_simple_count += 1;
                     }
                 }
-                VariadicKind::AttrSized {} => {}
+                VariadicKind::AttributeSized {} => {}
             }
         }
 
