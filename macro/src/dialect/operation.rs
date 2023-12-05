@@ -193,15 +193,15 @@ impl<'a> Operation<'a> {
             .dag_value(dag_field_name)?
             .args()
             .map(|(name, argument)| {
-                let mut argument_definition: Record = argument
+                let mut definition: Record = argument
                     .try_into()
                     .map_err(|error: tblgen::Error| error.set_location(definition))?;
 
-                if argument_definition.subclass_of("OpVariable") {
-                    argument_definition = argument_definition.def_value("constraint")?;
+                if definition.subclass_of("OpVariable") {
+                    definition = definition.def_value("constraint")?;
                 }
 
-                Ok((name, argument_definition))
+                Ok((name, definition))
             })
             .collect()
     }
