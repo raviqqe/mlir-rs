@@ -26,7 +26,7 @@ impl<'a> OperationField<'a> {
 
                 Some(match variadic_kind {
                     VariadicKind::Simple {
-                        variable_length_seen: seen_variable_length,
+                        variable_length_seen: variable_length_seen,
                     } => {
                         if constraint.is_optional() {
                             // Optional element, and some singular elements.
@@ -47,7 +47,7 @@ impl<'a> OperationField<'a> {
                               let group_length = self.operation.#count() - #len + 1;
                               self.operation.#plural().skip(#index).take(group_length)
                             }
-                        } else if *seen_variable_length {
+                        } else if *variable_length_seen {
                             // Single element after variable length group
                             // Compute the length of that variable group and take the next element
                             quote! {

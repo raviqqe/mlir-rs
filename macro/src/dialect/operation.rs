@@ -268,10 +268,10 @@ impl<'a> Operation<'a> {
 
             match &mut variadic_kind {
                 VariadicKind::Simple {
-                    variable_length_seen: seen_variable_length,
+                    variable_length_seen: variable_length_seen,
                 } => {
                     if constraint.has_variable_length() {
-                        *seen_variable_length = true;
+                        *variable_length_seen = true;
                     }
                 }
                 VariadicKind::SameSize {
