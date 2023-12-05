@@ -88,6 +88,7 @@ impl<'o> OperationBuilder<'o> {
                 let parameters = self.type_state.parameters_without(field.name);
                 let arguments_set = self.type_state.arguments_set(field.name, true);
                 let arguments_unset = self.type_state.arguments_set(field.name, false);
+
                 quote! {
                     impl<'c, #(#parameters),*> #builder_ident<'c, #(#arguments_unset),*> {
                         pub fn #name(mut self, #argument) -> #builder_ident<'c, #(#arguments_set),*> {
