@@ -282,7 +282,7 @@ impl<'a> Operation<'a> {
                         *preceding_simple_count += 1;
                     }
                 }
-                VariadicKind::AttributeSized {} => {}
+                VariadicKind::AttributeSized => {}
             }
         }
 
