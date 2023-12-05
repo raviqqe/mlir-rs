@@ -24,7 +24,7 @@ impl VariadicKind {
                 preceding_variadic_count: 0,
             }
         } else if attribute_sized {
-            Self::AttributeSized {}
+            Self::AttributeSized
         } else {
             unimplemented!()
         }
