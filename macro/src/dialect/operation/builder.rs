@@ -195,6 +195,7 @@ impl<'o> OperationBuilder<'o> {
     pub fn create_op_builder_fn(&self) -> TokenStream {
         let builder_ident = self.builder_identifier();
         let arguments = self.type_state.arguments_all_set(false);
+
         quote! {
             pub fn builder(
                 context: &'c ::melior::Context,
