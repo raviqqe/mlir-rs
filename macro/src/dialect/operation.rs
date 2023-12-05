@@ -167,17 +167,17 @@ impl<'a> Operation<'a> {
 
         while let Some(trait_list) = trait_lists.pop() {
             for value in trait_list.iter() {
-                let trait_definition: Record = value
+                let definition: Record = value
                     .try_into()
                     .map_err(|error: tblgen::Error| error.set_location(definition))?;
 
-                if trait_definition.subclass_of("TraitList") {
-                    trait_lists.push(trait_definition.list_value("traits")?);
+                if definition.subclass_of("TraitList") {
+                    trait_lists.push(definition.list_value("traits")?);
                 } else {
-                    if trait_definition.subclass_of("Interface") {
-                        trait_lists.push(trait_definition.list_value("baseInterfaces")?);
+                    if definition.subclass_of("Interface") {
+                        trait_lists.push(definition.list_value("baseInterfaces")?);
                     }
-                    traits.push(Trait::new(trait_definition)?)
+                    traits.push(Trait::new(definition)?)
                 }
             }
         }
@@ -250,7 +250,8 @@ impl<'a> Operation<'a> {
             .iter()
             .filter(|(_, constraint)| constraint.has_variable_length())
             .count();
-        let mut variadic_kind = VariadicKind::new(variable_length_count, same_size, attribute_sized);
+        let mut variadic_kind =
+            VariadicKind::new(variable_length_count, same_size, attribute_sized);
         let mut fields = vec![];
 
         for (index, (name, constraint)) in elements.iter().enumerate() {
