@@ -26,7 +26,7 @@ use tblgen::{error::WithLocation, record::Record};
 pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
     let summary = operation.summary()?;
     let description = operation.description()?;
-    let class_name = format_ident!("{}", &operation.class_name()?);
+    let class_name = format_ident!("{}", operation.class_name()?);
     let name = &operation.full_name()?;
     let accessors = operation
         .fields()
