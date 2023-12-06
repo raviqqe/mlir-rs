@@ -126,6 +126,7 @@ impl<'a> FieldKind<'a> {
                         parse_quote!(::melior::ir::operation::OperationResult<'c, '_>)
                     }
                 };
+
                 if !constraint.is_variadic() {
                     Self::create_result_type(base_type)
                 } else if let VariadicKind::AttributeSized = variadic_kind {
