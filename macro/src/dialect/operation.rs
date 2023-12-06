@@ -65,8 +65,60 @@ impl<'a> Operation<'a> {
         })
     }
 
+    fn dialect(&self) -> Result<Record, Error> {
+        Ok(self.definition.def_value("opDialect")?)
+    }
+
     pub fn dialect_name(&self) -> Result<&str, Error> {
         Ok(self.dialect()?.name()?)
+    }
+
+    pub fn class_name(&self) -> Result<&str, Error> {
+        let name = self.definition.name()?;
+
+        Ok(if name.starts_with('_') {
+            name
+        } else if let Some(name) = name.split('_').nth(1) {
+            // Trim dialect prefix from name.
+            name
+        } else {
+            name
+        })
+    }
+
+    pub fn short_name(&self) -> Result<&str, Error> {
+        Ok(self.definition.str_value("opName")?)
+    }
+
+    pub fn full_name(&self) -> Result<String, Error> {
+        let dialect_name = self.dialect()?.string_value("name")?;
+        let short_name = self.short_name()?;
+
+        Ok(if dialect_name.is_empty() {
+            short_name.into()
+        } else {
+            format!("{dialect_name}.{short_name}")
+        })
+    }
+
+    pub fn summary(&self) -> Result<String, Error> {
+        let short_name = self.short_name()?;
+        let class_name = self.class_name()?;
+        let summary = self.definition.str_value("summary")?;
+
+        Ok([
+            format!("[`{short_name}`]({class_name}) operation."),
+            if summary.is_empty() {
+                Default::default()
+            } else {
+                summary[0..1].to_uppercase() + &summary[1..] + "."
+            },
+        ]
+        .join(" "))
+    }
+
+    pub fn description(&self) -> Result<String, Error> {
+        sanitize_documentation(self.definition.str_value("description")?)
     }
 
     pub fn fields(&self) -> impl Iterator<Item = &OperationField<'a>> + Clone {
@@ -292,58 +344,6 @@ impl<'a> Operation<'a> {
             })
             .collect()
     }
-
-    pub fn dialect(&self) -> Result<Record, Error> {
-        Ok(self.definition.def_value("opDialect")?)
-    }
-
-    pub fn class_name(&self) -> Result<&str, Error> {
-        let name = self.definition.name()?;
-
-        Ok(if name.starts_with('_') {
-            name
-        } else if let Some(name) = name.split('_').nth(1) {
-            // Trim dialect prefix from name.
-            name
-        } else {
-            name
-        })
-    }
-
-    pub fn short_name(&self) -> Result<&str, Error> {
-        Ok(self.definition.str_value("opName")?)
-    }
-
-    pub fn full_name(&self) -> Result<String, Error> {
-        let dialect_name = self.dialect()?.string_value("name")?;
-        let short_name = self.short_name()?;
-
-        Ok(if dialect_name.is_empty() {
-            short_name.into()
-        } else {
-            format!("{dialect_name}.{short_name}")
-        })
-    }
-
-    pub fn summary(&self) -> Result<String, Error> {
-        let short_name = self.short_name()?;
-        let class_name = self.class_name()?;
-        let summary = self.definition.str_value("summary")?;
-
-        Ok([
-            format!("[`{short_name}`]({class_name}) operation."),
-            if summary.is_empty() {
-                Default::default()
-            } else {
-                summary[0..1].to_uppercase() + &summary[1..] + "."
-            },
-        ]
-        .join(" "))
-    }
-
-    pub fn description(&self) -> Result<String, Error> {
-        sanitize_documentation(self.definition.str_value("description")?)
-    }
 }
 
 pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
@@ -357,8 +357,8 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
     let builder_tokens = builder.to_tokens()?;
     let builder_fn = builder.create_op_builder_fn()?;
     let default_constructor = builder.create_default_constructor()?;
-    let summary = &operation.summary()?;
-    let description = &operation.description()?;
+    let summary = operation.summary()?;
+    let description = operation.description()?;
 
     Ok(quote! {
         #[doc = #summary]
