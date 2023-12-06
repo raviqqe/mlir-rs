@@ -7,8 +7,12 @@ mod sequence_info;
 mod variadic_kind;
 
 use self::{
-    builder::OperationBuilder, element_kind::ElementKind, field_kind::FieldKind,
-    operation_field::OperationField, sequence_info::SequenceInfo, variadic_kind::VariadicKind,
+    builder::{generate_operation_builder, OperationBuilder},
+    element_kind::ElementKind,
+    field_kind::FieldKind,
+    operation_field::OperationField,
+    sequence_info::SequenceInfo,
+    variadic_kind::VariadicKind,
 };
 use super::utility::sanitize_documentation;
 use crate::dialect::{
@@ -357,7 +361,7 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
         .collect::<Result<Vec<_>, _>>()?;
 
     let builder = OperationBuilder::new(operation)?;
-    let builder_tokens = builder.to_tokens()?;
+    let builder_tokens = generate_operation_builder(&builder)?;
     let builder_fn = builder.create_op_builder_fn()?;
     let default_constructor = builder.create_default_constructor()?;
 
