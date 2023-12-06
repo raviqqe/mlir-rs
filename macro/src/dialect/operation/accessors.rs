@@ -154,10 +154,7 @@ impl<'a> OperationField<'a> {
                     quote! { self.operation.attribute(#name).is_some() }
                 } else {
                     // TODO Handle returning `melior::Attribute`.
-                    quote! {
-                        #[allow(clippy::needless_question_mark)]
-                        Ok(self.operation.attribute(#name)?.try_into()?)
-                    }
+                    quote! { Ok(self.operation.attribute(#name)?.try_into()?) }
                 })
             }
         })
@@ -229,6 +226,7 @@ impl<'a> OperationField<'a> {
             let return_type = &self.kind.return_type()?;
             self.getter_impl()?.map(|body| {
                 quote! {
+                    #[allow(clippy::needless_question_mark)]
                     pub fn #ident(&self, context: &'c ::melior::Context) -> #return_type {
                         #body
                     }
