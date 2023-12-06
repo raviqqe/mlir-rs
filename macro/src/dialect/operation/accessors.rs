@@ -160,19 +160,16 @@ impl<'a> OperationField<'a> {
     }
 
     fn remover_impl(&self) -> Result<Option<TokenStream>, Error> {
-        Ok(match &self.kind {
-            FieldKind::Attribute { constraint } => {
+        Ok(if let FieldKind::Attribute { constraint } = &self.kind {
+            if constraint.is_unit()? || constraint.is_optional()? {
                 let name = &self.name;
 
-                if constraint.is_unit()? || constraint.is_optional()? {
-                    Some(quote! {
-                      self.operation.remove_attribute(#name)
-                    })
-                } else {
-                    None
-                }
+                Some(quote! { self.operation.remove_attribute(#name) })
+            } else {
+                None
             }
-            _ => None,
+        } else {
+            None
         })
     }
 
