@@ -342,9 +342,7 @@ impl<'a> Operation<'a> {
     }
 
     pub fn description(&self) -> Result<String, Error> {
-        Ok(sanitize_documentation(
-            self.definition.str_value("description")?,
-        )?)
+        sanitize_documentation(self.definition.str_value("description")?)
     }
 }
 
