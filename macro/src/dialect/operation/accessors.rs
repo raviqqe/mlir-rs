@@ -153,7 +153,9 @@ impl<'a> OperationField<'a> {
                 Some(if constraint.is_unit()? {
                     quote! { self.operation.attribute(#name).is_some() }
                 } else {
+                    // TODO Handle returning `melior::Attribute`.
                     quote! {
+                        #[allow(clippy::needless_question_mark)]
                         Ok(self.operation.attribute(#name)?.try_into()?)
                     }
                 })
