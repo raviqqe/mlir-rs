@@ -123,6 +123,7 @@ impl<'o> OperationBuilder<'o> {
 
             Ok(if field.kind.is_optional()? {
                 let parameters = self.type_state.parameters().collect::<Vec<_>>();
+
                 quote! {
                     impl<'c, #(#parameters),*> #builder_ident<'c, #(#parameters),*> {
                         pub fn #name(mut self, #argument) -> #builder_ident<'c, #(#parameters),*> {

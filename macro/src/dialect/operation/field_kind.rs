@@ -129,7 +129,7 @@ impl<'a> FieldKind<'a> {
 
                 if !constraint.is_variadic() {
                     Self::create_result_type(base_type)
-                } else if let VariadicKind::AttributeSized = variadic_kind {
+                } else if variadic_kind == &VariadicKind::AttributeSized {
                     Self::create_result_type(Self::create_iterator_type(base_type))
                 } else {
                     Self::create_iterator_type(base_type)
