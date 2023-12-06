@@ -27,9 +27,9 @@ impl<'o> OperationBuilder<'o> {
         field_names: &'a [Ident],
         phantoms: &'a [TokenStream],
     ) -> impl Iterator<Item = Result<TokenStream, Error>> + 'a {
-        let builder_ident = self.builder_identifier();
-
         self.operation.fields().map(move |field| {
+            // TODO Initialize a builder identifier out of this closure.
+            let builder_ident = self.builder_identifier()?;
             let name = sanitize_snake_case_name(field.name)?;
             let parameter_type = field.kind.parameter_type()?;
             let argument = quote! { #name: #parameter_type };
@@ -132,11 +132,11 @@ impl<'o> OperationBuilder<'o> {
             .create_builder_fns(&field_names, phantom_arguments.as_slice())
             .collect::<Result<Vec<_>, _>>()?;
 
-        let new = self.create_new_fn(phantom_arguments.as_slice());
-        let build = self.create_build_fn();
+        let new = self.create_new_fn(phantom_arguments.as_slice())?;
+        let build = self.create_build_fn()?;
 
-        let builder_ident = self.builder_identifier();
-        let doc = format!("Builder for {}", self.operation.summary);
+        let builder_ident = self.builder_identifier()?;
+        let doc = format!("Builder for {}", self.operation.summary()?);
         let iter_arguments = self.type_state.parameters();
 
         Ok(quote! {
@@ -155,31 +155,31 @@ impl<'o> OperationBuilder<'o> {
         })
     }
 
-    fn create_build_fn(&self) -> TokenStream {
-        let builder_ident = self.builder_identifier();
+    fn create_build_fn(&self) -> Result<TokenStream, Error> {
+        let builder_ident = self.builder_identifier()?;
         let arguments = self.type_state.arguments_all_set(true);
-        let class_name = format_ident!("{}", &self.operation.class_name);
+        let class_name = format_ident!("{}", &self.operation.class_name()?);
         let error = format!("should be a valid {class_name}");
         let maybe_infer = self
             .operation
             .can_infer_type
             .then_some(quote! { .enable_result_type_inference() });
 
-        quote! {
+        Ok(quote! {
             impl<'c> #builder_ident<'c, #(#arguments),*> {
                 pub fn build(self) -> #class_name<'c> {
                     self.builder #maybe_infer.build().expect("valid operation").try_into().expect(#error)
                 }
             }
-        }
+        })
     }
 
-    fn create_new_fn(&self, phantoms: &[TokenStream]) -> TokenStream {
-        let builder_ident = self.builder_identifier();
-        let name = &self.operation.full_name;
+    fn create_new_fn(&self, phantoms: &[TokenStream]) -> Result<TokenStream, Error> {
+        let builder_ident = self.builder_identifier()?;
+        let name = &self.operation.full_name()?;
         let arguments = self.type_state.arguments_all_set(false);
 
-        quote! {
+        Ok(quote! {
             impl<'c> #builder_ident<'c, #(#arguments),*> {
                 pub fn new(context: &'c ::melior::Context, location: ::melior::ir::Location<'c>) -> Self {
                     Self {
@@ -189,26 +189,26 @@ impl<'o> OperationBuilder<'o> {
                     }
                 }
             }
-        }
+        })
     }
 
-    pub fn create_op_builder_fn(&self) -> TokenStream {
-        let builder_ident = self.builder_identifier();
+    pub fn create_op_builder_fn(&self) -> Result<TokenStream, Error> {
+        let builder_ident = self.builder_identifier()?;
         let arguments = self.type_state.arguments_all_set(false);
 
-        quote! {
+        Ok(quote! {
             pub fn builder(
                 context: &'c ::melior::Context,
                 location: ::melior::ir::Location<'c>
             ) -> #builder_ident<'c, #(#arguments),*> {
                 #builder_ident::new(context, location)
             }
-        }
+        })
     }
 
     pub fn create_default_constructor(&self) -> Result<TokenStream, Error> {
-        let class_name = format_ident!("{}", &self.operation.class_name);
-        let name = sanitize_snake_case_name(self.operation.short_name)?;
+        let class_name = format_ident!("{}", &self.operation.class_name()?);
+        let name = sanitize_snake_case_name(self.operation.short_name()?)?;
         let arguments = Self::required_fields(self.operation)
             .map(|field| {
                 let field = field?;
@@ -227,7 +227,7 @@ impl<'o> OperationBuilder<'o> {
             })
             .collect::<Result<Vec<_>, Error>>()?;
 
-        let doc = format!("Creates a new {}", self.operation.summary);
+        let doc = format!("Creates a new {}", self.operation.summary()?);
 
         Ok(quote! {
             #[allow(clippy::too_many_arguments)]
@@ -259,7 +259,7 @@ impl<'o> OperationBuilder<'o> {
         ))
     }
 
-    fn builder_identifier(&self) -> Ident {
-        format_ident!("{}Builder", self.operation.class_name)
+    fn builder_identifier(&self) -> Result<Ident, Error> {
+        Ok(format_ident!("{}Builder", self.operation.class_name()?))
     }
 }
