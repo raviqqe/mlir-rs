@@ -23,7 +23,7 @@ use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use tblgen::{error::WithLocation, record::Record};
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct Operation<'a> {
     definition: Record<'a>,
     can_infer_type: bool,
