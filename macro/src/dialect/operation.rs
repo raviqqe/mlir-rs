@@ -347,18 +347,19 @@ impl<'a> Operation<'a> {
 }
 
 pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
+    let summary = operation.summary()?;
+    let description = operation.description()?;
     let class_name = format_ident!("{}", &operation.class_name()?);
     let name = &operation.full_name()?;
     let accessors = operation
         .fields()
         .map(|field| field.accessors())
         .collect::<Result<Vec<_>, _>>()?;
+
     let builder = OperationBuilder::new(operation)?;
     let builder_tokens = builder.to_tokens()?;
     let builder_fn = builder.create_op_builder_fn()?;
     let default_constructor = builder.create_default_constructor()?;
-    let summary = operation.summary()?;
-    let description = operation.description()?;
 
     Ok(quote! {
         #[doc = #summary]
