@@ -334,63 +334,63 @@ impl<'a> Operation<'a> {
             })
             .collect()
     }
+}
 
-    pub fn to_tokens(&self) -> Result<TokenStream, Error> {
-        let class_name = format_ident!("{}", &self.class_name);
-        let name = &self.full_name;
-        let accessors = self
-            .fields()
-            .map(|field| field.accessors())
-            .collect::<Result<Vec<_>, _>>()?;
-        let builder = OperationBuilder::new(self)?;
-        let builder_tokens = builder.to_tokens()?;
-        let builder_fn = builder.create_op_builder_fn();
-        let default_constructor = builder.create_default_constructor()?;
-        let summary = &self.summary;
-        let description = &self.description;
+pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
+    let class_name = format_ident!("{}", &operation.class_name);
+    let name = &operation.full_name;
+    let accessors = operation
+        .fields()
+        .map(|field| field.accessors())
+        .collect::<Result<Vec<_>, _>>()?;
+    let builder = OperationBuilder::new(operation)?;
+    let builder_tokens = builder.to_tokens()?;
+    let builder_fn = builder.create_op_builder_fn();
+    let default_constructor = builder.create_default_constructor()?;
+    let summary = &operation.summary;
+    let description = &operation.description;
 
-        Ok(quote! {
-            #[doc = #summary]
-            #[doc = "\n\n"]
-            #[doc = #description]
-            pub struct #class_name<'c> {
+    Ok(quote! {
+        #[doc = #summary]
+        #[doc = "\n\n"]
+        #[doc = #description]
+        pub struct #class_name<'c> {
+            operation: ::melior::ir::operation::Operation<'c>,
+        }
+
+        impl<'c> #class_name<'c> {
+            pub fn name() -> &'static str {
+                #name
+            }
+
+            pub fn operation(&self) -> &::melior::ir::operation::Operation<'c> {
+                &self.operation
+            }
+
+            #builder_fn
+
+            #(#accessors)*
+        }
+
+        #builder_tokens
+
+        #default_constructor
+
+        impl<'c> TryFrom<::melior::ir::operation::Operation<'c>> for #class_name<'c> {
+            type Error = ::melior::Error;
+
+            fn try_from(
                 operation: ::melior::ir::operation::Operation<'c>,
+            ) -> Result<Self, Self::Error> {
+                // TODO Check an operation name.
+                Ok(Self { operation })
             }
+        }
 
-            impl<'c> #class_name<'c> {
-                pub fn name() -> &'static str {
-                    #name
-                }
-
-                pub fn operation(&self) -> &::melior::ir::operation::Operation<'c> {
-                    &self.operation
-                }
-
-                #builder_fn
-
-                #(#accessors)*
+        impl<'c> From<#class_name<'c>> for ::melior::ir::operation::Operation<'c> {
+            fn from(operation: #class_name<'c>) -> ::melior::ir::operation::Operation<'c> {
+                operation.operation
             }
-
-            #builder_tokens
-
-            #default_constructor
-
-            impl<'c> TryFrom<::melior::ir::operation::Operation<'c>> for #class_name<'c> {
-                type Error = ::melior::Error;
-
-                fn try_from(
-                    operation: ::melior::ir::operation::Operation<'c>,
-                ) -> Result<Self, Self::Error> {
-                    // TODO Check an operation name.
-                    Ok(Self { operation })
-                }
-            }
-
-            impl<'c> From<#class_name<'c>> for ::melior::ir::operation::Operation<'c> {
-                fn from(operation: #class_name<'c>) -> ::melior::ir::operation::Operation<'c> {
-                    operation.operation
-                }
-            }
-        })
-    }
+        }
+    })
 }
