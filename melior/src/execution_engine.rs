@@ -36,12 +36,6 @@ impl ExecutionEngine {
     }
 
     /// Searches a symbol in a module and returns a pointer to it.
-    ///
-    /// # Safety
-    ///
-    /// This function modifies memory locations pointed by the `arguments`
-    /// argument. If those pointers are invalid or misaligned, calling this
-    /// function might result in undefined behavior.
     pub fn lookup(&self, name: &str) -> *mut () {
         unsafe { mlirExecutionEngineLookup(self.raw, StringRef::new(name).to_raw()) as *mut () }
     }
