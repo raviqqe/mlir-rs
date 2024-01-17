@@ -13,7 +13,9 @@ jobs:
     environment: ${{ github.ref == 'refs/heads/main' && 'release' || 'test' }}
     steps:
       - uses: actions/checkout@v4
-      - uses: raviqqe/cargo-cache@v1
+      - uses: swatinem/rust-cache@v2
+      - uses: homebrew/actions/setup-homebrew@master
+      - run: tools/setup.sh
       - run: cargo install cargo-workspaces
       - run: cargo workspaces publish -y --from-git
         env:
