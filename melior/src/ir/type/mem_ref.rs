@@ -97,6 +97,21 @@ mod tests {
     }
 
     #[test]
+    fn dynamic_dimension() {
+        let context = Context::new();
+
+        assert_eq!(
+            Type::from(MemRefType::new(
+                Type::float64(&context),
+                &[i64::MIN],
+                None,
+                None,
+            )),
+            Type::parse(&context, "memref<?xf64>").unwrap()
+        );
+    }
+
+    #[test]
     fn layout() {
         let context = Context::new();
 
