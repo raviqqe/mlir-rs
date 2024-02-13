@@ -95,6 +95,7 @@ impl<'a> TypeConstraint<'a> {
         self.0.subclass_of("Variadic")
     }
 
+    // TODO Support variadic-of-variadic.
     #[allow(unused)]
     pub fn is_variadic_of_variadic(&self) -> bool {
         self.0.subclass_of("VariadicOfVariadic")
@@ -124,11 +125,11 @@ impl<'a> AttributeConstraint<'a> {
     }
 
     #[allow(unused)]
-    pub fn is_symbol_ref(&self) -> bool {
-        self.0.name() == Ok("SymbolRefAttr")
-            || self.0.name() == Ok("FlatSymbolRefAttr")
+    pub fn is_symbol_ref(&self) -> Result<bool, Error> {
+        Ok(self.0.name()? == "SymbolRefAttr"
+            || self.0.name()? == "FlatSymbolRefAttr"
             || self.0.subclass_of("SymbolRefAttr")
-            || self.0.subclass_of("FlatSymbolRefAttr")
+            || self.0.subclass_of("FlatSymbolRefAttr"))
     }
 
     #[allow(unused)]
