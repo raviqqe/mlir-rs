@@ -195,11 +195,11 @@ impl Trait {
                 TraitKind::Predicate
             } else if definition.subclass_of("InterfaceTrait") {
                 TraitKind::Interface {
-                    name: Self::name(definition)?,
+                    name: Self::build_name(definition)?,
                 }
             } else if definition.subclass_of("NativeTrait") {
                 TraitKind::Native {
-                    name: Self::name(definition)?,
+                    name: Self::build_name(definition)?,
                     structural: definition.subclass_of("StructuralOpTrait"),
                 }
             } else if definition.subclass_of("GenInternalTrait") {
@@ -212,16 +212,16 @@ impl Trait {
         })
     }
 
-    pub fn has_name(&self, expected_name: &str) -> bool {
+    pub fn name(&self) -> Option<&str> {
         match &self.kind {
             TraitKind::Native { name, .. }
             | TraitKind::Internal { name }
-            | TraitKind::Interface { name } => name == expected_name,
-            TraitKind::Predicate => false,
+            | TraitKind::Interface { name } => Some(&name),
+            TraitKind::Predicate => None,
         }
     }
 
-    fn name(definition: Record) -> Result<String, Error> {
+    fn build_name(definition: Record) -> Result<String, Error> {
         let r#trait = definition.string_value("trait")?;
         let namespace = definition.string_value("cppNamespace")?;
 

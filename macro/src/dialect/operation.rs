@@ -98,7 +98,7 @@ pub struct Operation<'a> {
 impl<'a> Operation<'a> {
     pub fn new(definition: Record<'a>) -> Result<Self, Error> {
         let traits = Self::collect_traits(definition)?;
-        let has_trait = |name| traits.iter().any(|r#trait| r#trait.has_name(name));
+        let has_trait = |name| traits.iter().any(|r#trait| r#trait.name() == Some(name));
 
         let arguments = Self::dag_constraints(definition, "arguments")?;
         let regions = Self::collect_regions(definition)?;
@@ -119,10 +119,11 @@ impl<'a> Operation<'a> {
             attributes: Self::collect_attributes(&arguments)?,
             derived_attributes: Self::collect_derived_attributes(definition)?,
             can_infer_type: traits.iter().any(|r#trait| {
-                (r#trait.has_name("::mlir::OpTrait::FirstAttrDerivedResultType")
-                    || r#trait.has_name("::mlir::OpTrait::SameOperandsAndResultType"))
+                (r#trait.name() == Some("::mlir::OpTrait::FirstAttrDerivedResultType")
+                    || r#trait.name() == Some("::mlir::OpTrait::SameOperandsAndResultType"))
                     && unfixed_result_count == 0
-                    || r#trait.has_name("::mlir::InferTypeOpInterface::Trait") && regions.is_empty()
+                    || r#trait.name() == Some("::mlir::InferTypeOpInterface::Trait")
+                        && regions.is_empty()
             }),
             regions,
             definition,
