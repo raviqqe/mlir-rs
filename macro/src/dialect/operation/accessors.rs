@@ -6,8 +6,8 @@ use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 
 impl<'a> OperationField<'a> {
-    fn getter_impl(&self) -> Result<Option<TokenStream>, Error> {
-        Ok(match &self.kind {
+    fn getter(&self) -> Option<TokenStream> {
+        match &self.kind {
             FieldKind::Element {
                 kind,
                 constraint,
@@ -30,19 +30,19 @@ impl<'a> OperationField<'a> {
                             // Only present if the amount of groups is at least the number of
                             // elements.
                             quote! {
-                              if self.operation.#count() < #len {
-                                Err(::melior::Error::#error_variant(#name))
-                              } else {
-                                self.operation.#kind_ident(#index)
-                              }
+                                if self.operation.#count() < #len {
+                                    Err(::melior::Error::#error_variant(#name))
+                                } else {
+                                    self.operation.#kind_ident(#index)
+                                }
                             }
                         } else if constraint.is_variadic() {
                             // A unfixed group
                             // Length computed by subtracting the amount of other
                             // singular elements from the number of elements.
                             quote! {
-                              let group_length = self.operation.#count() - #len + 1;
-                              self.operation.#plural().skip(#index).take(group_length)
+                                let group_length = self.operation.#count() - #len + 1;
+                                self.operation.#plural().skip(#index).take(group_length)
                             }
                         } else if *unfixed_seen {
                             // Single element after unfixed group
@@ -86,8 +86,8 @@ impl<'a> OperationField<'a> {
                             let attribute =
                                 ::melior::ir::attribute::DenseI32ArrayAttribute::<'c>::try_from(
                                     self.operation
-                                        .attribute(#attribute_name)?
-                                )?;
+                                    .attribute(#attribute_name)?
+                                    )?;
                             let start = (0..#index)
                                 .map(|index| attribute.element(index))
                                 .collect::<Result<Vec<_>, _>>()?
@@ -157,7 +157,7 @@ impl<'a> OperationField<'a> {
                     quote! { Ok(self.operation.attribute(#name)?.try_into()?) }
                 })
             }
-        })
+        }
     }
 
     fn remover_impl(&self) -> Option<TokenStream> {
@@ -174,32 +174,32 @@ impl<'a> OperationField<'a> {
         }
     }
 
-    fn setter_impl(&self) -> Result<Option<TokenStream>, Error> {
+    fn setter_impl(&self) -> Option<TokenStream> {
         let FieldKind::Attribute { constraint } = &self.kind else {
-            return Ok(None);
+            return None;
         };
         let name = &self.name;
 
-        Ok(Some(if constraint.is_unit() {
+        Some(if constraint.is_unit() {
             quote! {
                 if value {
-                  self.operation.set_attribute(#name, Attribute::unit(&self.operation.context()));
+                    self.operation.set_attribute(#name, Attribute::unit(&self.operation.context()));
                 } else {
-                  self.operation.remove_attribute(#name)
+                    self.operation.remove_attribute(#name)
                 }
             }
         } else {
             quote! {
                 self.operation.set_attribute(#name, &value.into());
             }
-        }))
+        })
     }
 
     pub fn accessors(&self) -> Result<TokenStream, Error> {
         let setter = {
             let ident = sanitize_snake_case_name(&format!("set_{}", self.name))?;
 
-            if let Some(body) = self.setter_impl()? {
+            self.setter_impl().map(|body| {
                 let parameter_type = &self.kind.parameter_type();
 
                 quote! {
@@ -207,9 +207,7 @@ impl<'a> OperationField<'a> {
                         #body
                     }
                 }
-            } else {
-                quote!()
-            }
+            })
         };
         let remover = {
             let ident = sanitize_snake_case_name(&format!("remove_{}", self.name))?;
@@ -224,7 +222,7 @@ impl<'a> OperationField<'a> {
         let getter = {
             let ident = &self.sanitized_name;
             let return_type = &self.kind.return_type();
-            self.getter_impl()?.map(|body| {
+            self.getter().map(|body| {
                 quote! {
                     #[allow(clippy::needless_question_mark)]
                     pub fn #ident(&self, context: &'c ::melior::Context) -> #return_type {
