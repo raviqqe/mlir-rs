@@ -107,53 +107,59 @@ impl<'a> TypeConstraint<'a> {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct AttributeConstraint<'a>(Record<'a>);
+pub struct AttributeConstraint<'a> {
+    record: Record<'a>,
+    name: &'a str,
+}
 
 impl<'a> AttributeConstraint<'a> {
-    pub fn new(record: Record<'a>) -> Self {
-        Self(record)
+    pub fn new(record: Record<'a>) -> Result<Self, Error> {
+        Ok(Self {
+            name: record.name()?,
+            record,
+        })
     }
 
     #[allow(unused)]
     pub fn is_derived(&self) -> bool {
-        self.0.subclass_of("DerivedAttr")
+        self.record.subclass_of("DerivedAttr")
     }
 
     #[allow(unused)]
     pub fn is_type(&self) -> bool {
-        self.0.subclass_of("TypeAttrBase")
+        self.record.subclass_of("TypeAttrBase")
     }
 
     #[allow(unused)]
-    pub fn is_symbol_ref(&self) -> Result<bool, Error> {
-        Ok(self.0.name()? == "SymbolRefAttr"
-            || self.0.name()? == "FlatSymbolRefAttr"
-            || self.0.subclass_of("SymbolRefAttr")
-            || self.0.subclass_of("FlatSymbolRefAttr"))
+    pub fn is_symbol_ref(&self) -> bool {
+        self.name == "SymbolRefAttr"
+            || self.name == "FlatSymbolRefAttr"
+            || self.record.subclass_of("SymbolRefAttr")
+            || self.record.subclass_of("FlatSymbolRefAttr")
     }
 
     #[allow(unused)]
     pub fn is_enum(&self) -> bool {
-        self.0.subclass_of("EnumAttrInfo")
+        self.record.subclass_of("EnumAttrInfo")
     }
 
     pub fn is_optional(&self) -> Result<bool, Error> {
-        Ok(self.0.bit_value("isOptional")?)
+        Ok(self.record.bit_value("isOptional")?)
     }
 
     pub fn storage_type(&self) -> Result<&'static str, Error> {
         Ok(ATTRIBUTE_TYPES
-            .get(self.0.string_value("storageType")?.as_str().trim())
+            .get(self.record.string_value("storageType")?.as_str().trim())
             .copied()
             .unwrap_or(melior_attribute!(Attribute)))
     }
 
     pub fn is_unit(&self) -> Result<bool, Error> {
-        Ok(self.0.string_value("storageType")? == mlir_attribute!(UnitAttr))
+        Ok(self.record.string_value("storageType")? == mlir_attribute!(UnitAttr))
     }
 
     pub fn has_default_value(&self) -> Result<bool, Error> {
-        Ok(match self.0.string_value("defaultValue") {
+        Ok(match self.record.string_value("defaultValue") {
             Ok(value) => !value.is_empty(),
             Err(error) => {
                 // `defaultValue` can be uninitialized.
