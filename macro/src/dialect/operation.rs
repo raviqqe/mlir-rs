@@ -7,6 +7,7 @@ mod sequence_info;
 mod variadic_kind;
 
 use self::{
+    accessors::generate_accessors,
     builder::{generate_operation_builder, OperationBuilder},
     element_kind::ElementKind,
     field_kind::FieldKind,
@@ -30,7 +31,7 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
     let name = &operation.full_name()?;
     let accessors = operation
         .fields()
-        .map(|field| field.accessors())
+        .map(generate_accessors)
         .collect::<Result<Vec<_>, _>>()?;
 
     let builder = OperationBuilder::new(operation);
