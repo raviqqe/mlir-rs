@@ -150,7 +150,7 @@ impl<'a> OperationField<'a> {
             FieldKind::Attribute { constraint } => {
                 let name = &self.name;
 
-                Some(if constraint.is_unit()? {
+                Some(if constraint.is_unit() {
                     quote! { self.operation.attribute(#name).is_some() }
                 } else {
                     // TODO Handle returning `melior::Attribute`.
@@ -160,9 +160,9 @@ impl<'a> OperationField<'a> {
         })
     }
 
-    fn remover_impl(&self) -> Result<Option<TokenStream>, Error> {
-        Ok(if let FieldKind::Attribute { constraint } = &self.kind {
-            if constraint.is_unit()? || constraint.is_optional()? {
+    fn remover_impl(&self) -> Option<TokenStream> {
+        if let FieldKind::Attribute { constraint } = &self.kind {
+            if constraint.is_unit() || constraint.is_optional() {
                 let name = &self.name;
 
                 Some(quote! { self.operation.remove_attribute(#name) })
@@ -171,7 +171,7 @@ impl<'a> OperationField<'a> {
             }
         } else {
             None
-        })
+        }
     }
 
     fn setter_impl(&self) -> Result<Option<TokenStream>, Error> {
@@ -180,7 +180,7 @@ impl<'a> OperationField<'a> {
         };
         let name = &self.name;
 
-        Ok(Some(if constraint.is_unit()? {
+        Ok(Some(if constraint.is_unit() {
             quote! {
                 if value {
                   self.operation.set_attribute(#name, Attribute::unit(&self.operation.context()));
@@ -200,7 +200,7 @@ impl<'a> OperationField<'a> {
             let ident = sanitize_snake_case_name(&format!("set_{}", self.name))?;
 
             if let Some(body) = self.setter_impl()? {
-                let parameter_type = &self.kind.parameter_type()?;
+                let parameter_type = &self.kind.parameter_type();
 
                 quote! {
                     pub fn #ident(&mut self, context: &'c ::melior::Context, value: #parameter_type) {
@@ -213,7 +213,7 @@ impl<'a> OperationField<'a> {
         };
         let remover = {
             let ident = sanitize_snake_case_name(&format!("remove_{}", self.name))?;
-            self.remover_impl()?.map(|body| {
+            self.remover_impl().map(|body| {
                 quote! {
                     pub fn #ident(&mut self, context: &'c ::melior::Context) -> Result<(), ::melior::Error> {
                         #body
@@ -223,7 +223,7 @@ impl<'a> OperationField<'a> {
         };
         let getter = {
             let ident = &self.sanitized_name;
-            let return_type = &self.kind.return_type()?;
+            let return_type = &self.kind.return_type();
             self.getter_impl()?.map(|body| {
                 quote! {
                     #[allow(clippy::needless_question_mark)]

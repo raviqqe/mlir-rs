@@ -1,6 +1,7 @@
 use super::error::{Error, OdsError};
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
+use syn::Type;
 use tblgen::{
     error::{TableGenError, WithLocation},
     record::Record,
@@ -106,16 +107,41 @@ impl<'a> TypeConstraint<'a> {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct AttributeConstraint<'a> {
     record: Record<'a>,
     name: &'a str,
+    storage_type_str: String,
+    storage_type: Type,
+    optional: bool,
+    default: bool,
 }
 
 impl<'a> AttributeConstraint<'a> {
     pub fn new(record: Record<'a>) -> Result<Self, Error> {
+        let storage_type_str = record.string_value("storageType")?;
+
         Ok(Self {
             name: record.name()?,
+            storage_type: syn::parse_str(
+                &ATTRIBUTE_TYPES
+                    .get(storage_type_str.trim())
+                    .copied()
+                    .unwrap_or(melior_attribute!(Attribute)),
+            )?,
+            storage_type_str,
+            optional: record.bit_value("isOptional")?,
+            default: match record.string_value("defaultValue") {
+                Ok(value) => !value.is_empty(),
+                Err(error) => {
+                    // `defaultValue` can be uninitialized.
+                    if !matches!(error.error(), TableGenError::InitConversion { .. }) {
+                        return Err(error.into());
+                    }
+
+                    false
+                }
+            },
             record,
         })
     }
@@ -143,33 +169,20 @@ impl<'a> AttributeConstraint<'a> {
         self.record.subclass_of("EnumAttrInfo")
     }
 
-    pub fn is_optional(&self) -> Result<bool, Error> {
-        Ok(self.record.bit_value("isOptional")?)
+    pub fn is_optional(&self) -> bool {
+        self.optional
     }
 
-    pub fn storage_type(&self) -> Result<&'static str, Error> {
-        Ok(ATTRIBUTE_TYPES
-            .get(self.record.string_value("storageType")?.as_str().trim())
-            .copied()
-            .unwrap_or(melior_attribute!(Attribute)))
+    pub fn storage_type(&self) -> &Type {
+        &self.storage_type
     }
 
-    pub fn is_unit(&self) -> Result<bool, Error> {
-        Ok(self.record.string_value("storageType")? == mlir_attribute!(UnitAttr))
+    pub fn is_unit(&self) -> bool {
+        self.storage_type_str == mlir_attribute!(UnitAttr)
     }
 
-    pub fn has_default_value(&self) -> Result<bool, Error> {
-        Ok(match self.record.string_value("defaultValue") {
-            Ok(value) => !value.is_empty(),
-            Err(error) => {
-                // `defaultValue` can be uninitialized.
-                if !matches!(error.error(), TableGenError::InitConversion { .. }) {
-                    return Err(error.into());
-                }
-
-                false
-            }
-        })
+    pub fn has_default_value(&self) -> bool {
+        self.default
     }
 }
 

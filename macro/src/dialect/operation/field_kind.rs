@@ -1,7 +1,6 @@
 use super::{element_kind::ElementKind, SequenceInfo, VariadicKind};
-use crate::dialect::{
-    error::Error,
-    types::{AttributeConstraint, RegionConstraint, SuccessorConstraint, TypeConstraint},
+use crate::dialect::types::{
+    AttributeConstraint, RegionConstraint, SuccessorConstraint, TypeConstraint,
 };
 use syn::{parse_quote, Type};
 
@@ -36,14 +35,14 @@ impl<'a> FieldKind<'a> {
         }
     }
 
-    pub fn is_optional(&self) -> Result<bool, Error> {
-        Ok(match self {
+    pub fn is_optional(&self) -> bool {
+        match self {
             Self::Element { constraint, .. } => constraint.is_optional(),
             Self::Attribute { constraint, .. } => {
-                constraint.is_optional()? || constraint.has_default_value()?
+                constraint.is_optional() || constraint.has_default_value()
             }
             Self::Successor { .. } | Self::Region { .. } => false,
-        })
+        }
     }
 
     pub fn is_result(&self) -> bool {
@@ -56,8 +55,8 @@ impl<'a> FieldKind<'a> {
         )
     }
 
-    pub fn parameter_type(&self) -> Result<Type, Error> {
-        Ok(match self {
+    pub fn parameter_type(&self) -> Type {
+        match self {
             Self::Element {
                 kind, constraint, ..
             } => {
@@ -76,10 +75,10 @@ impl<'a> FieldKind<'a> {
                 }
             }
             Self::Attribute { constraint } => {
-                if constraint.is_unit()? {
+                if constraint.is_unit() {
                     parse_quote!(bool)
                 } else {
-                    let r#type: Type = syn::parse_str(constraint.storage_type()?)?;
+                    let r#type = constraint.storage_type();
                     parse_quote!(#r#type<'c>)
                 }
             }
@@ -99,7 +98,7 @@ impl<'a> FieldKind<'a> {
                     r#type
                 }
             }
-        })
+        }
     }
 
     fn create_result_type(r#type: Type) -> Type {
@@ -110,8 +109,8 @@ impl<'a> FieldKind<'a> {
         parse_quote!(impl Iterator<Item = #r#type>)
     }
 
-    pub fn return_type(&self) -> Result<Type, Error> {
-        Ok(match self {
+    pub fn return_type(&self) -> Type {
+        match self {
             Self::Element {
                 kind,
                 constraint,
@@ -136,10 +135,10 @@ impl<'a> FieldKind<'a> {
                 }
             }
             Self::Attribute { constraint } => {
-                if constraint.is_unit()? {
+                if constraint.is_unit() {
                     parse_quote!(bool)
                 } else {
-                    Self::create_result_type(self.parameter_type()?)
+                    Self::create_result_type(self.parameter_type())
                 }
             }
             Self::Successor { constraint, .. } => {
@@ -158,6 +157,6 @@ impl<'a> FieldKind<'a> {
                     Self::create_result_type(r#type)
                 }
             }
-        })
+        }
     }
 }

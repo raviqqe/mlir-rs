@@ -64,11 +64,11 @@ pub struct OperationBuilder<'o> {
 }
 
 impl<'o> OperationBuilder<'o> {
-    pub fn new(operation: &'o Operation<'o>) -> Result<Self, Error> {
-        Ok(Self {
+    pub fn new(operation: &'o Operation<'o>) -> Self {
+        Self {
             operation,
-            type_state: Self::create_type_state(operation)?,
-        })
+            type_state: Self::create_type_state(operation),
+        }
     }
 
     pub fn create_builder_fns<'a>(
@@ -80,7 +80,7 @@ impl<'o> OperationBuilder<'o> {
             // TODO Initialize a builder identifier out of this closure.
             let builder_ident = self.builder_identifier()?;
             let name = sanitize_snake_case_name(field.name)?;
-            let parameter_type = field.kind.parameter_type()?;
+            let parameter_type = field.kind.parameter_type();
             let argument = quote! { #name: #parameter_type };
             let add = format_ident!("add_{}s", field.kind.as_str());
 
@@ -121,7 +121,7 @@ impl<'o> OperationBuilder<'o> {
                 }
             };
 
-            Ok(if field.kind.is_optional()? {
+            Ok(if field.kind.is_optional() {
                 let parameters = self.type_state.parameters().collect::<Vec<_>>();
 
                 quote! {
@@ -212,21 +212,20 @@ impl<'o> OperationBuilder<'o> {
         let name = sanitize_snake_case_name(self.operation.short_name()?)?;
         let arguments = Self::required_fields(self.operation)
             .map(|field| {
-                let field = field?;
-                let parameter_type = &field.kind.parameter_type()?;
+                let parameter_type = &field.kind.parameter_type();
                 let parameter_name = &field.sanitized_name;
 
-                Ok(quote! { #parameter_name: #parameter_type })
+                quote! { #parameter_name: #parameter_type }
             })
-            .chain([Ok(quote! { location: ::melior::ir::Location<'c> })])
-            .collect::<Result<Vec<_>, Error>>()?;
+            .chain([quote! { location: ::melior::ir::Location<'c> }])
+            .collect::<Vec<_>>();
         let builder_calls = Self::required_fields(self.operation)
             .map(|field| {
-                let parameter_name = &field?.sanitized_name;
+                let parameter_name = &field.sanitized_name;
 
-                Ok(quote! { .#parameter_name(#parameter_name) })
+                quote! { .#parameter_name(#parameter_name) }
             })
-            .collect::<Result<Vec<_>, Error>>()?;
+            .collect::<Vec<_>>();
 
         let doc = format!("Creates a new {}", self.operation.summary()?);
 
@@ -241,23 +240,19 @@ impl<'o> OperationBuilder<'o> {
 
     fn required_fields<'a, 'b>(
         operation: &'a Operation<'b>,
-    ) -> impl Iterator<Item = Result<&'a OperationField<'b>, Error>> {
-        operation
-            .fields()
-            .filter(|field| !field.kind.is_result() || !operation.can_infer_type)
-            .filter_map(|field| match field.kind.is_optional() {
-                Ok(optional) => (!optional).then_some(Ok(field)),
-                Err(error) => Some(Err(error)),
-            })
+    ) -> impl Iterator<Item = &'a OperationField<'b>> {
+        operation.fields().filter(|field| {
+            (!field.kind.is_result() || !operation.can_infer_type) && !field.kind.is_optional()
+        })
     }
 
-    fn create_type_state(operation: &'o Operation<'o>) -> Result<TypeStateList, Error> {
-        Ok(TypeStateList::new(
+    fn create_type_state(operation: &'o Operation<'o>) -> TypeStateList {
+        TypeStateList::new(
             Self::required_fields(operation)
                 .enumerate()
-                .map(|(index, field)| Ok(TypeStateItem::new(index, field?.name.to_string())))
-                .collect::<Result<_, Error>>()?,
-        ))
+                .map(|(index, field)| TypeStateItem::new(index, field.name.to_string()))
+                .collect(),
+        )
     }
 
     fn builder_identifier(&self) -> Result<Ident, Error> {
