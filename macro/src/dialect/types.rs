@@ -124,7 +124,7 @@ impl<'a> AttributeConstraint<'a> {
         Ok(Self {
             name: record.name()?,
             storage_type: syn::parse_str(
-                &ATTRIBUTE_TYPES
+                ATTRIBUTE_TYPES
                     .get(storage_type_str.trim())
                     .copied()
                     .unwrap_or(melior_attribute!(Attribute)),
@@ -235,7 +235,7 @@ impl Trait {
         match &self.kind {
             TraitKind::Native { name, .. }
             | TraitKind::Internal { name }
-            | TraitKind::Interface { name } => Some(&name),
+            | TraitKind::Interface { name } => Some(name),
             TraitKind::Predicate => None,
         }
     }
