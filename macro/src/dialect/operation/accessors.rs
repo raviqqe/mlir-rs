@@ -160,7 +160,7 @@ impl<'a> OperationField<'a> {
         }
     }
 
-    fn remover_impl(&self) -> Option<TokenStream> {
+    fn remover(&self) -> Option<TokenStream> {
         if let FieldKind::Attribute { constraint } = &self.kind {
             if constraint.is_unit() || constraint.is_optional() {
                 let name = &self.name;
@@ -174,7 +174,7 @@ impl<'a> OperationField<'a> {
         }
     }
 
-    fn setter_impl(&self) -> Option<TokenStream> {
+    fn setter(&self) -> Option<TokenStream> {
         let FieldKind::Attribute { constraint } = &self.kind else {
             return None;
         };
@@ -199,7 +199,7 @@ impl<'a> OperationField<'a> {
         let setter = {
             let ident = sanitize_snake_case_name(&format!("set_{}", self.name))?;
 
-            self.setter_impl().map(|body| {
+            self.setter().map(|body| {
                 let parameter_type = &self.kind.parameter_type();
 
                 quote! {
@@ -211,7 +211,7 @@ impl<'a> OperationField<'a> {
         };
         let remover = {
             let ident = sanitize_snake_case_name(&format!("remove_{}", self.name))?;
-            self.remover_impl().map(|body| {
+            self.remover().map(|body| {
                 quote! {
                     pub fn #ident(&mut self, context: &'c ::melior::Context) -> Result<(), ::melior::Error> {
                         #body
