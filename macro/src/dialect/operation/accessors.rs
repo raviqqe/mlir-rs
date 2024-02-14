@@ -5,25 +5,19 @@ use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 
 pub fn generate_accessors(field: &OperationField) -> Result<TokenStream, Error> {
-    let getter = {
-        let ident = &field.sanitized_name;
-        let return_type = &field.kind.return_type();
-        generate_getter(field).map(|body| {
-            quote! {
-                #[allow(clippy::needless_question_mark)]
-                pub fn #ident(&self, context: &'c ::melior::Context) -> #return_type {
-                    #body
-                }
-            }
-        })
-    };
+    let ident = &field.sanitized_name;
+    let return_type = &field.kind.return_type();
+    let body = generate_getter(field);
 
     Ok(quote! {
-        #getter
+        #[allow(clippy::needless_question_mark)]
+        pub fn #ident(&self, context: &'c ::melior::Context) -> #return_type {
+            #body
+        }
     })
 }
 
-fn generate_getter(field: &OperationField) -> Option<TokenStream> {
+fn generate_getter(field: &OperationField) -> TokenStream {
     match &field.kind {
         FieldKind::Element {
             kind,
@@ -40,7 +34,7 @@ fn generate_getter(field: &OperationField) -> Option<TokenStream> {
             };
             let name = field.name;
 
-            Some(match variadic_kind {
+            match variadic_kind {
                 VariadicKind::Simple { unfixed_seen } => {
                     if constraint.is_optional() {
                         // Optional element, and some singular elements.
@@ -104,7 +98,7 @@ fn generate_getter(field: &OperationField) -> Option<TokenStream> {
                             ::melior::ir::attribute::DenseI32ArrayAttribute::<'c>::try_from(
                                 self.operation
                                 .attribute(#attribute_name)?
-                            )?;
+                                )?;
                         let start = (0..#index)
                             .map(|index| attribute.element(index))
                             .collect::<Result<Vec<_>, _>>()?
@@ -132,13 +126,13 @@ fn generate_getter(field: &OperationField) -> Option<TokenStream> {
 
                     quote! { #compute_start_length #get_elements }
                 }
-            })
+            }
         }
         FieldKind::Successor {
             constraint,
             sequence_info: SequenceInfo { index, .. },
         } => {
-            Some(if constraint.is_variadic() {
+            if constraint.is_variadic() {
                 // Only the last successor can be variadic
                 quote! {
                     self.operation.successors().skip(#index)
@@ -147,13 +141,13 @@ fn generate_getter(field: &OperationField) -> Option<TokenStream> {
                 quote! {
                     self.operation.successor(#index)
                 }
-            })
+            }
         }
         FieldKind::Region {
             constraint,
             sequence_info: SequenceInfo { index, .. },
         } => {
-            Some(if constraint.is_variadic() {
+            if constraint.is_variadic() {
                 // Only the last region can be variadic
                 quote! {
                     self.operation.regions().skip(#index)
@@ -162,7 +156,7 @@ fn generate_getter(field: &OperationField) -> Option<TokenStream> {
                 quote! {
                     self.operation.region(#index)
                 }
-            })
+            }
         }
     }
 }
