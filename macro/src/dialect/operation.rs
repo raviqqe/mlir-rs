@@ -31,9 +31,14 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
     let description = operation.description()?;
     let class_name = format_ident!("{}", operation.class_name()?);
     let name = &operation.full_name()?;
-    let accessors = operation
+
+    let field_accessors = operation
         .fields()
         .map(generate_accessors)
+        .collect::<Result<Vec<_>, _>>()?;
+    let attribute_accessors = operation
+        .attributes()
+        .map(attribute::generate_accessors)
         .collect::<Result<Vec<_>, _>>()?;
 
     let builder = OperationBuilder::new(operation);
@@ -60,7 +65,8 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
 
             #builder_fn
 
-            #(#accessors)*
+            #(#field_accessors)*
+            #(#attribute_accessors)*
         }
 
         #builder_tokens
@@ -195,8 +201,10 @@ impl<'a> Operation<'a> {
             .chain(&self.operands)
             .chain(&self.regions)
             .chain(&self.successors)
-            .chain(&self.attributes)
-            .chain(&self.derived_attributes)
+    }
+
+    pub fn attributes(&self) -> impl Iterator<Item = &Attribute<'a>> + Clone {
+        self.attributes.iter().chain(&self.derived_attributes)
     }
 
     fn collect_successors(definition: Record<'a>) -> Result<Vec<OperationField>, Error> {
