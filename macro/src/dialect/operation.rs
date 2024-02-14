@@ -94,8 +94,8 @@ pub struct Operation<'a> {
     successors: Vec<OperationField<'a>>,
     results: Vec<OperationField<'a>>,
     operands: Vec<OperationField<'a>>,
-    attributes: Vec<OperationField<'a>>,
-    derived_attributes: Vec<OperationField<'a>>,
+    attributes: Vec<Attribute<'a>>,
+    derived_attributes: Vec<Attribute<'a>>,
 }
 
 impl<'a> Operation<'a> {
