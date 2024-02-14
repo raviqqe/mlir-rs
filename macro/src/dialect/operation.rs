@@ -391,10 +391,10 @@ impl<'a> Operation<'a> {
         definition
             .values()
             .filter_map(|value| {
-                let Ok(def) = Record::try_from(value) else {
+                let Ok(definition) = Record::try_from(value) else {
                     return None;
                 };
-                def.subclass_of("Attr").then_some(def)
+                definition.subclass_of("Attr").then_some(definition)
             })
             .map(|definition| {
                 if definition.subclass_of("DerivedAttr") {
