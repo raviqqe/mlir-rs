@@ -11,7 +11,7 @@ pub struct Attribute<'a> {
 }
 
 impl<'a> Attribute<'a> {
-    pub fn new(name: &'a str, constrait: AttributeConstraint<'a>) -> Result<Self, Error> {
+    pub fn new(name: &'a str, constraint: AttributeConstraint<'a>) -> Result<Self, Error> {
         Ok(Self {
             name,
             sanitized_name: sanitize_snake_case_name(name)?,
