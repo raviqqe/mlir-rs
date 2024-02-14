@@ -3,8 +3,18 @@ use comrak::{arena_tree::NodeEdge, format_commonmark, nodes::NodeValue, parse_do
 use convert_case::{Case, Casing};
 use proc_macro2::Ident;
 use quote::format_ident;
+use syn::parse_quote;
+use syn::Type;
 
 const RESERVED_NAMES: &[&str] = &["name", "operation", "builder"];
+
+pub fn generate_result_type(r#type: Type) -> Type {
+    parse_quote!(Result<#r#type, ::melior::Error>)
+}
+
+pub fn generate_iterator_type(r#type: Type) -> Type {
+    parse_quote!(impl Iterator<Item = #r#type>)
+}
 
 pub fn sanitize_snake_case_name(name: &str) -> Result<Ident, Error> {
     sanitize_name(&name.to_case(Case::Snake))

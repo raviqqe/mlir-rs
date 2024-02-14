@@ -1,7 +1,5 @@
 use super::{element_kind::ElementKind, SequenceInfo, VariadicKind};
-use crate::dialect::types::{
-    AttributeConstraint, RegionConstraint, SuccessorConstraint, TypeConstraint,
-};
+use crate::dialect::types::{RegionConstraint, SuccessorConstraint, TypeConstraint};
 use syn::{parse_quote, Type};
 
 #[derive(Debug, Clone)]
@@ -11,9 +9,6 @@ pub enum FieldKind<'a> {
         constraint: TypeConstraint<'a>,
         sequence_info: SequenceInfo,
         variadic_kind: VariadicKind,
-    },
-    Attribute {
-        constraint: AttributeConstraint<'a>,
     },
     Successor {
         constraint: SuccessorConstraint<'a>,
@@ -29,7 +24,6 @@ impl<'a> FieldKind<'a> {
     pub fn as_str(&self) -> &'static str {
         match self {
             Self::Element { kind, .. } => kind.as_str(),
-            Self::Attribute { .. } => "attribute",
             Self::Successor { .. } => "successor",
             Self::Region { .. } => "region",
         }
@@ -38,9 +32,6 @@ impl<'a> FieldKind<'a> {
     pub fn is_optional(&self) -> bool {
         match self {
             Self::Element { constraint, .. } => constraint.is_optional(),
-            Self::Attribute { constraint, .. } => {
-                constraint.is_optional() || constraint.has_default_value()
-            }
             Self::Successor { .. } | Self::Region { .. } => false,
         }
     }
@@ -72,14 +63,6 @@ impl<'a> FieldKind<'a> {
                     parse_quote! { &[#base_type] }
                 } else {
                     base_type
-                }
-            }
-            Self::Attribute { constraint } => {
-                if constraint.is_unit() {
-                    parse_quote!(bool)
-                } else {
-                    let r#type = constraint.storage_type();
-                    parse_quote!(#r#type<'c>)
                 }
             }
             Self::Successor { constraint, .. } => {
@@ -132,13 +115,6 @@ impl<'a> FieldKind<'a> {
                     Self::create_result_type(Self::create_iterator_type(base_type))
                 } else {
                     Self::create_iterator_type(base_type)
-                }
-            }
-            Self::Attribute { constraint } => {
-                if constraint.is_unit() {
-                    parse_quote!(bool)
-                } else {
-                    Self::create_result_type(self.parameter_type())
                 }
             }
             Self::Successor { constraint, .. } => {

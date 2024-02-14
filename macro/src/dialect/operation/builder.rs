@@ -95,16 +95,17 @@ impl<'o> OperationBuilder<'o> {
                         quote! { &[#name] }
                     }
                 }
-                FieldKind::Attribute { .. } => {
-                    let name_string = &field.name;
+                // TODO
+                // FieldKind::Attribute { .. } => {
+                //     let name_string = &field.name;
 
-                    quote! {
-                        &[(
-                            ::melior::ir::Identifier::new(self.context, #name_string),
-                            #name.into(),
-                        )]
-                    }
-                }
+                //     quote! {
+                //         &[(
+                //             ::melior::ir::Identifier::new(self.context, #name_string),
+                //             #name.into(),
+                //         )]
+                //     }
+                // }
                 FieldKind::Successor { constraint, .. } => {
                     if constraint.is_variadic() {
                         quote! { #name }
