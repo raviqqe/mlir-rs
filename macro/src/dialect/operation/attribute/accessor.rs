@@ -65,10 +65,10 @@ fn generate_setter(attribute: &Attribute) -> Result<TokenStream, Error> {
 
 fn generate_remover(attribute: &Attribute) -> Result<Option<TokenStream>, Error> {
     let constrait = attribute.constraint();
-    let ident = sanitize_snake_case_name(&format!("remove_{}", attribute.name()))?;
 
     Ok(if constrait.is_unit() || constrait.is_optional() {
         let name = attribute.name();
+        let ident = sanitize_snake_case_name(&format!("remove_{}", attribute.name()))?;
 
         Some(quote! {
             pub fn #ident(&mut self, context: &'c ::melior::Context) -> Result<(), ::melior::Error> {
