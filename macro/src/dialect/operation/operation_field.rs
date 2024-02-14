@@ -6,6 +6,11 @@ use crate::dialect::{
 };
 use proc_macro2::Ident;
 
+pub trait OperationFieldV2 {
+    fn name(&self) -> &str;
+    fn sanitized_name(&self) -> &Ident;
+}
+
 #[derive(Debug, Clone)]
 pub struct OperationField<'a> {
     pub(crate) name: &'a str,
