@@ -1,5 +1,8 @@
 use super::{element_kind::ElementKind, SequenceInfo, VariadicKind};
-use crate::dialect::types::{RegionConstraint, SuccessorConstraint, TypeConstraint};
+use crate::dialect::{
+    types::{RegionConstraint, SuccessorConstraint, TypeConstraint},
+    utility::{generate_iterator_type, generate_result_type},
+};
 use syn::{parse_quote, Type};
 
 #[derive(Debug, Clone)]
@@ -84,14 +87,6 @@ impl<'a> FieldKind<'a> {
         }
     }
 
-    fn create_result_type(r#type: Type) -> Type {
-        parse_quote!(Result<#r#type, ::melior::Error>)
-    }
-
-    fn create_iterator_type(r#type: Type) -> Type {
-        parse_quote!(impl Iterator<Item = #r#type>)
-    }
-
     pub fn return_type(&self) -> Type {
         match self {
             Self::Element {
@@ -110,27 +105,27 @@ impl<'a> FieldKind<'a> {
                 };
 
                 if !constraint.is_variadic() {
-                    Self::create_result_type(base_type)
+                    generate_result_type(base_type)
                 } else if variadic_kind == &VariadicKind::AttributeSized {
-                    Self::create_result_type(Self::create_iterator_type(base_type))
+                    generate_result_type(generate_iterator_type(base_type))
                 } else {
-                    Self::create_iterator_type(base_type)
+                    generate_iterator_type(base_type)
                 }
             }
             Self::Successor { constraint, .. } => {
                 let r#type: Type = parse_quote!(::melior::ir::BlockRef<'c, '_>);
                 if constraint.is_variadic() {
-                    Self::create_iterator_type(r#type)
+                    generate_iterator_type(r#type)
                 } else {
-                    Self::create_result_type(r#type)
+                    generate_result_type(r#type)
                 }
             }
             Self::Region { constraint, .. } => {
                 let r#type: Type = parse_quote!(::melior::ir::RegionRef<'c, '_>);
                 if constraint.is_variadic() {
-                    Self::create_iterator_type(r#type)
+                    generate_iterator_type(r#type)
                 } else {
-                    Self::create_result_type(r#type)
+                    generate_result_type(r#type)
                 }
             }
         }
