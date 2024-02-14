@@ -285,12 +285,12 @@ impl<'a> Operation<'a> {
     }
 
     fn collect_results(
-        def: Record<'a>,
+        definition: Record<'a>,
         same_size: bool,
         attribute_sized: bool,
     ) -> Result<(Vec<OperationField>, usize), Error> {
         Self::collect_elements(
-            &Self::dag_constraints(def, "results")?
+            &Self::dag_constraints(definition, "results")?
                 .into_iter()
                 .map(|(name, constraint)| (name, TypeConstraint::new(constraint)))
                 .collect::<Vec<_>>(),
