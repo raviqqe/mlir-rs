@@ -98,7 +98,7 @@ fn generate_getter(field: &OperationField) -> TokenStream {
                             ::melior::ir::attribute::DenseI32ArrayAttribute::<'c>::try_from(
                                 self.operation
                                 .attribute(#attribute_name)?
-                                )?;
+                            )?;
                         let start = (0..#index)
                             .map(|index| attribute.element(index))
                             .collect::<Result<Vec<_>, _>>()?
