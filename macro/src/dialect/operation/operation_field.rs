@@ -1,7 +1,7 @@
 use super::{element_kind::ElementKind, field_kind::FieldKind, SequenceInfo, VariadicKind};
 use crate::dialect::{
     error::Error,
-    types::{AttributeConstraint, RegionConstraint, SuccessorConstraint, TypeConstraint},
+    types::{RegionConstraint, SuccessorConstraint, TypeConstraint},
     utility::sanitize_snake_case_name,
 };
 use proc_macro2::Ident;
@@ -35,13 +35,6 @@ impl<'a> OperationField<'a> {
             sanitized_name: sanitize_snake_case_name(name)?,
             kind,
         })
-    }
-
-    pub fn new_attribute(
-        name: &'a str,
-        constraint: AttributeConstraint<'a>,
-    ) -> Result<Self, Error> {
-        Self::new(name, FieldKind::Attribute { constraint })
     }
 
     pub fn new_region(

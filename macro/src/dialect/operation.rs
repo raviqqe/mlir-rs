@@ -1,4 +1,5 @@
 mod accessors;
+mod attribute;
 mod builder;
 mod element_kind;
 mod field_kind;
@@ -8,6 +9,7 @@ mod variadic_kind;
 
 use self::{
     accessors::generate_accessors,
+    attribute::Attribute,
     builder::{generate_operation_builder, OperationBuilder},
     element_kind::ElementKind,
     field_kind::FieldKind,
@@ -369,7 +371,7 @@ impl<'a> Operation<'a> {
 
     fn collect_attributes(
         arguments: &[(&'a str, Record<'a>)],
-    ) -> Result<Vec<OperationField<'a>>, Error> {
+    ) -> Result<Vec<Attribute<'a>>, Error> {
         arguments
             .iter()
             .filter(|(_, definition)| definition.subclass_of("Attr"))
@@ -379,15 +381,13 @@ impl<'a> Operation<'a> {
                         .with_location(*definition)
                         .into())
                 } else {
-                    OperationField::new_attribute(name, AttributeConstraint::new(*definition)?)
+                    Attribute::new(name, AttributeConstraint::new(*definition)?)
                 }
             })
             .collect()
     }
 
-    fn collect_derived_attributes(
-        definition: Record<'a>,
-    ) -> Result<Vec<OperationField<'a>>, Error> {
+    fn collect_derived_attributes(definition: Record<'a>) -> Result<Vec<Attribute<'a>>, Error> {
         definition
             .values()
             .filter_map(|value| {
@@ -398,10 +398,7 @@ impl<'a> Operation<'a> {
             })
             .map(|definition| {
                 if definition.subclass_of("DerivedAttr") {
-                    OperationField::new_attribute(
-                        definition.name()?,
-                        AttributeConstraint::new(definition)?,
-                    )
+                    Attribute::new(definition.name()?, AttributeConstraint::new(definition)?)
                 } else {
                     Err(OdsError::ExpectedSuperClass("DerivedAttr")
                         .with_location(definition)
