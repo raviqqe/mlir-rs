@@ -18,6 +18,16 @@ pub struct OperationField<'a> {
     pub(crate) kind: FieldKind<'a>,
 }
 
+impl OperationFieldV2 for OperationField<'_> {
+    fn name(&self) -> &str {
+        self.name
+    }
+
+    fn sanitized_name(&self) -> &Ident {
+        &self.sanitized_name
+    }
+}
+
 impl<'a> OperationField<'a> {
     fn new(name: &'a str, kind: FieldKind<'a>) -> Result<Self, Error> {
         Ok(Self {
