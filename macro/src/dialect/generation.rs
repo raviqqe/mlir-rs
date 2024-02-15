@@ -1,9 +1,9 @@
-mod accessor;
 mod attribute_accessor;
+mod field_accessor;
 mod operation_builder;
 
 use self::{
-    accessor::generate_accessors, attribute_accessor::generate_attribute_accessors,
+    attribute_accessor::generate_attribute_accessors, field_accessor::generate_accessors,
     operation_builder::generate_operation_builder,
 };
 use super::operation::{Operation, OperationBuilder};
