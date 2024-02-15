@@ -1,10 +1,10 @@
-use super::super::Attribute;
-use crate::dialect::operation::operation_field::OperationFieldLike;
+use crate::dialect::operation::Attribute;
+use crate::dialect::operation::OperationFieldLike;
 use crate::dialect::{error::Error, utility::sanitize_snake_case_name};
 use proc_macro2::TokenStream;
 use quote::quote;
 
-pub fn generate_accessors(attribute: &Attribute) -> Result<TokenStream, Error> {
+pub fn generate_attribute_accessors(attribute: &Attribute) -> Result<TokenStream, Error> {
     let getter = generate_getter(attribute)?;
     let setter = generate_setter(attribute)?;
     let remover = generate_remover(attribute)?;

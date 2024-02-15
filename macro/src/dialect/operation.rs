@@ -1,4 +1,3 @@
-mod accessors;
 mod attribute;
 mod builder;
 mod element_kind;
@@ -7,90 +6,20 @@ mod operation_field;
 mod sequence_info;
 mod variadic_kind;
 
-use self::{
-    accessors::generate_accessors,
-    attribute::Attribute,
-    builder::{generate_operation_builder, OperationBuilder},
-    element_kind::ElementKind,
-    field_kind::FieldKind,
-    operation_field::{OperationField, OperationFieldLike},
-    sequence_info::SequenceInfo,
-    variadic_kind::VariadicKind,
-};
+pub use self::attribute::Attribute;
+pub use self::builder::OperationBuilder;
+pub use self::element_kind::ElementKind;
+pub use self::field_kind::FieldKind;
+pub use self::operation_field::OperationField;
+pub use self::sequence_info::SequenceInfo;
+pub use self::variadic_kind::VariadicKind;
 use super::utility::sanitize_documentation;
 use crate::dialect::{
     error::{Error, OdsError},
     types::{AttributeConstraint, RegionConstraint, SuccessorConstraint, Trait, TypeConstraint},
 };
-use proc_macro2::TokenStream;
-use quote::{format_ident, quote};
+pub use operation_field::OperationFieldLike;
 use tblgen::{error::WithLocation, record::Record};
-
-pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
-    let summary = operation.summary()?;
-    let description = operation.description()?;
-    let class_name = format_ident!("{}", operation.class_name()?);
-    let name = &operation.full_name()?;
-
-    let field_accessors = operation
-        .operation_fields()
-        .map(generate_accessors)
-        .collect::<Result<Vec<_>, _>>()?;
-    let attribute_accessors = operation
-        .attributes()
-        .map(attribute::generate_accessors)
-        .collect::<Result<Vec<_>, _>>()?;
-
-    let builder = OperationBuilder::new(operation);
-    let builder_tokens = generate_operation_builder(&builder)?;
-    let builder_fn = builder.create_op_builder_fn()?;
-    let default_constructor = builder.create_default_constructor()?;
-
-    Ok(quote! {
-        #[doc = #summary]
-        #[doc = "\n\n"]
-        #[doc = #description]
-        pub struct #class_name<'c> {
-            operation: ::melior::ir::operation::Operation<'c>,
-        }
-
-        impl<'c> #class_name<'c> {
-            pub fn name() -> &'static str {
-                #name
-            }
-
-            pub fn operation(&self) -> &::melior::ir::operation::Operation<'c> {
-                &self.operation
-            }
-
-            #builder_fn
-
-            #(#field_accessors)*
-            #(#attribute_accessors)*
-        }
-
-        #builder_tokens
-
-        #default_constructor
-
-        impl<'c> TryFrom<::melior::ir::operation::Operation<'c>> for #class_name<'c> {
-            type Error = ::melior::Error;
-
-            fn try_from(
-                operation: ::melior::ir::operation::Operation<'c>,
-            ) -> Result<Self, Self::Error> {
-                // TODO Check an operation name.
-                Ok(Self { operation })
-            }
-        }
-
-        impl<'c> From<#class_name<'c>> for ::melior::ir::operation::Operation<'c> {
-            fn from(operation: #class_name<'c>) -> ::melior::ir::operation::Operation<'c> {
-                operation.operation
-            }
-        }
-    })
-}
 
 #[derive(Debug)]
 pub struct Operation<'a> {

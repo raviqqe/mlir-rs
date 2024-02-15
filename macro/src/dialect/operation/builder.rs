@@ -10,55 +10,6 @@ use super::{
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 
-pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStream, Error> {
-    let field_names = builder
-        .type_state
-        .field_names()
-        .map(sanitize_snake_case_name)
-        .collect::<Result<Vec<_>, _>>()?;
-
-    let phantom_fields = builder
-        .type_state
-        .parameters()
-        .zip(&field_names)
-        .map(|(r#type, name)| {
-            quote! {
-                #name: ::std::marker::PhantomData<#r#type>
-            }
-        });
-
-    let phantom_arguments = field_names
-        .iter()
-        .map(|name| quote! { #name: ::std::marker::PhantomData })
-        .collect::<Vec<_>>();
-
-    let builder_fns = builder
-        .create_builder_fns(&field_names, phantom_arguments.as_slice())
-        .collect::<Result<Vec<_>, _>>()?;
-
-    let new = builder.create_new_fn(phantom_arguments.as_slice())?;
-    let build = builder.create_build_fn()?;
-
-    let builder_identifier = builder.builder_identifier()?;
-    let doc = format!("Builder for {}", builder.operation.summary()?);
-    let iter_arguments = builder.type_state.parameters();
-
-    Ok(quote! {
-        #[doc = #doc]
-        pub struct #builder_identifier<'c, #(#iter_arguments),*> {
-            builder: ::melior::ir::operation::OperationBuilder<'c>,
-            context: &'c ::melior::Context,
-            #(#phantom_fields),*
-        }
-
-        #new
-
-        #(#builder_fns)*
-
-        #build
-    })
-}
-
 pub struct OperationBuilder<'o> {
     operation: &'o Operation<'o>,
     type_state: TypeStateList,
@@ -70,6 +21,14 @@ impl<'o> OperationBuilder<'o> {
             operation,
             type_state: Self::create_type_state(operation),
         }
+    }
+
+    pub fn operation(&self) -> &Operation {
+        self.operation
+    }
+
+    pub fn type_state(&self) -> &TypeStateList {
+        &self.type_state
     }
 
     pub fn create_builder_fns<'a>(
@@ -125,7 +84,7 @@ impl<'o> OperationBuilder<'o> {
         })
     }
 
-    fn create_build_fn(&self) -> Result<TokenStream, Error> {
+    pub fn create_build_fn(&self) -> Result<TokenStream, Error> {
         let builder_ident = self.builder_identifier()?;
         let arguments = self.type_state.arguments_all_set(true);
         let class_name = format_ident!("{}", &self.operation.class_name()?);
@@ -144,7 +103,7 @@ impl<'o> OperationBuilder<'o> {
         })
     }
 
-    fn create_new_fn(&self, phantoms: &[TokenStream]) -> Result<TokenStream, Error> {
+    pub fn create_new_fn(&self, phantoms: &[TokenStream]) -> Result<TokenStream, Error> {
         let builder_ident = self.builder_identifier()?;
         let name = &self.operation.full_name()?;
         let arguments = self.type_state.arguments_all_set(false);
@@ -224,7 +183,7 @@ impl<'o> OperationBuilder<'o> {
         )
     }
 
-    fn builder_identifier(&self) -> Result<Ident, Error> {
+    pub fn builder_identifier(&self) -> Result<Ident, Error> {
         Ok(format_ident!("{}Builder", self.operation.class_name()?))
     }
 }

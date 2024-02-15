@@ -1,5 +1,6 @@
-use super::{
-    super::error::Error, ElementKind, FieldKind, OperationField, SequenceInfo, VariadicKind,
+use crate::dialect::error::Error;
+use crate::dialect::operation::{
+    ElementKind, FieldKind, OperationField, SequenceInfo, VariadicKind,
 };
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};

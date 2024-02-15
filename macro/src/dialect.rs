@@ -1,4 +1,5 @@
 mod error;
+mod generation;
 mod input;
 mod operation;
 mod types;
@@ -6,7 +7,7 @@ mod utility;
 
 use self::{
     error::Error,
-    operation::generate_operation,
+    generation::generate_operation,
     utility::{sanitize_documentation, sanitize_snake_case_name},
 };
 pub use input::DialectInput;
