@@ -196,9 +196,8 @@ impl<'a> Operation<'a> {
 
         while let Some(trait_list) = trait_lists.pop() {
             for value in trait_list.iter() {
-                let definition: Record = value
-                    .try_into()
-                    .map_err(|error: tblgen::Error| error.set_location(definition))?;
+                let definition =
+                    Record::try_from(value).map_err(|error| error.set_location(definition))?;
 
                 if definition.subclass_of("TraitList") {
                     trait_lists.push(definition.list_value("traits")?);
