@@ -6,13 +6,11 @@ mod operation_field;
 mod sequence_info;
 mod variadic_kind;
 
-pub use self::attribute::Attribute;
-pub use self::builder::OperationBuilder;
-pub use self::element_kind::ElementKind;
-pub use self::field_kind::FieldKind;
-pub use self::operation_field::OperationField;
-pub use self::sequence_info::SequenceInfo;
-pub use self::variadic_kind::VariadicKind;
+pub use self::{
+    attribute::Attribute, builder::OperationBuilder, element_kind::ElementKind,
+    field_kind::FieldKind, operation_field::OperationField, sequence_info::SequenceInfo,
+    variadic_kind::VariadicKind,
+};
 use super::utility::sanitize_documentation;
 use crate::dialect::{
     error::{Error, OdsError},

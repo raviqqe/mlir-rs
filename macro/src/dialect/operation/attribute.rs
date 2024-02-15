@@ -1,7 +1,9 @@
-use crate::dialect::operation::operation_field::OperationFieldLike;
-use crate::dialect::types::AttributeConstraint;
-use crate::dialect::utility::generate_result_type;
-use crate::dialect::{error::Error, utility::sanitize_snake_case_name};
+use crate::dialect::{
+    error::Error,
+    operation::operation_field::OperationFieldLike,
+    types::AttributeConstraint,
+    utility::{generate_result_type, sanitize_snake_case_name},
+};
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 use syn::{parse_quote, Type};

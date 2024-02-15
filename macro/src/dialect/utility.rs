@@ -3,8 +3,7 @@ use comrak::{arena_tree::NodeEdge, format_commonmark, nodes::NodeValue, parse_do
 use convert_case::{Case, Casing};
 use proc_macro2::Ident;
 use quote::format_ident;
-use syn::parse_quote;
-use syn::Type;
+use syn::{parse_quote, Type};
 
 const RESERVED_NAMES: &[&str] = &["name", "operation", "builder"];
 
