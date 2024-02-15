@@ -18,7 +18,7 @@ use crate::dialect::{
     types::{RegionConstraint, SuccessorConstraint, TypeConstraint},
 };
 pub use operation_field::OperationFieldLike;
-use tblgen::{error::WithLocation, record::Record};
+use tblgen::{error::WithLocation, record::Record, TypedInit};
 
 #[derive(Debug)]
 pub struct Operation<'a> {
@@ -338,12 +338,11 @@ impl<'a> Operation<'a> {
     fn collect_derived_attributes(definition: Record<'a>) -> Result<Vec<Attribute<'a>>, Error> {
         definition
             .values()
-            .filter_map(|value| {
-                let Ok(definition) = Record::try_from(value) else {
-                    return None;
-                };
-                definition.subclass_of("Attr").then_some(definition)
-            })
+            .filter(|value| matches!(value.init, TypedInit::Def(_)))
+            .map(Record::try_from)
+            .collect::<Result<Vec<_>, _>>()?
+            .into_iter()
+            .filter(|definition| definition.subclass_of("Attr"))
             .map(|definition| {
                 if definition.subclass_of("DerivedAttr") {
                     Attribute::new(definition.name()?, definition)
