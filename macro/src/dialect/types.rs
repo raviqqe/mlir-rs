@@ -48,7 +48,7 @@ impl<'a> TypeConstraint<'a> {
         self.0.subclass_of("VariadicOfVariadic")
     }
 
-    pub fn has_unfixed(&self) -> bool {
+    pub fn is_unfixed(&self) -> bool {
         self.is_variadic() || self.is_optional()
     }
 }

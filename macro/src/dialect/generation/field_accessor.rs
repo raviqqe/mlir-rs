@@ -80,7 +80,7 @@ fn generate_getter(field: &OperationField) -> TokenStream {
                         let group_len = total_var_len / #unfixed_count;
                         let start = #preceding_simple_count + #preceding_variadic_count * group_len;
                     };
-                    let get_elements = if constraint.has_unfixed() {
+                    let get_elements = if constraint.is_unfixed() {
                         quote! {
                             self.operation.#plural().skip(start).take(group_len)
                         }
@@ -107,7 +107,7 @@ fn generate_getter(field: &OperationField) -> TokenStream {
                             .sum::<i32>() as usize;
                         let group_len = attribute.element(#index)? as usize;
                     };
-                    let get_elements = if !constraint.has_unfixed() {
+                    let get_elements = if !constraint.is_unfixed() {
                         quote! {
                             self.operation.#kind_ident(start)
                         }

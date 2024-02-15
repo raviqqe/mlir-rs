@@ -276,7 +276,7 @@ impl<'a> Operation<'a> {
     ) -> Result<(Vec<OperationField<'a>>, usize), Error> {
         let unfixed_count = elements
             .iter()
-            .filter(|(_, constraint)| constraint.has_unfixed())
+            .filter(|(_, constraint)| constraint.is_unfixed())
             .count();
         let mut variadic_kind = VariadicKind::new(unfixed_count, same_size, attribute_sized);
         let mut fields = vec![];
@@ -295,7 +295,7 @@ impl<'a> Operation<'a> {
 
             match &mut variadic_kind {
                 VariadicKind::Simple { unfixed_seen } => {
-                    if constraint.has_unfixed() {
+                    if constraint.is_unfixed() {
                         *unfixed_seen = true;
                     }
                 }
@@ -304,7 +304,7 @@ impl<'a> Operation<'a> {
                     preceding_variadic_count,
                     ..
                 } => {
-                    if constraint.has_unfixed() {
+                    if constraint.is_unfixed() {
                         *preceding_variadic_count += 1;
                     } else {
                         *preceding_simple_count += 1;

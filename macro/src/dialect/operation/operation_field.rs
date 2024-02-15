@@ -67,7 +67,7 @@ impl OperationFieldLike for OperationField<'_> {
     fn add_arguments(&self, name: &Ident) -> TokenStream {
         match &self.kind {
             FieldKind::Element { constraint, .. } => {
-                if constraint.has_unfixed() && !constraint.is_optional() {
+                if constraint.is_unfixed() && !constraint.is_optional() {
                     quote! { #name }
                 } else {
                     quote! { &[#name] }
