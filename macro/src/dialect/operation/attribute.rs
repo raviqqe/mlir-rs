@@ -1,35 +1,114 @@
 use crate::dialect::{
     error::Error,
     operation::operation_field::OperationFieldLike,
-    types::AttributeConstraint,
     utility::{generate_result_type, sanitize_snake_case_name},
 };
+use once_cell::sync::Lazy;
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
+use std::collections::HashMap;
 use syn::{parse_quote, Type};
+use tblgen::{error::TableGenError, Record};
+
+macro_rules! prefixed_string {
+    ($prefix:literal, $name:ident) => {
+        concat!($prefix, stringify!($name))
+    };
+}
+
+macro_rules! mlir_attribute {
+    ($name:ident) => {
+        prefixed_string!("::mlir::", $name)
+    };
+}
+
+macro_rules! melior_attribute {
+    ($name:ident) => {
+        prefixed_string!("::melior::ir::attribute::", $name)
+    };
+}
+
+static ATTRIBUTE_TYPES: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
+    let mut map = HashMap::new();
+
+    macro_rules! initialize_attributes {
+        ($($mlir:ident => $melior:ident),* $(,)*) => {
+            $(
+                map.insert(
+                    mlir_attribute!($mlir),
+                    melior_attribute!($melior),
+                );
+            )*
+        };
+    }
+
+    initialize_attributes!(
+        ArrayAttr => ArrayAttribute,
+        Attribute => Attribute,
+        DenseElementsAttr => DenseElementsAttribute,
+        DenseI32ArrayAttr => DenseI32ArrayAttribute,
+        FlatSymbolRefAttr => FlatSymbolRefAttribute,
+        FloatAttr => FloatAttribute,
+        IntegerAttr => IntegerAttribute,
+        StringAttr => StringAttribute,
+        TypeAttr => TypeAttribute,
+    );
+
+    map
+});
 
 #[derive(Debug)]
 pub struct Attribute<'a> {
     name: &'a str,
     sanitized_name: Ident,
-    constraint: AttributeConstraint<'a>,
+    storage_type_str: String,
+    storage_type: Type,
+    optional: bool,
+    default: bool,
 }
 
 impl<'a> Attribute<'a> {
-    pub fn new(name: &'a str, constraint: AttributeConstraint<'a>) -> Result<Self, Error> {
+    pub fn new(name: &'a str, record: Record<'a>) -> Result<Self, Error> {
         Ok(Self {
             name,
             sanitized_name: sanitize_snake_case_name(name)?,
-            constraint,
+            name: record.name()?,
+            storage_type: syn::parse_str(
+                ATTRIBUTE_TYPES
+                    .get(storage_type_str.trim())
+                    .copied()
+                    .unwrap_or(melior_attribute!(Attribute)),
+            )?,
+            storage_type_str,
+            optional: record.bit_value("isOptional")?,
+            default: match record.string_value("defaultValue") {
+                Ok(value) => !value.is_empty(),
+                Err(error) => {
+                    // `defaultValue` can be uninitialized.
+                    if !matches!(error.error(), TableGenError::InitConversion { .. }) {
+                        return Err(error.into());
+                    }
+
+                    false
+                }
+            },
         })
     }
 
     pub fn is_optional(&self) -> bool {
-        self.constraint.is_optional()
+        self.optional
+    }
+
+    pub fn storage_type(&self) -> &Type {
+        &self.storage_type
     }
 
     pub fn is_unit(&self) -> bool {
-        self.constraint.is_unit()
+        self.storage_type_str == mlir_attribute!(UnitAttr)
+    }
+
+    pub fn has_default_value(&self) -> bool {
+        self.default
     }
 }
 
@@ -47,16 +126,16 @@ impl OperationFieldLike for Attribute<'_> {
     }
 
     fn parameter_type(&self) -> Type {
-        if self.constraint.is_unit() {
+        if self.is_unit() {
             parse_quote!(bool)
         } else {
-            let r#type = self.constraint.storage_type();
+            let r#type = self.storage_type();
             parse_quote!(#r#type<'c>)
         }
     }
 
     fn return_type(&self) -> Type {
-        if self.constraint.is_unit() {
+        if self.is_unit() {
             parse_quote!(bool)
         } else {
             generate_result_type(self.parameter_type())
@@ -64,7 +143,7 @@ impl OperationFieldLike for Attribute<'_> {
     }
 
     fn is_optional(&self) -> bool {
-        self.is_optional() || self.constraint.has_default_value()
+        self.is_optional() || self.has_default_value()
     }
 
     fn is_result(&self) -> bool {
