@@ -215,10 +215,10 @@ impl<'a> Operation<'a> {
 
     fn dag_constraints(
         definition: Record<'a>,
-        dag_field_name: &str,
+        name: &str,
     ) -> Result<Vec<(&'a str, Record<'a>)>, Error> {
         definition
-            .dag_value(dag_field_name)?
+            .dag_value(name)?
             .args()
             .map(|(name, argument)| {
                 Ok((
