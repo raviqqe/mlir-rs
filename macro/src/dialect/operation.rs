@@ -13,7 +13,7 @@ use self::{
     builder::{generate_operation_builder, OperationBuilder},
     element_kind::ElementKind,
     field_kind::FieldKind,
-    operation_field::OperationField,
+    operation_field::{OperationField, OperationFieldV2},
     sequence_info::SequenceInfo,
     variadic_kind::VariadicKind,
 };
@@ -33,7 +33,7 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
     let name = &operation.full_name()?;
 
     let field_accessors = operation
-        .fields()
+        .operation_fields()
         .map(generate_accessors)
         .collect::<Result<Vec<_>, _>>()?;
     let attribute_accessors = operation
@@ -195,7 +195,16 @@ impl<'a> Operation<'a> {
         sanitize_documentation(self.definition.str_value("description")?)
     }
 
-    pub fn fields(&self) -> impl Iterator<Item = &OperationField<'a>> + Clone {
+    pub fn fields(&self) -> impl Iterator<Item = &dyn OperationFieldV2> + Clone {
+        self.results
+            .iter()
+            .chain(&self.operands)
+            .chain(&self.regions)
+            .chain(&self.successors)
+            .map(|field| -> &dyn OperationFieldV2 { field })
+    }
+
+    pub fn operation_fields(&self) -> impl Iterator<Item = &OperationField<'a>> + Clone {
         self.results
             .iter()
             .chain(&self.operands)

@@ -24,29 +24,11 @@ pub enum FieldKind<'a> {
 }
 
 impl<'a> FieldKind<'a> {
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            Self::Element { kind, .. } => kind.as_str(),
-            Self::Successor { .. } => "successor",
-            Self::Region { .. } => "region",
-        }
-    }
-
     pub fn is_optional(&self) -> bool {
         match self {
             Self::Element { constraint, .. } => constraint.is_optional(),
             Self::Successor { .. } | Self::Region { .. } => false,
         }
-    }
-
-    pub fn is_result(&self) -> bool {
-        matches!(
-            self,
-            Self::Element {
-                kind: ElementKind::Result,
-                ..
-            }
-        )
     }
 
     pub fn parameter_type(&self) -> Type {

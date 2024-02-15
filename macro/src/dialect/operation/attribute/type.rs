@@ -2,7 +2,9 @@ use crate::dialect::operation::operation_field::OperationFieldV2;
 use crate::dialect::types::AttributeConstraint;
 use crate::dialect::utility::generate_result_type;
 use crate::dialect::{error::Error, utility::sanitize_snake_case_name};
-use syn::{parse_quote, Ident, Type};
+use proc_macro2::{Ident, TokenStream};
+use quote::quote;
+use syn::{parse_quote, Type};
 
 #[derive(Debug)]
 pub struct Attribute<'a> {
@@ -23,8 +25,22 @@ impl<'a> Attribute<'a> {
     pub fn constraint(&self) -> &AttributeConstraint {
         &self.constraint
     }
+}
 
-    pub fn parameter_type(&self) -> Type {
+impl OperationFieldV2 for Attribute<'_> {
+    fn name(&self) -> &str {
+        &self.name
+    }
+
+    fn plural_identifier(&self) -> &str {
+        "attributes"
+    }
+
+    fn sanitized_name(&self) -> &Ident {
+        &self.sanitized_name
+    }
+
+    fn parameter_type(&self) -> Type {
         if self.constraint().is_unit() {
             parse_quote!(bool)
         } else {
@@ -33,21 +49,30 @@ impl<'a> Attribute<'a> {
         }
     }
 
-    pub fn return_type(&self) -> Type {
+    fn return_type(&self) -> Type {
         if self.constraint.is_unit() {
             parse_quote!(bool)
         } else {
             generate_result_type(self.parameter_type())
         }
     }
-}
 
-impl OperationFieldV2 for Attribute<'_> {
-    fn name(&self) -> &str {
-        &self.name
+    fn is_optional(&self) -> bool {
+        self.constraint.is_optional() || self.constraint.has_default_value()
     }
 
-    fn sanitized_name(&self) -> &Ident {
-        &self.sanitized_name
+    fn is_result(&self) -> bool {
+        false
+    }
+
+    fn add_arguments(&self, name: &Ident) -> TokenStream {
+        let name_string = &self.name;
+
+        quote! {
+            &[(
+                ::melior::ir::Identifier::new(self.context, #name_string),
+                #name.into(),
+            )]
+        }
     }
 }
