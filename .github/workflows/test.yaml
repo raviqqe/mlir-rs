@@ -9,8 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: Swatinem/rust-cache@v2
-      - uses: Homebrew/actions/setup-homebrew@master
+      - uses: swatinem/rust-cache@v2
+      - uses: homebrew/actions/setup-homebrew@master
       - run: tools/setup.sh
       - run: cargo build --all-features
   test:
@@ -23,16 +23,16 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - uses: Swatinem/rust-cache@v2
-      - uses: Homebrew/actions/setup-homebrew@master
+      - uses: swatinem/rust-cache@v2
+      - uses: homebrew/actions/setup-homebrew@master
       - run: tools/setup.sh
       - run: cargo test --all-features
   bench:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: Swatinem/rust-cache@v2
-      - uses: Homebrew/actions/setup-homebrew@master
+      - uses: swatinem/rust-cache@v2
+      - uses: homebrew/actions/setup-homebrew@master
       - run: tools/setup.sh
       - run: cargo bench
   dialect_build:
@@ -40,8 +40,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: Swatinem/rust-cache@v2
-      - uses: Homebrew/actions/setup-homebrew@master
+      - uses: swatinem/rust-cache@v2
+      - uses: homebrew/actions/setup-homebrew@master
       - run: tools/setup.sh
       - run: cargo install cargo-expand
       - run: cd melior && cargo expand --features ods-dialects > ~/current.rs
