@@ -12,19 +12,25 @@ use quote::{format_ident, quote};
 
 pub struct OperationBuilder<'o> {
     operation: &'o Operation<'o>,
+    identifier: Ident,
     type_state: TypeStateList,
 }
 
 impl<'o> OperationBuilder<'o> {
-    pub fn new(operation: &'o Operation<'o>) -> Self {
-        Self {
+    pub fn new(operation: &'o Operation<'o>) -> Result<Self, Error> {
+        Ok(Self {
             operation,
+            identifier: format_ident!("{}Builder", operation.class_name()?),
             type_state: Self::create_type_state(operation),
-        }
+        })
     }
 
     pub fn operation(&self) -> &Operation {
         self.operation
+    }
+
+    pub fn identifier(&self) -> &Ident {
+        &self.identifier
     }
 
     pub fn type_state(&self) -> &TypeStateList {
@@ -37,8 +43,7 @@ impl<'o> OperationBuilder<'o> {
         phantoms: &'a [TokenStream],
     ) -> impl Iterator<Item = Result<TokenStream, Error>> + 'a {
         self.operation.fields().map(move |field| {
-            // TODO Initialize a builder identifier out of this closure.
-            let builder_ident = self.builder_identifier()?;
+            let builder_ident = self.identifier();
             let name = sanitize_snake_case_name(field.name())?;
             let parameter_type = field.parameter_type();
             let argument = quote! { #name: #parameter_type };
@@ -181,9 +186,5 @@ impl<'o> OperationBuilder<'o> {
                 .map(|(index, field)| TypeStateItem::new(index, field.name().to_string()))
                 .collect(),
         )
-    }
-
-    pub fn builder_identifier(&self) -> Result<Ident, Error> {
-        Ok(format_ident!("{}Builder", self.operation.class_name()?))
     }
 }
