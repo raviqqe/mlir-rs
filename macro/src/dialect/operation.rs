@@ -221,13 +221,15 @@ impl<'a> Operation<'a> {
             .dag_value(name)?
             .args()
             .map(|(name, argument)| {
+                let definition =
+                    Record::try_from(argument).map_err(|error| error.set_location(definition))?;
+
                 Ok((
                     name,
                     if definition.subclass_of("OpVariable") {
                         definition.def_value("constraint")?
                     } else {
-                        Record::try_from(argument)
-                            .map_err(|error| error.set_location(definition))?
+                        definition
                     },
                 ))
             })
