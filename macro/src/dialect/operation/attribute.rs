@@ -35,7 +35,7 @@ impl<'a> Attribute<'a> {
 
 impl OperationFieldLike for Attribute<'_> {
     fn name(&self) -> &str {
-        &self.name
+        self.name
     }
 
     fn plural_identifier(&self) -> &str {

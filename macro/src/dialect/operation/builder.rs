@@ -166,8 +166,8 @@ impl<'o> OperationBuilder<'o> {
         })
     }
 
-    fn required_fields<'a, 'b>(
-        operation: &'a Operation<'b>,
+    fn required_fields<'a>(
+        operation: &'a Operation,
     ) -> impl Iterator<Item = &'a dyn OperationFieldLike> {
         operation.fields().filter(|field| {
             (!field.is_result() || !operation.can_infer_type) && !field.is_optional()
