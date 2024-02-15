@@ -47,6 +47,6 @@ jobs:
       - run: cd melior && cargo expand --features ods-dialects > ~/current.rs
       - uses: actions/checkout@v4
         with:
-          ref: 34ac730dc8
+          ref: melior-v0.15.1
       - run: cd melior && cargo expand --features ods-dialects > ~/main.rs
       - run: diff ~/main.rs ~/current.rs
