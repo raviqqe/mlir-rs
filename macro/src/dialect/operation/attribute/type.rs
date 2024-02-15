@@ -22,8 +22,8 @@ impl<'a> Attribute<'a> {
         })
     }
 
-    pub fn constraint(&self) -> &AttributeConstraint {
-        &self.constraint
+    pub fn is_unit(&self) -> bool {
+        self.constraint.is_unit()
     }
 }
 
@@ -41,10 +41,10 @@ impl OperationFieldLike for Attribute<'_> {
     }
 
     fn parameter_type(&self) -> Type {
-        if self.constraint().is_unit() {
+        if self.constraint.is_unit() {
             parse_quote!(bool)
         } else {
-            let r#type = self.constraint().storage_type();
+            let r#type = self.constraint.storage_type();
             parse_quote!(#r#type<'c>)
         }
     }

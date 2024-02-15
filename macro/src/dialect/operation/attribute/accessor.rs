@@ -21,7 +21,7 @@ fn generate_getter(attribute: &Attribute) -> Result<TokenStream, Error> {
 
     let ident = attribute.sanitized_name();
     let return_type = attribute.return_type();
-    let body = if attribute.constraint().is_unit() {
+    let body = if attribute.is_unit() {
         quote! { self.operation.attribute(#name).is_some() }
     } else {
         // TODO Handle returning `melior::Attribute`.
@@ -39,7 +39,7 @@ fn generate_getter(attribute: &Attribute) -> Result<TokenStream, Error> {
 fn generate_setter(attribute: &Attribute) -> Result<TokenStream, Error> {
     let name = attribute.name();
 
-    let body = if attribute.constraint().is_unit() {
+    let body = if attribute.is_unit() {
         quote! {
             if value {
                 self.operation.set_attribute(#name, Attribute::unit(&self.operation.context()));
@@ -64,9 +64,7 @@ fn generate_setter(attribute: &Attribute) -> Result<TokenStream, Error> {
 }
 
 fn generate_remover(attribute: &Attribute) -> Result<Option<TokenStream>, Error> {
-    let constrait = attribute.constraint();
-
-    Ok(if constrait.is_unit() || constrait.is_optional() {
+    Ok(if attribute.is_unit() || attribute.is_optional() {
         let name = attribute.name();
         let ident = sanitize_snake_case_name(&format!("remove_{}", attribute.name()))?;
 
