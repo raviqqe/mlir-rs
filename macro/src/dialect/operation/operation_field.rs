@@ -95,11 +95,10 @@ impl<'a> OperationField<'a> {
         Ok(Self {
             name,
             plural_identifier: match kind {
-                FieldKind::Element { kind, .. } => kind.as_str(),
-                FieldKind::Successor { .. } => "successor",
-                FieldKind::Region { .. } => "region",
-            }
-            .into(),
+                FieldKind::Element { kind, .. } => format!("{}s", kind.as_str()),
+                FieldKind::Successor { .. } => "successors".into(),
+                FieldKind::Region { .. } => "regions".into(),
+            },
             sanitized_name: sanitize_snake_case_name(name)?,
             kind,
         })

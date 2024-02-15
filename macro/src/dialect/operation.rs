@@ -202,6 +202,10 @@ impl<'a> Operation<'a> {
             .chain(&self.regions)
             .chain(&self.successors)
             .map(|field| -> &dyn OperationFieldV2 { field })
+            .chain(
+                self.attributes()
+                    .map(|field| -> &dyn OperationFieldV2 { field }),
+            )
     }
 
     pub fn operation_fields(&self) -> impl Iterator<Item = &OperationField<'a>> + Clone {

@@ -5,7 +5,7 @@ use self::{type_state_item::TypeStateItem, type_state_list::TypeStateList};
 use super::{
     super::{error::Error, utility::sanitize_snake_case_name},
     operation_field::OperationFieldV2,
-    FieldKind, Operation,
+    Operation,
 };
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
