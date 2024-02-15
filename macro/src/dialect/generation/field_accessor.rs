@@ -5,7 +5,7 @@ use crate::dialect::{
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 
-pub fn generate_accessors(field: &OperationField) -> Result<TokenStream, Error> {
+pub fn generate_accessor(field: &OperationField) -> Result<TokenStream, Error> {
     let ident = &field.sanitized_name;
     let return_type = &field.kind.return_type();
     let body = generate_getter(field);

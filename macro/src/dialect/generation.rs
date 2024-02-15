@@ -3,7 +3,7 @@ mod field_accessor;
 mod operation_builder;
 
 use self::{
-    attribute_accessor::generate_attribute_accessors, field_accessor::generate_accessors,
+    attribute_accessor::generate_attribute_accessors, field_accessor::generate_accessor,
     operation_builder::generate_operation_builder,
 };
 use super::operation::{Operation, OperationBuilder};
@@ -19,7 +19,7 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
 
     let field_accessors = operation
         .operation_fields()
-        .map(generate_accessors)
+        .map(generate_accessor)
         .collect::<Result<Vec<_>, _>>()?;
     let attribute_accessors = operation
         .attributes()
