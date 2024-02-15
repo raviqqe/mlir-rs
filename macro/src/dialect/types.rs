@@ -146,29 +146,6 @@ impl<'a> AttributeConstraint<'a> {
         })
     }
 
-    #[allow(unused)]
-    pub fn is_derived(&self) -> bool {
-        self.record.subclass_of("DerivedAttr")
-    }
-
-    #[allow(unused)]
-    pub fn is_type(&self) -> bool {
-        self.record.subclass_of("TypeAttrBase")
-    }
-
-    #[allow(unused)]
-    pub fn is_symbol_ref(&self) -> bool {
-        self.name == "SymbolRefAttr"
-            || self.name == "FlatSymbolRefAttr"
-            || self.record.subclass_of("SymbolRefAttr")
-            || self.record.subclass_of("FlatSymbolRefAttr")
-    }
-
-    #[allow(unused)]
-    pub fn is_enum(&self) -> bool {
-        self.record.subclass_of("EnumAttrInfo")
-    }
-
     pub fn is_optional(&self) -> bool {
         self.optional
     }
