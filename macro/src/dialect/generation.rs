@@ -26,7 +26,7 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
         .map(generate_attribute_accessors)
         .collect::<Result<Vec<_>, _>>()?;
 
-    let builder = OperationBuilder::new(operation);
+    let builder = OperationBuilder::new(operation)?;
     let builder_tokens = generate_operation_builder(&builder)?;
     let builder_fn = builder.create_op_builder_fn()?;
     let default_constructor = builder.create_default_constructor()?;

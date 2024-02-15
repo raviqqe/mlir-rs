@@ -34,7 +34,7 @@ pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStr
     let new = builder.create_new_fn(phantom_arguments.as_slice())?;
     let build = builder.create_build_fn()?;
 
-    let builder_identifier = builder.builder_identifier()?;
+    let builder_identifier = builder.identifier();
     let doc = format!("Builder for {}", builder.operation().summary()?);
     let iter_arguments = builder.type_state().parameters();
 

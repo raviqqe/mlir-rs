@@ -90,7 +90,7 @@ impl<'o> OperationBuilder<'o> {
     }
 
     pub fn create_build_fn(&self) -> Result<TokenStream, Error> {
-        let builder_ident = self.builder_identifier()?;
+        let builder_ident = self.identifier();
         let arguments = self.type_state.arguments_all_set(true);
         let class_name = format_ident!("{}", &self.operation.class_name()?);
         let error = format!("should be a valid {class_name}");
@@ -109,7 +109,7 @@ impl<'o> OperationBuilder<'o> {
     }
 
     pub fn create_new_fn(&self, phantoms: &[TokenStream]) -> Result<TokenStream, Error> {
-        let builder_ident = self.builder_identifier()?;
+        let builder_ident = self.identifier();
         let name = &self.operation.full_name()?;
         let arguments = self.type_state.arguments_all_set(false);
 
@@ -127,7 +127,7 @@ impl<'o> OperationBuilder<'o> {
     }
 
     pub fn create_op_builder_fn(&self) -> Result<TokenStream, Error> {
-        let builder_ident = self.builder_identifier()?;
+        let builder_ident = self.identifier();
         let arguments = self.type_state.arguments_all_set(false);
 
         Ok(quote! {
