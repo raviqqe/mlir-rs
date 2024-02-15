@@ -100,10 +100,6 @@ impl<'a> Attribute<'a> {
         self.optional
     }
 
-    pub fn storage_type(&self) -> &Type {
-        &self.storage_type
-    }
-
     pub fn is_unit(&self) -> bool {
         self.storage_type_string == mlir_attribute!(UnitAttr)
     }
@@ -130,7 +126,7 @@ impl OperationFieldLike for Attribute<'_> {
         if self.is_unit() {
             parse_quote!(bool)
         } else {
-            let r#type = self.storage_type();
+            let r#type = &self.storage_type;
             parse_quote!(#r#type<'c>)
         }
     }
