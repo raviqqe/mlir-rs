@@ -35,3 +35,20 @@ jobs:
       - uses: Homebrew/actions/setup-homebrew@master
       - run: tools/setup.sh
       - run: cargo bench
+  dialect_build:
+    # TODO Remove this job when refactoring of dialect macros is done.
+    runs-on: ubuntu-latest
+    env:
+      BASELINE_COMMIT: 34ac730dc8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - uses: Homebrew/actions/setup-homebrew@master
+      - run: tools/setup.sh
+      - run: cargo install cargo-expand
+      - run: cd melior && cargo expand --features ods-dialects > ~/current.rs
+      - uses: actions/checkout@v4
+        with:
+          branch: main
+      - run: cd melior && cargo expand --features ods-dialects > ~/main.rs
+      - run: diff ~/main.rs ~/current.rs
