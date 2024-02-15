@@ -14,7 +14,7 @@ pub use self::{
 use super::utility::sanitize_documentation;
 use crate::dialect::{
     error::{Error, OdsError},
-    types::{AttributeConstraint, RegionConstraint, SuccessorConstraint, Trait, TypeConstraint},
+    types::{RegionConstraint, SuccessorConstraint, Trait, TypeConstraint},
 };
 pub use operation_field::OperationFieldLike;
 use tblgen::{error::WithLocation, record::Record};
@@ -329,7 +329,7 @@ impl<'a> Operation<'a> {
                         .with_location(*definition)
                         .into())
                 } else {
-                    Attribute::new(name, AttributeConstraint::new(*definition)?)
+                    Attribute::new(name, *definition)
                 }
             })
             .collect()
@@ -346,7 +346,7 @@ impl<'a> Operation<'a> {
             })
             .map(|definition| {
                 if definition.subclass_of("DerivedAttr") {
-                    Attribute::new(definition.name()?, AttributeConstraint::new(definition)?)
+                    Attribute::new(definition.name()?, definition)
                 } else {
                     Err(OdsError::ExpectedSuperClass("DerivedAttr")
                         .with_location(definition)

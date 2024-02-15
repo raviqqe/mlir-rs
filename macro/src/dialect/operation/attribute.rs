@@ -61,7 +61,7 @@ static ATTRIBUTE_TYPES: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(||
 pub struct Attribute<'a> {
     name: &'a str,
     sanitized_name: Ident,
-    storage_type_str: String,
+    storage_type_string: String,
     storage_type: Type,
     optional: bool,
     default: bool,
@@ -69,17 +69,18 @@ pub struct Attribute<'a> {
 
 impl<'a> Attribute<'a> {
     pub fn new(name: &'a str, record: Record<'a>) -> Result<Self, Error> {
+        let storage_type_string = record.string_value("storageType")?;
+
         Ok(Self {
             name,
             sanitized_name: sanitize_snake_case_name(name)?,
-            name: record.name()?,
             storage_type: syn::parse_str(
                 ATTRIBUTE_TYPES
-                    .get(storage_type_str.trim())
+                    .get(storage_type_string.trim())
                     .copied()
                     .unwrap_or(melior_attribute!(Attribute)),
             )?,
-            storage_type_str,
+            storage_type_string,
             optional: record.bit_value("isOptional")?,
             default: match record.string_value("defaultValue") {
                 Ok(value) => !value.is_empty(),
@@ -104,7 +105,7 @@ impl<'a> Attribute<'a> {
     }
 
     pub fn is_unit(&self) -> bool {
-        self.storage_type_str == mlir_attribute!(UnitAttr)
+        self.storage_type_string == mlir_attribute!(UnitAttr)
     }
 
     pub fn has_default_value(&self) -> bool {
