@@ -1,4 +1,4 @@
-use crate::dialect::operation::operation_field::OperationFieldV2;
+use crate::dialect::operation::operation_field::OperationFieldLike;
 use crate::dialect::types::AttributeConstraint;
 use crate::dialect::utility::generate_result_type;
 use crate::dialect::{error::Error, utility::sanitize_snake_case_name};
@@ -27,7 +27,7 @@ impl<'a> Attribute<'a> {
     }
 }
 
-impl OperationFieldV2 for Attribute<'_> {
+impl OperationFieldLike for Attribute<'_> {
     fn name(&self) -> &str {
         &self.name
     }

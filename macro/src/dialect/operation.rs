@@ -13,7 +13,7 @@ use self::{
     builder::{generate_operation_builder, OperationBuilder},
     element_kind::ElementKind,
     field_kind::FieldKind,
-    operation_field::{OperationField, OperationFieldV2},
+    operation_field::{OperationField, OperationFieldLike},
     sequence_info::SequenceInfo,
     variadic_kind::VariadicKind,
 };
@@ -195,16 +195,16 @@ impl<'a> Operation<'a> {
         sanitize_documentation(self.definition.str_value("description")?)
     }
 
-    pub fn fields(&self) -> impl Iterator<Item = &dyn OperationFieldV2> + Clone {
+    pub fn fields(&self) -> impl Iterator<Item = &dyn OperationFieldLike> + Clone {
         self.results
             .iter()
             .chain(&self.operands)
             .chain(&self.regions)
             .chain(&self.successors)
-            .map(|field| -> &dyn OperationFieldV2 { field })
+            .map(|field| -> &dyn OperationFieldLike { field })
             .chain(
                 self.attributes()
-                    .map(|field| -> &dyn OperationFieldV2 { field }),
+                    .map(|field| -> &dyn OperationFieldLike { field }),
             )
     }
 

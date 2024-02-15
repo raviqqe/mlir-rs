@@ -4,7 +4,7 @@ mod type_state_list;
 use self::{type_state_item::TypeStateItem, type_state_list::TypeStateList};
 use super::{
     super::{error::Error, utility::sanitize_snake_case_name},
-    operation_field::OperationFieldV2,
+    operation_field::OperationFieldLike,
     Operation,
 };
 use proc_macro2::{Ident, TokenStream};
@@ -209,7 +209,7 @@ impl<'o> OperationBuilder<'o> {
 
     fn required_fields<'a, 'b>(
         operation: &'a Operation<'b>,
-    ) -> impl Iterator<Item = &'a dyn OperationFieldV2> {
+    ) -> impl Iterator<Item = &'a dyn OperationFieldLike> {
         operation.fields().filter(|field| {
             (!field.is_result() || !operation.can_infer_type) && !field.is_optional()
         })

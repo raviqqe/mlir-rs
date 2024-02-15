@@ -1,5 +1,5 @@
 use super::super::Attribute;
-use crate::dialect::operation::operation_field::OperationFieldV2;
+use crate::dialect::operation::operation_field::OperationFieldLike;
 use crate::dialect::{error::Error, utility::sanitize_snake_case_name};
 use proc_macro2::TokenStream;
 use quote::quote;

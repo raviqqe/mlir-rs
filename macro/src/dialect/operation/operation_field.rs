@@ -8,7 +8,8 @@ use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 use syn::Type;
 
-pub trait OperationFieldV2 {
+// TODO Rename this `OperationField`.
+pub trait OperationFieldLike {
     fn name(&self) -> &str;
     fn plural_identifier(&self) -> &str;
     fn sanitized_name(&self) -> &Ident;
@@ -28,7 +29,7 @@ pub struct OperationField<'a> {
     pub(crate) kind: FieldKind<'a>,
 }
 
-impl OperationFieldV2 for OperationField<'_> {
+impl OperationFieldLike for OperationField<'_> {
     fn name(&self) -> &str {
         self.name
     }
