@@ -11,8 +11,8 @@ use syn::Type;
 // TODO Rename this `OperationField`.
 pub trait OperationFieldLike {
     fn name(&self) -> &str;
-    fn plural_kind_identifier(&self) -> Ident;
     fn singular_identifier(&self) -> &Ident;
+    fn plural_kind_identifier(&self) -> Ident;
     fn parameter_type(&self) -> Type;
     fn return_type(&self) -> Type;
     fn is_optional(&self) -> bool;
@@ -34,12 +34,12 @@ impl OperationFieldLike for OperationField<'_> {
         self.name
     }
 
-    fn plural_kind_identifier(&self) -> Ident {
-        self.plural_identifier.clone()
-    }
-
     fn singular_identifier(&self) -> &Ident {
         &self.sanitized_name
+    }
+
+    fn plural_kind_identifier(&self) -> Ident {
+        self.plural_identifier.clone()
     }
 
     fn parameter_type(&self) -> Type {
