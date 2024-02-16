@@ -55,7 +55,7 @@ impl OperationFieldLike for Region<'_> {
     fn parameter_type(&self) -> Type {
         let r#type: Type = parse_quote!(::melior::ir::Region<'c>);
 
-        if self.constraint.is_variadic() {
+        if self.is_variadic() {
             parse_quote!(Vec<#r#type>)
         } else {
             r#type
@@ -65,7 +65,7 @@ impl OperationFieldLike for Region<'_> {
     fn return_type(&self) -> Type {
         let r#type: Type = parse_quote!(::melior::ir::RegionRef<'c, '_>);
 
-        if self.constraint.is_variadic() {
+        if self.is_variadic() {
             generate_iterator_type(r#type)
         } else {
             generate_result_type(r#type)
@@ -81,7 +81,7 @@ impl OperationFieldLike for Region<'_> {
     }
 
     fn add_arguments(&self, name: &Ident) -> TokenStream {
-        if self.constraint.is_variadic() {
+        if self.is_variadic() {
             quote! { #name }
         } else {
             quote! { vec![#name] }
