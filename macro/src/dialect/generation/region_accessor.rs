@@ -21,7 +21,6 @@ pub fn generate_region_accessor(region: &Region) -> Result<TokenStream, Error> {
     };
 
     Ok(quote! {
-        #[allow(clippy::needless_question_mark)]
         pub fn #identifier(&self, context: &'c ::melior::Context) -> #return_type {
             #body
         }
