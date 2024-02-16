@@ -63,7 +63,7 @@ fn generate_builder_fns(
         let name = sanitize_snake_case_name(field.name())?;
         let parameter_type = field.parameter_type();
         let argument = quote! { #name: #parameter_type };
-        let add = format_ident!("add_{}", field.plural_identifier());
+        let add = format_ident!("add_{}", field.plural_kind_identifier());
 
         // Argument types can be singular and variadic. But `add` functions in Melior
         // are always variadic, so we need to create a slice or `Vec` for singular
@@ -167,7 +167,7 @@ pub fn generate_default_constructor(builder: &OperationBuilder) -> Result<TokenS
         .required_fields()
         .map(|field| {
             let parameter_type = &field.parameter_type();
-            let parameter_name = &field.sanitized_name();
+            let parameter_name = &field.singular_identifier();
 
             quote! { #parameter_name: #parameter_type }
         })
@@ -177,7 +177,7 @@ pub fn generate_default_constructor(builder: &OperationBuilder) -> Result<TokenS
         .operation()
         .required_fields()
         .map(|field| {
-            let parameter_name = &field.sanitized_name();
+            let parameter_name = &field.singular_identifier();
 
             quote! { .#parameter_name(#parameter_name) }
         })

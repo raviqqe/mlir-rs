@@ -5,14 +5,14 @@ use crate::dialect::{
     utility::sanitize_snake_case_name,
 };
 use proc_macro2::{Ident, TokenStream};
-use quote::quote;
+use quote::{format_ident, quote};
 use syn::Type;
 
 // TODO Rename this `OperationField`.
 pub trait OperationFieldLike {
     fn name(&self) -> &str;
-    fn plural_identifier(&self) -> &str;
-    fn sanitized_name(&self) -> &Ident;
+    fn plural_kind_identifier(&self) -> Ident;
+    fn singular_identifier(&self) -> &Ident;
     fn parameter_type(&self) -> Type;
     fn return_type(&self) -> Type;
     fn is_optional(&self) -> bool;
@@ -24,7 +24,7 @@ pub trait OperationFieldLike {
 #[derive(Debug, Clone)]
 pub struct OperationField<'a> {
     pub(crate) name: &'a str,
-    pub(crate) plural_identifier: String,
+    pub(crate) plural_identifier: Ident,
     pub(crate) sanitized_name: Ident,
     pub(crate) kind: FieldKind<'a>,
 }
@@ -34,11 +34,11 @@ impl OperationFieldLike for OperationField<'_> {
         self.name
     }
 
-    fn plural_identifier(&self) -> &str {
-        &self.plural_identifier
+    fn plural_kind_identifier(&self) -> Ident {
+        self.plural_identifier.clone()
     }
 
-    fn sanitized_name(&self) -> &Ident {
+    fn singular_identifier(&self) -> &Ident {
         &self.sanitized_name
     }
 
@@ -96,9 +96,9 @@ impl<'a> OperationField<'a> {
         Ok(Self {
             name,
             plural_identifier: match kind {
-                FieldKind::Element { kind, .. } => format!("{}s", kind.as_str()),
-                FieldKind::Successor { .. } => "successors".into(),
-                FieldKind::Region { .. } => "regions".into(),
+                FieldKind::Element { kind, .. } => format_ident!("{}s", kind.as_str()),
+                FieldKind::Successor { .. } => format_ident!("successors"),
+                FieldKind::Region { .. } => format_ident!("regions"),
             },
             sanitized_name: sanitize_snake_case_name(name)?,
             kind,

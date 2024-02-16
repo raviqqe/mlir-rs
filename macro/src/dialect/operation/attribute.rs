@@ -4,9 +4,10 @@ use crate::dialect::{
     utility::{generate_result_type, sanitize_snake_case_name},
 };
 use once_cell::sync::Lazy;
-use proc_macro2::{Ident, TokenStream};
+use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use std::collections::HashMap;
+use syn::Ident;
 use syn::{parse_quote, Type};
 use tblgen::{error::TableGenError, Record};
 
@@ -60,7 +61,7 @@ static ATTRIBUTE_TYPES: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(||
 #[derive(Debug)]
 pub struct Attribute<'a> {
     name: &'a str,
-    sanitized_name: Ident,
+    singular_identifier: Ident,
     storage_type_string: String,
     storage_type: Type,
     optional: bool,
@@ -73,7 +74,7 @@ impl<'a> Attribute<'a> {
 
         Ok(Self {
             name,
-            sanitized_name: sanitize_snake_case_name(name)?,
+            singular_identifier: sanitize_snake_case_name(name)?,
             storage_type: syn::parse_str(
                 ATTRIBUTE_TYPES
                     .get(storage_type_string.trim())
@@ -114,12 +115,12 @@ impl OperationFieldLike for Attribute<'_> {
         self.name
     }
 
-    fn plural_identifier(&self) -> &str {
-        "attributes"
+    fn singular_identifier(&self) -> &Ident {
+        &self.singular_identifier
     }
 
-    fn sanitized_name(&self) -> &Ident {
-        &self.sanitized_name
+    fn plural_kind_identifier(&self) -> Ident {
+        Ident::new("attributes", Span::call_site())
     }
 
     fn parameter_type(&self) -> Type {

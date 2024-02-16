@@ -21,7 +21,7 @@ pub fn generate_attribute_accessors(attribute: &Attribute) -> Result<TokenStream
 fn generate_getter(attribute: &Attribute) -> Result<TokenStream, Error> {
     let name = attribute.name();
 
-    let ident = attribute.sanitized_name();
+    let identifier = attribute.singular_identifier();
     let return_type = attribute.return_type();
     let body = if attribute.is_unit() {
         quote! { self.operation.attribute(#name).is_some() }
@@ -32,7 +32,7 @@ fn generate_getter(attribute: &Attribute) -> Result<TokenStream, Error> {
 
     Ok(quote! {
         #[allow(clippy::needless_question_mark)]
-        pub fn #ident(&self, context: &'c ::melior::Context) -> #return_type {
+        pub fn #identifier(&self, context: &'c ::melior::Context) -> #return_type {
             #body
         }
     })
