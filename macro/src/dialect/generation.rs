@@ -3,8 +3,9 @@ mod field_accessor;
 mod operation_builder;
 
 use self::{
-    attribute_accessor::generate_attribute_accessors, field_accessor::generate_accessor,
-    operation_builder::generate_operation_builder,
+    attribute_accessor::generate_attribute_accessors,
+    field_accessor::generate_accessor,
+    operation_builder::{generate_default_constructor, generate_operation_builder},
 };
 use super::operation::{Operation, OperationBuilder};
 use crate::dialect::error::Error;
@@ -29,7 +30,7 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
     let builder = OperationBuilder::new(operation)?;
     let builder_tokens = generate_operation_builder(&builder)?;
     let builder_fn = builder.create_op_builder_fn()?;
-    let default_constructor = builder.create_default_constructor()?;
+    let default_constructor = generate_default_constructor(&builder)?;
 
     Ok(quote! {
         #[doc = #summary]

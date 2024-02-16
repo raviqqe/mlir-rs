@@ -148,6 +148,11 @@ impl<'a> Operation<'a> {
         self.attributes.iter().chain(&self.derived_attributes)
     }
 
+    pub fn required_fields(&self) -> impl Iterator<Item = &dyn OperationFieldLike> {
+        self.fields()
+            .filter(|field| (!field.is_result() || !self.can_infer_type) && !field.is_optional())
+    }
+
     fn collect_successors(definition: Record<'a>) -> Result<Vec<OperationField>, Error> {
         let successors_dag = definition.dag_value("successors")?;
         let len = successors_dag.num_args();

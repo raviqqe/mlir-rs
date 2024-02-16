@@ -4,7 +4,6 @@ mod type_state_list;
 use self::{type_state_item::TypeStateItem, type_state_list::TypeStateList};
 use super::{
     super::{error::Error, utility::sanitize_snake_case_name},
-    operation_field::OperationFieldLike,
     Operation,
 };
 use proc_macro2::{Ident, TokenStream};
@@ -140,48 +139,10 @@ impl<'o> OperationBuilder<'o> {
         })
     }
 
-    pub fn create_default_constructor(&self) -> Result<TokenStream, Error> {
-        let class_name = format_ident!("{}", &self.operation.class_name()?);
-        let name = sanitize_snake_case_name(self.operation.short_name()?)?;
-        let arguments = Self::required_fields(self.operation)
-            .map(|field| {
-                let parameter_type = &field.parameter_type();
-                let parameter_name = &field.sanitized_name();
-
-                quote! { #parameter_name: #parameter_type }
-            })
-            .chain([quote! { location: ::melior::ir::Location<'c> }])
-            .collect::<Vec<_>>();
-        let builder_calls = Self::required_fields(self.operation)
-            .map(|field| {
-                let parameter_name = &field.sanitized_name();
-
-                quote! { .#parameter_name(#parameter_name) }
-            })
-            .collect::<Vec<_>>();
-
-        let doc = format!("Creates a new {}", self.operation.summary()?);
-
-        Ok(quote! {
-            #[allow(clippy::too_many_arguments)]
-            #[doc = #doc]
-            pub fn #name<'c>(context: &'c ::melior::Context, #(#arguments),*) -> #class_name<'c> {
-                #class_name::builder(context, location)#(#builder_calls)*.build()
-            }
-        })
-    }
-
-    fn required_fields<'a>(
-        operation: &'a Operation,
-    ) -> impl Iterator<Item = &'a dyn OperationFieldLike> {
-        operation.fields().filter(|field| {
-            (!field.is_result() || !operation.can_infer_type) && !field.is_optional()
-        })
-    }
-
     fn create_type_state(operation: &'o Operation<'o>) -> TypeStateList {
         TypeStateList::new(
-            Self::required_fields(operation)
+            operation
+                .required_fields()
                 .enumerate()
                 .map(|(index, field)| TypeStateItem::new(index, field.name().to_string()))
                 .collect(),

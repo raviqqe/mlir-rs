@@ -2,7 +2,7 @@ use crate::dialect::{
     error::Error, operation::OperationBuilder, utility::sanitize_snake_case_name,
 };
 use proc_macro2::TokenStream;
-use quote::quote;
+use quote::{format_ident, quote};
 
 pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStream, Error> {
     let field_names = builder
@@ -51,5 +51,40 @@ pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStr
         #(#builder_fns)*
 
         #build_fn
+    })
+}
+
+pub fn generate_default_constructor(builder: &OperationBuilder) -> Result<TokenStream, Error> {
+    let class_name = format_ident!("{}", &builder.operation().class_name()?);
+    let name = sanitize_snake_case_name(builder.operation().short_name()?)?;
+    let arguments = builder
+        .operation()
+        .required_fields()
+        .map(|field| {
+            let parameter_type = &field.parameter_type();
+            let parameter_name = &field.sanitized_name();
+
+            quote! { #parameter_name: #parameter_type }
+        })
+        .chain([quote! { location: ::melior::ir::Location<'c> }])
+        .collect::<Vec<_>>();
+    let builder_calls = builder
+        .operation()
+        .required_fields()
+        .map(|field| {
+            let parameter_name = &field.sanitized_name();
+
+            quote! { .#parameter_name(#parameter_name) }
+        })
+        .collect::<Vec<_>>();
+
+    let doc = format!("Creates a new {}", builder.operation().summary()?);
+
+    Ok(quote! {
+        #[allow(clippy::too_many_arguments)]
+        #[doc = #doc]
+        pub fn #name<'c>(context: &'c ::melior::Context, #(#arguments),*) -> #class_name<'c> {
+            #class_name::builder(context, location)#(#builder_calls)*.build()
+        }
     })
 }
