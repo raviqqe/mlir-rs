@@ -1,7 +1,7 @@
 use crate::dialect::{
     error::Error,
     operation::{Attribute, OperationFieldLike},
-    utility::sanitize_snake_case_name,
+    utility::sanitize_snake_case_identifier,
 };
 use proc_macro2::TokenStream;
 use quote::quote;
@@ -55,7 +55,7 @@ fn generate_setter(attribute: &Attribute) -> Result<TokenStream, Error> {
         }
     };
 
-    let ident = sanitize_snake_case_name(&format!("set_{}", attribute.name()))?;
+    let ident = sanitize_snake_case_identifier(&format!("set_{}", attribute.name()))?;
     let r#type = attribute.parameter_type();
 
     Ok(quote! {
@@ -68,7 +68,7 @@ fn generate_setter(attribute: &Attribute) -> Result<TokenStream, Error> {
 fn generate_remover(attribute: &Attribute) -> Result<Option<TokenStream>, Error> {
     Ok(if attribute.is_unit() || attribute.is_optional() {
         let name = attribute.name();
-        let ident = sanitize_snake_case_name(&format!("remove_{}", attribute.name()))?;
+        let ident = sanitize_snake_case_identifier(&format!("remove_{}", attribute.name()))?;
 
         Some(quote! {
             pub fn #ident(&mut self, context: &'c ::melior::Context) -> Result<(), ::melior::Error> {

@@ -1,5 +1,5 @@
 use crate::dialect::{
-    error::Error, operation::OperationBuilder, utility::sanitize_snake_case_name,
+    error::Error, operation::OperationBuilder, utility::sanitize_snake_case_identifier,
 };
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
@@ -9,7 +9,7 @@ pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStr
     let field_names = builder
         .type_state()
         .field_names()
-        .map(sanitize_snake_case_name)
+        .map(sanitize_snake_case_identifier)
         .collect::<Result<Vec<_>, _>>()?;
 
     let phantom_fields =
@@ -60,22 +60,22 @@ fn generate_builder_fns(
 ) -> Result<Vec<TokenStream>, Error> {
     builder.operation().fields().map(move |field| {
         let builder_identifier = builder.identifier();
-        let name = sanitize_snake_case_name(field.name())?;
+        let identifier = sanitize_snake_case_identifier(field.name())?;
         let parameter_type = field.parameter_type();
-        let argument = quote! { #name: #parameter_type };
+        let argument = quote! { #identifier: #parameter_type };
         let add = format_ident!("add_{}", field.plural_kind_identifier());
 
         // Argument types can be singular and variadic. But `add` functions in Melior
         // are always variadic, so we need to create a slice or `Vec` for singular
         // arguments.
-        let add_arguments = field.add_arguments(&name);
+        let add_arguments = field.add_arguments(&identifier);
 
         Ok(if field.is_optional() {
             let parameters = builder.type_state().parameters().collect::<Vec<_>>();
 
             quote! {
                 impl<'c, #(#parameters),*> #builder_identifier<'c, #(#parameters),*> {
-                    pub fn #name(mut self, #argument) -> #builder_identifier<'c, #(#parameters),*> {
+                    pub fn #identifier(mut self, #argument) -> #builder_identifier<'c, #(#parameters),*> {
                         self.builder = self.builder.#add(#add_arguments);
                         self
                     }
@@ -90,7 +90,7 @@ fn generate_builder_fns(
 
             quote! {
                 impl<'c, #(#parameters),*> #builder_identifier<'c, #(#arguments_unset),*> {
-                    pub fn #name(mut self, #argument) -> #builder_identifier<'c, #(#arguments_set),*> {
+                    pub fn #identifier(mut self, #argument) -> #builder_identifier<'c, #(#arguments_set),*> {
                         self.builder = self.builder.#add(#add_arguments);
                         let Self { context, mut builder, #(#field_names),* } = self;
                         #builder_identifier {
@@ -161,7 +161,7 @@ pub fn generate_operation_builder_fn(builder: &OperationBuilder) -> Result<Token
 
 pub fn generate_default_constructor(builder: &OperationBuilder) -> Result<TokenStream, Error> {
     let class_name = format_ident!("{}", &builder.operation().class_name()?);
-    let name = sanitize_snake_case_name(builder.operation().short_name()?)?;
+    let name = sanitize_snake_case_identifier(builder.operation().short_name()?)?;
     let arguments = builder
         .operation()
         .required_fields()

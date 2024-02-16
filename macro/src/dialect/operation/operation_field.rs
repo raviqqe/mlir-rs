@@ -2,7 +2,7 @@ use super::{element_kind::ElementKind, field_kind::FieldKind, SequenceInfo, Vari
 use crate::dialect::{
     error::Error,
     types::{RegionConstraint, SuccessorConstraint, TypeConstraint},
-    utility::sanitize_snake_case_name,
+    utility::sanitize_snake_case_identifier,
 };
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
@@ -100,7 +100,7 @@ impl<'a> OperationField<'a> {
                 FieldKind::Successor { .. } => format_ident!("successors"),
                 FieldKind::Region { .. } => format_ident!("regions"),
             },
-            sanitized_name: sanitize_snake_case_name(name)?,
+            sanitized_name: sanitize_snake_case_identifier(name)?,
             kind,
         })
     }

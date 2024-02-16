@@ -9,7 +9,7 @@ mod utility;
 use self::{
     error::Error,
     generation::generate_operation,
-    utility::{sanitize_documentation, sanitize_snake_case_name},
+    utility::{sanitize_documentation, sanitize_snake_case_identifier},
 };
 pub use input::DialectInput;
 use operation::Operation;
@@ -81,7 +81,7 @@ fn generate_dialect_module(
         "`{name}` dialect.\n\n{}",
         sanitize_documentation(dialect.str_value("description").unwrap_or(""),)?
     );
-    let name = sanitize_snake_case_name(name)?;
+    let name = sanitize_snake_case_identifier(name)?;
 
     Ok(quote! {
         #[doc = #doc]

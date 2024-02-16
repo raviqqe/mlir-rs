@@ -1,7 +1,7 @@
 use crate::dialect::{
     error::Error,
     operation::operation_field::OperationFieldLike,
-    utility::{generate_result_type, sanitize_snake_case_name},
+    utility::{generate_result_type, sanitize_snake_case_identifier},
 };
 use once_cell::sync::Lazy;
 use proc_macro2::{Span, TokenStream};
@@ -74,7 +74,7 @@ impl<'a> Attribute<'a> {
 
         Ok(Self {
             name,
-            singular_identifier: sanitize_snake_case_name(name)?,
+            singular_identifier: sanitize_snake_case_identifier(name)?,
             storage_type: syn::parse_str(
                 ATTRIBUTE_TYPES
                     .get(storage_type_string.trim())

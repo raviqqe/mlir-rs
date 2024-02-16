@@ -15,7 +15,7 @@ pub fn generate_iterator_type(r#type: Type) -> Type {
     parse_quote!(impl Iterator<Item = #r#type>)
 }
 
-pub fn sanitize_snake_case_name(name: &str) -> Result<Ident, Error> {
+pub fn sanitize_snake_case_identifier(name: &str) -> Result<Ident, Error> {
     sanitize_name(&name.to_case(Case::Snake))
 }
 
@@ -72,20 +72,26 @@ mod tests {
 
     #[test]
     fn sanitize_name_with_dot() {
-        assert_eq!(sanitize_snake_case_name("foo.bar").unwrap(), "foo_bar");
+        assert_eq!(
+            sanitize_snake_case_identifier("foo.bar").unwrap(),
+            "foo_bar"
+        );
     }
 
     #[test]
     fn sanitize_name_with_dot_and_underscore() {
         assert_eq!(
-            sanitize_snake_case_name("foo.bar_baz").unwrap(),
+            sanitize_snake_case_identifier("foo.bar_baz").unwrap(),
             "foo_bar_baz"
         );
     }
 
     #[test]
     fn sanitize_reserved_name() {
-        assert_eq!(sanitize_snake_case_name("builder").unwrap(), "_builder");
+        assert_eq!(
+            sanitize_snake_case_identifier("builder").unwrap(),
+            "_builder"
+        );
     }
 
     #[test]
