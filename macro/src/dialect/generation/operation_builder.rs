@@ -65,9 +65,9 @@ fn generate_builder_fns(
         let argument = quote! { #name: #parameter_type };
         let add = format_ident!("add_{}", field.plural_identifier());
 
-        // Argument types can be singular and variadic, but add functions in melior
-        // are always variadic, so we need to create a slice or vec for singular
-        // arguments
+        // Argument types can be singular and variadic. But `add` functions in Melior
+        // are always variadic, so we need to create a slice or `Vec` for singular
+        // arguments.
         let add_arguments = field.add_arguments(&name);
 
         Ok(if field.is_optional() {
