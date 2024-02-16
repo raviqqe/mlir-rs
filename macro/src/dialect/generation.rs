@@ -28,7 +28,8 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
         .collect::<Result<Vec<_>, _>>()?;
     let region_accessors = operation
         .regions()
-        .map(generate_region_accessor)
+        .enumerate()
+        .map(|(index, region)| generate_region_accessor(index, region))
         .collect::<Result<Vec<_>, _>>()?;
     let attribute_accessors = operation
         .attributes()

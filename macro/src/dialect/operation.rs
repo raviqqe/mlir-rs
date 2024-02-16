@@ -184,13 +184,10 @@ impl<'a> Operation<'a> {
     }
 
     fn collect_regions(definition: Record<'a>) -> Result<Vec<Region>, Error> {
-        let regions_dag = definition.dag_value("regions")?;
-        let len = regions_dag.num_args();
-
-        regions_dag
+        definition
+            .dag_value("regions")?
             .args()
-            .enumerate()
-            .map(|(index, (name, value))| {
+            .map(|(name, value)| {
                 Region::new(
                     name,
                     RegionConstraint::new(
@@ -198,7 +195,6 @@ impl<'a> Operation<'a> {
                             .try_into()
                             .map_err(|error: tblgen::Error| error.set_location(definition))?,
                     ),
-                    SequenceInfo { index, len },
                 )
             })
             .collect()
