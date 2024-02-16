@@ -3,6 +3,7 @@ mod builder;
 mod element_kind;
 mod field_kind;
 mod operation_field;
+mod region;
 mod sequence_info;
 mod variadic_kind;
 
