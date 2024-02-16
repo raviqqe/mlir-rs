@@ -144,20 +144,5 @@ fn generate_getter(field: &OperationField) -> TokenStream {
                 }
             }
         }
-        FieldKind::Region {
-            constraint,
-            sequence_info: SequenceInfo { index, .. },
-        } => {
-            if constraint.is_variadic() {
-                // Only the last region can be variadic
-                quote! {
-                    self.operation.regions().skip(#index)
-                }
-            } else {
-                quote! {
-                    self.operation.region(#index)
-                }
-            }
-        }
     }
 }

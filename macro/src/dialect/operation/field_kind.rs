@@ -1,6 +1,6 @@
 use super::{element_kind::ElementKind, SequenceInfo, VariadicKind};
 use crate::dialect::{
-    types::{RegionConstraint, SuccessorConstraint, TypeConstraint},
+    types::{SuccessorConstraint, TypeConstraint},
     utility::{generate_iterator_type, generate_result_type},
 };
 use syn::{parse_quote, Type};
@@ -17,17 +17,13 @@ pub enum FieldKind<'a> {
         constraint: SuccessorConstraint<'a>,
         sequence_info: SequenceInfo,
     },
-    Region {
-        constraint: RegionConstraint<'a>,
-        sequence_info: SequenceInfo,
-    },
 }
 
 impl<'a> FieldKind<'a> {
     pub fn is_optional(&self) -> bool {
         match self {
             Self::Element { constraint, .. } => constraint.is_optional(),
-            Self::Successor { .. } | Self::Region { .. } => false,
+            Self::Successor { .. } => false,
         }
     }
 
@@ -54,14 +50,6 @@ impl<'a> FieldKind<'a> {
                 let r#type: Type = parse_quote!(&::melior::ir::Block<'c>);
                 if constraint.is_variadic() {
                     parse_quote!(&[#r#type])
-                } else {
-                    r#type
-                }
-            }
-            Self::Region { constraint, .. } => {
-                let r#type: Type = parse_quote!(::melior::ir::Region<'c>);
-                if constraint.is_variadic() {
-                    parse_quote!(Vec<#r#type>)
                 } else {
                     r#type
                 }
@@ -96,14 +84,6 @@ impl<'a> FieldKind<'a> {
             }
             Self::Successor { constraint, .. } => {
                 let r#type: Type = parse_quote!(::melior::ir::BlockRef<'c, '_>);
-                if constraint.is_variadic() {
-                    generate_iterator_type(r#type)
-                } else {
-                    generate_result_type(r#type)
-                }
-            }
-            Self::Region { constraint, .. } => {
-                let r#type: Type = parse_quote!(::melior::ir::RegionRef<'c, '_>);
                 if constraint.is_variadic() {
                     generate_iterator_type(r#type)
                 } else {

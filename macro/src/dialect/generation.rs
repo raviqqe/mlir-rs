@@ -1,6 +1,7 @@
 mod attribute_accessor;
 mod field_accessor;
 mod operation_builder;
+mod region_accessor;
 
 use self::{
     attribute_accessor::generate_attribute_accessors,
@@ -8,6 +9,7 @@ use self::{
     operation_builder::{
         generate_default_constructor, generate_operation_builder, generate_operation_builder_fn,
     },
+    region_accessor::generate_region_accessor,
 };
 use super::operation::{Operation, OperationBuilder};
 use crate::dialect::error::Error;
@@ -21,8 +23,12 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
     let name = &operation.full_name()?;
 
     let field_accessors = operation
-        .operation_fields()
+        .general_fields()
         .map(generate_accessor)
+        .collect::<Result<Vec<_>, _>>()?;
+    let region_accessors = operation
+        .regions()
+        .map(generate_region_accessor)
         .collect::<Result<Vec<_>, _>>()?;
     let attribute_accessors = operation
         .attributes()
@@ -54,6 +60,7 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
             #builder_fn
 
             #(#field_accessors)*
+            #(#region_accessors)*
             #(#attribute_accessors)*
         }
 

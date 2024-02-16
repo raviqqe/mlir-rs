@@ -7,6 +7,7 @@ mod region;
 mod sequence_info;
 mod variadic_kind;
 
+pub use self::region::Region;
 pub use self::{
     attribute::Attribute, builder::OperationBuilder, element_kind::ElementKind,
     field_kind::FieldKind, operation_field::OperationField, sequence_info::SequenceInfo,
@@ -25,7 +26,7 @@ use tblgen::{error::WithLocation, record::Record, TypedInit};
 pub struct Operation<'a> {
     definition: Record<'a>,
     can_infer_type: bool,
-    regions: Vec<OperationField<'a>>,
+    regions: Vec<Region<'a>>,
     successors: Vec<OperationField<'a>>,
     results: Vec<OperationField<'a>>,
     operands: Vec<OperationField<'a>>,
@@ -132,8 +133,17 @@ impl<'a> Operation<'a> {
         self.results
             .iter()
             .chain(&self.operands)
-            .chain(&self.regions)
-            .chain(&self.successors)
+            .map(|field| -> &dyn OperationFieldLike { &*field })
+            .chain(
+                self.regions
+                    .iter()
+                    .map(|field| -> &dyn OperationFieldLike { &*field }),
+            )
+            .chain(
+                self.successors
+                    .iter()
+                    .map(|field| -> &dyn OperationFieldLike { &*field }),
+            )
             .map(|field| -> &dyn OperationFieldLike { field })
             .chain(
                 self.attributes()
@@ -141,12 +151,15 @@ impl<'a> Operation<'a> {
             )
     }
 
-    pub fn operation_fields(&self) -> impl Iterator<Item = &OperationField<'a>> + Clone {
+    pub fn general_fields(&self) -> impl Iterator<Item = &OperationField<'a>> + Clone {
         self.results
             .iter()
             .chain(&self.operands)
-            .chain(&self.regions)
             .chain(&self.successors)
+    }
+
+    pub fn regions(&self) -> impl Iterator<Item = &Region<'a>> + Clone {
+        self.regions.iter()
     }
 
     pub fn attributes(&self) -> impl Iterator<Item = &Attribute<'a>> + Clone {
@@ -179,7 +192,7 @@ impl<'a> Operation<'a> {
             .collect()
     }
 
-    fn collect_regions(definition: Record<'a>) -> Result<Vec<OperationField>, Error> {
+    fn collect_regions(definition: Record<'a>) -> Result<Vec<Region>, Error> {
         let regions_dag = definition.dag_value("regions")?;
         let len = regions_dag.num_args();
 
@@ -187,7 +200,7 @@ impl<'a> Operation<'a> {
             .args()
             .enumerate()
             .map(|(index, (name, value))| {
-                OperationField::new_region(
+                Region::new(
                     name,
                     RegionConstraint::new(
                         value

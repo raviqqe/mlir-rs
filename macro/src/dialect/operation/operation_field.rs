@@ -1,7 +1,7 @@
 use super::{element_kind::ElementKind, field_kind::FieldKind, SequenceInfo, VariadicKind};
 use crate::dialect::{
     error::Error,
-    types::{RegionConstraint, SuccessorConstraint, TypeConstraint},
+    types::{SuccessorConstraint, TypeConstraint},
     utility::sanitize_snake_case_identifier,
 };
 use proc_macro2::{Ident, TokenStream};
@@ -80,13 +80,6 @@ impl OperationFieldLike for OperationField<'_> {
                     quote! { &[#name] }
                 }
             }
-            FieldKind::Region { constraint, .. } => {
-                if constraint.is_variadic() {
-                    quote! { #name }
-                } else {
-                    quote! { vec![#name] }
-                }
-            }
         }
     }
 }
@@ -98,25 +91,10 @@ impl<'a> OperationField<'a> {
             plural_identifier: match kind {
                 FieldKind::Element { kind, .. } => format_ident!("{}s", kind.as_str()),
                 FieldKind::Successor { .. } => format_ident!("successors"),
-                FieldKind::Region { .. } => format_ident!("regions"),
             },
             sanitized_name: sanitize_snake_case_identifier(name)?,
             kind,
         })
-    }
-
-    pub fn new_region(
-        name: &'a str,
-        constraint: RegionConstraint<'a>,
-        sequence_info: SequenceInfo,
-    ) -> Result<Self, Error> {
-        Self::new(
-            name,
-            FieldKind::Region {
-                constraint,
-                sequence_info,
-            },
-        )
     }
 
     pub fn new_successor(
