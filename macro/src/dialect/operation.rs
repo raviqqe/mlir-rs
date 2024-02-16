@@ -7,11 +7,10 @@ mod region;
 mod sequence_info;
 mod variadic_kind;
 
-pub use self::region::Region;
 pub use self::{
     attribute::Attribute, builder::OperationBuilder, element_kind::ElementKind,
-    field_kind::FieldKind, operation_field::OperationField, sequence_info::SequenceInfo,
-    variadic_kind::VariadicKind,
+    field_kind::FieldKind, operation_field::OperationField, region::Region,
+    sequence_info::SequenceInfo, variadic_kind::VariadicKind,
 };
 use super::utility::sanitize_documentation;
 use crate::dialect::{

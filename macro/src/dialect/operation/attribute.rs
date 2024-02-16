@@ -7,8 +7,7 @@ use once_cell::sync::Lazy;
 use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use std::collections::HashMap;
-use syn::Ident;
-use syn::{parse_quote, Type};
+use syn::{parse_quote, Ident, Type};
 use tblgen::{error::TableGenError, Record};
 
 macro_rules! prefixed_string {
