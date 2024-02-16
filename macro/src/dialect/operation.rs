@@ -132,16 +132,16 @@ impl<'a> Operation<'a> {
         self.results
             .iter()
             .chain(&self.operands)
-            .map(|field| -> &dyn OperationFieldLike { &*field })
+            .map(|field| -> &dyn OperationFieldLike { field })
             .chain(
                 self.regions
                     .iter()
-                    .map(|field| -> &dyn OperationFieldLike { &*field }),
+                    .map(|field| -> &dyn OperationFieldLike { field }),
             )
             .chain(
                 self.successors
                     .iter()
-                    .map(|field| -> &dyn OperationFieldLike { &*field }),
+                    .map(|field| -> &dyn OperationFieldLike { field }),
             )
             .map(|field| -> &dyn OperationFieldLike { field })
             .chain(
