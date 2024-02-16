@@ -35,7 +35,7 @@ pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStr
     let build_fn = builder.create_build_fn()?;
 
     let builder_identifier = builder.identifier();
-    let doc = format!("Builder for {}", builder.operation().summary()?);
+    let doc = format!("A builder for {}", builder.operation().summary()?);
     let type_arguments = builder.type_state().parameters();
 
     Ok(quote! {
