@@ -6,14 +6,14 @@ use super::{super::error::Error, Operation};
 use quote::format_ident;
 use syn::Ident;
 
-pub struct OperationBuilder<'o> {
-    operation: &'o Operation<'o>,
+pub struct OperationBuilder<'a> {
+    operation: &'a Operation<'a>,
     identifier: Ident,
     type_state: TypeStateList,
 }
 
-impl<'o> OperationBuilder<'o> {
-    pub fn new(operation: &'o Operation<'o>) -> Result<Self, Error> {
+impl<'a> OperationBuilder<'a> {
+    pub fn new(operation: &'a Operation<'a>) -> Result<Self, Error> {
         Ok(Self {
             operation,
             identifier: format_ident!("{}Builder", operation.class_name()?),
@@ -33,7 +33,7 @@ impl<'o> OperationBuilder<'o> {
         &self.type_state
     }
 
-    fn create_type_state(operation: &'o Operation<'o>) -> TypeStateList {
+    fn create_type_state(operation: &Operation) -> TypeStateList {
         TypeStateList::new(
             operation
                 .required_fields()
