@@ -59,7 +59,7 @@ fn generate_builder_fns(
     phantoms: &[TokenStream],
 ) -> Result<Vec<TokenStream>, Error> {
     builder.operation().fields().map(move |field| {
-        let builder_ident = builder.identifier();
+        let builder_identifier = builder.identifier();
         let name = sanitize_snake_case_name(field.name())?;
         let parameter_type = field.parameter_type();
         let argument = quote! { #name: #parameter_type };
@@ -74,8 +74,8 @@ fn generate_builder_fns(
             let parameters = builder.type_state().parameters().collect::<Vec<_>>();
 
             quote! {
-                impl<'c, #(#parameters),*> #builder_ident<'c, #(#parameters),*> {
-                    pub fn #name(mut self, #argument) -> #builder_ident<'c, #(#parameters),*> {
+                impl<'c, #(#parameters),*> #builder_identifier<'c, #(#parameters),*> {
+                    pub fn #name(mut self, #argument) -> #builder_identifier<'c, #(#parameters),*> {
                         self.builder = self.builder.#add(#add_arguments);
                         self
                     }
@@ -89,11 +89,11 @@ fn generate_builder_fns(
             let arguments_unset = builder.type_state().arguments_set(field.name(), false);
 
             quote! {
-                impl<'c, #(#parameters),*> #builder_ident<'c, #(#arguments_unset),*> {
-                    pub fn #name(mut self, #argument) -> #builder_ident<'c, #(#arguments_set),*> {
+                impl<'c, #(#parameters),*> #builder_identifier<'c, #(#arguments_unset),*> {
+                    pub fn #name(mut self, #argument) -> #builder_identifier<'c, #(#arguments_set),*> {
                         self.builder = self.builder.#add(#add_arguments);
                         let Self { context, mut builder, #(#field_names),* } = self;
-                        Self {
+                        #builder_identifier {
                             context,
                             builder,
                             #(#phantoms),*
