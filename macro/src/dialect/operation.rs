@@ -128,26 +128,18 @@ impl<'a> Operation<'a> {
         sanitize_documentation(self.definition.str_value("description")?)
     }
 
-    pub fn fields(&self) -> impl Iterator<Item = &dyn OperationFieldLike> + Clone {
+    pub fn fields(&self) -> impl Iterator<Item = &dyn OperationFieldLike> {
+        fn convert(field: &impl OperationFieldLike) -> &dyn OperationFieldLike {
+            field
+        }
+
         self.results
             .iter()
             .chain(&self.operands)
-            .map(|field| -> &dyn OperationFieldLike { field })
-            .chain(
-                self.regions
-                    .iter()
-                    .map(|field| -> &dyn OperationFieldLike { field }),
-            )
-            .chain(
-                self.successors
-                    .iter()
-                    .map(|field| -> &dyn OperationFieldLike { field }),
-            )
-            .map(|field| -> &dyn OperationFieldLike { field })
-            .chain(
-                self.attributes()
-                    .map(|field| -> &dyn OperationFieldLike { field }),
-            )
+            .map(convert)
+            .chain(self.regions.iter().map(convert))
+            .chain(self.successors.iter().map(convert))
+            .chain(self.attributes().map(convert))
     }
 
     pub fn general_fields(&self) -> impl Iterator<Item = &OperationField<'a>> + Clone {
