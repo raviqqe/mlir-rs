@@ -1,4 +1,4 @@
-use super::{OperationFieldLike, VariadicKind};
+use super::{OperationElement, OperationFieldLike, VariadicKind};
 use crate::dialect::{
     error::Error,
     types::TypeConstraint,
@@ -28,18 +28,6 @@ impl<'a> OperationResult<'a> {
             constraint,
             variadic_kind,
         })
-    }
-
-    pub fn is_unfixed(&self) -> bool {
-        self.constraint.is_unfixed()
-    }
-
-    pub fn is_variadic(&self) -> bool {
-        self.constraint.is_variadic()
-    }
-
-    pub fn variadic_kind(&self) -> &VariadicKind {
-        &self.variadic_kind
     }
 }
 
@@ -94,5 +82,15 @@ impl OperationFieldLike for OperationResult<'_> {
         } else {
             quote! { &[#name] }
         }
+    }
+}
+
+impl OperationElement for OperationResult<'_> {
+    fn is_variadic(&self) -> bool {
+        self.constraint.is_variadic()
+    }
+
+    fn variadic_kind(&self) -> &VariadicKind {
+        &self.variadic_kind
     }
 }

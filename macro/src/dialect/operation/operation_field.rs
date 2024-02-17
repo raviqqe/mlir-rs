@@ -1,4 +1,4 @@
-use super::{field_kind::FieldKind, SequenceInfo, VariadicKind};
+use super::{field_kind::FieldKind, OperationElement, SequenceInfo, VariadicKind};
 use crate::dialect::{
     error::Error, types::TypeConstraint, utility::sanitize_snake_case_identifier,
 };
@@ -25,6 +25,26 @@ pub struct OperationField<'a> {
     pub(crate) plural_identifier: Ident,
     pub(crate) sanitized_name: Ident,
     pub(crate) kind: FieldKind<'a>,
+}
+
+impl<'a> OperationField<'a> {
+    pub fn new(
+        name: &'a str,
+        constraint: TypeConstraint<'a>,
+        sequence_info: SequenceInfo,
+        variadic_kind: VariadicKind,
+    ) -> Result<Self, Error> {
+        Ok(Self {
+            name,
+            plural_identifier: format_ident!("operands"),
+            sanitized_name: sanitize_snake_case_identifier(name)?,
+            kind: FieldKind::Element {
+                constraint,
+                sequence_info,
+                variadic_kind,
+            },
+        })
+    }
 }
 
 impl OperationFieldLike for OperationField<'_> {
@@ -69,22 +89,16 @@ impl OperationFieldLike for OperationField<'_> {
     }
 }
 
-impl<'a> OperationField<'a> {
-    pub fn new(
-        name: &'a str,
-        constraint: TypeConstraint<'a>,
-        sequence_info: SequenceInfo,
-        variadic_kind: VariadicKind,
-    ) -> Result<Self, Error> {
-        Ok(Self {
-            name,
-            plural_identifier: format_ident!("operands"),
-            sanitized_name: sanitize_snake_case_identifier(name)?,
-            kind: FieldKind::Element {
-                constraint,
-                sequence_info,
-                variadic_kind,
-            },
-        })
+impl OperationElement for OperationField<'_> {
+    fn is_variadic(&self) -> bool {
+        match &self.kind {
+            FieldKind::Element { constraint, .. } => constraint.is_variadic(),
+        }
+    }
+
+    fn variadic_kind(&self) -> &VariadicKind {
+        match &self.kind {
+            FieldKind::Element { variadic_kind, .. } => variadic_kind,
+        }
     }
 }

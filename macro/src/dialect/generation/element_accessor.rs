@@ -1,39 +1,24 @@
-use crate::dialect::{
-    error::Error,
-    operation::{OperationElement, OperationFieldLike, OperationResult, VariadicKind},
-};
+use crate::dialect::operation::{OperationElement, OperationFieldLike, VariadicKind};
 use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use syn::Ident;
 
-pub fn generate_result_accessor(
-    result: &OperationResult,
+pub fn generate_element_getter(
+    field: &(impl OperationFieldLike + OperationElement),
+    singular_kind: &str,
+    plural_kind: &str,
     index: usize,
     length: usize,
-) -> Result<TokenStream, Error> {
-    let identifier = result.singular_identifier();
-    let return_type = result.return_type();
-    let body = generate_getter(result, index, length);
-
-    Ok(quote! {
-        #[allow(clippy::needless_question_mark)]
-        pub fn #identifier(&self, context: &'c ::melior::Context) -> #return_type {
-            #body
-        }
-    })
-}
-
-// TODO Share this logic with `Operand`.
-fn generate_getter(result: &OperationResult, index: usize, length: usize) -> TokenStream {
-    let kind_singular_identifier = Ident::new("result", Span::call_site());
-    let kind_plural_identifier = Ident::new("results", Span::call_site());
-    let count = Ident::new("result_count", Span::call_site());
+) -> TokenStream {
+    let kind_singular_identifier = Ident::new(singular_kind, Span::call_site());
+    let kind_plural_identifier = Ident::new(plural_kind, Span::call_site());
+    let count = Ident::new(&format!("{singular_kind}_count"), Span::call_site());
     let error_variant = quote!(ResultNotFound);
-    let name = result.name();
+    let name = field.name();
 
-    match result.variadic_kind() {
+    match field.variadic_kind() {
         VariadicKind::Simple { unfixed_seen } => {
-            if result.is_optional() {
+            if field.is_optional() {
                 // Optional element, and some singular elements.
                 // Only present if the amount of groups is at least the number of
                 // elements.
@@ -44,7 +29,7 @@ fn generate_getter(result: &OperationResult, index: usize, length: usize) -> Tok
                         self.operation.#kind_singular_identifier(#index)
                     }
                 }
-            } else if result.is_variadic() {
+            } else if field.is_variadic() {
                 // A unfixed group
                 // Length computed by subtracting the amount of other
                 // singular elements from the number of elements.
@@ -76,7 +61,7 @@ fn generate_getter(result: &OperationResult, index: usize, length: usize) -> Tok
                 let group_len = total_var_len / #unfixed_count;
                 let start = #preceding_simple_count + #preceding_variadic_count * group_len;
             };
-            let get_elements = if result.is_unfixed() {
+            let get_elements = if field.is_unfixed() {
                 quote! {
                     self.operation.#kind_plural_identifier().skip(start).take(group_len)
                 }
@@ -89,11 +74,12 @@ fn generate_getter(result: &OperationResult, index: usize, length: usize) -> Tok
             quote! { #compute_start_length #get_elements }
         }
         VariadicKind::AttributeSized => {
-            let get_elements = if !result.is_unfixed() {
+            let segment_size_attribute = format!("{singular_kind}_segment_sizes");
+            let get_elements = if !field.is_unfixed() {
                 quote! {
                     self.operation.#kind_singular_identifier(start)
                 }
-            } else if result.is_optional() {
+            } else if field.is_optional() {
                 quote! {
                     if group_len == 0 {
                         Err(::melior::Error::#error_variant(#name))
@@ -111,7 +97,7 @@ fn generate_getter(result: &OperationResult, index: usize, length: usize) -> Tok
                 let attribute =
                     ::melior::ir::attribute::DenseI32ArrayAttribute::<'c>::try_from(
                         self.operation
-                        .attribute("result_segment_sizes")?
+                        .attribute(#segment_size_attribute)?
                     )?;
                 let start = (0..#index)
                     .map(|index| attribute.element(index))

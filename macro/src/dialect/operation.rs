@@ -1,6 +1,7 @@
 mod attribute;
 mod builder;
 mod field_kind;
+mod operation_element;
 mod operation_field;
 mod operation_result;
 mod region;
@@ -10,8 +11,9 @@ mod variadic_kind;
 
 pub use self::{
     attribute::Attribute, builder::OperationBuilder, field_kind::FieldKind,
-    operation_field::OperationField, operation_result::OperationResult, region::Region,
-    sequence_info::SequenceInfo, successor::Successor, variadic_kind::VariadicKind,
+    operation_element::OperationElement, operation_field::OperationField,
+    operation_result::OperationResult, region::Region, sequence_info::SequenceInfo,
+    successor::Successor, variadic_kind::VariadicKind,
 };
 use super::utility::sanitize_documentation;
 use crate::dialect::{
