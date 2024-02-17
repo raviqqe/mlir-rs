@@ -1,4 +1,4 @@
-use super::{OperationElement, OperationFieldLike, VariadicKind};
+use super::{OperationElement, OperationField, VariadicKind};
 use crate::dialect::{
     error::Error,
     types::TypeConstraint,
@@ -31,7 +31,7 @@ impl<'a> OperationResult<'a> {
     }
 }
 
-impl OperationFieldLike for OperationResult<'_> {
+impl OperationField for OperationResult<'_> {
     fn name(&self) -> &str {
         self.name
     }

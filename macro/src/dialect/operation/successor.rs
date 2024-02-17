@@ -1,4 +1,4 @@
-use super::OperationFieldLike;
+use super::OperationField;
 use crate::dialect::{
     error::Error,
     types::SuccessorConstraint,
@@ -29,7 +29,7 @@ impl<'a> Successor<'a> {
     }
 }
 
-impl OperationFieldLike for Successor<'_> {
+impl OperationField for Successor<'_> {
     fn name(&self) -> &str {
         self.name
     }

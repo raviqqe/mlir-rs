@@ -1,4 +1,4 @@
-use crate::dialect::operation::{OperationFieldLike, Successor};
+use crate::dialect::operation::{OperationField, Successor};
 use proc_macro2::TokenStream;
 use quote::quote;
 

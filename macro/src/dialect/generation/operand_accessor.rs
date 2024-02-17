@@ -1,10 +1,10 @@
 use super::element_accessor::generate_element_getter;
-use crate::dialect::{error::Error, operation::OperationField};
+use crate::dialect::{error::Error, operation::Operand};
 use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
 
 pub fn generate_operand_accessor(
-    field: &OperationField,
+    field: &Operand,
     index: usize,
     length: usize,
 ) -> Result<TokenStream, Error> {

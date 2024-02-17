@@ -1,4 +1,4 @@
-use super::OperationFieldLike;
+use super::OperationField;
 use crate::dialect::{
     error::Error,
     types::RegionConstraint,
@@ -29,7 +29,7 @@ impl<'a> Region<'a> {
     }
 }
 
-impl OperationFieldLike for Region<'_> {
+impl OperationField for Region<'_> {
     fn name(&self) -> &str {
         self.name
     }

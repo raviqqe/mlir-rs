@@ -1,10 +1,10 @@
-use crate::dialect::operation::{OperationElement, OperationFieldLike, VariadicKind};
+use crate::dialect::operation::{OperationElement, OperationField, VariadicKind};
 use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use syn::Ident;
 
 pub fn generate_element_getter(
-    field: &(impl OperationFieldLike + OperationElement),
+    field: &(impl OperationField + OperationElement),
     singular_kind: &str,
     plural_kind: &str,
     error_variant: &Ident,

@@ -1,6 +1,6 @@
 use crate::dialect::{
     error::Error,
-    operation::operation_field::OperationFieldLike,
+    operation::operation_field::OperationField,
     utility::{generate_result_type, sanitize_snake_case_identifier},
 };
 use once_cell::sync::Lazy;
@@ -109,7 +109,7 @@ impl<'a> Attribute<'a> {
     }
 }
 
-impl OperationFieldLike for Attribute<'_> {
+impl OperationField for Attribute<'_> {
     fn name(&self) -> &str {
         self.name
     }

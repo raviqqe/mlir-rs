@@ -1,6 +1,7 @@
 mod attribute;
 mod builder;
 mod field_kind;
+mod operand;
 mod operation_element;
 mod operation_field;
 mod region;
@@ -10,8 +11,8 @@ mod successor;
 mod variadic_kind;
 
 pub use self::{
-    attribute::Attribute, builder::OperationBuilder, operation_element::OperationElement,
-    operation_field::OperationField, region::Region, result::OperationResult,
+    attribute::Attribute, builder::OperationBuilder, operand::Operand,
+    operation_element::OperationElement, region::Region, result::OperationResult,
     sequence_info::SequenceInfo, successor::Successor, variadic_kind::VariadicKind,
 };
 use super::utility::sanitize_documentation;
@@ -20,7 +21,7 @@ use crate::dialect::{
     r#trait::Trait,
     types::{RegionConstraint, SuccessorConstraint, TypeConstraint},
 };
-pub use operation_field::OperationFieldLike;
+pub use operation_field::OperationField;
 use tblgen::{error::WithLocation, record::Record, TypedInit};
 
 #[derive(Debug)]
@@ -30,7 +31,7 @@ pub struct Operation<'a> {
     regions: Vec<Region<'a>>,
     successors: Vec<Successor<'a>>,
     results: Vec<OperationResult<'a>>,
-    operands: Vec<OperationField<'a>>,
+    operands: Vec<Operand<'a>>,
     attributes: Vec<Attribute<'a>>,
     derived_attributes: Vec<Attribute<'a>>,
 }
@@ -130,8 +131,8 @@ impl<'a> Operation<'a> {
         sanitize_documentation(self.definition.str_value("description")?)
     }
 
-    pub fn fields(&self) -> impl Iterator<Item = &dyn OperationFieldLike> {
-        fn convert(field: &impl OperationFieldLike) -> &dyn OperationFieldLike {
+    pub fn fields(&self) -> impl Iterator<Item = &dyn OperationField> {
+        fn convert(field: &impl OperationField) -> &dyn OperationField {
             field
         }
         self.results
@@ -143,7 +144,7 @@ impl<'a> Operation<'a> {
             .chain(self.attributes().map(convert))
     }
 
-    pub fn operands(&self) -> impl Iterator<Item = &OperationField<'a>> + Clone {
+    pub fn operands(&self) -> impl Iterator<Item = &Operand<'a>> + Clone {
         self.operands.iter()
     }
 
@@ -171,7 +172,7 @@ impl<'a> Operation<'a> {
         self.attributes.iter().chain(&self.derived_attributes)
     }
 
-    pub fn required_fields(&self) -> impl Iterator<Item = &dyn OperationFieldLike> {
+    pub fn required_fields(&self) -> impl Iterator<Item = &dyn OperationField> {
         self.fields()
             .filter(|field| (!field.is_result() || !self.can_infer_type) && !field.is_optional())
     }
@@ -276,7 +277,7 @@ impl<'a> Operation<'a> {
         arguments: &[(&'a str, Record<'a>)],
         same_size: bool,
         attribute_sized: bool,
-    ) -> Result<Vec<OperationField<'a>>, Error> {
+    ) -> Result<Vec<Operand<'a>>, Error> {
         Ok(Self::collect_elements(
             &arguments
                 .iter()
@@ -284,7 +285,7 @@ impl<'a> Operation<'a> {
                 .map(|(name, definition)| (*name, TypeConstraint::new(*definition)))
                 .collect::<Vec<_>>(),
             |name, constraint, sequence_info, variadic_kind| {
-                OperationField::new(name, constraint, sequence_info, variadic_kind)
+                Operand::new(name, constraint, sequence_info, variadic_kind)
             },
             same_size,
             attribute_sized,

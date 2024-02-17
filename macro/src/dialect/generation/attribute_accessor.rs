@@ -1,6 +1,6 @@
 use crate::dialect::{
     error::Error,
-    operation::{Attribute, OperationFieldLike},
+    operation::{Attribute, OperationField},
     utility::sanitize_snake_case_identifier,
 };
 use proc_macro2::TokenStream;

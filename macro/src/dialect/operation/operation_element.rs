@@ -1,6 +1,6 @@
-use super::{OperationFieldLike, VariadicKind};
+use super::{OperationField, VariadicKind};
 
-pub trait OperationElement: OperationFieldLike {
+pub trait OperationElement: OperationField {
     fn is_variadic(&self) -> bool;
     fn variadic_kind(&self) -> &VariadicKind;
 

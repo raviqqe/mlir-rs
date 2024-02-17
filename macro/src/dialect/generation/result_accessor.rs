@@ -1,7 +1,7 @@
 use super::element_accessor::generate_element_getter;
 use crate::dialect::{
     error::Error,
-    operation::{OperationFieldLike, OperationResult},
+    operation::{OperationField, OperationResult},
 };
 use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
