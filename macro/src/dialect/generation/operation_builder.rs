@@ -150,10 +150,11 @@ pub fn generate_operation_builder_fn(builder: &OperationBuilder) -> TokenStream 
     let arguments = builder.type_state().arguments_all_set(false);
 
     quote! {
+        /// Creates a builder.
         pub fn builder(
             context: &'c ::melior::Context,
             location: ::melior::ir::Location<'c>
-            ) -> #builder_ident<'c, #(#arguments),*> {
+        ) -> #builder_ident<'c, #(#arguments),*> {
             #builder_ident::new(context, location)
         }
     }
