@@ -1,5 +1,8 @@
 use super::element_accessor::generate_element_getter;
-use crate::dialect::{error::Error, operation::Operand};
+use crate::dialect::{
+    error::Error,
+    operation::{Operand, OperationField},
+};
 use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
 
@@ -8,8 +11,8 @@ pub fn generate_operand_accessor(
     index: usize,
     length: usize,
 ) -> Result<TokenStream, Error> {
-    let ident = &field.sanitized_name;
-    let return_type = &field.kind.return_type();
+    let ident = field.singular_identifier();
+    let return_type = field.return_type();
     let body = generate_element_getter(
         field,
         "operand",

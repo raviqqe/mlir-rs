@@ -1,17 +1,19 @@
-use super::{field_kind::FieldKind, OperationElement, OperationField, VariadicKind};
+use super::{OperationElement, OperationField, VariadicKind};
 use crate::dialect::{
-    error::Error, types::TypeConstraint, utility::sanitize_snake_case_identifier,
+    error::Error,
+    types::TypeConstraint,
+    utility::{generate_iterator_type, generate_result_type, sanitize_snake_case_identifier},
 };
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
-use syn::Type;
+use syn::{parse_quote, Type};
 
 #[derive(Debug)]
 pub struct Operand<'a> {
-    pub(crate) name: &'a str,
-    pub(crate) plural_identifier: Ident,
-    pub(crate) sanitized_name: Ident,
-    pub(crate) kind: FieldKind<'a>,
+    name: &'a str,
+    singular_identifier: Ident,
+    constraint: TypeConstraint<'a>,
+    variadic_kind: VariadicKind,
 }
 
 impl<'a> Operand<'a> {
@@ -22,12 +24,9 @@ impl<'a> Operand<'a> {
     ) -> Result<Self, Error> {
         Ok(Self {
             name,
-            plural_identifier: format_ident!("operands"),
-            sanitized_name: sanitize_snake_case_identifier(name)?,
-            kind: FieldKind::Element {
-                constraint,
-                variadic_kind,
-            },
+            singular_identifier: sanitize_snake_case_identifier(name)?,
+            constraint,
+            variadic_kind,
         })
     }
 }
@@ -38,23 +37,37 @@ impl OperationField for Operand<'_> {
     }
 
     fn singular_identifier(&self) -> &Ident {
-        &self.sanitized_name
+        &self.singular_identifier
     }
 
     fn plural_kind_identifier(&self) -> Ident {
-        self.plural_identifier.clone()
+        format_ident!("operands")
     }
 
     fn parameter_type(&self) -> Type {
-        self.kind.parameter_type()
+        let r#type: Type = parse_quote!(::melior::ir::Value<'c, '_>);
+
+        if self.constraint.is_variadic() {
+            parse_quote! { &[#r#type] }
+        } else {
+            r#type
+        }
     }
 
     fn return_type(&self) -> Type {
-        self.kind.return_type()
+        let r#type: Type = parse_quote!(::melior::ir::Value<'c, '_>);
+
+        if !self.constraint.is_variadic() {
+            generate_result_type(r#type)
+        } else if self.variadic_kind == VariadicKind::AttributeSized {
+            generate_result_type(generate_iterator_type(r#type))
+        } else {
+            generate_iterator_type(r#type)
+        }
     }
 
     fn is_optional(&self) -> bool {
-        self.kind.is_optional()
+        self.constraint.is_optional()
     }
 
     fn is_result(&self) -> bool {
@@ -62,28 +75,20 @@ impl OperationField for Operand<'_> {
     }
 
     fn add_arguments(&self, name: &Ident) -> TokenStream {
-        match &self.kind {
-            FieldKind::Element { constraint, .. } => {
-                if constraint.is_variadic() {
-                    quote! { #name }
-                } else {
-                    quote! { &[#name] }
-                }
-            }
+        if self.constraint.is_variadic() {
+            quote! { #name }
+        } else {
+            quote! { &[#name] }
         }
     }
 }
 
 impl OperationElement for Operand<'_> {
     fn is_variadic(&self) -> bool {
-        match &self.kind {
-            FieldKind::Element { constraint, .. } => constraint.is_variadic(),
-        }
+        self.constraint.is_variadic()
     }
 
     fn variadic_kind(&self) -> &VariadicKind {
-        match &self.kind {
-            FieldKind::Element { variadic_kind, .. } => variadic_kind,
-        }
+        &self.variadic_kind
     }
 }

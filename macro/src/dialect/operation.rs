@@ -1,6 +1,5 @@
 mod attribute;
 mod builder;
-mod field_kind;
 mod operand;
 mod operation_element;
 mod operation_field;
