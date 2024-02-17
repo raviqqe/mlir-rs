@@ -24,12 +24,12 @@ pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStr
 
     let phantom_arguments = field_names
         .iter()
-        .map(|name| quote! { #name: ::std::marker::PhantomData })
+        .map(|name| quote! { #name: Default::default() })
         .collect::<Vec<_>>();
 
-    let builder_fns = generate_field_fns(builder, phantom_arguments.as_slice());
+    let field_fns = generate_field_fns(builder, &phantom_arguments);
 
-    let new_fn = generate_new_fn(builder, phantom_arguments.as_slice())?;
+    let new_fn = generate_new_fn(builder, &phantom_arguments)?;
     let build_fn = generate_build_fn(builder)?;
 
     let builder_identifier = builder.identifier();
@@ -46,7 +46,7 @@ pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStr
 
         #new_fn
 
-        #(#builder_fns)*
+        #(#field_fns)*
 
         #build_fn
     })
