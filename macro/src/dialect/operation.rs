@@ -106,22 +106,22 @@ impl<'a> Operation<'a> {
 
     pub fn full_operation_name(&self) -> Result<String, Error> {
         let dialect_name = self.dialect()?.string_value("name")?;
-        let short_name = self.operation_name()?;
+        let operation_name = self.operation_name()?;
 
         Ok(if dialect_name.is_empty() {
-            short_name.into()
+            operation_name.into()
         } else {
-            format!("{dialect_name}.{short_name}")
+            format!("{dialect_name}.{operation_name}")
         })
     }
 
     pub fn summary(&self) -> Result<String, Error> {
-        let short_name = self.operation_name()?;
+        let operation_name = self.operation_name()?;
         let name = &self.name;
         let summary = self.definition.str_value("summary")?;
 
         Ok([
-            format!("A(n) [`{short_name}`]({name}) operation."),
+            format!("A(n) [`{operation_name}`]({name}) operation."),
             if summary.is_empty() {
                 Default::default()
             } else {
