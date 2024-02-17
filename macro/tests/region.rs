@@ -40,7 +40,7 @@ fn variadic_after_single() {
         let block = Block::new(&[]);
         let (r1, r2, r3) = (Region::new(), Region::new(), Region::new());
         r2.append_block(block);
-        region_test::VariadicOp::builder(&context, location)
+        region_test::VariadicOperation::builder(&context, location)
             .default_region(r1)
             .other_regions(vec![r2, r3])
             .build()
