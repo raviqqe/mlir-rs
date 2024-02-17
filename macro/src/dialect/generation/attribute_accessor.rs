@@ -59,7 +59,7 @@ fn generate_setter(attribute: &Attribute) -> Result<TokenStream, Error> {
     let r#type = attribute.parameter_type();
 
     Ok(quote! {
-        pub fn #ident(&mut self, context: &'c ::melior::Context, value: #r#type) {
+        pub fn #ident(&mut self, value: #r#type) {
             #body
         }
     })
@@ -71,7 +71,7 @@ fn generate_remover(attribute: &Attribute) -> Result<Option<TokenStream>, Error>
         let ident = sanitize_snake_case_identifier(&format!("remove_{}", attribute.name()))?;
 
         Some(quote! {
-            pub fn #ident(&mut self, context: &'c ::melior::Context) -> Result<(), ::melior::Error> {
+            pub fn #ident(&mut self) -> Result<(), ::melior::Error> {
                 self.operation.remove_attribute(#name)
             }
         })
