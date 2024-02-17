@@ -84,10 +84,7 @@ impl<'a> Operation<'a> {
     pub fn class_name(&self) -> Result<&str, Error> {
         let name = self.definition.name()?;
 
-        Ok(if name.starts_with('_') {
-            name
-        } else if let Some(name) = name.split('_').nth(1) {
-            // Trim dialect prefix from name.
+        Ok(if let Some((_, name)) = name.split_once('_') {
             name
         } else {
             name
