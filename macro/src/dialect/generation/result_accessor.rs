@@ -11,13 +11,13 @@ pub fn generate_result_accessor(
     index: usize,
     length: usize,
 ) -> Result<TokenStream, Error> {
-    let identifiier = result.singular_identifier();
+    let identifier = result.singular_identifier();
     let return_type = result.return_type();
     let body = generate_getter(result, index, length);
 
     Ok(quote! {
         #[allow(clippy::needless_question_mark)]
-        pub fn #identifiier(&self, context: &'c ::melior::Context) -> #return_type {
+        pub fn #identifier(&self, context: &'c ::melior::Context) -> #return_type {
             #body
         }
     })

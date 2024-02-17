@@ -73,7 +73,7 @@ impl OperationFieldLike for OperationResult<'_> {
 
         if !self.constraint.is_variadic() {
             generate_result_type(r#type)
-        } else if &self.variadic_kind == &VariadicKind::AttributeSized {
+        } else if self.variadic_kind == VariadicKind::AttributeSized {
             generate_result_type(generate_iterator_type(r#type))
         } else {
             generate_iterator_type(r#type)

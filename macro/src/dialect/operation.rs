@@ -8,11 +8,10 @@ mod sequence_info;
 mod successor;
 mod variadic_kind;
 
-pub use self::operation_result::OperationResult;
 pub use self::{
     attribute::Attribute, builder::OperationBuilder, field_kind::FieldKind,
-    operation_field::OperationField, region::Region, sequence_info::SequenceInfo,
-    successor::Successor, variadic_kind::VariadicKind,
+    operation_field::OperationField, operation_result::OperationResult, region::Region,
+    sequence_info::SequenceInfo, successor::Successor, variadic_kind::VariadicKind,
 };
 use super::utility::sanitize_documentation;
 use crate::dialect::{
