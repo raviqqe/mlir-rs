@@ -264,7 +264,7 @@ impl<'a> Operation<'a> {
                 .into_iter()
                 .map(|(name, constraint)| (name, TypeConstraint::new(constraint)))
                 .collect::<Vec<_>>(),
-            |name, constraint, variadic_kind| OperationResult::new(name, constraint, variadic_kind),
+            OperationResult::new,
             same_size,
             attribute_sized,
         )
@@ -281,7 +281,7 @@ impl<'a> Operation<'a> {
                 .filter(|(_, definition)| definition.subclass_of("TypeConstraint"))
                 .map(|(name, definition)| (*name, TypeConstraint::new(*definition)))
                 .collect::<Vec<_>>(),
-            |name, constraint, variadic_kind| Operand::new(name, constraint, variadic_kind),
+            Operand::new,
             same_size,
             attribute_sized,
         )?
