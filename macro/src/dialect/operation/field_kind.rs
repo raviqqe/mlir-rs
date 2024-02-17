@@ -1,4 +1,4 @@
-use super::{element_kind::ElementKind, SequenceInfo, VariadicKind};
+use super::{SequenceInfo, VariadicKind};
 use crate::dialect::{
     types::TypeConstraint,
     utility::{generate_iterator_type, generate_result_type},
@@ -27,14 +27,8 @@ impl<'a> FieldKind<'a> {
             Self::Element {
                 kind, constraint, ..
             } => {
-                let r#type: Type = match kind {
-                    ElementKind::Operand => {
-                        parse_quote!(::melior::ir::Value<'c, '_>)
-                    }
-                    ElementKind::Result => {
-                        parse_quote!(::melior::ir::Type<'c>)
-                    }
-                };
+                let r#type: Type = parse_quote!(::melior::ir::Value<'c, '_>);
+
                 if constraint.is_variadic() {
                     parse_quote! { &[#r#type] }
                 } else {
@@ -52,14 +46,7 @@ impl<'a> FieldKind<'a> {
                 variadic_kind,
                 ..
             } => {
-                let r#type: Type = match kind {
-                    ElementKind::Operand => {
-                        parse_quote!(::melior::ir::Value<'c, '_>)
-                    }
-                    ElementKind::Result => {
-                        parse_quote!(::melior::ir::operation::OperationResult<'c, '_>)
-                    }
-                };
+                let r#type: Type = parse_quote!(::melior::ir::Value<'c, '_>);
 
                 if !constraint.is_variadic() {
                     generate_result_type(r#type)
