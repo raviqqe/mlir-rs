@@ -27,7 +27,7 @@ fn simple() {
 
     assert_eq!(operation.lhs().unwrap(), block.argument(0).unwrap().into());
     assert_eq!(operation.rhs().unwrap(), block.argument(1).unwrap().into());
-    assert_eq!(operation.operation().operand_count(), 2);
+    assert_eq!(operation.as_operation().operand_count(), 2);
 }
 
 #[test]
@@ -62,6 +62,6 @@ fn variadic_after_single() {
         operation.others().nth(1),
         Some(block.argument(1).unwrap().into())
     );
-    assert_eq!(operation.operation().operand_count(), 3);
+    assert_eq!(operation.as_operation().operand_count(), 3);
     assert_eq!(operation.others().count(), 2);
 }

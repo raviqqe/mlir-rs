@@ -29,14 +29,14 @@ fn variadic_after_single() {
 
     let location = Location::unknown(&context);
 
-    let operation = {
+    let one_operation = {
         let block = Block::new(&[]);
         let regions = (Region::new(), Region::new(), Region::new());
         regions.1.append_block(block);
         region_test::variadic(&context, regions.0, vec![regions.1, regions.2], location)
     };
 
-    let op2 = {
+    let other_operation = {
         let block = Block::new(&[]);
         let (r1, r2, r3) = (Region::new(), Region::new(), Region::new());
         r2.append_block(block);
@@ -47,19 +47,23 @@ fn variadic_after_single() {
     };
 
     assert_eq!(
-        operation.operation().to_string(),
-        op2.operation().to_string()
+        one_operation.as_operation().to_string(),
+        other_operation.as_operation().to_string()
     );
 
-    assert!(operation.default_region().unwrap().first_block().is_none());
-    assert_eq!(operation.other_regions().count(), 2);
-    assert!(operation
+    assert!(one_operation
+        .default_region()
+        .unwrap()
+        .first_block()
+        .is_none());
+    assert_eq!(one_operation.other_regions().count(), 2);
+    assert!(one_operation
         .other_regions()
         .next()
         .unwrap()
         .first_block()
         .is_some());
-    assert!(operation
+    assert!(one_operation
         .other_regions()
         .nth(1)
         .unwrap()
