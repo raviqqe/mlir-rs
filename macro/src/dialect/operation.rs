@@ -10,10 +10,9 @@ mod successor;
 mod variadic_kind;
 
 pub use self::{
-    attribute::Attribute, builder::OperationBuilder, field_kind::FieldKind,
-    operation_element::OperationElement, operation_field::OperationField,
-    operation_result::OperationResult, region::Region, sequence_info::SequenceInfo,
-    successor::Successor, variadic_kind::VariadicKind,
+    attribute::Attribute, builder::OperationBuilder, operation_element::OperationElement,
+    operation_field::OperationField, operation_result::OperationResult, region::Region,
+    sequence_info::SequenceInfo, successor::Successor, variadic_kind::VariadicKind,
 };
 use super::utility::sanitize_documentation;
 use crate::dialect::{
@@ -144,8 +143,12 @@ impl<'a> Operation<'a> {
             .chain(self.attributes().map(convert))
     }
 
-    pub fn general_fields(&self) -> impl Iterator<Item = &OperationField<'a>> + Clone {
+    pub fn operands(&self) -> impl Iterator<Item = &OperationField<'a>> + Clone {
         self.operands.iter()
+    }
+
+    pub fn operand_len(&self) -> usize {
+        self.operands.len()
     }
 
     pub fn results(&self) -> impl Iterator<Item = &OperationResult<'a>> + Clone {

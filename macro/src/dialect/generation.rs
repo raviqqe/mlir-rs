@@ -8,7 +8,7 @@ mod successor_accessor;
 
 use self::{
     attribute_accessor::generate_attribute_accessors,
-    field_accessor::generate_accessor,
+    field_accessor::generate_operand_accessor,
     operation_builder::{
         generate_default_constructor, generate_operation_builder, generate_operation_builder_fn,
     },
@@ -33,8 +33,9 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
         .map(|(index, result)| generate_result_accessor(result, index, operation.result_len()))
         .collect::<Result<Vec<_>, _>>()?;
     let operand_accessors = operation
-        .general_fields()
-        .map(generate_accessor)
+        .operands()
+        .enumerate()
+        .map(|(index, operand)| generate_operand_accessor(operand, index, operation.operand_len()))
         .collect::<Result<Vec<_>, _>>()?;
     let successor_accessors = operation
         .successors()

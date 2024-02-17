@@ -7,13 +7,13 @@ pub fn generate_element_getter(
     field: &(impl OperationFieldLike + OperationElement),
     singular_kind: &str,
     plural_kind: &str,
+    error_variant: &Ident,
     index: usize,
     length: usize,
 ) -> TokenStream {
     let kind_singular_identifier = Ident::new(singular_kind, Span::call_site());
     let kind_plural_identifier = Ident::new(plural_kind, Span::call_site());
     let count = Ident::new(&format!("{singular_kind}_count"), Span::call_site());
-    let error_variant = quote!(ResultNotFound);
     let name = field.name();
 
     match field.variadic_kind() {
