@@ -100,6 +100,14 @@ impl<'a> Attribute<'a> {
         })
     }
 
+    pub fn set_identifier(&self) -> &Ident {
+        &self.set_identifier
+    }
+
+    pub fn remove_identifier(&self) -> &Ident {
+        &self.remove_identifier
+    }
+
     pub fn is_optional(&self) -> bool {
         self.optional
     }

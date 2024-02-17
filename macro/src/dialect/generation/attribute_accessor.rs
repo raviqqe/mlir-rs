@@ -1,7 +1,4 @@
-use crate::dialect::{
-    operation::{Attribute, OperationField},
-    utility::sanitize_snake_case_identifier,
-};
+use crate::dialect::operation::{Attribute, OperationField};
 use proc_macro2::TokenStream;
 use quote::quote;
 
