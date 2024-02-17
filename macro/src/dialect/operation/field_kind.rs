@@ -8,7 +8,6 @@ use syn::{parse_quote, Type};
 #[derive(Debug)]
 pub enum FieldKind<'a> {
     Element {
-        kind: ElementKind,
         constraint: TypeConstraint<'a>,
         sequence_info: SequenceInfo,
         variadic_kind: VariadicKind,
@@ -24,9 +23,7 @@ impl<'a> FieldKind<'a> {
 
     pub fn parameter_type(&self) -> Type {
         match self {
-            Self::Element {
-                kind, constraint, ..
-            } => {
+            Self::Element { constraint, .. } => {
                 let r#type: Type = parse_quote!(::melior::ir::Value<'c, '_>);
 
                 if constraint.is_variadic() {
@@ -41,7 +38,6 @@ impl<'a> FieldKind<'a> {
     pub fn return_type(&self) -> Type {
         match self {
             Self::Element {
-                kind,
                 constraint,
                 variadic_kind,
                 ..

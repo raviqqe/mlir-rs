@@ -1,9 +1,10 @@
 use crate::dialect::{
     error::Error,
-    operation::{ElementKind, FieldKind, OperationField, SequenceInfo, VariadicKind},
+    operation::{FieldKind, OperationField, SequenceInfo, VariadicKind},
 };
-use proc_macro2::TokenStream;
+use proc_macro2::{Span, TokenStream};
 use quote::{format_ident, quote};
+use syn::Ident;
 
 pub fn generate_accessor(field: &OperationField) -> Result<TokenStream, Error> {
     let ident = &field.sanitized_name;
@@ -21,18 +22,14 @@ pub fn generate_accessor(field: &OperationField) -> Result<TokenStream, Error> {
 fn generate_getter(field: &OperationField) -> TokenStream {
     match &field.kind {
         FieldKind::Element {
-            kind,
             constraint,
             sequence_info: SequenceInfo { index, len },
             variadic_kind,
         } => {
-            let kind_ident = format_ident!("{}", kind.as_str());
-            let plural = format_ident!("{}s", kind.as_str());
-            let count = format_ident!("{}_count", kind.as_str());
-            let error_variant = match kind {
-                ElementKind::Operand => quote!(OperandNotFound),
-                ElementKind::Result => quote!(ResultNotFound),
-            };
+            let kind_ident = Ident::new("operand", Span::call_site());
+            let plural = Ident::new("operands", Span::call_site());
+            let count = Ident::new("operand_count", Span::call_site());
+            let error_variant = quote!(OperandNotFound);
             let name = field.name;
 
             match variadic_kind {
@@ -75,11 +72,6 @@ fn generate_getter(field: &OperationField) -> TokenStream {
                     preceding_simple_count,
                     preceding_variadic_count,
                 } => {
-                    let compute_start_length = quote! {
-                        let total_var_len = self.operation.#count() - #unfixed_count + 1;
-                        let group_len = total_var_len / #unfixed_count;
-                        let start = #preceding_simple_count + #preceding_variadic_count * group_len;
-                    };
                     let get_elements = if constraint.is_unfixed() {
                         quote! {
                             self.operation.#plural().skip(start).take(group_len)
@@ -90,23 +82,15 @@ fn generate_getter(field: &OperationField) -> TokenStream {
                         }
                     };
 
-                    quote! { #compute_start_length #get_elements }
+                    quote! {
+                        let total_var_len = self.operation.#count() - #unfixed_count + 1;
+                        let group_len = total_var_len / #unfixed_count;
+                        let start = #preceding_simple_count + #preceding_variadic_count * group_len;
+
+                        #get_elements
+                    }
                 }
                 VariadicKind::AttributeSized => {
-                    let attribute_name = format!("{}_segment_sizes", kind.as_str());
-                    let compute_start_length = quote! {
-                        let attribute =
-                            ::melior::ir::attribute::DenseI32ArrayAttribute::<'c>::try_from(
-                                self.operation
-                                .attribute(#attribute_name)?
-                            )?;
-                        let start = (0..#index)
-                            .map(|index| attribute.element(index))
-                            .collect::<Result<Vec<_>, _>>()?
-                            .into_iter()
-                            .sum::<i32>() as usize;
-                        let group_len = attribute.element(#index)? as usize;
-                    };
                     let get_elements = if !constraint.is_unfixed() {
                         quote! {
                             self.operation.#kind_ident(start)
@@ -125,7 +109,21 @@ fn generate_getter(field: &OperationField) -> TokenStream {
                         }
                     };
 
-                    quote! { #compute_start_length #get_elements }
+                    quote! {
+                        let attribute =
+                            ::melior::ir::attribute::DenseI32ArrayAttribute::<'c>::try_from(
+                                self.operation
+                                .attribute("operand_segment_sizes")?
+                            )?;
+                        let start = (0..#index)
+                            .map(|index| attribute.element(index))
+                            .collect::<Result<Vec<_>, _>>()?
+                            .into_iter()
+                            .sum::<i32>() as usize;
+                        let group_len = attribute.element(#index)? as usize;
+
+                        #get_elements
+                    }
                 }
             }
         }

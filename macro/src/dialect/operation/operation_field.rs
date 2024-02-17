@@ -1,4 +1,4 @@
-use super::{element_kind::ElementKind, field_kind::FieldKind, SequenceInfo, VariadicKind};
+use super::{field_kind::FieldKind, SequenceInfo, VariadicKind};
 use crate::dialect::{
     error::Error, types::TypeConstraint, utility::sanitize_snake_case_identifier,
 };
@@ -53,13 +53,7 @@ impl OperationFieldLike for OperationField<'_> {
     }
 
     fn is_result(&self) -> bool {
-        matches!(
-            self.kind,
-            FieldKind::Element {
-                kind: ElementKind::Result,
-                ..
-            }
-        )
+        false
     }
 
     fn add_arguments(&self, name: &Ident) -> TokenStream {
@@ -76,32 +70,21 @@ impl OperationFieldLike for OperationField<'_> {
 }
 
 impl<'a> OperationField<'a> {
-    fn new(name: &'a str, kind: FieldKind<'a>) -> Result<Self, Error> {
-        Ok(Self {
-            name,
-            plural_identifier: match kind {
-                FieldKind::Element { kind, .. } => format_ident!("{}s", kind.as_str()),
-            },
-            sanitized_name: sanitize_snake_case_identifier(name)?,
-            kind,
-        })
-    }
-
-    pub fn new_element(
+    pub fn new(
         name: &'a str,
         constraint: TypeConstraint<'a>,
-        kind: ElementKind,
         sequence_info: SequenceInfo,
         variadic_kind: VariadicKind,
     ) -> Result<Self, Error> {
-        Self::new(
+        Ok(Self {
             name,
-            FieldKind::Element {
-                kind,
+            plural_identifier: format_ident!("operands"),
+            sanitized_name: sanitize_snake_case_identifier(name)?,
+            kind: FieldKind::Element {
                 constraint,
                 sequence_info,
                 variadic_kind,
             },
-        )
+        })
     }
 }

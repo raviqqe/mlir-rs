@@ -17,7 +17,7 @@ pub struct OperationResult<'a> {
 }
 
 impl<'a> OperationResult<'a> {
-    fn new(
+    pub fn new(
         name: &'a str,
         constraint: TypeConstraint<'a>,
         variadic_kind: VariadicKind,
@@ -28,6 +28,18 @@ impl<'a> OperationResult<'a> {
             constraint,
             variadic_kind,
         })
+    }
+
+    pub fn is_unfixed(&self) -> bool {
+        self.constraint.is_unfixed()
+    }
+
+    pub fn is_variadic(&self) -> bool {
+        self.constraint.is_variadic()
+    }
+
+    pub fn variadic_kind(&self) -> &VariadicKind {
+        &self.variadic_kind
     }
 }
 
