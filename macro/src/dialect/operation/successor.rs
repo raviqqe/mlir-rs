@@ -24,10 +24,6 @@ impl<'a> Successor<'a> {
         })
     }
 
-    pub fn name(&self) -> &str {
-        self.name
-    }
-
     pub fn is_variadic(&self) -> bool {
         self.constraint.is_variadic()
     }
