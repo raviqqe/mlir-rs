@@ -1,7 +1,6 @@
 use super::OperationField;
 use crate::dialect::{
     error::Error,
-    types::RegionConstraint,
     utility::{generate_iterator_type, generate_result_type, sanitize_snake_case_identifier},
 };
 use proc_macro2::{Span, TokenStream};
@@ -12,20 +11,20 @@ use syn::{parse_quote, Ident, Type};
 pub struct Region<'a> {
     name: &'a str,
     singular_identifier: Ident,
-    constraint: RegionConstraint<'a>,
+    variadic: bool,
 }
 
 impl<'a> Region<'a> {
-    pub fn new(name: &'a str, constraint: RegionConstraint<'a>) -> Result<Self, Error> {
+    pub fn new(name: &'a str, variadic: bool) -> Result<Self, Error> {
         Ok(Self {
             name,
             singular_identifier: sanitize_snake_case_identifier(name)?,
-            constraint,
+            variadic,
         })
     }
 
     pub fn is_variadic(&self) -> bool {
-        self.constraint.is_variadic()
+        self.variadic
     }
 }
 
