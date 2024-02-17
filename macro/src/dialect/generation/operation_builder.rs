@@ -5,25 +5,14 @@ use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 
 pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStream, Error> {
-    let field_names = builder
-        .type_state()
-        .field_names()
-        .map(sanitize_snake_case_identifier)
-        .collect::<Result<Vec<_>, _>>()?;
-
     let state_types = builder
         .type_state()
         .parameters()
         .map(|r#type| quote! { ::std::marker::PhantomData<#r#type> });
 
-    let state_values = field_names
-        .iter()
-        .map(|name| quote! { #name: Default::default() })
-        .collect::<Vec<_>>();
+    let field_fns = generate_field_fns(builder);
 
-    let field_fns = generate_field_fns(builder, &state_values);
-
-    let new_fn = generate_new_fn(builder, &state_values)?;
+    let new_fn = generate_new_fn(builder)?;
     let build_fn = generate_build_fn(builder)?;
 
     let builder_identifier = builder.identifier();
@@ -47,10 +36,7 @@ pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStr
 }
 
 // TODO Split this function for different kinds of fields.
-fn generate_field_fns(
-    builder: &OperationBuilder,
-    state_values: &[TokenStream],
-) -> Vec<TokenStream> {
+fn generate_field_fns(builder: &OperationBuilder) -> Vec<TokenStream> {
     builder.operation().fields().map(move |field| {
         let builder_identifier = builder.identifier();
         let identifier = field.singular_identifier();
@@ -87,7 +73,7 @@ fn generate_field_fns(
                         #builder_identifier {
                             context: self.context,
                             builder: self.builder.#add(#add_arguments),
-                            _state: (#(#state_values),*)
+                            _state: Default::default(),
                         }
                     }
                 }
@@ -115,10 +101,7 @@ fn generate_build_fn(builder: &OperationBuilder) -> Result<TokenStream, Error> {
     })
 }
 
-fn generate_new_fn(
-    builder: &OperationBuilder,
-    state_values: &[TokenStream],
-) -> Result<TokenStream, Error> {
+fn generate_new_fn(builder: &OperationBuilder) -> Result<TokenStream, Error> {
     let builder_ident = builder.identifier();
     let name = &builder.operation().full_name()?;
     let arguments = builder.type_state().arguments_all_set(false);
@@ -129,7 +112,7 @@ fn generate_new_fn(
                 Self {
                     context,
                     builder: ::melior::ir::operation::OperationBuilder::new( #name, location),
-                    _state: (#(#state_values),*)
+                    _state: Default::default(),
                 }
             }
         }
