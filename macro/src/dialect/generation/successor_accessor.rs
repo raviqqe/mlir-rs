@@ -17,8 +17,7 @@ pub fn generate_successor_accessor(index: usize, successor: &Successor) -> Token
     };
 
     quote! {
-        #[allow(clippy::needless_question_mark)]
-        pub fn #identifier(&self, context: &'c ::melior::Context) -> #return_type {
+        pub fn #identifier(&self) -> #return_type {
             #body
         }
     }

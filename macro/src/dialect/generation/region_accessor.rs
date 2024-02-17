@@ -17,7 +17,7 @@ pub fn generate_region_accessor(index: usize, region: &Region) -> TokenStream {
     };
 
     quote! {
-        pub fn #identifier(&self, context: &'c ::melior::Context) -> #return_type {
+        pub fn #identifier(&self) -> #return_type {
             #body
         }
     }
