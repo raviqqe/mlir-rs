@@ -56,11 +56,6 @@ pub fn generate_element_getter(
             preceding_simple_count,
             preceding_variadic_count,
         } => {
-            let compute_start_length = quote! {
-                let total_var_len = self.operation.#count() - #unfixed_count + 1;
-                let group_len = total_var_len / #unfixed_count;
-                let start = #preceding_simple_count + #preceding_variadic_count * group_len;
-            };
             let get_elements = if field.is_unfixed() {
                 quote! {
                     self.operation.#kind_plural_identifier().skip(start).take(group_len)
@@ -71,7 +66,13 @@ pub fn generate_element_getter(
                 }
             };
 
-            quote! { #compute_start_length #get_elements }
+            quote! {
+                let total_var_len = self.operation.#count() - #unfixed_count + 1;
+                let group_len = total_var_len / #unfixed_count;
+                let start = #preceding_simple_count + #preceding_variadic_count * group_len;
+
+                #get_elements
+            }
         }
         VariadicKind::AttributeSized => {
             let segment_size_attribute = format!("{singular_kind}_segment_sizes");
