@@ -17,7 +17,7 @@ use super::utility::sanitize_documentation;
 use crate::dialect::{
     error::{Error, OdsError},
     r#trait::Trait,
-    types::TypeConstraint,
+    r#type::Type,
 };
 pub use operation_field::OperationField;
 use tblgen::{error::WithLocation, record::Record, TypedInit};
@@ -260,7 +260,7 @@ impl<'a> Operation<'a> {
         Self::collect_elements(
             &Self::dag_constraints(definition, "results")?
                 .into_iter()
-                .map(|(name, constraint)| (name, TypeConstraint::new(constraint)))
+                .map(|(name, constraint)| (name, Type::new(constraint)))
                 .collect::<Vec<_>>(),
             OperationResult::new,
             same_size,
@@ -277,7 +277,7 @@ impl<'a> Operation<'a> {
             &arguments
                 .iter()
                 .filter(|(_, definition)| definition.subclass_of("TypeConstraint"))
-                .map(|(name, definition)| (*name, TypeConstraint::new(*definition)))
+                .map(|(name, definition)| (*name, Type::new(*definition)))
                 .collect::<Vec<_>>(),
             Operand::new,
             same_size,
@@ -287,24 +287,24 @@ impl<'a> Operation<'a> {
     }
 
     fn collect_elements<T>(
-        elements: &[(&'a str, TypeConstraint<'a>)],
-        create: impl Fn(&'a str, TypeConstraint<'a>, VariadicKind) -> Result<T, Error>,
+        elements: &[(&'a str, Type<'a>)],
+        create: impl Fn(&'a str, Type<'a>, VariadicKind) -> Result<T, Error>,
         same_size: bool,
         attribute_sized: bool,
     ) -> Result<(Vec<T>, usize), Error> {
         let unfixed_count = elements
             .iter()
-            .filter(|(_, constraint)| constraint.is_unfixed())
+            .filter(|(_, r#type)| r#type.is_unfixed())
             .count();
         let mut variadic_kind = VariadicKind::new(unfixed_count, same_size, attribute_sized);
         let mut fields = vec![];
 
-        for (name, constraint) in elements {
-            fields.push(create(name, *constraint, variadic_kind.clone())?);
+        for (name, r#type) in elements {
+            fields.push(create(name, *r#type, variadic_kind.clone())?);
 
             match &mut variadic_kind {
                 VariadicKind::Simple { unfixed_seen } => {
-                    if constraint.is_unfixed() {
+                    if r#type.is_unfixed() {
                         *unfixed_seen = true;
                     }
                 }
@@ -313,7 +313,7 @@ impl<'a> Operation<'a> {
                     preceding_variadic_count,
                     ..
                 } => {
-                    if constraint.is_unfixed() {
+                    if r#type.is_unfixed() {
                         *preceding_variadic_count += 1;
                     } else {
                         *preceding_simple_count += 1;

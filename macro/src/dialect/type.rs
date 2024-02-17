@@ -1,25 +1,33 @@
 use tblgen::record::Record;
 
 #[derive(Debug, Clone, Copy)]
-pub struct TypeConstraint<'a>(Record<'a>);
+pub struct Type<'a> {
+    optional: bool,
+    variadic: bool,
+    variadic_of_variadic: bool,
+}
 
-impl<'a> TypeConstraint<'a> {
+impl<'a> Type<'a> {
     pub fn new(record: Record<'a>) -> Self {
-        Self(record)
+        Self {
+            optional: record.subclass_of("Optional"),
+            variadic: record.subclass_of("Variadic"),
+            variadic_of_variadic: record.subclass_of("VariadicOfVariadic"),
+        }
     }
 
     pub fn is_optional(&self) -> bool {
-        self.0.subclass_of("Optional")
+        self.optional
     }
 
     pub fn is_variadic(&self) -> bool {
-        self.0.subclass_of("Variadic")
+        self.variadic
     }
 
     // TODO Support variadic-of-variadic.
     #[allow(unused)]
     pub fn is_variadic_of_variadic(&self) -> bool {
-        self.0.subclass_of("VariadicOfVariadic")
+        self.variadic_of_variadic
     }
 
     pub fn is_unfixed(&self) -> bool {
