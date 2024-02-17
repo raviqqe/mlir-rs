@@ -50,7 +50,7 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
     let attribute_accessors = operation
         .attributes()
         .map(generate_attribute_accessors)
-        .collect::<Result<Vec<_>, _>>()?;
+        .collect::<Vec<_>>();
 
     let builder = OperationBuilder::new(operation)?;
     let builder_tokens = generate_operation_builder(&builder)?;

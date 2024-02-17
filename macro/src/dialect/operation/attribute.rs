@@ -62,6 +62,8 @@ pub struct Attribute<'a> {
     name: &'a str,
     singular_identifier: Ident,
     storage_type_string: String,
+    set_identifier: Ident,
+    remove_identifier: Ident,
     storage_type: Type,
     optional: bool,
     default: bool,
@@ -74,6 +76,8 @@ impl<'a> Attribute<'a> {
         Ok(Self {
             name,
             singular_identifier: sanitize_snake_case_identifier(name)?,
+            set_identifier: sanitize_snake_case_identifier(&format!("set_{name}"))?,
+            remove_identifier: sanitize_snake_case_identifier(&format!("remove_{name}"))?,
             storage_type: syn::parse_str(
                 ATTRIBUTE_TYPES
                     .get(storage_type_string.trim())
