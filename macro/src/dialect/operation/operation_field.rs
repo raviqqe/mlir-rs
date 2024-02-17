@@ -8,7 +8,6 @@ use syn::Type;
 
 // TODO Rename this `OperationField`.
 pub trait OperationFieldLike {
-    // TODO Remove this.
     fn name(&self) -> &str;
     fn singular_identifier(&self) -> &Ident;
     fn plural_kind_identifier(&self) -> Ident;
