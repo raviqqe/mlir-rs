@@ -13,10 +13,6 @@ pub enum FieldKind<'a> {
         sequence_info: SequenceInfo,
         variadic_kind: VariadicKind,
     },
-    Successor {
-        constraint: SuccessorConstraint<'a>,
-        sequence_info: SequenceInfo,
-    },
 }
 
 impl<'a> FieldKind<'a> {

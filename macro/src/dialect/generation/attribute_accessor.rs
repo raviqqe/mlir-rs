@@ -31,6 +31,7 @@ fn generate_getter(attribute: &Attribute) -> Result<TokenStream, Error> {
     };
 
     Ok(quote! {
+        #[allow(clippy::needless_question_mark)]
         pub fn #identifier(&self, context: &'c ::melior::Context) -> #return_type {
             #body
         }
