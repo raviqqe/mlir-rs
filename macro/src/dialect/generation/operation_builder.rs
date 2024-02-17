@@ -3,62 +3,35 @@ use crate::dialect::{
 };
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
-use syn::Ident;
 
 pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStream, Error> {
-    let field_names = builder
-        .type_state()
-        .field_names()
-        .map(sanitize_snake_case_identifier)
-        .collect::<Result<Vec<_>, _>>()?;
-
-    let phantom_fields =
-        builder
-            .type_state()
-            .parameters()
-            .zip(&field_names)
-            .map(|(r#type, name)| {
-                quote! {
-                    #name: ::std::marker::PhantomData<#r#type>
-                }
-            });
-
-    let phantom_arguments = field_names
-        .iter()
-        .map(|name| quote! { #name: ::std::marker::PhantomData })
-        .collect::<Vec<_>>();
-
-    let builder_fns = generate_field_fns(builder, &field_names, phantom_arguments.as_slice());
-
-    let new_fn = generate_new_fn(builder, phantom_arguments.as_slice())?;
+    let state_types = builder.type_state().parameters();
+    let field_fns = generate_field_fns(builder);
+    let new_fn = generate_new_fn(builder)?;
     let build_fn = generate_build_fn(builder)?;
 
-    let builder_identifier = builder.identifier();
+    let identifier = builder.identifier();
     let doc = format!("A builder for {}", builder.operation().summary()?);
     let type_arguments = builder.type_state().parameters();
 
     Ok(quote! {
         #[doc = #doc]
-        pub struct #builder_identifier<'c, #(#type_arguments),*> {
+        pub struct #identifier<'c, #(#type_arguments),*> {
             builder: ::melior::ir::operation::OperationBuilder<'c>,
             context: &'c ::melior::Context,
-            #(#phantom_fields),*
+            _state: ::std::marker::PhantomData<(#(#state_types),*)>,
         }
 
         #new_fn
 
-        #(#builder_fns)*
+        #(#field_fns)*
 
         #build_fn
     })
 }
 
 // TODO Split this function for different kinds of fields.
-fn generate_field_fns(
-    builder: &OperationBuilder,
-    field_names: &[Ident],
-    phantoms: &[TokenStream],
-) -> Vec<TokenStream> {
+fn generate_field_fns(builder: &OperationBuilder) -> Vec<TokenStream> {
     builder.operation().fields().map(move |field| {
         let builder_identifier = builder.identifier();
         let identifier = field.singular_identifier();
@@ -91,13 +64,11 @@ fn generate_field_fns(
 
             quote! {
                 impl<'c, #(#parameters),*> #builder_identifier<'c, #(#arguments_unset),*> {
-                    pub fn #identifier(mut self, #argument) -> #builder_identifier<'c, #(#arguments_set),*> {
-                        self.builder = self.builder.#add(#add_arguments);
-                        let Self { context, mut builder, #(#field_names),* } = self;
+                    pub fn #identifier(self, #argument) -> #builder_identifier<'c, #(#arguments_set),*> {
                         #builder_identifier {
-                            context,
-                            builder,
-                            #(#phantoms),*
+                            context: self.context,
+                            builder: self.builder.#add(#add_arguments),
+                            _state: Default::default(),
                         }
                     }
                 }
@@ -125,10 +96,7 @@ fn generate_build_fn(builder: &OperationBuilder) -> Result<TokenStream, Error> {
     })
 }
 
-fn generate_new_fn(
-    builder: &OperationBuilder,
-    phantoms: &[TokenStream],
-) -> Result<TokenStream, Error> {
+fn generate_new_fn(builder: &OperationBuilder) -> Result<TokenStream, Error> {
     let builder_ident = builder.identifier();
     let name = &builder.operation().full_operation_name()?;
     let arguments = builder.type_state().arguments_all_set(false);
@@ -139,7 +107,7 @@ fn generate_new_fn(
                 Self {
                     context,
                     builder: ::melior::ir::operation::OperationBuilder::new(#name, location),
-                    #(#phantoms),*
+                    _state: Default::default(),
                 }
             }
         }

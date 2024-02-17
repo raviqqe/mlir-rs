@@ -2,7 +2,7 @@ use crate::dialect::operation::{OperationField, Region};
 use proc_macro2::TokenStream;
 use quote::quote;
 
-pub fn generate_region_accessor(index: usize, region: &Region) -> TokenStream {
+pub fn generate_region_accessor(region: &Region, index: usize) -> TokenStream {
     let identifier = &region.singular_identifier();
     let return_type = &region.return_type();
     let body = if region.is_variadic() {

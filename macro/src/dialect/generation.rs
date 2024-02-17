@@ -31,21 +31,21 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
         .results()
         .enumerate()
         .map(|(index, result)| generate_result_accessor(result, index, operation.result_len()))
-        .collect::<Result<Vec<_>, _>>()?;
+        .collect::<Vec<_>>();
     let operand_accessors = operation
         .operands()
         .enumerate()
         .map(|(index, operand)| generate_operand_accessor(operand, index, operation.operand_len()))
-        .collect::<Result<Vec<_>, _>>()?;
+        .collect::<Vec<_>>();
     let region_accessors = operation
         .regions()
         .enumerate()
-        .map(|(index, region)| generate_region_accessor(index, region))
+        .map(|(index, region)| generate_region_accessor(region, index))
         .collect::<Vec<_>>();
     let successor_accessors = operation
         .successors()
         .enumerate()
-        .map(|(index, region)| generate_successor_accessor(index, region))
+        .map(|(index, region)| generate_successor_accessor(region, index))
         .collect::<Vec<_>>();
     let attribute_accessors = operation
         .attributes()

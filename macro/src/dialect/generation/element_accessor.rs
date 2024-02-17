@@ -16,7 +16,7 @@ pub fn generate_element_getter(
     let count = Ident::new(&format!("{singular_kind}_count"), Span::call_site());
     let name = field.name();
 
-    match field.variadic_kind() {
+    let body = match field.variadic_kind() {
         VariadicKind::Simple { unfixed_seen } => {
             if field.is_optional() {
                 // Optional element, and some singular elements.
@@ -109,6 +109,15 @@ pub fn generate_element_getter(
 
                 #get_elements
             }
+        }
+    };
+
+    let identifier = field.singular_identifier();
+    let return_type = field.return_type();
+
+    quote! {
+        pub fn #identifier(&self) -> #return_type {
+            #body
         }
     }
 }
