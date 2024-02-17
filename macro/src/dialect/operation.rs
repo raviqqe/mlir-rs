@@ -165,19 +165,15 @@ impl<'a> Operation<'a> {
     }
 
     fn collect_successors(definition: Record<'a>) -> Result<Vec<Successor>, Error> {
-        let successors_dag = definition.dag_value("successors")?;
-        let len = successors_dag.num_args();
-
-        successors_dag
+        definition
+            .dag_value("successors")?
             .args()
-            .enumerate()
-            .map(|(index, (name, value))| {
+            .map(|(name, value)| {
                 Successor::new(
                     name,
                     SuccessorConstraint::new(
                         Record::try_from(value).map_err(|error| error.set_location(definition))?,
                     ),
-                    SequenceInfo { index, len },
                 )
             })
             .collect()
