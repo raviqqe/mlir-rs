@@ -1,24 +1,20 @@
-use crate::dialect::{
-    error::Error,
-    operation::{Attribute, OperationField},
-    utility::sanitize_snake_case_identifier,
-};
+use crate::dialect::operation::{Attribute, OperationField};
 use proc_macro2::TokenStream;
 use quote::quote;
 
-pub fn generate_attribute_accessors(attribute: &Attribute) -> Result<TokenStream, Error> {
-    let getter = generate_getter(attribute)?;
-    let setter = generate_setter(attribute)?;
-    let remover = generate_remover(attribute)?;
+pub fn generate_attribute_accessors(attribute: &Attribute) -> TokenStream {
+    let getter = generate_getter(attribute);
+    let setter = generate_setter(attribute);
+    let remover = generate_remover(attribute);
 
-    Ok(quote! {
+    quote! {
         #getter
         #setter
         #remover
-    })
+    }
 }
 
-fn generate_getter(attribute: &Attribute) -> Result<TokenStream, Error> {
+fn generate_getter(attribute: &Attribute) -> TokenStream {
     let name = attribute.name();
 
     let identifier = attribute.singular_identifier();
@@ -30,15 +26,15 @@ fn generate_getter(attribute: &Attribute) -> Result<TokenStream, Error> {
         quote! { Ok(self.operation.attribute(#name)?.try_into()?) }
     };
 
-    Ok(quote! {
+    quote! {
         #[allow(clippy::needless_question_mark)]
         pub fn #identifier(&self) -> #return_type {
             #body
         }
-    })
+    }
 }
 
-fn generate_setter(attribute: &Attribute) -> Result<TokenStream, Error> {
+fn generate_setter(attribute: &Attribute) -> TokenStream {
     let name = attribute.name();
 
     let body = if attribute.is_unit() {
@@ -55,27 +51,27 @@ fn generate_setter(attribute: &Attribute) -> Result<TokenStream, Error> {
         }
     };
 
-    let ident = sanitize_snake_case_identifier(&format!("set_{}", attribute.name()))?;
+    let identifier = attribute.set_identifier();
     let r#type = attribute.parameter_type();
 
-    Ok(quote! {
-        pub fn #ident(&mut self, value: #r#type) {
+    quote! {
+        pub fn #identifier(&mut self, value: #r#type) {
             #body
         }
-    })
+    }
 }
 
-fn generate_remover(attribute: &Attribute) -> Result<Option<TokenStream>, Error> {
-    Ok(if attribute.is_unit() || attribute.is_optional() {
+fn generate_remover(attribute: &Attribute) -> Option<TokenStream> {
+    if attribute.is_unit() || attribute.is_optional() {
         let name = attribute.name();
-        let ident = sanitize_snake_case_identifier(&format!("remove_{}", attribute.name()))?;
+        let identifier = attribute.remove_identifier();
 
         Some(quote! {
-            pub fn #ident(&mut self) -> Result<(), ::melior::Error> {
+            pub fn #identifier(&mut self) -> Result<(), ::melior::Error> {
                 self.operation.remove_attribute(#name)
             }
         })
     } else {
         None
-    })
+    }
 }
