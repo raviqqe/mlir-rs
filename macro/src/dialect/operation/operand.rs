@@ -1,7 +1,7 @@
 use super::{OperationElement, OperationField, VariadicKind};
 use crate::dialect::{
     error::Error,
-    type::Type,
+    r#type::Type,
     utility::{generate_iterator_type, generate_result_type, sanitize_snake_case_identifier},
 };
 use proc_macro2::{Ident, TokenStream};
