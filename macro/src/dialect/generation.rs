@@ -78,8 +78,8 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
 
             #(#result_accessors)*
             #(#operand_accessors)*
-            #(#successor_accessors)*
             #(#region_accessors)*
+            #(#successor_accessors)*
             #(#attribute_accessors)*
         }
 
