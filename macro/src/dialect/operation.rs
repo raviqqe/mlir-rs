@@ -27,7 +27,7 @@ pub struct Operation<'a> {
     definition: Record<'a>,
     can_infer_type: bool,
     regions: Vec<Region<'a>>,
-    successors: Vec<OperationField<'a>>,
+    successors: Vec<Successor<'a>>,
     results: Vec<OperationField<'a>>,
     operands: Vec<OperationField<'a>>,
     attributes: Vec<Attribute<'a>>,
@@ -144,17 +144,18 @@ impl<'a> Operation<'a> {
     }
 
     pub fn general_fields(&self) -> impl Iterator<Item = &OperationField<'a>> + Clone {
-        self.results
-            .iter()
-            .chain(&self.operands)
-            .chain(&self.successors)
+        self.results.iter().chain(&self.operands)
     }
 
-    pub fn regions(&self) -> impl Iterator<Item = &Region<'a>> + Clone {
+    pub fn successors(&self) -> impl Iterator<Item = &Successor<'a>> {
+        self.successors.iter()
+    }
+
+    pub fn regions(&self) -> impl Iterator<Item = &Region<'a>> {
         self.regions.iter()
     }
 
-    pub fn attributes(&self) -> impl Iterator<Item = &Attribute<'a>> + Clone {
+    pub fn attributes(&self) -> impl Iterator<Item = &Attribute<'a>> {
         self.attributes.iter().chain(&self.derived_attributes)
     }
 
@@ -163,7 +164,7 @@ impl<'a> Operation<'a> {
             .filter(|field| (!field.is_result() || !self.can_infer_type) && !field.is_optional())
     }
 
-    fn collect_successors(definition: Record<'a>) -> Result<Vec<OperationField>, Error> {
+    fn collect_successors(definition: Record<'a>) -> Result<Vec<Successor>, Error> {
         let successors_dag = definition.dag_value("successors")?;
         let len = successors_dag.num_args();
 
@@ -171,12 +172,10 @@ impl<'a> Operation<'a> {
             .args()
             .enumerate()
             .map(|(index, (name, value))| {
-                OperationField::new_successor(
+                Successor::new(
                     name,
                     SuccessorConstraint::new(
-                        value
-                            .try_into()
-                            .map_err(|error: tblgen::Error| error.set_location(definition))?,
+                        Record::try_from(value).map_err(|error| error.set_location(definition))?,
                     ),
                     SequenceInfo { index, len },
                 )

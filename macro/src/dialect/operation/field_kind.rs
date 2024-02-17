@@ -1,6 +1,6 @@
 use super::{element_kind::ElementKind, SequenceInfo, VariadicKind};
 use crate::dialect::{
-    types::{SuccessorConstraint, TypeConstraint},
+    types::TypeConstraint,
     utility::{generate_iterator_type, generate_result_type},
 };
 use syn::{parse_quote, Type};
@@ -19,7 +19,6 @@ impl<'a> FieldKind<'a> {
     pub fn is_optional(&self) -> bool {
         match self {
             Self::Element { constraint, .. } => constraint.is_optional(),
-            Self::Successor { .. } => false,
         }
     }
 
@@ -40,14 +39,6 @@ impl<'a> FieldKind<'a> {
                     parse_quote! { &[#base_type] }
                 } else {
                     base_type
-                }
-            }
-            Self::Successor { constraint, .. } => {
-                let r#type: Type = parse_quote!(&::melior::ir::Block<'c>);
-                if constraint.is_variadic() {
-                    parse_quote!(&[#r#type])
-                } else {
-                    r#type
                 }
             }
         }
@@ -76,14 +67,6 @@ impl<'a> FieldKind<'a> {
                     generate_result_type(generate_iterator_type(base_type))
                 } else {
                     generate_iterator_type(base_type)
-                }
-            }
-            Self::Successor { constraint, .. } => {
-                let r#type: Type = parse_quote!(::melior::ir::BlockRef<'c, '_>);
-                if constraint.is_variadic() {
-                    generate_iterator_type(r#type)
-                } else {
-                    generate_result_type(r#type)
                 }
             }
         }

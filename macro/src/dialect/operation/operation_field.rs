@@ -1,8 +1,6 @@
 use super::{element_kind::ElementKind, field_kind::FieldKind, SequenceInfo, VariadicKind};
 use crate::dialect::{
-    error::Error,
-    types::{SuccessorConstraint, TypeConstraint},
-    utility::sanitize_snake_case_identifier,
+    error::Error, types::TypeConstraint, utility::sanitize_snake_case_identifier,
 };
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
@@ -73,13 +71,6 @@ impl OperationFieldLike for OperationField<'_> {
                     quote! { &[#name] }
                 }
             }
-            FieldKind::Successor { constraint, .. } => {
-                if constraint.is_variadic() {
-                    quote! { #name }
-                } else {
-                    quote! { &[#name] }
-                }
-            }
         }
     }
 }
@@ -90,25 +81,10 @@ impl<'a> OperationField<'a> {
             name,
             plural_identifier: match kind {
                 FieldKind::Element { kind, .. } => format_ident!("{}s", kind.as_str()),
-                FieldKind::Successor { .. } => format_ident!("successors"),
             },
             sanitized_name: sanitize_snake_case_identifier(name)?,
             kind,
         })
-    }
-
-    pub fn new_successor(
-        name: &'a str,
-        constraint: SuccessorConstraint<'a>,
-        sequence_info: SequenceInfo,
-    ) -> Result<Self, Error> {
-        Self::new(
-            name,
-            FieldKind::Successor {
-                constraint,
-                sequence_info,
-            },
-        )
     }
 
     pub fn new_element(

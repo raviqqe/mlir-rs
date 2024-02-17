@@ -129,20 +129,5 @@ fn generate_getter(field: &OperationField) -> TokenStream {
                 }
             }
         }
-        FieldKind::Successor {
-            constraint,
-            sequence_info: SequenceInfo { index, .. },
-        } => {
-            if constraint.is_variadic() {
-                // Only the last successor can be variadic
-                quote! {
-                    self.operation.successors().skip(#index)
-                }
-            } else {
-                quote! {
-                    self.operation.successor(#index)
-                }
-            }
-        }
     }
 }
