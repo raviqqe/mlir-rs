@@ -56,24 +56,25 @@ unsafe extern "C" fn callback_destruct<'a, T: RunExternalPass<'a>>(pass: *mut T)
 }
 
 unsafe extern "C" fn callback_initialize<'a, T: RunExternalPass<'a>>(
-    ctx: MlirContext,
+    context: MlirContext,
     pass: *mut T,
 ) -> MlirLogicalResult {
     pass.as_mut()
         .expect("pass should be valid when called")
-        .initialize(ContextRef::from_raw(ctx));
+        .initialize(ContextRef::from_raw(context));
+
     MlirLogicalResult { value: 1 }
 }
 
 unsafe extern "C" fn callback_run<'a, T: RunExternalPass<'a>>(
-    op: MlirOperation,
+    operation: MlirOperation,
     mlir_pass: MlirExternalPass,
     pass: *mut T,
 ) {
     pass.as_mut()
         .expect("pass should be valid when called")
         .run(
-            OperationRef::from_raw(op),
+            OperationRef::from_raw(operation),
             ExternalPass::from_raw(mlir_pass),
         )
 }

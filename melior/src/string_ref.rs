@@ -7,10 +7,6 @@ use std::{
 };
 
 /// A string reference.
-// https://mlir.llvm.org/docs/CAPI/#stringref
-//
-// TODO The documentation says string refs do not have to be null-terminated.
-// But it looks like some functions do not handle strings not null-terminated?
 #[derive(Clone, Copy, Debug)]
 pub struct StringRef<'a> {
     raw: MlirStringRef,

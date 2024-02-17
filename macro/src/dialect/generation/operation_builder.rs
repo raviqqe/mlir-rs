@@ -185,7 +185,7 @@ pub fn generate_default_constructor(builder: &OperationBuilder) -> Result<TokenS
         })
         .collect::<Vec<_>>();
 
-    let doc = format!("Creates a new {}", builder.operation().summary()?);
+    let doc = format!("Creates a {}", builder.operation().summary()?);
 
     Ok(quote! {
         #[allow(clippy::too_many_arguments)]
