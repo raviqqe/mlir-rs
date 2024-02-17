@@ -5,13 +5,8 @@ use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 
 pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStream, Error> {
-    let state_types = builder
-        .type_state()
-        .parameters()
-        .map(|r#type| quote! { ::std::marker::PhantomData<#r#type> });
-
+    let state_types = builder.type_state().parameters();
     let field_fns = generate_field_fns(builder);
-
     let new_fn = generate_new_fn(builder)?;
     let build_fn = generate_build_fn(builder)?;
 
@@ -24,7 +19,7 @@ pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStr
         pub struct #builder_identifier<'c, #(#type_arguments),*> {
             builder: ::melior::ir::operation::OperationBuilder<'c>,
             context: &'c ::melior::Context,
-            _state: (#(#state_types),*)
+            _state: ::std::marker::PhantomData<(#(#state_types),*)>,
         }
 
         #new_fn
