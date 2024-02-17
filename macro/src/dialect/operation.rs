@@ -17,7 +17,7 @@ use super::utility::sanitize_documentation;
 use crate::dialect::{
     error::{Error, OdsError},
     r#trait::Trait,
-    types::{RegionConstraint, SuccessorConstraint, TypeConstraint},
+    types::TypeConstraint,
 };
 pub use operation_field::OperationField;
 use tblgen::{error::WithLocation, record::Record, TypedInit};

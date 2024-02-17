@@ -1,32 +1,6 @@
 use tblgen::record::Record;
 
 #[derive(Debug, Clone, Copy)]
-pub struct RegionConstraint<'a>(Record<'a>);
-
-impl<'a> RegionConstraint<'a> {
-    pub fn new(record: Record<'a>) -> Self {
-        Self(record)
-    }
-
-    pub fn is_variadic(&self) -> bool {
-        self.0.subclass_of("VariadicRegion")
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct SuccessorConstraint<'a>(Record<'a>);
-
-impl<'a> SuccessorConstraint<'a> {
-    pub fn new(record: Record<'a>) -> Self {
-        Self(record)
-    }
-
-    pub fn is_variadic(&self) -> bool {
-        self.0.subclass_of("VariadicSuccessor")
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
 pub struct TypeConstraint<'a>(Record<'a>);
 
 impl<'a> TypeConstraint<'a> {
