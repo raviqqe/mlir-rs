@@ -25,6 +25,7 @@ use tblgen::{error::WithLocation, record::Record, TypedInit};
 #[derive(Debug)]
 pub struct Operation<'a> {
     definition: Record<'a>,
+    name: String,
     can_infer_type: bool,
     regions: Vec<Region<'a>>,
     successors: Vec<Successor<'a>>,
@@ -48,6 +49,7 @@ impl<'a> Operation<'a> {
         )?;
 
         Ok(Self {
+            name: Self::build_name(definition)?,
             successors: Self::collect_successors(definition)?,
             operands: Self::collect_operands(
                 &arguments,
@@ -81,15 +83,17 @@ impl<'a> Operation<'a> {
         Ok(self.dialect()?.name()?)
     }
 
-    pub fn class_name(&self) -> Result<&str, Error> {
-        let name = self.definition.name()?;
+    fn build_name(definition: Record) -> Result<String, Error> {
+        let name = definition.name()?;
 
         Ok(if let Some((_, name)) = name.split_once('_') {
             name
         } else {
             name
         }
-        .trim_end_matches("Op"))
+        .trim_end_matches("Op")
+        .to_owned()
+            + "Operation")
     }
 
     pub fn short_name(&self) -> Result<&str, Error> {
@@ -109,11 +113,11 @@ impl<'a> Operation<'a> {
 
     pub fn summary(&self) -> Result<String, Error> {
         let short_name = self.short_name()?;
-        let class_name = self.class_name()?;
+        let name = &self.name;
         let summary = self.definition.str_value("summary")?;
 
         Ok([
-            format!("[`{short_name}`]({class_name}) operation."),
+            format!("[`{short_name}`]({name}) operation."),
             if summary.is_empty() {
                 Default::default()
             } else {
