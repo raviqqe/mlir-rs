@@ -6,7 +6,6 @@ mod operation_element;
 mod operation_field;
 mod region;
 mod result;
-mod sequence_info;
 mod successor;
 mod variadic_kind;
 
