@@ -216,7 +216,7 @@ mod tests {
             let i64_type = IntegerType::new(&context, 64);
 
             block.append_operation(
-                llvm::AllocaOpBuilder::new(&context, location)
+                llvm::AllocaOperationBuilder::new(&context, location)
                     .alignment(IntegerAttribute::new(8, i64_type.into()))
                     .elem_type(TypeAttribute::new(i64_type.into()))
                     .array_size(alloca_size)
