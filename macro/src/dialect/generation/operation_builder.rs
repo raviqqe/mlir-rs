@@ -107,18 +107,18 @@ fn generate_field_fns(
 }
 
 fn generate_build_fn(builder: &OperationBuilder) -> Result<TokenStream, Error> {
-    let builder_ident = builder.identifier();
+    let builder_identifier = builder.identifier();
     let arguments = builder.type_state().arguments_all_set(true);
-    let class_name = format_ident!("{}", &builder.operation().class_name()?);
-    let error = format!("should be a valid {class_name}");
+    let name = format_ident!("{}", &builder.operation().name());
+    let error = format!("should be a valid {name}");
     let maybe_infer = builder
         .operation()
         .can_infer_type()
         .then_some(quote! { .enable_result_type_inference() });
 
     Ok(quote! {
-        impl<'c> #builder_ident<'c, #(#arguments),*> {
-            pub fn build(self) -> #class_name<'c> {
+        impl<'c> #builder_identifier<'c, #(#arguments),*> {
+            pub fn build(self) -> #name<'c> {
                 self.builder #maybe_infer.build().expect("valid operation").try_into().expect(#error)
             }
         }
@@ -162,7 +162,7 @@ pub fn generate_operation_builder_fn(builder: &OperationBuilder) -> TokenStream 
 }
 
 pub fn generate_default_constructor(builder: &OperationBuilder) -> Result<TokenStream, Error> {
-    let class_name = format_ident!("{}", &builder.operation().class_name()?);
+    let identifier = format_ident!("{}", &builder.operation().name());
     let name = sanitize_snake_case_identifier(builder.operation().operation_name()?)?;
     let arguments = builder
         .operation()
@@ -190,8 +190,8 @@ pub fn generate_default_constructor(builder: &OperationBuilder) -> Result<TokenS
     Ok(quote! {
         #[allow(clippy::too_many_arguments)]
         #[doc = #doc]
-        pub fn #name<'c>(context: &'c ::melior::Context, #(#arguments),*) -> #class_name<'c> {
-            #class_name::builder(context, location)#(#builder_calls)*.build()
+        pub fn #name<'c>(context: &'c ::melior::Context, #(#arguments),*) -> #identifier<'c> {
+            #identifier::builder(context, location)#(#builder_calls)*.build()
         }
     })
 }

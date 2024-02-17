@@ -24,8 +24,8 @@ use quote::{format_ident, quote};
 pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
     let summary = operation.summary()?;
     let description = operation.description()?;
-    let class_name = format_ident!("{}", operation.class_name()?);
-    let name = &operation.full_name()?;
+    let identifier = format_ident!("{}", operation.name());
+    let operation_name = operation.full_operation_name()?;
 
     let result_accessors = operation
         .results()
@@ -52,7 +52,7 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
         .map(generate_attribute_accessors)
         .collect::<Vec<_>>();
 
-    let builder = OperationBuilder::new(operation)?;
+    let builder = OperationBuilder::new(operation);
     let builder_tokens = generate_operation_builder(&builder)?;
     let builder_fn = generate_operation_builder_fn(&builder);
     let default_constructor = generate_default_constructor(&builder)?;
@@ -61,14 +61,14 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
         #[doc = #summary]
         #[doc = "\n\n"]
         #[doc = #description]
-        pub struct #class_name<'c> {
+        pub struct #identifier<'c> {
             operation: ::melior::ir::operation::Operation<'c>,
         }
 
-        impl<'c> #class_name<'c> {
+        impl<'c> #identifier<'c> {
             /// Returns a name.
             pub fn name() -> &'static str {
-                #name
+                #operation_name
             }
 
             /// Returns a generic operation.
@@ -89,7 +89,7 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
 
         #default_constructor
 
-        impl<'c> TryFrom<::melior::ir::operation::Operation<'c>> for #class_name<'c> {
+        impl<'c> TryFrom<::melior::ir::operation::Operation<'c>> for #identifier<'c> {
             type Error = ::melior::Error;
 
             fn try_from(
@@ -100,8 +100,8 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
             }
         }
 
-        impl<'c> From<#class_name<'c>> for ::melior::ir::operation::Operation<'c> {
-            fn from(operation: #class_name<'c>) -> ::melior::ir::operation::Operation<'c> {
+        impl<'c> From<#identifier<'c>> for ::melior::ir::operation::Operation<'c> {
+            fn from(operation: #identifier<'c>) -> Self {
                 operation.operation
             }
         }

@@ -71,18 +71,6 @@ impl<'a> Operation<'a> {
         })
     }
 
-    pub fn can_infer_type(&self) -> bool {
-        self.can_infer_type
-    }
-
-    fn dialect(&self) -> Result<Record, Error> {
-        Ok(self.definition.def_value("opDialect")?)
-    }
-
-    pub fn dialect_name(&self) -> Result<&str, Error> {
-        Ok(self.dialect()?.name()?)
-    }
-
     fn build_name(definition: Record) -> Result<String, Error> {
         let name = definition.name()?;
 
@@ -94,6 +82,22 @@ impl<'a> Operation<'a> {
         .trim_end_matches("Op")
         .to_owned()
             + "Operation")
+    }
+
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn can_infer_type(&self) -> bool {
+        self.can_infer_type
+    }
+
+    fn dialect(&self) -> Result<Record, Error> {
+        Ok(self.definition.def_value("opDialect")?)
+    }
+
+    pub fn dialect_name(&self) -> Result<&str, Error> {
+        Ok(self.dialect()?.name()?)
     }
 
     pub fn operation_name(&self) -> Result<&str, Error> {
