@@ -17,7 +17,7 @@ fn simple() {
 
     let r#type = Type::parse(&context, "i32").unwrap();
     let block = Block::new(&[(r#type, location), (r#type, location)]);
-    let op = operand_test::simple(
+    let operation = operand_test::simple(
         &context,
         r#type,
         block.argument(0).unwrap().into(),
@@ -25,9 +25,9 @@ fn simple() {
         location,
     );
 
-    assert_eq!(op.lhs().unwrap(), block.argument(0).unwrap().into());
-    assert_eq!(op.rhs().unwrap(), block.argument(1).unwrap().into());
-    assert_eq!(op.operation().operand_count(), 2);
+    assert_eq!(operation.lhs().unwrap(), block.argument(0).unwrap().into());
+    assert_eq!(operation.rhs().unwrap(), block.argument(1).unwrap().into());
+    assert_eq!(operation.operation().operand_count(), 2);
 }
 
 #[test]
@@ -39,7 +39,7 @@ fn variadic_after_single() {
 
     let r#type = Type::parse(&context, "i32").unwrap();
     let block = Block::new(&[(r#type, location), (r#type, location), (r#type, location)]);
-    let op = operand_test::variadic(
+    let operation = operand_test::variadic(
         &context,
         r#type,
         block.argument(0).unwrap().into(),
@@ -50,9 +50,18 @@ fn variadic_after_single() {
         location,
     );
 
-    assert_eq!(op.first().unwrap(), block.argument(0).unwrap().into());
-    assert_eq!(op.others().next(), Some(block.argument(2).unwrap().into()));
-    assert_eq!(op.others().nth(1), Some(block.argument(1).unwrap().into()));
-    assert_eq!(op.operation().operand_count(), 3);
-    assert_eq!(op.others().count(), 2);
+    assert_eq!(
+        operation.first().unwrap(),
+        block.argument(0).unwrap().into()
+    );
+    assert_eq!(
+        operation.others().next(),
+        Some(block.argument(2).unwrap().into())
+    );
+    assert_eq!(
+        operation.others().nth(1),
+        Some(block.argument(1).unwrap().into())
+    );
+    assert_eq!(operation.operation().operand_count(), 3);
+    assert_eq!(operation.others().count(), 2);
 }
