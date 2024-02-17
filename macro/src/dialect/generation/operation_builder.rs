@@ -3,7 +3,6 @@ use crate::dialect::{
 };
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
-use syn::Ident;
 
 pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStream, Error> {
     let field_names = builder
@@ -28,7 +27,7 @@ pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStr
         .map(|name| quote! { #name: ::std::marker::PhantomData })
         .collect::<Vec<_>>();
 
-    let builder_fns = generate_field_fns(builder, &field_names, phantom_arguments.as_slice());
+    let builder_fns = generate_field_fns(builder, phantom_arguments.as_slice());
 
     let new_fn = generate_new_fn(builder, phantom_arguments.as_slice())?;
     let build_fn = generate_build_fn(builder)?;
@@ -54,11 +53,7 @@ pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStr
 }
 
 // TODO Split this function for different kinds of fields.
-fn generate_field_fns(
-    builder: &OperationBuilder,
-    field_names: &[Ident],
-    phantoms: &[TokenStream],
-) -> Vec<TokenStream> {
+fn generate_field_fns(builder: &OperationBuilder, phantoms: &[TokenStream]) -> Vec<TokenStream> {
     builder.operation().fields().map(move |field| {
         let builder_identifier = builder.identifier();
         let identifier = field.singular_identifier();
@@ -91,12 +86,10 @@ fn generate_field_fns(
 
             quote! {
                 impl<'c, #(#parameters),*> #builder_identifier<'c, #(#arguments_unset),*> {
-                    pub fn #identifier(mut self, #argument) -> #builder_identifier<'c, #(#arguments_set),*> {
-                        self.builder = self.builder.#add(#add_arguments);
-                        let Self { context, mut builder, #(#field_names),* } = self;
+                    pub fn #identifier(self, #argument) -> #builder_identifier<'c, #(#arguments_set),*> {
                         #builder_identifier {
-                            context,
-                            builder,
+                            context: self.context,
+                            builder: self.builder.#add(#add_arguments),
                             #(#phantoms),*
                         }
                     }
