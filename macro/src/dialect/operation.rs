@@ -291,8 +291,8 @@ impl<'a> Operation<'a> {
     fn collect_elements<T>(
         elements: &[(&'a str, TypeConstraint<'a>)],
         create: impl Fn(&'a str, TypeConstraint<'a>, SequenceInfo, VariadicKind) -> Result<T, Error>,
-        attribute_sized: bool,
         same_size: bool,
+        attribute_sized: bool,
     ) -> Result<(Vec<T>, usize), Error> {
         let unfixed_count = elements
             .iter()
