@@ -16,7 +16,7 @@ use crate::{
     string_ref::StringRef,
 };
 use mlir_sys::{mlirDialectEqual, mlirDialectGetContext, mlirDialectGetNamespace, MlirDialect};
-use std::marker::PhantomData;
+use std::{marker::PhantomData, str::Utf8Error};
 
 #[cfg(feature = "ods-dialects")]
 pub mod ods;
@@ -35,9 +35,8 @@ impl<'c> Dialect<'c> {
     }
 
     /// Gets a namespace.
-    // TODO Return &str.
-    pub fn namespace(&self) -> StringRef {
-        unsafe { StringRef::from_raw(mlirDialectGetNamespace(self.raw)) }
+    pub fn namespace(&self) -> Result<&str, Utf8Error> {
+        unsafe { StringRef::from_raw(mlirDialectGetNamespace(self.raw)) }.as_str()
     }
 
     /// Creates a dialect from a raw object.
@@ -64,6 +63,19 @@ impl<'c> Eq for Dialect<'c> {}
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn namespace() {
+        let context = Context::new();
+
+        assert_eq!(
+            DialectHandle::llvm()
+                .load_dialect(&context)
+                .namespace()
+                .unwrap(),
+            "llvm"
+        );
+    }
 
     #[test]
     fn equal() {
