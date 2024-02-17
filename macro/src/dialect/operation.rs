@@ -11,7 +11,7 @@ mod variadic_kind;
 
 pub use self::{
     attribute::Attribute, builder::OperationBuilder, operation_element::OperationElement,
-    operation_field::OperationField, operation_result::OperationResult, region::Region,
+    operation_field::OperationField, region::Region, result::OperationResult,
     sequence_info::SequenceInfo, successor::Successor, variadic_kind::VariadicKind,
 };
 use super::utility::sanitize_documentation;
