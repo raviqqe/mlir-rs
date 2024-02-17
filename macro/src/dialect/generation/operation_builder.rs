@@ -53,6 +53,7 @@ pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStr
     })
 }
 
+// TODO Split this function for different kinds of fields.
 fn generate_field_fns(
     builder: &OperationBuilder,
     field_names: &[Ident],
