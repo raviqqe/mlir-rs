@@ -24,7 +24,7 @@ pub fn generate_operand_accessor(
 
     Ok(quote! {
         #[allow(clippy::needless_question_mark)]
-        pub fn #ident(&self, context: &'c ::melior::Context) -> #return_type {
+        pub fn #ident(&self) -> #return_type {
             #body
         }
     })
