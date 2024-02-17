@@ -10,13 +10,13 @@ pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStr
     let new_fn = generate_new_fn(builder)?;
     let build_fn = generate_build_fn(builder)?;
 
-    let builder_identifier = builder.identifier();
+    let identifier = builder.identifier();
     let doc = format!("A builder for {}", builder.operation().summary()?);
     let type_arguments = builder.type_state().parameters();
 
     Ok(quote! {
         #[doc = #doc]
-        pub struct #builder_identifier<'c, #(#type_arguments),*> {
+        pub struct #identifier<'c, #(#type_arguments),*> {
             builder: ::melior::ir::operation::OperationBuilder<'c>,
             context: &'c ::melior::Context,
             _state: ::std::marker::PhantomData<(#(#state_types),*)>,
