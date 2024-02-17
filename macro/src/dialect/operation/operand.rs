@@ -1,7 +1,7 @@
 use super::{OperationElement, OperationField, VariadicKind};
 use crate::dialect::{
     error::Error,
-    r#type::Type,
+    r#type::Type as ElementType,
     utility::{generate_iterator_type, generate_result_type, sanitize_snake_case_identifier},
 };
 use proc_macro2::{Ident, TokenStream};
@@ -12,14 +12,14 @@ use syn::{parse_quote, Type};
 pub struct Operand<'a> {
     name: &'a str,
     singular_identifier: Ident,
-    r#type: Type<'a>,
+    r#type: ElementType,
     variadic_kind: VariadicKind,
 }
 
 impl<'a> Operand<'a> {
     pub fn new(
         name: &'a str,
-        r#type: Type<'a>,
+        r#type: ElementType,
         variadic_kind: VariadicKind,
     ) -> Result<Self, Error> {
         Ok(Self {

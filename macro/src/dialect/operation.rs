@@ -287,8 +287,8 @@ impl<'a> Operation<'a> {
     }
 
     fn collect_elements<T>(
-        elements: &[(&'a str, Type<'a>)],
-        create: impl Fn(&'a str, Type<'a>, VariadicKind) -> Result<T, Error>,
+        elements: &[(&'a str, Type)],
+        create: impl Fn(&'a str, Type, VariadicKind) -> Result<T, Error>,
         same_size: bool,
         attribute_sized: bool,
     ) -> Result<(Vec<T>, usize), Error> {

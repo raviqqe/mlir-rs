@@ -1,14 +1,14 @@
 use tblgen::record::Record;
 
 #[derive(Debug, Clone, Copy)]
-pub struct Type<'a> {
+pub struct Type {
     optional: bool,
     variadic: bool,
     variadic_of_variadic: bool,
 }
 
-impl<'a> Type<'a> {
-    pub fn new(record: Record<'a>) -> Self {
+impl Type {
+    pub fn new(record: Record) -> Self {
         Self {
             optional: record.subclass_of("Optional"),
             variadic: record.subclass_of("Variadic"),

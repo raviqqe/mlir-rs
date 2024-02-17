@@ -3,7 +3,7 @@ mod generation;
 mod input;
 mod operation;
 mod r#trait;
-mod types;
+mod r#type;
 mod utility;
 
 use self::{
