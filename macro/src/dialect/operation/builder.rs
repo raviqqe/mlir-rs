@@ -2,7 +2,7 @@ mod type_state_item;
 mod type_state_list;
 
 use self::{type_state_item::TypeStateItem, type_state_list::TypeStateList};
-use super::{super::error::Error, Operation};
+use super::Operation;
 use quote::format_ident;
 use syn::Ident;
 
