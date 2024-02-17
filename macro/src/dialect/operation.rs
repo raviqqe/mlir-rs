@@ -13,7 +13,7 @@ mod variadic_kind;
 pub use self::{
     attribute::Attribute, builder::OperationBuilder, operand::Operand,
     operation_element::OperationElement, region::Region, result::OperationResult,
-    sequence_info::SequenceInfo, successor::Successor, variadic_kind::VariadicKind,
+    successor::Successor, variadic_kind::VariadicKind,
 };
 use super::utility::sanitize_documentation;
 use crate::dialect::{
@@ -135,6 +135,7 @@ impl<'a> Operation<'a> {
         fn convert(field: &impl OperationField) -> &dyn OperationField {
             field
         }
+
         self.results
             .iter()
             .map(convert)
@@ -265,9 +266,7 @@ impl<'a> Operation<'a> {
                 .into_iter()
                 .map(|(name, constraint)| (name, TypeConstraint::new(constraint)))
                 .collect::<Vec<_>>(),
-            |name, constraint, _sequence_info, variadic_kind| {
-                OperationResult::new(name, constraint, variadic_kind)
-            },
+            |name, constraint, variadic_kind| OperationResult::new(name, constraint, variadic_kind),
             same_size,
             attribute_sized,
         )
@@ -284,9 +283,7 @@ impl<'a> Operation<'a> {
                 .filter(|(_, definition)| definition.subclass_of("TypeConstraint"))
                 .map(|(name, definition)| (*name, TypeConstraint::new(*definition)))
                 .collect::<Vec<_>>(),
-            |name, constraint, sequence_info, variadic_kind| {
-                Operand::new(name, constraint, sequence_info, variadic_kind)
-            },
+            |name, constraint, variadic_kind| Operand::new(name, constraint, variadic_kind),
             same_size,
             attribute_sized,
         )?
@@ -295,7 +292,7 @@ impl<'a> Operation<'a> {
 
     fn collect_elements<T>(
         elements: &[(&'a str, TypeConstraint<'a>)],
-        create: impl Fn(&'a str, TypeConstraint<'a>, SequenceInfo, VariadicKind) -> Result<T, Error>,
+        create: impl Fn(&'a str, TypeConstraint<'a>, VariadicKind) -> Result<T, Error>,
         same_size: bool,
         attribute_sized: bool,
     ) -> Result<(Vec<T>, usize), Error> {
@@ -306,16 +303,8 @@ impl<'a> Operation<'a> {
         let mut variadic_kind = VariadicKind::new(unfixed_count, same_size, attribute_sized);
         let mut fields = vec![];
 
-        for (index, (name, constraint)) in elements.iter().enumerate() {
-            fields.push(create(
-                name,
-                *constraint,
-                SequenceInfo {
-                    index,
-                    len: elements.len(),
-                },
-                variadic_kind.clone(),
-            )?);
+        for (name, constraint) in elements {
+            fields.push(create(name, *constraint, variadic_kind.clone())?);
 
             match &mut variadic_kind {
                 VariadicKind::Simple { unfixed_seen } => {

@@ -1,4 +1,4 @@
-use super::{SequenceInfo, VariadicKind};
+use super::VariadicKind;
 use crate::dialect::{
     types::TypeConstraint,
     utility::{generate_iterator_type, generate_result_type},
@@ -9,7 +9,6 @@ use syn::{parse_quote, Type};
 pub enum FieldKind<'a> {
     Element {
         constraint: TypeConstraint<'a>,
-        sequence_info: SequenceInfo,
         variadic_kind: VariadicKind,
     },
 }

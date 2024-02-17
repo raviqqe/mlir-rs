@@ -1,4 +1,4 @@
-use super::{field_kind::FieldKind, OperationElement, OperationField, SequenceInfo, VariadicKind};
+use super::{field_kind::FieldKind, OperationElement, OperationField, VariadicKind};
 use crate::dialect::{
     error::Error, types::TypeConstraint, utility::sanitize_snake_case_identifier,
 };
@@ -18,7 +18,6 @@ impl<'a> Operand<'a> {
     pub fn new(
         name: &'a str,
         constraint: TypeConstraint<'a>,
-        sequence_info: SequenceInfo,
         variadic_kind: VariadicKind,
     ) -> Result<Self, Error> {
         Ok(Self {
@@ -27,7 +26,6 @@ impl<'a> Operand<'a> {
             sanitized_name: sanitize_snake_case_identifier(name)?,
             kind: FieldKind::Element {
                 constraint,
-                sequence_info,
                 variadic_kind,
             },
         })
