@@ -88,7 +88,8 @@ impl<'a> Operation<'a> {
             name
         } else {
             name
-        })
+        }
+        .trim_end_matches("Op"))
     }
 
     pub fn short_name(&self) -> Result<&str, Error> {
