@@ -121,11 +121,11 @@ impl<'a> Operation<'a> {
         let summary = self.definition.str_value("summary")?;
 
         Ok([
-            format!("[`{short_name}`]({name}) operation."),
+            format!("A(n) [`{short_name}`]({name}) operation."),
             if summary.is_empty() {
                 Default::default()
             } else {
-                summary[0..1].to_uppercase() + &summary[1..] + "."
+                "A(n) ".to_owned() + summary + "."
             },
         ]
         .join(" "))
