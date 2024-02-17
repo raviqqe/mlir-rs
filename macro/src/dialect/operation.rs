@@ -96,13 +96,13 @@ impl<'a> Operation<'a> {
             + "Operation")
     }
 
-    pub fn short_name(&self) -> Result<&str, Error> {
+    pub fn operation_name(&self) -> Result<&str, Error> {
         Ok(self.definition.str_value("opName")?)
     }
 
-    pub fn full_name(&self) -> Result<String, Error> {
+    pub fn full_operation_name(&self) -> Result<String, Error> {
         let dialect_name = self.dialect()?.string_value("name")?;
-        let short_name = self.short_name()?;
+        let short_name = self.operation_name()?;
 
         Ok(if dialect_name.is_empty() {
             short_name.into()
@@ -112,7 +112,7 @@ impl<'a> Operation<'a> {
     }
 
     pub fn summary(&self) -> Result<String, Error> {
-        let short_name = self.short_name()?;
+        let short_name = self.operation_name()?;
         let name = &self.name;
         let summary = self.definition.str_value("summary")?;
 

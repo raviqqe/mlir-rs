@@ -130,7 +130,7 @@ fn generate_new_fn(
     phantoms: &[TokenStream],
 ) -> Result<TokenStream, Error> {
     let builder_ident = builder.identifier();
-    let name = &builder.operation().full_name()?;
+    let name = &builder.operation().full_operation_name()?;
     let arguments = builder.type_state().arguments_all_set(false);
 
     Ok(quote! {
@@ -138,7 +138,7 @@ fn generate_new_fn(
             pub fn new(context: &'c ::melior::Context, location: ::melior::ir::Location<'c>) -> Self {
                 Self {
                     context,
-                    builder: ::melior::ir::operation::OperationBuilder::new( #name, location),
+                    builder: ::melior::ir::operation::OperationBuilder::new(#name, location),
                     #(#phantoms),*
                 }
             }
@@ -163,7 +163,7 @@ pub fn generate_operation_builder_fn(builder: &OperationBuilder) -> TokenStream 
 
 pub fn generate_default_constructor(builder: &OperationBuilder) -> Result<TokenStream, Error> {
     let class_name = format_ident!("{}", &builder.operation().class_name()?);
-    let name = sanitize_snake_case_identifier(builder.operation().short_name()?)?;
+    let name = sanitize_snake_case_identifier(builder.operation().operation_name()?)?;
     let arguments = builder
         .operation()
         .required_fields()
