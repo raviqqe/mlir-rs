@@ -134,11 +134,10 @@ impl<'a> Operation<'a> {
         fn convert(field: &impl OperationFieldLike) -> &dyn OperationFieldLike {
             field
         }
-
-        self.operands
+        self.results
             .iter()
             .map(convert)
-            .chain(self.results.iter().map(convert))
+            .chain(self.operands.iter().map(convert))
             .chain(self.regions.iter().map(convert))
             .chain(self.successors.iter().map(convert))
             .chain(self.attributes().map(convert))

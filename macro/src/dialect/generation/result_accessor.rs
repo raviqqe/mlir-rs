@@ -1,11 +1,9 @@
 use crate::dialect::{
     error::Error,
-    operation::{
-        FieldKind, OperationField, OperationFieldLike, OperationResult, SequenceInfo, VariadicKind,
-    },
+    operation::{OperationFieldLike, OperationResult, VariadicKind},
 };
 use proc_macro2::{Span, TokenStream};
-use quote::{format_ident, quote};
+use quote::quote;
 use syn::Ident;
 
 pub fn generate_result_accessor(

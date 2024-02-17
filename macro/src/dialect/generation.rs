@@ -75,6 +75,7 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
             #builder_fn
 
             #(#field_accessors)*
+            #(#result_accessors)*
             #(#successor_accessors)*
             #(#region_accessors)*
             #(#attribute_accessors)*

@@ -3,7 +3,7 @@ use crate::dialect::{
     operation::{FieldKind, OperationField, SequenceInfo, VariadicKind},
 };
 use proc_macro2::{Span, TokenStream};
-use quote::{format_ident, quote};
+use quote::quote;
 use syn::Ident;
 
 pub fn generate_accessor(field: &OperationField) -> Result<TokenStream, Error> {
