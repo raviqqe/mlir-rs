@@ -66,11 +66,13 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
         }
 
         impl<'c> #class_name<'c> {
+            /// Returns a name.
             pub fn name() -> &'static str {
                 #name
             }
 
-            pub fn operation(&self) -> &::melior::ir::operation::Operation<'c> {
+            /// Converts itself into a generic operation.
+            pub fn as_operation(&self) -> &::melior::ir::operation::Operation<'c> {
                 &self.operation
             }
 
