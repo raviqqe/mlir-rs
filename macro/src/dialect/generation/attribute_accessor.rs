@@ -55,7 +55,7 @@ fn generate_setter(attribute: &Attribute) -> TokenStream {
     let r#type = attribute.parameter_type();
 
     quote! {
-        pub fn #identifier(&mut self, context: &'c ::melior::Context, value: #r#type) {
+        pub fn #identifier(&mut self, value: #r#type) {
             #body
         }
     }
@@ -67,7 +67,7 @@ fn generate_remover(attribute: &Attribute) -> Option<TokenStream> {
         let identifier = attribute.remove_identifier();
 
         Some(quote! {
-            pub fn #identifier(&mut self, context: &'c ::melior::Context) -> Result<(), ::melior::Error> {
+            pub fn #identifier(&mut self) -> Result<(), ::melior::Error> {
                 self.operation.remove_attribute(#name)
             }
         })
