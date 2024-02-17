@@ -11,16 +11,10 @@ pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStr
         .map(sanitize_snake_case_identifier)
         .collect::<Result<Vec<_>, _>>()?;
 
-    let phantom_fields =
-        builder
-            .type_state()
-            .parameters()
-            .zip(&field_names)
-            .map(|(r#type, name)| {
-                quote! {
-                    #name: ::std::marker::PhantomData<#r#type>
-                }
-            });
+    let phantom_types = builder
+        .type_state()
+        .parameters()
+        .map(|r#type| quote! { ::std::marker::PhantomData<#r#type> });
 
     let phantom_arguments = field_names
         .iter()
@@ -41,7 +35,7 @@ pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStr
         pub struct #builder_identifier<'c, #(#type_arguments),*> {
             builder: ::melior::ir::operation::OperationBuilder<'c>,
             context: &'c ::melior::Context,
-            #(#phantom_fields),*
+            state: (#(#phantom_types),*)
         }
 
         #new_fn
