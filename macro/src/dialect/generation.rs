@@ -37,15 +37,15 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
         .enumerate()
         .map(|(index, operand)| generate_operand_accessor(operand, index, operation.operand_len()))
         .collect::<Result<Vec<_>, _>>()?;
-    let successor_accessors = operation
-        .successors()
-        .enumerate()
-        .map(|(index, region)| generate_successor_accessor(index, region))
-        .collect::<Vec<_>>();
     let region_accessors = operation
         .regions()
         .enumerate()
         .map(|(index, region)| generate_region_accessor(index, region))
+        .collect::<Vec<_>>();
+    let successor_accessors = operation
+        .successors()
+        .enumerate()
+        .map(|(index, region)| generate_successor_accessor(index, region))
         .collect::<Vec<_>>();
     let attribute_accessors = operation
         .attributes()
