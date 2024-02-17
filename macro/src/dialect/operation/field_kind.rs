@@ -5,7 +5,7 @@ use crate::dialect::{
 };
 use syn::{parse_quote, Type};
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub enum FieldKind<'a> {
     Element {
         kind: ElementKind,
@@ -27,7 +27,7 @@ impl<'a> FieldKind<'a> {
             Self::Element {
                 kind, constraint, ..
             } => {
-                let base_type: Type = match kind {
+                let r#type: Type = match kind {
                     ElementKind::Operand => {
                         parse_quote!(::melior::ir::Value<'c, '_>)
                     }
@@ -36,9 +36,9 @@ impl<'a> FieldKind<'a> {
                     }
                 };
                 if constraint.is_variadic() {
-                    parse_quote! { &[#base_type] }
+                    parse_quote! { &[#r#type] }
                 } else {
-                    base_type
+                    r#type
                 }
             }
         }
@@ -52,7 +52,7 @@ impl<'a> FieldKind<'a> {
                 variadic_kind,
                 ..
             } => {
-                let base_type: Type = match kind {
+                let r#type: Type = match kind {
                     ElementKind::Operand => {
                         parse_quote!(::melior::ir::Value<'c, '_>)
                     }
@@ -62,11 +62,11 @@ impl<'a> FieldKind<'a> {
                 };
 
                 if !constraint.is_variadic() {
-                    generate_result_type(base_type)
+                    generate_result_type(r#type)
                 } else if variadic_kind == &VariadicKind::AttributeSized {
-                    generate_result_type(generate_iterator_type(base_type))
+                    generate_result_type(generate_iterator_type(r#type))
                 } else {
-                    generate_iterator_type(base_type)
+                    generate_iterator_type(r#type)
                 }
             }
         }

@@ -19,7 +19,7 @@ pub trait OperationFieldLike {
     fn add_arguments(&self, name: &Ident) -> TokenStream;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct OperationField<'a> {
     pub(crate) name: &'a str,
     pub(crate) plural_identifier: Ident,
@@ -65,7 +65,7 @@ impl OperationFieldLike for OperationField<'_> {
     fn add_arguments(&self, name: &Ident) -> TokenStream {
         match &self.kind {
             FieldKind::Element { constraint, .. } => {
-                if constraint.is_unfixed() && !constraint.is_optional() {
+                if constraint.is_variadic() {
                     quote! { #name }
                 } else {
                     quote! { &[#name] }

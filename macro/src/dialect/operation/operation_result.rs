@@ -1,26 +1,32 @@
-use super::{OperationField, OperationFieldLike};
+use super::{OperationFieldLike, VariadicKind};
 use crate::dialect::{
     error::Error,
-    types::{RegionConstraint, TypeConstraint},
-    utility::sanitize_snake_case_identifier,
+    types::TypeConstraint,
+    utility::{generate_iterator_type, generate_result_type, sanitize_snake_case_identifier},
 };
-use proc_macro2::TokenStream;
+use proc_macro2::{Span, TokenStream};
 use quote::quote;
-use syn::{Ident, Type};
+use syn::{parse_quote, Ident, Type};
 
 #[derive(Debug)]
 pub struct OperationResult<'a> {
     name: &'a str,
     singular_identifier: Ident,
-    constraint: RegionConstraint<'a>,
+    constraint: TypeConstraint<'a>,
+    variadic_kind: VariadicKind,
 }
 
 impl<'a> OperationResult<'a> {
-    fn new(name: &'a str, constraint: TypeConstraint<'a>) -> Result<Self, Error> {
+    fn new(
+        name: &'a str,
+        constraint: TypeConstraint<'a>,
+        variadic_kind: VariadicKind,
+    ) -> Result<Self, Error> {
         Ok(Self {
             name,
             singular_identifier: sanitize_snake_case_identifier(name)?,
             constraint,
+            variadic_kind,
         })
     }
 }
@@ -38,16 +44,32 @@ impl OperationFieldLike for OperationResult<'_> {
         Ident::new("results", Span::call_site())
     }
 
+    // TODO Share this logic with `Operand`.
     fn parameter_type(&self) -> Type {
-        self.kind.parameter_type()
+        let r#type: Type = parse_quote!(::melior::ir::Type<'c>);
+
+        if self.constraint.is_variadic() {
+            parse_quote! { &[#r#type] }
+        } else {
+            r#type
+        }
     }
 
+    // TODO Share this logic with `Operand`.
     fn return_type(&self) -> Type {
-        self.kind.return_type()
+        let r#type: Type = parse_quote!(::melior::ir::operation::OperationResult<'c, '_>);
+
+        if !self.constraint.is_variadic() {
+            generate_result_type(r#type)
+        } else if &self.variadic_kind == &VariadicKind::AttributeSized {
+            generate_result_type(generate_iterator_type(r#type))
+        } else {
+            generate_iterator_type(r#type)
+        }
     }
 
     fn is_optional(&self) -> bool {
-        self.kind.is_optional()
+        self.constraint.is_optional()
     }
 
     fn is_result(&self) -> bool {
