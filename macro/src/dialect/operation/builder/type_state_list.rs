@@ -19,10 +19,6 @@ impl TypeStateList {
         }
     }
 
-    pub fn field_names(&self) -> impl Iterator<Item = &str> {
-        self.items.iter().map(|item| item.field_name())
-    }
-
     pub fn parameters(&self) -> impl Iterator<Item = &GenericArgument> {
         self.items.iter().map(|item| item.generic_param())
     }
