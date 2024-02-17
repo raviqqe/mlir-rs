@@ -109,8 +109,8 @@ fn generate_field_fns(
 fn generate_build_fn(builder: &OperationBuilder) -> Result<TokenStream, Error> {
     let builder_identifier = builder.identifier();
     let arguments = builder.type_state().arguments_all_set(true);
-    let name = format_ident!("{}", &builder.operation().name());
-    let error = format!("should be a valid {name}");
+    let operation_identifier = format_ident!("{}", &builder.operation().name());
+    let error = format!("should be a valid {operation_identifier}");
     let maybe_infer = builder
         .operation()
         .can_infer_type()
@@ -118,7 +118,7 @@ fn generate_build_fn(builder: &OperationBuilder) -> Result<TokenStream, Error> {
 
     Ok(quote! {
         impl<'c> #builder_identifier<'c, #(#arguments),*> {
-            pub fn build(self) -> #name<'c> {
+            pub fn build(self) -> #operation_identifier<'c> {
                 self.builder #maybe_infer.build().expect("valid operation").try_into().expect(#error)
             }
         }
