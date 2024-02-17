@@ -28,7 +28,7 @@ pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStr
         .map(|name| quote! { #name: ::std::marker::PhantomData })
         .collect::<Vec<_>>();
 
-    let builder_fns = generate_field_fns(builder, &field_names, phantom_arguments.as_slice())?;
+    let builder_fns = generate_field_fns(builder, &field_names, phantom_arguments.as_slice());
 
     let new_fn = generate_new_fn(builder, phantom_arguments.as_slice())?;
     let build_fn = generate_build_fn(builder)?;
@@ -57,7 +57,7 @@ fn generate_field_fns(
     builder: &OperationBuilder,
     field_names: &[Ident],
     phantoms: &[TokenStream],
-) -> Result<Vec<TokenStream>, Error> {
+) -> Vec<TokenStream> {
     builder.operation().fields().map(move |field| {
         let builder_identifier = builder.identifier();
         let identifier = field.singular_identifier();
@@ -70,7 +70,7 @@ fn generate_field_fns(
         // arguments.
         let add_arguments = field.add_arguments(&identifier);
 
-        Ok(if field.is_optional() {
+        if field.is_optional() {
             let parameters = builder.type_state().parameters().collect::<Vec<_>>();
 
             quote! {
@@ -101,7 +101,7 @@ fn generate_field_fns(
                     }
                 }
             }
-        })
+        }
     }).collect()
 }
 
@@ -145,18 +145,18 @@ fn generate_new_fn(
     })
 }
 
-pub fn generate_operation_builder_fn(builder: &OperationBuilder) -> Result<TokenStream, Error> {
+pub fn generate_operation_builder_fn(builder: &OperationBuilder) -> TokenStream {
     let builder_ident = builder.identifier();
     let arguments = builder.type_state().arguments_all_set(false);
 
-    Ok(quote! {
+    quote! {
         pub fn builder(
             context: &'c ::melior::Context,
             location: ::melior::ir::Location<'c>
-        ) -> #builder_ident<'c, #(#arguments),*> {
+            ) -> #builder_ident<'c, #(#arguments),*> {
             #builder_ident::new(context, location)
         }
-    })
+    }
 }
 
 pub fn generate_default_constructor(builder: &OperationBuilder) -> Result<TokenStream, Error> {

@@ -32,12 +32,12 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
         .successors()
         .enumerate()
         .map(|(index, region)| generate_successor_accessor(index, region))
-        .collect::<Result<Vec<_>, _>>()?;
+        .collect::<Vec<_>>();
     let region_accessors = operation
         .regions()
         .enumerate()
         .map(|(index, region)| generate_region_accessor(index, region))
-        .collect::<Result<Vec<_>, _>>()?;
+        .collect::<Vec<_>>();
     let attribute_accessors = operation
         .attributes()
         .map(generate_attribute_accessors)
@@ -45,7 +45,7 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
 
     let builder = OperationBuilder::new(operation)?;
     let builder_tokens = generate_operation_builder(&builder)?;
-    let builder_fn = generate_operation_builder_fn(&builder)?;
+    let builder_fn = generate_operation_builder_fn(&builder);
     let default_constructor = generate_default_constructor(&builder)?;
 
     Ok(quote! {

@@ -1,11 +1,8 @@
-use crate::dialect::{
-    error::Error,
-    operation::{OperationFieldLike, Region},
-};
+use crate::dialect::operation::{OperationFieldLike, Region};
 use proc_macro2::TokenStream;
 use quote::quote;
 
-pub fn generate_region_accessor(index: usize, region: &Region) -> Result<TokenStream, Error> {
+pub fn generate_region_accessor(index: usize, region: &Region) -> TokenStream {
     let identifier = &region.singular_identifier();
     let return_type = &region.return_type();
     let body = if region.is_variadic() {
@@ -19,9 +16,9 @@ pub fn generate_region_accessor(index: usize, region: &Region) -> Result<TokenSt
         }
     };
 
-    Ok(quote! {
+    quote! {
         pub fn #identifier(&self, context: &'c ::melior::Context) -> #return_type {
             #body
         }
-    })
+    }
 }

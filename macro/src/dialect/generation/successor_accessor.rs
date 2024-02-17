@@ -1,14 +1,8 @@
-use crate::dialect::{
-    error::Error,
-    operation::{OperationFieldLike, Successor},
-};
+use crate::dialect::operation::{OperationFieldLike, Successor};
 use proc_macro2::TokenStream;
 use quote::quote;
 
-pub fn generate_successor_accessor(
-    index: usize,
-    successor: &Successor,
-) -> Result<TokenStream, Error> {
+pub fn generate_successor_accessor(index: usize, successor: &Successor) -> TokenStream {
     let identifier = successor.singular_identifier();
     let return_type = successor.return_type();
     let body = if successor.is_variadic() {
@@ -22,10 +16,10 @@ pub fn generate_successor_accessor(
         }
     };
 
-    Ok(quote! {
+    quote! {
         #[allow(clippy::needless_question_mark)]
         pub fn #identifier(&self, context: &'c ::melior::Context) -> #return_type {
             #body
         }
-    })
+    }
 }
