@@ -71,7 +71,7 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
                 #name
             }
 
-            /// Converts itself into a generic operation.
+            /// Returns a generic operation of this specialized operation.
             pub fn as_operation(&self) -> &::melior::ir::operation::Operation<'c> {
                 &self.operation
             }
