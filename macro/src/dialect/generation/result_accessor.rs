@@ -17,7 +17,7 @@ pub fn generate_result_accessor(
         result,
         "result",
         "results",
-        &Ident::new("OperandNotFound", Span::call_site()),
+        &Ident::new("ResultNotFound", Span::call_site()),
         index,
         length,
     );

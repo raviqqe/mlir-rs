@@ -1,6 +1,6 @@
 mod attribute_accessor;
 mod element_accessor;
-mod field_accessor;
+mod operand_accessor;
 mod operation_builder;
 mod region_accessor;
 mod result_accessor;
@@ -8,7 +8,7 @@ mod successor_accessor;
 
 use self::{
     attribute_accessor::generate_attribute_accessors,
-    field_accessor::generate_operand_accessor,
+    operand_accessor::generate_operand_accessor,
     operation_builder::{
         generate_default_constructor, generate_operation_builder, generate_operation_builder_fn,
     },
