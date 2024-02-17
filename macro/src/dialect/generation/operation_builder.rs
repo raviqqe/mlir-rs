@@ -60,7 +60,7 @@ fn generate_field_fns(
 ) -> Result<Vec<TokenStream>, Error> {
     builder.operation().fields().map(move |field| {
         let builder_identifier = builder.identifier();
-        let identifier = sanitize_snake_case_identifier(field.name())?;
+        let identifier = field.singular_identifier();
         let parameter_type = field.parameter_type();
         let argument = quote! { #identifier: #parameter_type };
         let add = format_ident!("add_{}", field.plural_kind_identifier());
