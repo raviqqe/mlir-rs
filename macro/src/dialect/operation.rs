@@ -106,12 +106,8 @@ impl<'a> Operation<'a> {
         self.can_infer_type
     }
 
-    fn dialect(&self) -> Result<Record, Error> {
-        Ok(self.definition.def_value("opDialect")?)
-    }
-
-    pub fn dialect_name(&self) -> Result<&str, Error> {
-        Ok(self.dialect()?.name()?)
+    pub fn dialect_name(&self) -> &str {
+        self.dialect_name
     }
 
     pub fn operation_name(&self) -> &str {
