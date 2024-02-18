@@ -7,11 +7,11 @@ use quote::{format_ident, quote};
 pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStream, Error> {
     let state_types = builder.type_state().parameters();
     let field_fns = generate_field_fns(builder);
-    let new_fn = generate_new_fn(builder)?;
+    let new_fn = generate_new_fn(builder);
     let build_fn = generate_build_fn(builder)?;
 
     let identifier = builder.identifier();
-    let doc = format!("A builder for {}", builder.operation().summary()?);
+    let doc = format!("A builder for {}", builder.operation().documentation_name());
     let type_arguments = builder.type_state().parameters();
 
     Ok(quote! {
@@ -96,12 +96,12 @@ fn generate_build_fn(builder: &OperationBuilder) -> Result<TokenStream, Error> {
     })
 }
 
-fn generate_new_fn(builder: &OperationBuilder) -> Result<TokenStream, Error> {
+fn generate_new_fn(builder: &OperationBuilder) -> TokenStream {
     let builder_ident = builder.identifier();
-    let name = &builder.operation().full_operation_name()?;
+    let name = &builder.operation().full_operation_name();
     let arguments = builder.type_state().arguments_all_set(false);
 
-    Ok(quote! {
+    quote! {
         impl<'c> #builder_ident<'c, #(#arguments),*> {
             pub fn new(context: &'c ::melior::Context, location: ::melior::ir::Location<'c>) -> Self {
                 Self {
@@ -111,7 +111,7 @@ fn generate_new_fn(builder: &OperationBuilder) -> Result<TokenStream, Error> {
                 }
             }
         }
-    })
+    }
 }
 
 pub fn generate_operation_builder_fn(builder: &OperationBuilder) -> TokenStream {
@@ -131,7 +131,7 @@ pub fn generate_operation_builder_fn(builder: &OperationBuilder) -> TokenStream 
 
 pub fn generate_default_constructor(builder: &OperationBuilder) -> Result<TokenStream, Error> {
     let identifier = format_ident!("{}", &builder.operation().name());
-    let name = sanitize_snake_case_identifier(builder.operation().operation_name()?)?;
+    let name = sanitize_snake_case_identifier(builder.operation().operation_name())?;
     let arguments = builder
         .operation()
         .required_fields()
@@ -153,7 +153,7 @@ pub fn generate_default_constructor(builder: &OperationBuilder) -> Result<TokenS
         })
         .collect::<Vec<_>>();
 
-    let doc = format!("Creates a {}", builder.operation().summary()?);
+    let doc = format!("Creates a {}", builder.operation().documentation_name());
 
     Ok(quote! {
         #[allow(clippy::too_many_arguments)]

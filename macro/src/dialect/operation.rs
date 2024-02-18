@@ -26,6 +26,9 @@ use tblgen::{error::WithLocation, record::Record, TypedInit};
 pub struct Operation<'a> {
     definition: Record<'a>,
     name: String,
+    dialect_name: &'a str,
+    operation_name: &'a str,
+    summary: String,
     can_infer_type: bool,
     regions: Vec<Region<'a>>,
     successors: Vec<Successor<'a>>,
@@ -50,6 +53,9 @@ impl<'a> Operation<'a> {
 
         Ok(Self {
             name: Self::build_name(definition)?,
+            dialect_name: definition.def_value("opDialect")?.str_value("name")?,
+            operation_name: definition.str_value("opName")?,
+            summary: definition.str_value("summary")?.into(),
             successors: Self::collect_successors(definition)?,
             operands: Self::collect_operands(
                 &arguments,
@@ -100,35 +106,32 @@ impl<'a> Operation<'a> {
         Ok(self.dialect()?.name()?)
     }
 
-    pub fn operation_name(&self) -> Result<&str, Error> {
-        Ok(self.definition.str_value("opName")?)
+    pub fn operation_name(&self) -> &str {
+        self.operation_name
     }
 
-    pub fn full_operation_name(&self) -> Result<String, Error> {
-        let dialect_name = self.dialect()?.string_value("name")?;
-        let operation_name = self.operation_name()?;
-
-        Ok(if dialect_name.is_empty() {
-            operation_name.into()
+    pub fn full_operation_name(&self) -> String {
+        if self.dialect_name.is_empty() {
+            self.operation_name.into()
         } else {
-            format!("{dialect_name}.{operation_name}")
-        })
+            format!("{}.{}", self.dialect_name, self.operation_name)
+        }
     }
 
-    pub fn summary(&self) -> Result<String, Error> {
-        let operation_name = self.operation_name()?;
-        let name = &self.name;
-        let summary = self.definition.str_value("summary")?;
+    pub fn documentation_name(&self) -> String {
+        format!("a [`{}`]({}) operation", self.operation_name, &self.name)
+    }
 
-        Ok([
-            format!("A(n) [`{operation_name}`]({name}) operation."),
-            if summary.is_empty() {
+    pub fn summary(&self) -> String {
+        format!(
+            "{} {}",
+            self.documentation_name(),
+            if self.summary.is_empty() {
                 Default::default()
             } else {
-                "A(n) ".to_owned() + summary + "."
+                "A ".to_owned() + &self.summary + "."
             },
-        ]
-        .join(" "))
+        )
     }
 
     pub fn description(&self) -> Result<String, Error> {
