@@ -117,11 +117,7 @@ impl<'a> Operation<'a> {
     }
 
     pub fn full_operation_name(&self) -> String {
-        if self.short_dialect_name.is_empty() {
-            self.operation_name.into()
-        } else {
-            format!("{}.{}", self.short_dialect_name, self.operation_name)
-        }
+        format!("{}.{}", self.short_dialect_name, self.operation_name)
     }
 
     pub fn documentation_name(&self) -> String {
