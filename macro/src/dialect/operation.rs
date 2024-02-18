@@ -18,6 +18,7 @@ use crate::dialect::{
     error::{Error, OdsError},
     r#trait::Trait,
     r#type::Type,
+    utility::capitalize_string,
 };
 pub use operation_field::OperationField;
 use tblgen::{error::WithLocation, record::Record, TypedInit};
@@ -28,7 +29,7 @@ pub struct Operation<'a> {
     name: String,
     dialect_name: &'a str,
     operation_name: &'a str,
-    summary: String,
+    summary: &'a str,
     can_infer_type: bool,
     regions: Vec<Region<'a>>,
     successors: Vec<Successor<'a>>,
@@ -55,7 +56,7 @@ impl<'a> Operation<'a> {
             name: Self::build_name(definition)?,
             dialect_name: definition.def_value("opDialect")?.str_value("name")?,
             operation_name: definition.str_value("opName")?,
-            summary: definition.str_value("summary")?.into(),
+            summary: definition.str_value("summary")?,
             successors: Self::collect_successors(definition)?,
             operands: Self::collect_operands(
                 &arguments,
@@ -123,15 +124,13 @@ impl<'a> Operation<'a> {
     }
 
     pub fn summary(&self) -> String {
-        let name = self.documentation_name();
-
         format!(
             "{}. {}",
-            name[..1].to_uppercase() + &name[1..],
+            capitalize_string(&self.documentation_name()),
             if self.summary.is_empty() {
                 Default::default()
             } else {
-                self.summary.to_owned() + "."
+                capitalize_string(self.summary) + "."
             },
         )
     }
