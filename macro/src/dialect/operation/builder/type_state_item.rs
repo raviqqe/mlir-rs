@@ -4,16 +4,14 @@ use syn::GenericArgument;
 #[derive(Debug)]
 pub struct TypeStateItem {
     field_name: String,
-    generic_param: GenericArgument,
+    generic_parameter: GenericArgument,
 }
 
 impl TypeStateItem {
     pub fn new(index: usize, field_name: String) -> Self {
+        let identifier = format_ident!("T{}", index);
         Self {
-            generic_param: {
-                let ident = format_ident!("T{}", index);
-                syn::parse2(quote!(#ident)).expect("Ident is a valid GenericArgument")
-            },
+            generic_parameter: syn::parse2(quote!(#identifier)).expect("valid GenericArgument"),
             field_name,
         }
     }
@@ -22,7 +20,7 @@ impl TypeStateItem {
         &self.field_name
     }
 
-    pub fn generic_param(&self) -> &GenericArgument {
-        &self.generic_param
+    pub fn generic_parameter(&self) -> &GenericArgument {
+        &self.generic_parameter
     }
 }
