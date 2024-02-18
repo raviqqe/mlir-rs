@@ -139,20 +139,6 @@ impl<'a> Operation<'a> {
         sanitize_documentation(self.definition.str_value("description")?)
     }
 
-    pub fn fields(&self) -> impl Iterator<Item = &dyn OperationField> {
-        fn convert(field: &impl OperationField) -> &dyn OperationField {
-            field
-        }
-
-        self.results
-            .iter()
-            .map(convert)
-            .chain(self.operands.iter().map(convert))
-            .chain(self.regions.iter().map(convert))
-            .chain(self.successors.iter().map(convert))
-            .chain(self.attributes().map(convert))
-    }
-
     pub fn operands(&self) -> impl Iterator<Item = &Operand<'a>> + Clone {
         self.operands.iter()
     }
@@ -182,8 +168,21 @@ impl<'a> Operation<'a> {
     }
 
     pub fn required_fields(&self) -> impl Iterator<Item = &dyn OperationField> {
-        self.fields()
-            .filter(|field| (!field.is_result() || !self.can_infer_type) && !field.is_optional())
+        fn convert(field: &impl OperationField) -> &dyn OperationField {
+            field
+        }
+
+        (if self.can_infer_type {
+            Default::default()
+        } else {
+            self.results.iter()
+        })
+        .map(convert)
+        .chain(self.operands.iter().map(convert))
+        .chain(self.regions.iter().map(convert))
+        .chain(self.successors.iter().map(convert))
+        .chain(self.attributes().map(convert))
+        .filter(|field| !field.is_optional())
     }
 
     fn collect_successors(definition: Record<'a>) -> Result<Vec<Successor>, Error> {
