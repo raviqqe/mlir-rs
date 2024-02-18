@@ -23,6 +23,8 @@ use crate::dialect::{
 pub use operation_field::OperationField;
 use tblgen::{error::WithLocation, record::Record, TypedInit};
 
+const VOWELS: &str = "aeiou";
+
 #[derive(Debug)]
 pub struct Operation<'a> {
     definition: Record<'a>,
@@ -120,7 +122,16 @@ impl<'a> Operation<'a> {
     }
 
     pub fn documentation_name(&self) -> String {
-        format!("a(n) [`{}`]({}) operation", self.operation_name, &self.name)
+        format!(
+            "{} [`{}`]({}) operation",
+            if VOWELS.contains(&self.operation_name()[..1]) {
+                "an"
+            } else {
+                "a"
+            },
+            self.operation_name,
+            &self.name
+        )
     }
 
     pub fn summary(&self) -> String {
