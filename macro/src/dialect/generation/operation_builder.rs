@@ -7,11 +7,15 @@ use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 
 pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStream, Error> {
-    let result_fns = builder
-        .operation()
-        .results()
-        .map(|result| generate_field_fn(builder, result))
-        .collect::<Vec<_>>();
+    let result_fns = if builder.operation().can_infer_type() {
+        Default::default()
+    } else {
+        builder
+            .operation()
+            .results()
+            .map(|result| generate_field_fn(builder, result))
+            .collect::<Vec<_>>()
+    };
     let operand_fns = builder
         .operation()
         .operands()
@@ -88,8 +92,6 @@ fn generate_field_fn(builder: &OperationBuilder, field: &impl OperationField) ->
                 }
             }
         }
-    } else if field.is_result() && builder.operation().can_infer_type() {
-        quote!()
     } else {
         let parameters = builder.type_state().parameters_without(field.name());
         let arguments_set = builder.type_state().arguments_set(field.name(), true);
