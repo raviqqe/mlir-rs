@@ -22,7 +22,6 @@ fn generate_getter(attribute: &Attribute) -> TokenStream {
     let body = if attribute.is_unit() {
         quote! { self.operation.attribute(#name).is_some() }
     } else {
-        // TODO Handle returning `melior::Attribute`.
         quote! { Ok(self.operation.attribute(#name)?.try_into()?) }
     };
 
