@@ -44,7 +44,7 @@ pub fn r#for<'c>(
 ) -> Operation<'c> {
     OperationBuilder::new("scf.for", location)
         .add_operands(&[start, end, step])
-        .add_regions(vec![region])
+        .add_regions([region])
         .build()
         .expect("valid operation")
 }
@@ -60,7 +60,7 @@ pub fn r#if<'c>(
     OperationBuilder::new("scf.if", location)
         .add_operands(&[condition])
         .add_results(result_types)
-        .add_regions(vec![then_region, else_region])
+        .add_regions([then_region, else_region])
         .build()
         .expect("valid operation")
 }
@@ -78,7 +78,7 @@ pub fn index_switch<'c>(
         .add_operands(&[condition])
         .add_results(result_types)
         .add_attributes(&[(Identifier::new(context, "cases"), cases.into())])
-        .add_regions(regions)
+        .add_regions_vec(regions)
         .build()
         .expect("valid operation")
 }
@@ -94,7 +94,7 @@ pub fn r#while<'c>(
     OperationBuilder::new("scf.while", location)
         .add_operands(initial_values)
         .add_results(result_types)
-        .add_regions(vec![before_region, after_region])
+        .add_regions([before_region, after_region])
         .build()
         .expect("valid operation")
 }

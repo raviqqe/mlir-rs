@@ -540,7 +540,7 @@ mod tests {
         context.set_allow_unregistered_dialects(true);
 
         let operation = OperationBuilder::new("foo", Location::unknown(&context))
-            .add_regions(vec![Region::new()])
+            .add_regions([Region::new()])
             .build()
             .unwrap();
 

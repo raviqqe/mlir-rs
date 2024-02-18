@@ -126,7 +126,7 @@ mod tests {
 
         let module = Module::from_operation(
             OperationBuilder::new("builtin.module", Location::unknown(&context))
-                .add_regions(vec![region])
+                .add_regions([region])
                 .build()
                 .unwrap(),
         )

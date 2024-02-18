@@ -11,7 +11,7 @@ use mlir_sys::{
     mlirOperationStateAddSuccessors, mlirOperationStateEnableResultTypeInference,
     mlirOperationStateGet, MlirOperationState,
 };
-use std::marker::PhantomData;
+use std::{marker::PhantomData, mem::forget};
 
 /// An operation builder.
 pub struct OperationBuilder<'c> {
@@ -34,7 +34,7 @@ impl<'c> OperationBuilder<'c> {
             mlirOperationStateAddResults(
                 &mut self.raw,
                 results.len() as isize,
-                results as *const _ as *const _,
+                results.as_ptr() as *const _,
             )
         }
 
@@ -47,7 +47,7 @@ impl<'c> OperationBuilder<'c> {
             mlirOperationStateAddOperands(
                 &mut self.raw,
                 operands.len() as isize,
-                operands as *const _ as *const _,
+                operands.as_ptr() as *const _,
             )
         }
 
@@ -55,12 +55,14 @@ impl<'c> OperationBuilder<'c> {
     }
 
     /// Adds regions.
-    pub fn add_regions(mut self, regions: Vec<Region<'c>>) -> Self {
+    pub fn add_regions<const N: usize>(mut self, regions: [Region<'c>; N]) -> Self {
+        forget(regions);
+
         unsafe {
             mlirOperationStateAddOwnedRegions(
                 &mut self.raw,
                 regions.len() as isize,
-                regions.leak().as_ptr() as *const _,
+                regions.as_ptr() as *const _,
             )
         }
 
@@ -163,7 +165,7 @@ mod tests {
         context.set_allow_unregistered_dialects(true);
 
         OperationBuilder::new("foo", Location::unknown(&context))
-            .add_regions(vec![Region::new()])
+            .add_regions([Region::new()])
             .build()
             .unwrap();
     }

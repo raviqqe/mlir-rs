@@ -38,7 +38,7 @@ impl OperationField for Region<'_> {
     }
 
     fn plural_kind_identifier(&self) -> Ident {
-        Ident::new("regions", Span::call_site())
+        Ident::new("regions_vec", Span::call_site())
     }
 
     fn parameter_type(&self) -> Type {
