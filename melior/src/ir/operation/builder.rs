@@ -70,7 +70,7 @@ impl<'c> OperationBuilder<'c> {
     /// Adds successor blocks.
     // TODO Fix this to ensure blocks are alive while they are referenced by the
     // operation.
-    // TODO Should we accept `BlockRef`?
+    // TODO Should we accept `BlockRef` to avoid `.collect()`?
     pub fn add_successors(mut self, successors: &[&Block<'c>]) -> Self {
         unsafe {
             mlirOperationStateAddSuccessors(
