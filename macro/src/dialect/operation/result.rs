@@ -72,10 +72,6 @@ impl OperationField for OperationResult<'_> {
         self.r#type.is_optional()
     }
 
-    fn is_result(&self) -> bool {
-        true
-    }
-
     fn add_arguments(&self, name: &Ident) -> TokenStream {
         if self.r#type.is_unfixed() && !self.r#type.is_optional() {
             quote! { #name }

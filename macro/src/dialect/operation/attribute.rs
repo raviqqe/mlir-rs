@@ -155,10 +155,6 @@ impl OperationField for Attribute<'_> {
         self.is_optional() || self.has_default_value()
     }
 
-    fn is_result(&self) -> bool {
-        false
-    }
-
     fn add_arguments(&self, name: &Ident) -> TokenStream {
         let name_string = &self.name;
 

@@ -65,10 +65,6 @@ impl OperationField for Successor<'_> {
         false
     }
 
-    fn is_result(&self) -> bool {
-        false
-    }
-
     fn add_arguments(&self, name: &Ident) -> TokenStream {
         if self.is_variadic() {
             quote! { #name }
