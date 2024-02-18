@@ -23,6 +23,7 @@ use crate::dialect::{
 pub use operation_field::OperationField;
 use tblgen::{error::WithLocation, record::Record, TypedInit};
 
+// spell-checker: disable-next-line
 const VOWELS: &str = "aeiou";
 
 #[derive(Debug)]
