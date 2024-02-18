@@ -10,6 +10,7 @@ pub struct TypeStateItem {
 impl TypeStateItem {
     pub fn new(index: usize, field_name: String) -> Self {
         let identifier = format_ident!("T{}", index);
+
         Self {
             generic_parameter: syn::parse2(quote!(#identifier)).expect("valid GenericArgument"),
             field_name,
