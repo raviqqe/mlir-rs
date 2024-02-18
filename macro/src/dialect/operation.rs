@@ -21,6 +21,7 @@ use crate::dialect::{
     utility::capitalize_string,
 };
 pub use operation_field::OperationField;
+use std::collections::HashSet;
 use syn::Ident;
 use tblgen::{error::WithLocation, record::Record, TypedInit};
 
@@ -49,14 +50,17 @@ impl<'a> Operation<'a> {
     pub fn new(definition: Record<'a>) -> Result<Self, Error> {
         let operation_name = definition.str_value("opName")?;
         let traits = Self::collect_traits(definition)?;
-        let has_trait = |name| traits.iter().any(|r#trait| r#trait.name() == Some(name));
+        let trait_names = traits
+            .iter()
+            .flat_map(|r#trait| r#trait.name())
+            .collect::<HashSet<_>>();
 
         let arguments = Self::dag_constraints(definition, "arguments")?;
         let regions = Self::collect_regions(definition)?;
         let (results, unfixed_result_count) = Self::collect_results(
             definition,
-            has_trait("::mlir::OpTrait::SameVariadicResultSize"),
-            has_trait("::mlir::OpTrait::AttrSizedResultSegments"),
+            trait_names.contains("::mlir::OpTrait::SameVariadicResultSize"),
+            trait_names.contains("::mlir::OpTrait::AttrSizedResultSegments"),
         )?;
 
         Ok(Self {
@@ -69,8 +73,8 @@ impl<'a> Operation<'a> {
             successors: Self::collect_successors(definition)?,
             operands: Self::collect_operands(
                 &arguments,
-                has_trait("::mlir::OpTrait::SameVariadicOperandSize"),
-                has_trait("::mlir::OpTrait::AttrSizedOperandSegments"),
+                trait_names.contains("::mlir::OpTrait::SameVariadicOperandSize"),
+                trait_names.contains("::mlir::OpTrait::AttrSizedOperandSegments"),
             )?,
             results,
             attributes: Self::collect_attributes(&arguments)?,
