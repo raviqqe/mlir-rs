@@ -47,7 +47,7 @@ fn generate_setter(attribute: &Attribute) -> TokenStream {
         }
     } else {
         quote! {
-            self.operation.set_attribute(#name, &value.into());
+            self.operation.set_attribute(#name, value.into());
         }
     };
 

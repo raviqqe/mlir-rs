@@ -200,7 +200,7 @@ impl<'c> Operation<'c> {
     }
 
     /// Sets the attribute with the given name to the given attribute.
-    pub fn set_attribute(&mut self, name: &str, attribute: &Attribute<'c>) {
+    pub fn set_attribute(&mut self, name: &str, attribute: Attribute<'c>) {
         unsafe {
             mlirOperationSetAttributeByName(
                 self.raw,
