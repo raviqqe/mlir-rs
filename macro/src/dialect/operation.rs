@@ -60,7 +60,7 @@ impl<'a> Operation<'a> {
 
         Ok(Self {
             name: Self::build_name(definition)?,
-            dialect_name: definition.def_value("opDialect")?.str_value("name")?,
+            dialect_name: definition.def_value("opDialect")?.name()?,
             operation_name,
             summary: definition.str_value("summary")?,
             constructor_identifier: sanitize_snake_case_identifier(operation_name)?,

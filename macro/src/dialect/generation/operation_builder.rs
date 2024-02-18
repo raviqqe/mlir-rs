@@ -1,7 +1,6 @@
 use crate::dialect::{
     error::Error,
     operation::{OperationBuilder, OperationField},
-    utility::sanitize_snake_case_identifier,
 };
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
