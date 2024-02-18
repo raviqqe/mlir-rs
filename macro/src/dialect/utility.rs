@@ -65,6 +65,14 @@ pub fn sanitize_documentation(string: &str) -> Result<String, Error> {
     Ok(String::from_utf8(buffer)?)
 }
 
+pub fn capitalize_string(string: &str) -> String {
+    if string.is_empty() {
+        "".into()
+    } else {
+        string[..1].to_uppercase() + &string[1..]
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
