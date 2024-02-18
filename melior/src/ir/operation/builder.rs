@@ -60,7 +60,7 @@ impl<'c> OperationBuilder<'c> {
             mlirOperationStateAddOwnedRegions(
                 &mut self.raw,
                 regions.len() as isize,
-                regions.leak().as_ptr() as *const _ as *const _,
+                regions.leak().as_ptr() as *const _,
             )
         }
 
