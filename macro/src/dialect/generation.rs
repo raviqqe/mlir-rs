@@ -17,11 +17,10 @@ use self::{
     successor_accessor::generate_successor_accessor,
 };
 use super::operation::{Operation, OperationBuilder};
-use crate::dialect::error::Error;
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 
-pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
+pub fn generate_operation(operation: &Operation) -> TokenStream {
     let summary = operation.summary();
     let description = operation.description();
     let identifier = format_ident!("{}", operation.name());
@@ -53,11 +52,11 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
         .collect::<Vec<_>>();
 
     let builder = OperationBuilder::new(operation);
-    let builder_tokens = generate_operation_builder(&builder)?;
+    let builder_tokens = generate_operation_builder(&builder);
     let builder_fn = generate_operation_builder_fn(&builder);
     let default_constructor = generate_default_constructor(&builder);
 
-    Ok(quote! {
+    quote! {
         #[doc = #summary]
         #[doc = "\n\n"]
         #[doc = #description]
@@ -94,7 +93,7 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
 
             fn try_from(
                 operation: ::melior::ir::operation::Operation<'c>,
-            ) -> Result<Self, Self::Error> {
+                ) -> Result<Self, Self::Error> {
                 // TODO Check an operation name.
                 Ok(Self { operation })
             }
@@ -105,5 +104,5 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
                 operation.operation
             }
         }
-    })
+    }
 }

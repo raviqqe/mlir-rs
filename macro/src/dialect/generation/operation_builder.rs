@@ -1,11 +1,8 @@
-use crate::dialect::{
-    error::Error,
-    operation::{OperationBuilder, OperationField},
-};
+use crate::dialect::operation::{OperationBuilder, OperationField};
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 
-pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStream, Error> {
+pub fn generate_operation_builder(builder: &OperationBuilder) -> TokenStream {
     let result_fns = if builder.operation().can_infer_type() {
         Default::default()
     } else {
@@ -47,7 +44,7 @@ pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStr
     let type_arguments = builder.type_state().parameters();
     let state_types = builder.type_state().parameters();
 
-    Ok(quote! {
+    quote! {
         #[doc = #doc]
         pub struct #identifier<'c, #(#type_arguments),*> {
             builder: ::melior::ir::operation::OperationBuilder<'c>,
@@ -64,7 +61,7 @@ pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStr
         #(#attribute_fns)*
 
         #build_fn
-    })
+    }
 }
 
 // TODO Split this function for different kinds of fields.

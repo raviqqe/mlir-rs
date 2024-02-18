@@ -70,7 +70,7 @@ fn generate_dialect_module(
         .iter()
         .filter(|operation| operation.dialect_name() == dialect_name)
         .map(generate_operation)
-        .collect::<Result<Vec<_>, _>>()?;
+        .collect::<Vec<_>>();
 
     let doc = format!(
         "`{name}` dialect.\n\n{}",
