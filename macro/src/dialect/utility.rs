@@ -117,4 +117,9 @@ mod tests {
             "``` text\nfoo\n```\n\n``` text\nbar\n```\n"
         );
     }
+
+    #[test]
+    fn capitalize() {
+        assert_eq!(&capitalize_string("foo"), "Foo");
+    }
 }
