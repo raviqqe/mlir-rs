@@ -32,6 +32,7 @@ pub struct Operation<'a> {
     definition: Record<'a>,
     name: String,
     dialect_name: &'a str,
+    dialect_identifier: &'a str,
     operation_name: &'a str,
     summary: &'a str,
     constructor_identifier: Ident,
@@ -60,7 +61,8 @@ impl<'a> Operation<'a> {
 
         Ok(Self {
             name: Self::build_name(definition)?,
-            dialect_name: definition.def_value("opDialect")?.name()?,
+            dialect_name: definition.def_value("opDialect")?.str_value("name")?,
+            dialect_identifier: definition.def_value("opDialect")?.name()?,
             operation_name,
             summary: definition.str_value("summary")?,
             constructor_identifier: sanitize_snake_case_identifier(operation_name)?,
@@ -107,7 +109,7 @@ impl<'a> Operation<'a> {
     }
 
     pub fn dialect_name(&self) -> &str {
-        self.dialect_name
+        self.dialect_identifier
     }
 
     pub fn operation_name(&self) -> &str {
