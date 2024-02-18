@@ -70,15 +70,6 @@ impl<'a> Operation<'a> {
             operation_name,
             summary: definition.str_value("summary")?,
             constructor_identifier: sanitize_snake_case_identifier(operation_name)?,
-            successors: Self::collect_successors(definition)?,
-            operands: Self::collect_operands(
-                &arguments,
-                trait_names.contains("::mlir::OpTrait::SameVariadicOperandSize"),
-                trait_names.contains("::mlir::OpTrait::AttrSizedOperandSegments"),
-            )?,
-            results,
-            attributes: Self::collect_attributes(&arguments)?,
-            derived_attributes: Self::collect_derived_attributes(definition)?,
             can_infer_type: traits.iter().any(|r#trait| {
                 (r#trait.name() == Some("::mlir::OpTrait::FirstAttrDerivedResultType")
                     || r#trait.name() == Some("::mlir::OpTrait::SameOperandsAndResultType"))
@@ -86,7 +77,16 @@ impl<'a> Operation<'a> {
                     || r#trait.name() == Some("::mlir::InferTypeOpInterface::Trait")
                         && regions.is_empty()
             }),
+            results,
+            operands: Self::collect_operands(
+                &arguments,
+                trait_names.contains("::mlir::OpTrait::SameVariadicOperandSize"),
+                trait_names.contains("::mlir::OpTrait::AttrSizedOperandSegments"),
+            )?,
             regions,
+            successors: Self::collect_successors(definition)?,
+            attributes: Self::collect_attributes(&arguments)?,
+            derived_attributes: Self::collect_derived_attributes(definition)?,
             definition,
         })
     }
