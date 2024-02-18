@@ -50,7 +50,7 @@ melior_macro::dialect! {
 melior_macro::dialect! {
     name: "llvm",
     // spell-checker: disable-next-line
-    table_gen: r#"include "mlir/Dialect/LLVMIR/LLVMOps.td""#
+    table_gen: r#"include "mlir/Dialect/LLVMIR/LLVMOps.td" include "mlir/Dialect/LLVMIR/LLVMIntrinsicOps.td""#
 }
 melior_macro::dialect! {
     name: "memref",
