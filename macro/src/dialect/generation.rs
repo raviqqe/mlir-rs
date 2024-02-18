@@ -23,7 +23,7 @@ use quote::{format_ident, quote};
 
 pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
     let summary = operation.summary();
-    let description = operation.description()?;
+    let description = operation.description();
     let identifier = format_ident!("{}", operation.name());
     let operation_name = operation.full_operation_name();
 

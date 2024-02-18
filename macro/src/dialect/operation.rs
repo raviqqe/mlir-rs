@@ -30,13 +30,13 @@ const VOWELS: &str = "aeiou";
 
 #[derive(Debug)]
 pub struct Operation<'a> {
-    definition: Record<'a>,
     name: String,
     short_dialect_name: &'a str,
     dialect_name: &'a str,
     operation_name: &'a str,
-    summary: &'a str,
     constructor_identifier: Ident,
+    summary: &'a str,
+    description: String,
     can_infer_type: bool,
     results: Vec<OperationResult<'a>>,
     operands: Vec<Operand<'a>>,
@@ -68,8 +68,9 @@ impl<'a> Operation<'a> {
             dialect_name: definition.def_value("opDialect")?.name()?,
             short_dialect_name: definition.def_value("opDialect")?.str_value("name")?,
             operation_name,
-            summary: definition.str_value("summary")?,
             constructor_identifier: sanitize_snake_case_identifier(operation_name)?,
+            summary: definition.str_value("summary")?,
+            description: sanitize_documentation(definition.str_value("description")?)?,
             can_infer_type: traits.iter().any(|r#trait| {
                 (r#trait.name() == Some("::mlir::OpTrait::FirstAttrDerivedResultType")
                     || r#trait.name() == Some("::mlir::OpTrait::SameOperandsAndResultType"))
@@ -87,7 +88,6 @@ impl<'a> Operation<'a> {
             successors: Self::collect_successors(definition)?,
             attributes: Self::collect_attributes(&arguments)?,
             derived_attributes: Self::collect_derived_attributes(definition)?,
-            definition,
         })
     }
 
@@ -149,8 +149,8 @@ impl<'a> Operation<'a> {
         )
     }
 
-    pub fn description(&self) -> Result<String, Error> {
-        sanitize_documentation(self.definition.str_value("description")?)
+    pub fn description(&self) -> &str {
+        &self.description
     }
 
     pub fn constructor_identifier(&self) -> &Ident {

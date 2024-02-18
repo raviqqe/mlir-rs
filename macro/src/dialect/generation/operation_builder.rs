@@ -37,7 +37,7 @@ pub fn generate_operation_builder(builder: &OperationBuilder) -> Result<TokenStr
         .collect::<Vec<_>>();
 
     let new_fn = generate_new_fn(builder);
-    let build_fn = generate_build_fn(builder)?;
+    let build_fn = generate_build_fn(builder);
 
     let identifier = builder.identifier();
     let doc = format!(
@@ -110,7 +110,7 @@ fn generate_field_fn(builder: &OperationBuilder, field: &impl OperationField) ->
     }
 }
 
-fn generate_build_fn(builder: &OperationBuilder) -> Result<TokenStream, Error> {
+fn generate_build_fn(builder: &OperationBuilder) -> TokenStream {
     let identifier = builder.identifier();
     let arguments = builder.type_state().arguments_all_set(true);
     let operation_identifier = format_ident!("{}", &builder.operation().name());
@@ -120,13 +120,13 @@ fn generate_build_fn(builder: &OperationBuilder) -> Result<TokenStream, Error> {
         .can_infer_type()
         .then_some(quote! { .enable_result_type_inference() });
 
-    Ok(quote! {
+    quote! {
         impl<'c> #identifier<'c, #(#arguments),*> {
             pub fn build(self) -> #operation_identifier<'c> {
                 self.builder #maybe_infer.build().expect("valid operation").try_into().expect(#error)
             }
         }
-    })
+    }
 }
 
 fn generate_new_fn(builder: &OperationBuilder) -> TokenStream {
