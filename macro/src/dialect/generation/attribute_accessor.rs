@@ -62,7 +62,7 @@ fn generate_setter(attribute: &Attribute) -> TokenStream {
 }
 
 fn generate_remover(attribute: &Attribute) -> Option<TokenStream> {
-    if attribute.is_unit() || attribute.is_optional() {
+    if attribute.is_optional() {
         let name = attribute.name();
         let identifier = attribute.remove_identifier();
 
