@@ -11,8 +11,8 @@ pub fn generate_element_getter(
     index: usize,
     length: usize,
 ) -> TokenStream {
-    let kind_singular_identifier = Ident::new(singular_kind, Span::call_site());
-    let kind_plural_identifier = Ident::new(plural_kind, Span::call_site());
+    let singular_kind_identifier = Ident::new(singular_kind, Span::call_site());
+    let plural_kind_identifier = Ident::new(plural_kind, Span::call_site());
     let count = Ident::new(&format!("{singular_kind}_count"), Span::call_site());
     let name = field.name();
 
@@ -26,7 +26,7 @@ pub fn generate_element_getter(
                     if self.operation.#count() < #length {
                         Err(::melior::Error::#error_variant(#name))
                     } else {
-                        self.operation.#kind_singular_identifier(#index)
+                        self.operation.#singular_kind_identifier(#index)
                     }
                 }
             } else if field.is_variadic() {
@@ -35,19 +35,19 @@ pub fn generate_element_getter(
                 // singular elements from the number of elements.
                 quote! {
                     let group_length = self.operation.#count() - #length + 1;
-                    self.operation.#kind_plural_identifier().skip(#index).take(group_length)
+                    self.operation.#plural_kind_identifier().skip(#index).take(group_length)
                 }
             } else if *unfixed_seen {
                 // Single element after unfixed group
                 // Compute the length of that variable group and take the next element
                 quote! {
                     let group_length = self.operation.#count() - #length + 1;
-                    self.operation.#kind_singular_identifier(#index + group_length - 1)
+                    self.operation.#singular_kind_identifier(#index + group_length - 1)
                 }
             } else {
                 // All elements so far are singular
                 quote! {
-                    self.operation.#kind_singular_identifier(#index)
+                    self.operation.#singular_kind_identifier(#index)
                 }
             }
         }
@@ -58,11 +58,11 @@ pub fn generate_element_getter(
         } => {
             let get_elements = if field.is_unfixed() {
                 quote! {
-                    self.operation.#kind_plural_identifier().skip(start).take(group_len)
+                    self.operation.#plural_kind_identifier().skip(start).take(group_len)
                 }
             } else {
                 quote! {
-                    self.operation.#kind_singular_identifier(start)
+                    self.operation.#singular_kind_identifier(start)
                 }
             };
 
@@ -78,19 +78,19 @@ pub fn generate_element_getter(
             let segment_size_attribute = format!("{singular_kind}_segment_sizes");
             let get_elements = if !field.is_unfixed() {
                 quote! {
-                    self.operation.#kind_singular_identifier(start)
+                    self.operation.#singular_kind_identifier(start)
                 }
             } else if field.is_optional() {
                 quote! {
                     if group_len == 0 {
                         Err(::melior::Error::#error_variant(#name))
                     } else {
-                        self.operation.#kind_singular_identifier(start)
+                        self.operation.#singular_kind_identifier(start)
                     }
                 }
             } else {
                 quote! {
-                    Ok(self.operation.#kind_plural_identifier().skip(start).take(group_len))
+                    Ok(self.operation.#plural_kind_identifier().skip(start).take(group_len))
                 }
             };
 
