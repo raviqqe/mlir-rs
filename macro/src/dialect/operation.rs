@@ -126,7 +126,7 @@ impl<'a> Operation<'a> {
         let name = self.documentation_name();
 
         format!(
-            "{} {}",
+            "{}. {}",
             name[..1].to_uppercase() + &name[1..],
             if self.summary.is_empty() {
                 Default::default()
