@@ -40,7 +40,7 @@ fn generate_setter(attribute: &Attribute) -> TokenStream {
     let body = if attribute.is_unit() {
         quote! {
             if value {
-                self.operation.set_attribute(#name, Attribute::unit(&self.operation.context()));
+                self.operation.set_attribute(#name, Attribute::unit(self.operation.context()));
             } else {
                 self.operation.remove_attribute(#name)
             }
