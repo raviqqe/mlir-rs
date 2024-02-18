@@ -131,7 +131,7 @@ impl<'a> Operation<'a> {
             if self.summary.is_empty() {
                 Default::default()
             } else {
-                "A(n) ".to_owned() + &self.summary + "."
+                self.summary.to_owned() + "."
             },
         )
     }
