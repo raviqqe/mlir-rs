@@ -1,5 +1,5 @@
-use quote::{format_ident, quote};
-use syn::GenericArgument;
+use quote::format_ident;
+use syn::{parse_quote, GenericArgument};
 
 #[derive(Debug)]
 pub struct TypeStateItem {
@@ -12,7 +12,7 @@ impl TypeStateItem {
         let identifier = format_ident!("T{}", index);
 
         Self {
-            generic_parameter: syn::parse2(quote!(#identifier)).expect("valid GenericArgument"),
+            generic_parameter: parse_quote!(#identifier),
             field_name,
         }
     }

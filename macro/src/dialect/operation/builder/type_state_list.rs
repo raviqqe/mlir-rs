@@ -1,7 +1,6 @@
 use super::type_state_item::TypeStateItem;
-use quote::quote;
 use std::iter::repeat;
-use syn::GenericArgument;
+use syn::{parse_quote, GenericArgument};
 
 #[derive(Debug)]
 pub struct TypeStateList {
@@ -14,8 +13,8 @@ impl TypeStateList {
     pub fn new(items: Vec<TypeStateItem>) -> Self {
         Self {
             items,
-            unset: syn::parse2(quote!(::melior::dialect::ods::__private::Unset)).unwrap(),
-            set: syn::parse2(quote!(::melior::dialect::ods::__private::Set)).unwrap(),
+            unset: parse_quote!(::melior::dialect::ods::__private::Unset),
+            set: parse_quote!(::melior::dialect::ods::__private::Set),
         }
     }
 
