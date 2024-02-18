@@ -31,10 +31,10 @@ pub struct Operation<'a> {
     operation_name: &'a str,
     summary: &'a str,
     can_infer_type: bool,
-    regions: Vec<Region<'a>>,
-    successors: Vec<Successor<'a>>,
     results: Vec<OperationResult<'a>>,
     operands: Vec<Operand<'a>>,
+    regions: Vec<Region<'a>>,
+    successors: Vec<Successor<'a>>,
     attributes: Vec<Attribute<'a>>,
     derived_attributes: Vec<Attribute<'a>>,
 }
