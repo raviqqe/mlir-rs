@@ -70,38 +70,29 @@ impl<'c> OperationBuilder<'c> {
     /// Adds successor blocks.
     // TODO Fix this to ensure blocks are alive while they are referenced by the
     // operation.
-    // TODO Should we accept `BlockRef` to avoid `.collect()`?
     pub fn add_successors(mut self, successors: &[&Block<'c>]) -> Self {
-        unsafe {
-            mlirOperationStateAddSuccessors(
-                &mut self.raw,
-                successors.len() as isize,
-                successors
-                    .iter()
-                    .map(|block| block.to_raw())
-                    .collect::<Vec<_>>()
-                    .as_ptr() as *const _,
-            )
+        for block in successors {
+            unsafe {
+                mlirOperationStateAddSuccessors(&mut self.raw, 1, &[block.to_raw()] as *const _)
+            }
         }
 
         self
     }
 
     /// Adds attributes.
-    // TODO Should we accept `NamedAttribute`?
     pub fn add_attributes(mut self, attributes: &[(Identifier<'c>, Attribute<'c>)]) -> Self {
-        unsafe {
-            mlirOperationStateAddAttributes(
-                &mut self.raw,
-                attributes.len() as isize,
-                attributes
-                    .iter()
-                    .map(|(identifier, attribute)| {
-                        mlirNamedAttributeGet(identifier.to_raw(), attribute.to_raw())
-                    })
-                    .collect::<Vec<_>>()
-                    .as_ptr() as *const _,
-            )
+        for (identifier, attribute) in attributes {
+            unsafe {
+                mlirOperationStateAddAttributes(
+                    &mut self.raw,
+                    1,
+                    &[mlirNamedAttributeGet(
+                        identifier.to_raw(),
+                        attribute.to_raw(),
+                    )] as *const _,
+                )
+            }
         }
 
         self
