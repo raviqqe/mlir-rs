@@ -29,7 +29,7 @@ pub fn execute_region<'c>(
 ) -> Operation<'c> {
     OperationBuilder::new("scf.execute_region", location)
         .add_results(result_types)
-        .add_regions(vec![region])
+        .add_regions([region])
         .build()
         .expect("valid operation")
 }

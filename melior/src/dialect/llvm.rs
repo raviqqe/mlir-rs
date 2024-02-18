@@ -213,7 +213,7 @@ pub fn func<'c>(
             (Identifier::new(context, "function_type"), r#type.into()),
         ])
         .add_attributes(attributes)
-        .add_regions(vec![region])
+        .add_regions([region])
         .build()
         .expect("valid operation")
 }

@@ -56,13 +56,26 @@ impl<'c> OperationBuilder<'c> {
 
     /// Adds regions.
     pub fn add_regions<const N: usize>(mut self, regions: [Region<'c>; N]) -> Self {
-        forget(regions);
-
         unsafe {
             mlirOperationStateAddOwnedRegions(
                 &mut self.raw,
                 regions.len() as isize,
                 regions.as_ptr() as *const _,
+            )
+        }
+
+        forget(regions);
+
+        self
+    }
+
+    /// Adds regions.
+    pub fn add_regions_vec(mut self, regions: Vec<Region<'c>>) -> Self {
+        unsafe {
+            mlirOperationStateAddOwnedRegions(
+                &mut self.raw,
+                regions.len() as isize,
+                regions.leak().as_ptr() as *const _,
             )
         }
 
