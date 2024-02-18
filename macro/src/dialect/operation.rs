@@ -13,7 +13,7 @@ pub use self::{
     operation_element::OperationElement, region::Region, result::OperationResult,
     successor::Successor, variadic_kind::VariadicKind,
 };
-use super::utility::sanitize_documentation;
+use super::utility::{sanitize_documentation, sanitize_snake_case_identifier};
 use crate::dialect::{
     error::{Error, OdsError},
     r#trait::Trait,
@@ -21,6 +21,7 @@ use crate::dialect::{
     utility::capitalize_string,
 };
 pub use operation_field::OperationField;
+use syn::Ident;
 use tblgen::{error::WithLocation, record::Record, TypedInit};
 
 // spell-checker: disable-next-line
@@ -33,6 +34,7 @@ pub struct Operation<'a> {
     dialect_name: &'a str,
     operation_name: &'a str,
     summary: &'a str,
+    constructor_identifier: Ident,
     can_infer_type: bool,
     results: Vec<OperationResult<'a>>,
     operands: Vec<Operand<'a>>,
@@ -44,6 +46,7 @@ pub struct Operation<'a> {
 
 impl<'a> Operation<'a> {
     pub fn new(definition: Record<'a>) -> Result<Self, Error> {
+        let operation_name = definition.str_value("opName")?;
         let traits = Self::collect_traits(definition)?;
         let has_trait = |name| traits.iter().any(|r#trait| r#trait.name() == Some(name));
 
@@ -58,8 +61,9 @@ impl<'a> Operation<'a> {
         Ok(Self {
             name: Self::build_name(definition)?,
             dialect_name: definition.def_value("opDialect")?.str_value("name")?,
-            operation_name: definition.str_value("opName")?,
+            operation_name,
             summary: definition.str_value("summary")?,
+            constructor_identifier: sanitize_snake_case_identifier(operation_name)?,
             successors: Self::collect_successors(definition)?,
             operands: Self::collect_operands(
                 &arguments,
@@ -149,6 +153,10 @@ impl<'a> Operation<'a> {
 
     pub fn description(&self) -> Result<String, Error> {
         sanitize_documentation(self.definition.str_value("description")?)
+    }
+
+    pub fn constructor_identifier(&self) -> &Ident {
+        &self.constructor_identifier
     }
 
     pub fn results(&self) -> impl Iterator<Item = &OperationResult<'a>> + Clone {

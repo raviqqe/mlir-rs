@@ -163,17 +163,17 @@ pub fn generate_operation_builder_fn(builder: &OperationBuilder) -> TokenStream 
     }
 }
 
-pub fn generate_default_constructor(builder: &OperationBuilder) -> Result<TokenStream, Error> {
-    let identifier = format_ident!("{}", &builder.operation().name());
-    let name = sanitize_snake_case_identifier(builder.operation().operation_name())?;
+pub fn generate_default_constructor(builder: &OperationBuilder) -> TokenStream {
+    let operation_identifier = format_ident!("{}", &builder.operation().name());
+    let constructor_identifier = builder.operation().constructor_identifier();
     let arguments = builder
         .operation()
         .required_fields()
         .map(|field| {
-            let parameter_type = &field.parameter_type();
-            let parameter_name = &field.singular_identifier();
+            let r#type = &field.parameter_type();
+            let name = &field.singular_identifier();
 
-            quote! { #parameter_name: #parameter_type }
+            quote! { #name: #r#type }
         })
         .chain([quote! { location: ::melior::ir::Location<'c> }])
         .collect::<Vec<_>>();
@@ -181,19 +181,19 @@ pub fn generate_default_constructor(builder: &OperationBuilder) -> Result<TokenS
         .operation()
         .required_fields()
         .map(|field| {
-            let parameter_name = &field.singular_identifier();
+            let name = &field.singular_identifier();
 
-            quote! { .#parameter_name(#parameter_name) }
+            quote! { .#name(#name) }
         })
         .collect::<Vec<_>>();
 
     let doc = format!("Creates {}.", builder.operation().documentation_name());
 
-    Ok(quote! {
+    quote! {
         #[allow(clippy::too_many_arguments)]
         #[doc = #doc]
-        pub fn #name<'c>(context: &'c ::melior::Context, #(#arguments),*) -> #identifier<'c> {
-            #identifier::builder(context, location)#(#builder_calls)*.build()
+        pub fn #constructor_identifier<'c>(context: &'c ::melior::Context, #(#arguments),*) -> #operation_identifier<'c> {
+            #operation_identifier::builder(context, location)#(#builder_calls)*.build()
         }
-    })
+    }
 }

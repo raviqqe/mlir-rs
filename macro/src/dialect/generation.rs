@@ -55,7 +55,7 @@ pub fn generate_operation(operation: &Operation) -> Result<TokenStream, Error> {
     let builder = OperationBuilder::new(operation);
     let builder_tokens = generate_operation_builder(&builder)?;
     let builder_fn = generate_operation_builder_fn(&builder);
-    let default_constructor = generate_default_constructor(&builder)?;
+    let default_constructor = generate_default_constructor(&builder);
 
     Ok(quote! {
         #[doc = #summary]
