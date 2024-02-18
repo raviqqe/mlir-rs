@@ -70,7 +70,7 @@ fn generate_field_fn(builder: &OperationBuilder, field: &impl OperationField) ->
     let identifier = field.singular_identifier();
     let parameter_type = field.parameter_type();
     let argument = quote! { #identifier: #parameter_type };
-    let add = format_ident!("add_{}", field.plural_kind_identifier());
+    let add_identifier = format_ident!("add_{}", field.plural_kind_identifier());
 
     // Argument types can be singular and variadic. But `add` functions in Melior
     // are always variadic, so we need to create a slice or `Vec` for singular
@@ -83,7 +83,7 @@ fn generate_field_fn(builder: &OperationBuilder, field: &impl OperationField) ->
         quote! {
             impl<'c, #(#parameters),*> #builder_identifier<'c, #(#parameters),*> {
                 pub fn #identifier(mut self, #argument) -> #builder_identifier<'c, #(#parameters),*> {
-                    self.builder = self.builder.#add(#add_arguments);
+                    self.builder = self.builder.#add_identifier(#add_arguments);
                     self
                 }
             }
@@ -100,7 +100,7 @@ fn generate_field_fn(builder: &OperationBuilder, field: &impl OperationField) ->
                 pub fn #identifier(self, #argument) -> #builder_identifier<'c, #(#arguments_set),*> {
                     #builder_identifier {
                         context: self.context,
-                        builder: self.builder.#add(#add_arguments),
+                        builder: self.builder.#add_identifier(#add_arguments),
                         _state: Default::default(),
                     }
                 }
