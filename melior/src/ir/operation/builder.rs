@@ -11,7 +11,10 @@ use mlir_sys::{
     mlirOperationStateAddSuccessors, mlirOperationStateEnableResultTypeInference,
     mlirOperationStateGet, MlirOperationState,
 };
-use std::{marker::PhantomData, mem::forget};
+use std::{
+    marker::PhantomData,
+    mem::{forget, transmute, ManuallyDrop},
+};
 
 /// An operation builder.
 pub struct OperationBuilder<'c> {
@@ -69,13 +72,13 @@ impl<'c> OperationBuilder<'c> {
         self
     }
 
-    /// Adds regions.
+    /// Adds regions in a [`Vec`](std::vec::Vec).
     pub fn add_regions_vec(mut self, regions: Vec<Region<'c>>) -> Self {
         unsafe {
             mlirOperationStateAddOwnedRegions(
                 &mut self.raw,
                 regions.len() as isize,
-                regions.leak().as_ptr() as *const _,
+                transmute::<_, Vec<ManuallyDrop<Region>>>(regions).as_ptr() as *const _,
             )
         }
 
