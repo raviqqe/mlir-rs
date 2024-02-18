@@ -81,7 +81,7 @@ fn generate_field_fns(builder: &OperationBuilder) -> Vec<TokenStream> {
 }
 
 fn generate_build_fn(builder: &OperationBuilder) -> Result<TokenStream, Error> {
-    let builder_identifier = builder.identifier();
+    let identifier = builder.identifier();
     let arguments = builder.type_state().arguments_all_set(true);
     let operation_identifier = format_ident!("{}", &builder.operation().name());
     let error = format!("should be a valid {operation_identifier}");
@@ -91,7 +91,7 @@ fn generate_build_fn(builder: &OperationBuilder) -> Result<TokenStream, Error> {
         .then_some(quote! { .enable_result_type_inference() });
 
     Ok(quote! {
-        impl<'c> #builder_identifier<'c, #(#arguments),*> {
+        impl<'c> #identifier<'c, #(#arguments),*> {
             pub fn build(self) -> #operation_identifier<'c> {
                 self.builder #maybe_infer.build().expect("valid operation").try_into().expect(#error)
             }
@@ -100,12 +100,12 @@ fn generate_build_fn(builder: &OperationBuilder) -> Result<TokenStream, Error> {
 }
 
 fn generate_new_fn(builder: &OperationBuilder) -> TokenStream {
-    let builder_ident = builder.identifier();
+    let identifier = builder.identifier();
     let name = &builder.operation().full_operation_name();
     let arguments = builder.type_state().arguments_all_set(false);
 
     quote! {
-        impl<'c> #builder_ident<'c, #(#arguments),*> {
+        impl<'c> #identifier<'c, #(#arguments),*> {
             pub fn new(context: &'c ::melior::Context, location: ::melior::ir::Location<'c>) -> Self {
                 Self {
                     context,
