@@ -4,17 +4,22 @@ on:
     branches:
       - main
   pull_request:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: Swatinem/rust-cache@v2
-      - uses: Homebrew/actions/setup-homebrew@master
+      - uses: actions/configure-pages@v4
+      - uses: swatinem/rust-cache@v2
+      - uses: homebrew/actions/setup-homebrew@master
       - run: tools/setup.sh
       - run: cargo doc --all-features
-      - uses: peaceiris/actions-gh-pages@v3
-        if: github.ref == 'refs/heads/main'
+      - uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: target/doc
+          path: target/doc
+      - uses: actions/deploy-pages@v4
+        if: github.ref == 'refs/heads/main'
