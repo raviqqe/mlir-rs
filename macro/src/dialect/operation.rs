@@ -31,8 +31,8 @@ const VOWELS: &str = "aeiou";
 pub struct Operation<'a> {
     definition: Record<'a>,
     name: String,
+    short_dialect_name: &'a str,
     dialect_name: &'a str,
-    dialect_identifier: &'a str,
     operation_name: &'a str,
     summary: &'a str,
     constructor_identifier: Ident,
@@ -61,8 +61,8 @@ impl<'a> Operation<'a> {
 
         Ok(Self {
             name: Self::build_name(definition)?,
-            dialect_name: definition.def_value("opDialect")?.str_value("name")?,
-            dialect_identifier: definition.def_value("opDialect")?.name()?,
+            dialect_name: definition.def_value("opDialect")?.name()?,
+            short_dialect_name: definition.def_value("opDialect")?.str_value("name")?,
             operation_name,
             summary: definition.str_value("summary")?,
             constructor_identifier: sanitize_snake_case_identifier(operation_name)?,
@@ -109,7 +109,7 @@ impl<'a> Operation<'a> {
     }
 
     pub fn dialect_name(&self) -> &str {
-        self.dialect_identifier
+        self.dialect_name
     }
 
     pub fn operation_name(&self) -> &str {
@@ -117,10 +117,10 @@ impl<'a> Operation<'a> {
     }
 
     pub fn full_operation_name(&self) -> String {
-        if self.dialect_name.is_empty() {
+        if self.short_dialect_name.is_empty() {
             self.operation_name.into()
         } else {
-            format!("{}.{}", self.dialect_name, self.operation_name)
+            format!("{}.{}", self.short_dialect_name, self.operation_name)
         }
     }
 
