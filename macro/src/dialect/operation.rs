@@ -119,17 +119,19 @@ impl<'a> Operation<'a> {
     }
 
     pub fn documentation_name(&self) -> String {
-        format!("a [`{}`]({}) operation", self.operation_name, &self.name)
+        format!("a(n) [`{}`]({}) operation", self.operation_name, &self.name)
     }
 
     pub fn summary(&self) -> String {
+        let name = self.documentation_name();
+
         format!(
             "{} {}",
-            self.documentation_name(),
+            name[..1].to_uppercase() + &name[1..],
             if self.summary.is_empty() {
                 Default::default()
             } else {
-                "A ".to_owned() + &self.summary + "."
+                "A(n) ".to_owned() + &self.summary + "."
             },
         )
     }
