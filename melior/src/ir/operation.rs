@@ -569,7 +569,7 @@ mod tests {
         );
         assert!(operation.remove_attribute("foo").is_ok());
         assert!(operation.remove_attribute("foo").is_err());
-        operation.set_attribute("foo", &StringAttribute::new(&context, "foo").into());
+        operation.set_attribute("foo", StringAttribute::new(&context, "foo").into());
         assert_eq!(
             operation.attribute("foo").map(|a| a.to_string()),
             Ok("\"foo\"".into())
