@@ -35,11 +35,15 @@ impl<'a> OperationBuilder<'a> {
 
     fn create_type_state(operation: &Operation) -> TypeStateList {
         TypeStateList::new(
-            operation
-                .required_fields()
-                .enumerate()
-                .map(|(index, field)| TypeStateItem::new(index, field.name().to_string()))
-                .collect(),
+            Self::build_names(operation.required_results()),
+            Self::build_names(operation.required_operands()),
+            Self::build_names(operation.required_regions()),
+            Self::build_names(operation.required_successors()),
+            Self::build_names(operation.required_attributes()),
         )
+    }
+
+    fn build_names(fields: impl Iterator<Item = &impl OpertionField>) -> Vec<String> {
+        fields.map(|field| field.name().into()).collect()
     }
 }

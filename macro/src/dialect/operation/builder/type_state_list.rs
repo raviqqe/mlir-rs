@@ -1,15 +1,30 @@
-use super::type_state_item::TypeStateItem;
 use std::iter::repeat;
 use syn::{parse_quote, GenericArgument};
 
 #[derive(Debug)]
 pub struct TypeStateList {
-    items: Vec<TypeStateItem>,
+    results: Vec<String>,
+    operands: Vec<String>,
+    regions: Vec<String>,
+    successors: Vec<String>,
+    attributes: Vec<String>,
 }
 
 impl TypeStateList {
-    pub fn new(items: Vec<TypeStateItem>) -> Self {
-        Self { items }
+    pub fn new(
+        results: Vec<String>,
+        operands: Vec<String>,
+        regions: Vec<String>,
+        successors: Vec<String>,
+        attributes: Vec<String>,
+    ) -> Self {
+        Self {
+            results,
+            operands,
+            regions,
+            successors,
+            attributes,
+        }
     }
 
     pub fn parameters(&self) -> impl Iterator<Item = &GenericArgument> {
