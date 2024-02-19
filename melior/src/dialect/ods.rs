@@ -212,7 +212,8 @@ mod tests {
                 arith::AddFOperationBuilder::new(&context, location)
                     .rhs(block.argument(1).unwrap().into())
                     .lhs(block.argument(0).unwrap().into())
-                    .build(),
+                    .build()
+                    .into(),
             );
 
             block.append_operation(func::r#return(&[], location));
