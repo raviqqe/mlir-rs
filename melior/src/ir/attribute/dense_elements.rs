@@ -30,7 +30,7 @@ impl<'c> DenseElementsAttribute<'c> {
         }
     }
 
-    /// Gets a length.
+    /// Returns a length.
     pub fn len(&self) -> usize {
         (unsafe { mlirElementsAttrGetNumElements(self.attribute.to_raw()) }) as usize
     }
@@ -40,7 +40,7 @@ impl<'c> DenseElementsAttribute<'c> {
         self.len() == 0
     }
 
-    /// Gets an i32 element.
+    /// Returns an i32 element.
     // TODO Prevent calling these type specific methods on other types.
     pub fn i32_element(&self, index: usize) -> Result<i32, Error> {
         if !self.is_dense_int_elements() {
@@ -61,7 +61,7 @@ impl<'c> DenseElementsAttribute<'c> {
         }
     }
 
-    /// Gets an i64 element.
+    /// Returns an i64 element.
     pub fn i64_element(&self, index: usize) -> Result<i64, Error> {
         if !self.is_dense_int_elements() {
             Err(Error::ElementExpected {

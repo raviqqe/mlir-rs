@@ -15,12 +15,12 @@ pub struct BlockArgument<'c, 'a> {
 }
 
 impl<'c, 'a> BlockArgument<'c, 'a> {
-    /// Gets an argument number.
+    /// Returns an argument number.
     pub fn argument_number(&self) -> usize {
         unsafe { mlirBlockArgumentGetArgNumber(self.value.to_raw()) as usize }
     }
 
-    /// Gets an owner operation.
+    /// Returns an owner operation.
     pub fn owner(&self) -> BlockRef<'c, '_> {
         unsafe { BlockRef::from_raw(mlirBlockArgumentGetOwner(self.value.to_raw())) }
     }

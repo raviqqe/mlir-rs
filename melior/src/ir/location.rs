@@ -68,7 +68,7 @@ impl<'c> Location<'c> {
         unsafe { Self::from_raw(mlirLocationUnknownGet(context.to_raw())) }
     }
 
-    /// Gets a context.
+    /// Returns a context.
     pub fn context(&self) -> ContextRef<'c> {
         unsafe { ContextRef::from_raw(mlirLocationGetContext(self.raw)) }
     }

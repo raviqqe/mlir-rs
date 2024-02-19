@@ -7,12 +7,12 @@ pub trait TypeLike<'c> {
     /// Converts a type into a raw object.
     fn to_raw(&self) -> MlirType;
 
-    /// Gets a context.
+    /// Returns a context.
     fn context(&self) -> ContextRef<'c> {
         unsafe { ContextRef::from_raw(mlirTypeGetContext(self.to_raw())) }
     }
 
-    /// Gets an ID.
+    /// Returns an ID.
     fn id(&self) -> TypeId<'c> {
         unsafe { TypeId::from_raw(mlirTypeGetTypeID(self.to_raw())) }
     }

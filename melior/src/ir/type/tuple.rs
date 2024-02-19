@@ -20,7 +20,7 @@ impl<'c> TupleType<'c> {
         }
     }
 
-    /// Gets a field at a position.
+    /// Returns a field at a position.
     pub fn r#type(&self, index: usize) -> Result<Type, Error> {
         if index < self.type_count() {
             unsafe {
@@ -38,7 +38,7 @@ impl<'c> TupleType<'c> {
         }
     }
 
-    /// Gets a number of fields.
+    /// Returns a number of fields.
     pub fn type_count(&self) -> usize {
         unsafe { mlirTupleTypeGetNumTypes(self.r#type.to_raw()) as usize }
     }

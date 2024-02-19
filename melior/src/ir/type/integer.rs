@@ -30,7 +30,7 @@ impl<'c> IntegerType<'c> {
         unsafe { Self::from_raw(mlirIntegerTypeUnsignedGet(context.to_raw(), bits)) }
     }
 
-    /// Gets a bit width.
+    /// Returns a bit width.
     pub fn width(&self) -> u32 {
         unsafe { mlirIntegerTypeGetWidth(self.to_raw()) }
     }

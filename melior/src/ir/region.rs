@@ -26,7 +26,7 @@ impl<'c> Region<'c> {
         }
     }
 
-    /// Gets the first block in a region.
+    /// Returns the first block in a region.
     pub fn first_block(&self) -> Option<BlockRef<'c, '_>> {
         unsafe {
             let block = mlirRegionGetFirstBlock(self.raw);

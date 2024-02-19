@@ -76,7 +76,7 @@ impl DialectHandle {
         unsafe { Self::from_raw(mlirGetDialectHandle__tensor__()) }
     }
 
-    /// Gets a namespace.
+    /// Returns a namespace.
     pub fn namespace(&self) -> StringRef {
         unsafe { StringRef::from_raw(mlirDialectHandleGetNamespace(self.raw)) }
     }

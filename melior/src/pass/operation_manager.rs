@@ -18,7 +18,7 @@ pub struct OperationPassManager<'c, 'a> {
 }
 
 impl<'c, 'a> OperationPassManager<'c, 'a> {
-    /// Gets an operation pass manager for nested operations corresponding to a
+    /// Returns an operation pass manager for nested operations corresponding to a
     /// given name.
     pub fn nested_under(&self, name: &str) -> Self {
         let name = StringRef::new(name);

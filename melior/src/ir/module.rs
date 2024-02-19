@@ -42,12 +42,12 @@ impl<'c> Module<'c> {
         unsafe { OperationRefMut::from_raw(mlirModuleGetOperation(self.raw)) }
     }
 
-    /// Gets a context.
+    /// Returns a context.
     pub fn context(&self) -> ContextRef<'c> {
         unsafe { ContextRef::from_raw(mlirModuleGetContext(self.raw)) }
     }
 
-    /// Gets a block of a module body.
+    /// Returns a block of a module body.
     pub fn body(&self) -> BlockRef<'c, '_> {
         unsafe { BlockRef::from_raw(mlirModuleGetBody(self.raw)) }
     }

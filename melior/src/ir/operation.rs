@@ -41,29 +41,29 @@ pub struct Operation<'c> {
 }
 
 impl<'c> Operation<'c> {
-    /// Gets a context.
+    /// Returns a context.
     pub fn context(&self) -> ContextRef<'c> {
         unsafe { ContextRef::from_raw(mlirOperationGetContext(self.raw)) }
     }
 
-    /// Gets a name.
+    /// Returns a name.
     pub fn name(&self) -> Identifier<'c> {
         unsafe { Identifier::from_raw(mlirOperationGetName(self.raw)) }
     }
 
-    /// Gets a block.
+    /// Returns a block.
     // TODO Store lifetime of block in operations, or create another type like
     // `AppendedOperationRef`?
     pub fn block(&self) -> Option<BlockRef<'c, '_>> {
         unsafe { BlockRef::from_option_raw(mlirOperationGetBlock(self.raw)) }
     }
 
-    /// Gets the number of operands.
+    /// Returns the number of operands.
     pub fn operand_count(&self) -> usize {
         unsafe { mlirOperationGetNumOperands(self.raw) as usize }
     }
 
-    /// Gets the operand at a position.
+    /// Returns the operand at a position.
     pub fn operand(&self, index: usize) -> Result<Value<'c, '_>, Error> {
         if index < self.operand_count() {
             Ok(unsafe { Value::from_raw(mlirOperationGetOperand(self.raw, index as isize)) })
@@ -76,17 +76,17 @@ impl<'c> Operation<'c> {
         }
     }
 
-    /// Gets all operands.
+    /// Returns all operands.
     pub fn operands(&self) -> impl Iterator<Item = Value<'c, '_>> {
         (0..self.operand_count()).map(|index| self.operand(index).expect("valid operand index"))
     }
 
-    /// Gets the number of results.
+    /// Returns the number of results.
     pub fn result_count(&self) -> usize {
         unsafe { mlirOperationGetNumResults(self.raw) as usize }
     }
 
-    /// Gets a result at a position.
+    /// Returns a result at a position.
     pub fn result(&self, index: usize) -> Result<OperationResult<'c, '_>, Error> {
         if index < self.result_count() {
             Ok(unsafe {
@@ -101,17 +101,17 @@ impl<'c> Operation<'c> {
         }
     }
 
-    /// Gets all results.
+    /// Returns all results.
     pub fn results(&self) -> impl Iterator<Item = OperationResult<'c, '_>> {
         (0..self.result_count()).map(|index| self.result(index).expect("valid result index"))
     }
 
-    /// Gets the number of regions.
+    /// Returns the number of regions.
     pub fn region_count(&self) -> usize {
         unsafe { mlirOperationGetNumRegions(self.raw) as usize }
     }
 
-    /// Gets a region at a position.
+    /// Returns a region at a position.
     pub fn region(&self, index: usize) -> Result<RegionRef<'c, '_>, Error> {
         if index < self.region_count() {
             Ok(unsafe { RegionRef::from_raw(mlirOperationGetRegion(self.raw, index as isize)) })
@@ -124,17 +124,17 @@ impl<'c> Operation<'c> {
         }
     }
 
-    /// Gets all regions.
+    /// Returns all regions.
     pub fn regions(&self) -> impl Iterator<Item = RegionRef<'c, '_>> {
         (0..self.region_count()).map(|index| self.region(index).expect("valid result index"))
     }
 
-    /// Gets the number of successors.
+    /// Returns the number of successors.
     pub fn successor_count(&self) -> usize {
         unsafe { mlirOperationGetNumSuccessors(self.raw) as usize }
     }
 
-    /// Gets a successor at a position.
+    /// Returns a successor at a position.
     pub fn successor(&self, index: usize) -> Result<BlockRef<'c, '_>, Error> {
         if index < self.successor_count() {
             Ok(unsafe { BlockRef::from_raw(mlirOperationGetSuccessor(self.raw, index as isize)) })
@@ -147,18 +147,18 @@ impl<'c> Operation<'c> {
         }
     }
 
-    /// Gets all successors.
+    /// Returns all successors.
     pub fn successors(&self) -> impl Iterator<Item = BlockRef<'c, '_>> {
         (0..self.successor_count())
             .map(|index| self.successor(index).expect("valid successor index"))
     }
 
-    /// Gets the number of attributes.
+    /// Returns the number of attributes.
     pub fn attribute_count(&self) -> usize {
         unsafe { mlirOperationGetNumAttributes(self.raw) as usize }
     }
 
-    /// Gets a attribute at a position.
+    /// Returns a attribute at a position.
     pub fn attribute_at(&self, index: usize) -> Result<(Identifier<'c>, Attribute<'c>), Error> {
         if index < self.attribute_count() {
             unsafe {
@@ -177,13 +177,13 @@ impl<'c> Operation<'c> {
         }
     }
 
-    /// Gets all attributes.
+    /// Returns all attributes.
     pub fn attributes(&self) -> impl Iterator<Item = (Identifier<'c>, Attribute<'c>)> + '_ {
         (0..self.attribute_count())
             .map(|index| self.attribute_at(index).expect("valid attribute index"))
     }
 
-    /// Gets a attribute with the given name.
+    /// Returns a attribute with the given name.
     pub fn attribute(&self, name: &str) -> Result<Attribute<'c>, Error> {
         unsafe {
             Attribute::from_option_raw(mlirOperationGetAttributeByName(
@@ -217,7 +217,7 @@ impl<'c> Operation<'c> {
             .ok_or(Error::AttributeNotFound(name.into()))
     }
 
-    /// Gets the next operation in the same block.
+    /// Returns the next operation in the same block.
     pub fn next_in_block(&self) -> Option<OperationRef<'c, '_>> {
         unsafe { OperationRef::from_option_raw(mlirOperationGetNextInBlock(self.raw)) }
     }
@@ -337,12 +337,12 @@ pub struct OperationRef<'c, 'a> {
 }
 
 impl<'c, 'a> OperationRef<'c, 'a> {
-    /// Gets a result at a position.
+    /// Returns a result at a position.
     pub fn result(self, index: usize) -> Result<OperationResult<'c, 'a>, Error> {
         unsafe { self.to_ref() }.result(index)
     }
 
-    /// Gets an operation.
+    /// Returns an operation.
     ///
     /// This function is different from `deref` because the correct lifetime is
     /// kept for the return type.

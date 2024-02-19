@@ -48,7 +48,7 @@ impl<'c> Block<'c> {
         }
     }
 
-    /// Gets an argument at a position.
+    /// Returns an argument at a position.
     pub fn argument(&self, index: usize) -> Result<BlockArgument<'c, '_>, Error> {
         unsafe {
             if index < self.argument_count() {
@@ -66,12 +66,12 @@ impl<'c> Block<'c> {
         }
     }
 
-    /// Gets a number of arguments.
+    /// Returns a number of arguments.
     pub fn argument_count(&self) -> usize {
         unsafe { mlirBlockGetNumArguments(self.raw) as usize }
     }
 
-    /// Gets the first operation.
+    /// Returns the first operation.
     pub fn first_operation(&self) -> Option<OperationRef> {
         unsafe {
             let operation = mlirBlockGetFirstOperation(self.raw);
@@ -84,19 +84,19 @@ impl<'c> Block<'c> {
         }
     }
 
-    /// Gets a terminator operation.
+    /// Returns a terminator operation.
     pub fn terminator(&self) -> Option<OperationRef> {
         unsafe { OperationRef::from_option_raw(mlirBlockGetTerminator(self.raw)) }
     }
 
-    /// Gets a parent region.
+    /// Returns a parent region.
     // TODO Store lifetime of regions in blocks, or create another type like
     // `InsertedBlockRef`?
     pub fn parent_region(&self) -> Option<RegionRef<'c, '_>> {
         unsafe { RegionRef::from_option_raw(mlirBlockGetParentRegion(self.raw)) }
     }
 
-    /// Gets a parent operation.
+    /// Returns a parent operation.
     pub fn parent_operation(&self) -> Option<OperationRef> {
         unsafe { OperationRef::from_option_raw(mlirBlockGetParentOperation(self.raw)) }
     }
@@ -187,7 +187,7 @@ impl<'c> Block<'c> {
         }
     }
 
-    /// Gets a next block in a region.
+    /// Returns a next block in a region.
     pub fn next_in_region(&self) -> Option<BlockRef<'c, '_>> {
         unsafe { BlockRef::from_option_raw(mlirBlockGetNextInRegion(self.raw)) }
     }

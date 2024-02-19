@@ -20,7 +20,7 @@ pub struct AffineMap<'c> {
 }
 
 impl<'c> AffineMap<'c> {
-    /// Gets a context.
+    /// Returns a context.
     pub fn context(&self) -> ContextRef<'c> {
         unsafe { ContextRef::from_raw(mlirAffineMapGetContext(self.raw)) }
     }
