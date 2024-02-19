@@ -185,6 +185,18 @@ impl<'a> Operation<'a> {
         self.attributes.iter().chain(&self.derived_attributes)
     }
 
+    pub fn required_results(&self) -> impl Iterator<Item = &(impl OperationField + '_)> {
+        fn convert(field: &impl OperationField) -> &dyn OperationField {
+            field
+        }
+
+        if self.can_infer_type {
+            Default::default()
+        } else {
+            self.results.iter()
+        }
+    }
+
     pub fn required_fields(&self) -> impl Iterator<Item = &dyn OperationField> {
         fn convert(field: &impl OperationField) -> &dyn OperationField {
             field

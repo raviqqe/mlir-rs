@@ -8,8 +8,8 @@ pub struct TypeStateItem {
 }
 
 impl TypeStateItem {
-    pub fn new(index: usize, field_name: String) -> Self {
-        let identifier = format_ident!("T{}", index);
+    pub fn new(field_name: String, prefix: &'static str, index: usize) -> Self {
+        let identifier = format_ident!("{prefix}{index}");
 
         Self {
             generic_parameter: parse_quote!(#identifier),
