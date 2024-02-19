@@ -305,7 +305,7 @@ impl<'c> PartialEq for Operation<'c> {
 
 impl<'c> Eq for Operation<'c> {}
 
-impl<'a> Display for Operation<'a> {
+impl<'c> Display for Operation<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         let mut data = (formatter, Ok(()));
 
