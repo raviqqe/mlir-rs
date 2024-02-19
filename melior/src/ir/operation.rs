@@ -458,7 +458,7 @@ impl<'c, 'a> OperationRefMut<'c, 'a> {
 }
 
 impl<'c, 'a> Deref for OperationRefMut<'c, 'a> {
-    type Target = Operation<'a>;
+    type Target = Operation<'c>;
 
     fn deref(&self) -> &Self::Target {
         unsafe { transmute(self) }
