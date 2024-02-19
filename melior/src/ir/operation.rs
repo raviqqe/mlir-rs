@@ -342,7 +342,7 @@ impl<'c, 'a> OperationRef<'c, 'a> {
         unsafe { self.to_ref() }.result(index)
     }
 
-    /// Gets an operation.
+    /// Gets a operation.
     ///
     /// This function is different from `deref` because the correct lifetime is
     /// kept for the return type.
