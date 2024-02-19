@@ -5,17 +5,11 @@ use syn::{parse_quote, GenericArgument};
 #[derive(Debug)]
 pub struct TypeStateList {
     items: Vec<TypeStateItem>,
-    unset: GenericArgument,
-    set: GenericArgument,
 }
 
 impl TypeStateList {
     pub fn new(items: Vec<TypeStateItem>) -> Self {
-        Self {
-            items,
-            unset: ,
-            set: ,
-        }
+        Self { items }
     }
 
     pub fn parameters(&self) -> impl Iterator<Item = &GenericArgument> {
@@ -36,21 +30,21 @@ impl TypeStateList {
         &'a self,
         field_name: &'a str,
         set: bool,
-    ) -> impl Iterator<Item = &GenericArgument> {
+    ) -> impl Iterator<Item = GenericArgument> + 'a {
         self.items.iter().map(move |item| {
             if item.field_name() == field_name {
                 self.set_argument(set)
             } else {
-                item.generic_parameter()
+                item.generic_parameter().clone()
             }
         })
     }
 
-    pub fn arguments_all_set(&self, set: bool) -> impl Iterator<Item = &GenericArgument> {
+    pub fn arguments_all_set(&self, set: bool) -> impl Iterator<Item = GenericArgument> {
         repeat(self.set_argument(set)).take(self.items.len())
     }
 
-    fn set_argument(&self, set: bool) -> &GenericArgument {
+    fn set_argument(&self, set: bool) -> GenericArgument {
         if set {
             parse_quote!(::melior::dialect::ods::__private::Set)
         } else {
