@@ -391,7 +391,7 @@ impl<'c, 'a> OperationRef<'c, 'a> {
 }
 
 impl<'c, 'a> Deref for OperationRef<'c, 'a> {
-    type Target = Operation<'a>;
+    type Target = Operation<'c>;
 
     fn deref(&self) -> &Self::Target {
         unsafe { transmute(self) }
