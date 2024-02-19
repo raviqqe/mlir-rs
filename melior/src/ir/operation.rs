@@ -351,7 +351,6 @@ impl<'c, 'a> OperationRef<'c, 'a> {
     ///
     /// The returned reference is safe to use only in the lifetime scope of the
     /// operation reference.
-    // TODO Remove this?
     pub unsafe fn to_ref(&self) -> &'a Operation<'c> {
         // As we can't deref OperationRef<'a> into `&'a Operation`, we forcibly cast its
         // lifetime here to extend it from the lifetime of `ObjectRef<'a>` itself into
