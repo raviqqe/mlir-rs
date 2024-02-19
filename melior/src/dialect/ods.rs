@@ -181,12 +181,12 @@ mod tests {
     }
 
     #[test]
-    fn compile_llvm_alloca() {
+    fn compile_arith_addf() {
         let context = create_test_context();
         let location = Location::unknown(&context);
-        let integer_type = IntegerType::new(&context, 64).into();
+        let r#type = Float32Type::new(&context).into();
 
-        test_operation("alloc", &context, &[integer_type], |block| {
+        test_operation("addf", &context, &[r#type], |block| {
             let alloca_size = block.argument(0).unwrap().into();
             let i64_type = IntegerType::new(&context, 64);
 
@@ -194,6 +194,29 @@ mod tests {
                 llvm::alloca(
                     &context,
                     dialect::llvm::r#type::pointer(i64_type.into(), 0),
+                    alloca_size,
+                    location,
+                )
+                .into(),
+            );
+
+            block.append_operation(func::r#return(&[], location));
+        });
+    }
+
+    #[test]
+    fn compile_llvm_alloca() {
+        let context = create_test_context();
+        let location = Location::unknown(&context);
+        let integer_type = IntegerType::new(&context, 64).into();
+
+        test_operation("alloc", &context, &[integer_type], |block| {
+            let alloca_size = block.argument(0).unwrap().into();
+
+            block.append_operation(
+                llvm::alloca(
+                    &context,
+                    dialect::llvm::r#type::pointer(integer_type.into(), 0),
                     alloca_size,
                     location,
                 )
@@ -213,12 +236,11 @@ mod tests {
 
         test_operation("alloc_builder", &context, &[integer_type], |block| {
             let alloca_size = block.argument(0).unwrap().into();
-            let i64_type = IntegerType::new(&context, 64);
 
             block.append_operation(
                 llvm::AllocaOperationBuilder::new(&context, location)
-                    .alignment(IntegerAttribute::new(8, i64_type.into()))
-                    .elem_type(TypeAttribute::new(i64_type.into()))
+                    .alignment(IntegerAttribute::new(8, integer_type.into()))
+                    .elem_type(TypeAttribute::new(integer_type.into()))
                     .array_size(alloca_size)
                     .res(ptr_type)
                     .build()
