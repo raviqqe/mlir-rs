@@ -191,7 +191,7 @@ mod tests {
                 arith::addf(
                     &context,
                     block.argument(0).unwrap().into(),
-                    block.argument(0).unwrap().into(),
+                    block.argument(1).unwrap().into(),
                     location,
                 )
                 .into(),
@@ -207,7 +207,7 @@ mod tests {
         let location = Location::unknown(&context);
         let r#type = Type::float32(&context);
 
-        test_operation("addf", &context, &[r#type, r#type], |block| {
+        test_operation("addf_builder", &context, &[r#type, r#type], |block| {
             block.append_operation(
                 arith::AddFOperationBuilder::new(&context, location)
                     .rhs(block.argument(1).unwrap().into())
