@@ -2,7 +2,7 @@ mod type_state_item;
 mod type_state_list;
 
 use self::{type_state_item::TypeStateItem, type_state_list::TypeStateList};
-use super::Operation;
+use super::{Operation, OperationField};
 use quote::format_ident;
 use syn::Ident;
 
@@ -43,7 +43,7 @@ impl<'a> OperationBuilder<'a> {
         )
     }
 
-    fn build_names(fields: impl Iterator<Item = &impl OpertionField>) -> Vec<String> {
+    fn build_names(fields: impl Iterator<Item = &'_ impl OperationField>) -> Vec<String> {
         fields.map(|field| field.name().into()).collect()
     }
 }
