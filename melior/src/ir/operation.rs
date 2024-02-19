@@ -358,6 +358,22 @@ impl<'c, 'a> OperationRef<'c, 'a> {
         transmute(self)
     }
 
+    /// Gets an mutable operation.
+    ///
+    /// This function is different from `deref` because the correct lifetime is
+    /// kept for the return type.
+    ///
+    /// # Safety
+    ///
+    /// The returned reference is safe to use only in the lifetime scope of the
+    /// operation reference.
+    pub unsafe fn to_ref_mut(&mut self) -> &'a mut Operation<'c> {
+        // As we can't deref OperationRef<'a> into `&'a Operation`, we forcibly cast its
+        // lifetime here to extend it from the lifetime of `ObjectRef<'a>` itself into
+        // `'a`.
+        transmute(self)
+    }
+
     /// Converts an operation reference into a raw object.
     pub const fn to_raw(self) -> MlirOperation {
         self.raw
@@ -393,12 +409,6 @@ impl<'c, 'a> Deref for OperationRef<'c, 'a> {
     type Target = Operation<'a>;
 
     fn deref(&self) -> &Self::Target {
-        unsafe { transmute(self) }
-    }
-}
-
-impl<'c, 'a> DerefMut for OperationRef<'c, 'a> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
         unsafe { transmute(self) }
     }
 }
