@@ -13,8 +13,8 @@ impl TypeStateList {
     pub fn new(items: Vec<TypeStateItem>) -> Self {
         Self {
             items,
-            unset: parse_quote!(::melior::dialect::ods::__private::Unset),
-            set: parse_quote!(::melior::dialect::ods::__private::Set),
+            unset: ,
+            set: ,
         }
     }
 
@@ -52,9 +52,9 @@ impl TypeStateList {
 
     fn set_argument(&self, set: bool) -> &GenericArgument {
         if set {
-            &self.set
+            parse_quote!(::melior::dialect::ods::__private::Set)
         } else {
-            &self.unset
+            parse_quote!(::melior::dialect::ods::__private::Unset)
         }
     }
 }
