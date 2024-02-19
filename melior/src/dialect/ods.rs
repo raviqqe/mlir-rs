@@ -209,13 +209,10 @@ mod tests {
 
         test_operation("addf", &context, &[r#type, r#type], |block| {
             block.append_operation(
-                arith::addf(
-                    &context,
-                    block.argument(0).unwrap().into(),
-                    block.argument(0).unwrap().into(),
-                    location,
-                )
-                .into(),
+                arith::AddFOperationBuilder::new(&context, location)
+                    .rhs(block.argument(1).unwrap().into())
+                    .lhs(block.argument(0).unwrap().into())
+                    .into(),
             );
 
             block.append_operation(func::r#return(&[], location));
