@@ -43,7 +43,7 @@ impl<'a> OperationBuilder<'a> {
         )
     }
 
-    fn build_names(fields: impl Iterator<Item = &'_ impl OperationField>) -> Vec<String> {
+    fn build_names<'a>(fields: impl Iterator<Item = &'a impl OperationField>) -> Vec<String> {
         fields.map(|field| field.name().into()).collect()
     }
 }
