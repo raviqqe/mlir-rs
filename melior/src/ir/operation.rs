@@ -31,7 +31,7 @@ use std::{
     ffi::c_void,
     fmt::{Debug, Display, Formatter},
     marker::PhantomData,
-    ops::Deref,
+    ops::{Deref, DerefMut},
 };
 
 /// An operation.
@@ -351,6 +351,7 @@ impl<'c, 'a> OperationRef<'c, 'a> {
     ///
     /// The returned reference is safe to use only in the lifetime scope of the
     /// operation reference.
+    // TODO Remove this?
     pub unsafe fn to_ref(&self) -> &'a Operation<'c> {
         // As we can't deref OperationRef<'a> into `&'a Operation`, we forcibly cast its
         // lifetime here to extend it from the lifetime of `ObjectRef<'a>` itself into
@@ -412,6 +413,79 @@ impl<'c, 'a> Display for OperationRef<'c, 'a> {
 }
 
 impl<'c, 'a> Debug for OperationRef<'c, 'a> {
+    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
+        Debug::fmt(self.deref(), formatter)
+    }
+}
+
+/// A mutable reference to an operation.
+#[derive(Clone, Copy)]
+pub struct OperationRefMut<'c, 'a> {
+    raw: MlirOperation,
+    _reference: PhantomData<&'a Operation<'c>>,
+}
+
+impl<'c, 'a> OperationRefMut<'c, 'a> {
+    /// Converts an operation reference into a raw object.
+    pub const fn to_raw(self) -> MlirOperation {
+        self.raw
+    }
+
+    /// Creates an operation reference from a raw object.
+    ///
+    /// # Safety
+    ///
+    /// A raw object must be valid.
+    pub unsafe fn from_raw(raw: MlirOperation) -> Self {
+        Self {
+            raw,
+            _reference: Default::default(),
+        }
+    }
+
+    /// Creates an optional operation reference from a raw object.
+    ///
+    /// # Safety
+    ///
+    /// A raw object must be valid.
+    pub unsafe fn from_option_raw(raw: MlirOperation) -> Option<Self> {
+        if raw.ptr.is_null() {
+            None
+        } else {
+            Some(Self::from_raw(raw))
+        }
+    }
+}
+
+impl<'c, 'a> Deref for OperationRefMut<'c, 'a> {
+    type Target = Operation<'a>;
+
+    fn deref(&self) -> &Self::Target {
+        unsafe { transmute(self) }
+    }
+}
+
+impl<'c, 'a> DerefMut for OperationRefMut<'c, 'a> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        unsafe { transmute(self) }
+    }
+}
+
+impl<'c, 'a> PartialEq for OperationRefMut<'c, 'a> {
+    fn eq(&self, other: &Self) -> bool {
+        unsafe { mlirOperationEqual(self.raw, other.raw) }
+    }
+}
+
+impl<'c, 'a> Eq for OperationRefMut<'c, 'a> {}
+
+impl<'c, 'a> Display for OperationRefMut<'c, 'a> {
+    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
+        Display::fmt(self.deref(), formatter)
+    }
+}
+
+impl<'c, 'a> Debug for OperationRefMut<'c, 'a> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Debug::fmt(self.deref(), formatter)
     }
