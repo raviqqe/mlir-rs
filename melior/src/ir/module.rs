@@ -98,7 +98,7 @@ impl<'c> Drop for Module<'c> {
 mod tests {
     use super::*;
     use crate::{
-        ir::{operation::OperationBuilder, Block, Region},
+        ir::{attribute::StringAttribute, operation::OperationBuilder, Block, Region},
         test::create_test_context,
     };
 
@@ -161,7 +161,7 @@ mod tests {
 
         module
             .as_operation_mut()
-            .set_attribute("sym_name", StringAtribute::new(&context, "foo"));
+            .set_attribute("sym_name", StringAttribute::new(&context, "foo"));
 
         assert!(module.as_operation().verify());
     }
