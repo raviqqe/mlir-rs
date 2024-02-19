@@ -184,17 +184,35 @@ mod tests {
     fn compile_arith_addf() {
         let context = create_test_context();
         let location = Location::unknown(&context);
-        let r#type = Float32Type::new(&context).into();
+        let r#type = Type::float32(&context);
 
-        test_operation("addf", &context, &[r#type], |block| {
-            let alloca_size = block.argument(0).unwrap().into();
-            let i64_type = IntegerType::new(&context, 64);
-
+        test_operation("addf", &context, &[r#type, r#type], |block| {
             block.append_operation(
-                llvm::alloca(
+                arith::addf(
                     &context,
-                    dialect::llvm::r#type::pointer(i64_type.into(), 0),
-                    alloca_size,
+                    block.argument(0).unwrap().into(),
+                    block.argument(0).unwrap().into(),
+                    location,
+                )
+                .into(),
+            );
+
+            block.append_operation(func::r#return(&[], location));
+        });
+    }
+
+    #[test]
+    fn compile_arith_addf_builder_with_reverse_order() {
+        let context = create_test_context();
+        let location = Location::unknown(&context);
+        let r#type = Type::float32(&context);
+
+        test_operation("addf", &context, &[r#type, r#type], |block| {
+            block.append_operation(
+                arith::addf(
+                    &context,
+                    block.argument(0).unwrap().into(),
+                    block.argument(0).unwrap().into(),
                     location,
                 )
                 .into(),
