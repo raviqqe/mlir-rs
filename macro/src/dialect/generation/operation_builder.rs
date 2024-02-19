@@ -109,7 +109,7 @@ fn generate_field_fn(builder: &OperationBuilder, field: &impl OperationField) ->
 
 fn generate_build_fn(builder: &OperationBuilder) -> TokenStream {
     let identifier = builder.identifier();
-    let arguments = builder.type_state().arguments_all_set(true);
+    let arguments = builder.type_state().arguments_with_all(true);
     let operation_identifier = format_ident!("{}", &builder.operation().name());
     let error = format!("should be a valid {operation_identifier}");
     let maybe_infer = builder
@@ -129,7 +129,7 @@ fn generate_build_fn(builder: &OperationBuilder) -> TokenStream {
 fn generate_new_fn(builder: &OperationBuilder) -> TokenStream {
     let identifier = builder.identifier();
     let name = &builder.operation().full_operation_name();
-    let arguments = builder.type_state().arguments_all_set(false);
+    let arguments = builder.type_state().arguments_with_all(false);
 
     quote! {
         impl<'c> #identifier<'c, #(#arguments),*> {
@@ -146,7 +146,7 @@ fn generate_new_fn(builder: &OperationBuilder) -> TokenStream {
 
 pub fn generate_operation_builder_fn(builder: &OperationBuilder) -> TokenStream {
     let builder_ident = builder.identifier();
-    let arguments = builder.type_state().arguments_all_set(false);
+    let arguments = builder.type_state().arguments_with_all(false);
 
     quote! {
         /// Creates a builder.
