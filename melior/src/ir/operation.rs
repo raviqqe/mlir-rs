@@ -31,7 +31,7 @@ use std::{
     ffi::c_void,
     fmt::{Debug, Display, Formatter},
     marker::PhantomData,
-    ops::Deref,
+    ops::{Deref, DerefMut},
 };
 
 /// An operation.
@@ -393,6 +393,12 @@ impl<'c, 'a> Deref for OperationRef<'c, 'a> {
     type Target = Operation<'a>;
 
     fn deref(&self) -> &Self::Target {
+        unsafe { transmute(self) }
+    }
+}
+
+impl<'c, 'a> DerefMut for OperationRef<'c, 'a> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
         unsafe { transmute(self) }
     }
 }
