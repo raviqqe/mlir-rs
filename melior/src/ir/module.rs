@@ -157,11 +157,11 @@ mod tests {
     fn set_attribute() {
         let context = create_test_context();
 
-        let module = Module::new(Location::unknown(&context));
+        let mut module = Module::new(Location::unknown(&context));
 
         module
             .as_operation_mut()
-            .set_attribute("sym_name", StringAttribute::new(&context, "foo"));
+            .set_attribute("sym_name", StringAttribute::new(&context, "foo").into());
 
         assert!(module.as_operation().verify());
     }
