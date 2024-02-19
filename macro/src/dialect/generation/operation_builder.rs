@@ -90,8 +90,8 @@ fn generate_field_fn(builder: &OperationBuilder, field: &impl OperationField) ->
         }
     } else {
         let parameters = builder.type_state().parameters_without(field.name());
-        let arguments_set = builder.type_state().arguments_set(field.name(), true);
-        let arguments_unset = builder.type_state().arguments_set(field.name(), false);
+        let arguments_set = builder.type_state().arguments_with(field.name(), true);
+        let arguments_unset = builder.type_state().arguments_with(field.name(), false);
 
         quote! {
             impl<'c, #(#parameters),*> #builder_identifier<'c, #(#arguments_unset),*> {

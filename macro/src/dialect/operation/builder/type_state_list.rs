@@ -41,7 +41,7 @@ impl TypeStateList {
             .map(|item| item.generic_parameter())
     }
 
-    pub fn arguments_set<'a>(
+    pub fn arguments_with<'a>(
         &'a self,
         field_name: &'a str,
         set: bool,
@@ -55,7 +55,7 @@ impl TypeStateList {
         })
     }
 
-    pub fn arguments_all_set(&self, set: bool) -> impl Iterator<Item = GenericArgument> {
+    pub fn arguments_with_all(&self, set: bool) -> impl Iterator<Item = GenericArgument> {
         repeat(self.set_argument(set)).take(self.items.len())
     }
 
