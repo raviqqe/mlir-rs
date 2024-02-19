@@ -31,7 +31,7 @@ use std::{
     ffi::c_void,
     fmt::{Debug, Display, Formatter},
     marker::PhantomData,
-    ops::{Deref, DerefMut},
+    ops::Deref,
 };
 
 /// An operation.
