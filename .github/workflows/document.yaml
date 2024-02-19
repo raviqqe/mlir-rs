@@ -18,6 +18,7 @@ jobs:
       - uses: homebrew/actions/setup-homebrew@master
       - run: tools/setup.sh
       - run: cargo doc --all-features
+      - run: rm target/doc/.lock
       - uses: actions/upload-pages-artifact@v3
         with:
           path: target/doc
