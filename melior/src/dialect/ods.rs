@@ -232,7 +232,7 @@ mod tests {
             block.append_operation(
                 llvm::alloca(
                     &context,
-                    dialect::llvm::r#type::pointer(integer_type.into(), 0),
+                    dialect::llvm::r#type::pointer(integer_type, 0),
                     alloca_size,
                     location,
                 )
@@ -255,8 +255,8 @@ mod tests {
 
             block.append_operation(
                 llvm::AllocaOperationBuilder::new(&context, location)
-                    .alignment(IntegerAttribute::new(8, integer_type.into()))
-                    .elem_type(TypeAttribute::new(integer_type.into()))
+                    .alignment(IntegerAttribute::new(8, integer_type))
+                    .elem_type(TypeAttribute::new(integer_type))
                     .array_size(alloca_size)
                     .res(ptr_type)
                     .build()
