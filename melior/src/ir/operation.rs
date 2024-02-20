@@ -745,12 +745,7 @@ mod tests {
                 .build()
                 .unwrap(),
         );
-        block
-            .first_operation_mut()
-            .unwrap()
-            .next_in_block_mut()
-            .unwrap()
-            .remove_from_parent();
+        block.first_operation_mut().unwrap().remove_from_parent();
 
         assert_eq!(block.first_operation().unwrap().next_in_block(), None);
     }
