@@ -737,7 +737,7 @@ mod tests {
         );
         block.append_operation(
             OperationBuilder::new("bar", Location::unknown(&context))
-                .add_operands(first_operation.result(0).into())
+                .add_operands(&[first_operation.result(0).unwrap().into()])
                 .build()
                 .unwrap(),
         );
