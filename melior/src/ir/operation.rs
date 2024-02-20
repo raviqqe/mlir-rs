@@ -722,7 +722,6 @@ mod tests {
         );
     }
 
-    // TODO
     #[test]
     fn remove_from_parent() {
         let context = create_test_context();
@@ -731,7 +730,7 @@ mod tests {
 
         let first_operation = block.append_operation(
             OperationBuilder::new("foo", Location::unknown(&context))
-                .add_results(Type::index(&context))
+                .add_results(&[Type::index(&context)])
                 .build()
                 .unwrap(),
         );
