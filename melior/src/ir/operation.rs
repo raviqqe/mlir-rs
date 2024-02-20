@@ -24,7 +24,7 @@ use mlir_sys::{
     mlirOperationGetNumAttributes, mlirOperationGetNumOperands, mlirOperationGetNumRegions,
     mlirOperationGetNumResults, mlirOperationGetNumSuccessors, mlirOperationGetOperand,
     mlirOperationGetRegion, mlirOperationGetResult, mlirOperationGetSuccessor, mlirOperationPrint,
-    mlirOperationPrintWithFlags, mlirOperationRemoveAttributeByName,
+    mlirOperationPrintWithFlags, mlirOperationRemoveAttributeByName, mlirOperationRemoveFromParent,
     mlirOperationSetAttributeByName, mlirOperationVerify, MlirOperation,
 };
 use std::{
@@ -220,6 +220,11 @@ impl<'c> Operation<'c> {
     /// Returns the next operation in the same block.
     pub fn next_in_block(&self) -> Option<OperationRef<'c, '_>> {
         unsafe { OperationRef::from_option_raw(mlirOperationGetNextInBlock(self.raw)) }
+    }
+
+    /// Removes itself from a parent block.
+    pub fn remove_from_parent(&mut self) {
+        unsafe { mlirOperationRemoveFromParent(self.raw) }
     }
 
     /// Verifies an operation.
