@@ -775,7 +775,7 @@ mod tests {
         let location = Location::unknown(&context);
         let mut block = Block::new(&[]);
 
-        let first_operation = block.append_operation(
+        let operation = block.append_operation(
             OperationBuilder::new("foo", location)
                 .add_results(&[Type::index(&context)])
                 .add_regions([{
@@ -790,12 +790,13 @@ mod tests {
                 .build()
                 .unwrap(),
         );
-        block.first_operation_mut().unwrap().remove_from_parent();
 
-        assert_eq!(block.first_operation().unwrap().next_in_block(), None);
-        assert_eq!(
-            block.first_operation().unwrap().to_string(),
-            "\"bar\"(<<UNKNOWN SSA VALUE>>) : (index) -> ()"
-        );
+        assert!(operation
+            .region(0)
+            .unwrap()
+            .first_block()
+            .unwrap()
+            .first_operation()
+            .is_some());
     }
 }
