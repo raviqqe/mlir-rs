@@ -3,7 +3,9 @@
 mod argument;
 
 pub use self::argument::BlockArgument;
-use super::{Location, Operation, OperationRef, RegionRef, Type, TypeLike, Value};
+use super::{
+    operation::OperationRefMut, Location, Operation, OperationRef, RegionRef, Type, TypeLike, Value,
+};
 use crate::{context::Context, utility::print_callback, Error};
 use mlir_sys::{
     mlirBlockAddArgument, mlirBlockAppendOwnedOperation, mlirBlockCreate, mlirBlockDestroy,
@@ -71,22 +73,24 @@ impl<'c> Block<'c> {
         unsafe { mlirBlockGetNumArguments(self.raw) as usize }
     }
 
-    /// Returns the first operation.
+    /// Returns a reference to the first operation.
     pub fn first_operation(&self) -> Option<OperationRef<'c, '_>> {
-        unsafe {
-            let operation = mlirBlockGetFirstOperation(self.raw);
+        unsafe { OperationRef::from_option_raw(mlirBlockGetFirstOperation(self.raw)) }
+    }
 
-            if operation.ptr.is_null() {
-                None
-            } else {
-                Some(OperationRef::from_raw(operation))
-            }
-        }
+    /// Returns a mutable reference to the first operation.
+    pub fn first_operation_mut(&mut self) -> Option<OperationRefMut<'c, '_>> {
+        unsafe { OperationRefMut::from_option_raw(mlirBlockGetFirstOperation(self.raw)) }
     }
 
     /// Returns a terminator operation.
     pub fn terminator(&self) -> Option<OperationRef<'c, '_>> {
         unsafe { OperationRef::from_option_raw(mlirBlockGetTerminator(self.raw)) }
+    }
+
+    /// Returns a terminator operation.
+    pub fn terminator_mut(&mut self) -> Option<OperationRefMut<'c, '_>> {
+        unsafe { OperationRefMut::from_option_raw(mlirBlockGetTerminator(self.raw)) }
     }
 
     /// Returns a parent region.

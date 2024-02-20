@@ -217,9 +217,14 @@ impl<'c> Operation<'c> {
             .ok_or(Error::AttributeNotFound(name.into()))
     }
 
-    /// Returns the next operation in the same block.
+    /// Returns a reference to the next operation in the same block.
     pub fn next_in_block(&self) -> Option<OperationRef<'c, '_>> {
         unsafe { OperationRef::from_option_raw(mlirOperationGetNextInBlock(self.raw)) }
+    }
+
+    /// Returns a mutable reference to the next operation in the same block.
+    pub fn next_in_block_mut(&self) -> Option<OperationRefMut<'c, '_>> {
+        unsafe { OperationRefMut::from_option_raw(mlirOperationGetNextInBlock(self.raw)) }
     }
 
     /// Removes itself from a parent block.
@@ -726,7 +731,7 @@ mod tests {
     fn remove_from_parent() {
         let context = create_test_context();
         context.set_allow_unregistered_dialects(true);
-        let block = Block::new(&[]);
+        let mut block = Block::new(&[]);
 
         let first_operation = block.append_operation(
             OperationBuilder::new("foo", Location::unknown(&context))
@@ -740,6 +745,12 @@ mod tests {
                 .build()
                 .unwrap(),
         );
+        block
+            .first_operation_mut()
+            .unwrap()
+            .next_in_block_mut()
+            .unwrap()
+            .remove_from_parent();
 
         assert_eq!(block.first_operation().unwrap().next_in_block(), None);
     }
