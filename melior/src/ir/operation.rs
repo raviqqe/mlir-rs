@@ -721,4 +721,31 @@ mod tests {
             Ok("\"foo\"() : () -> () [unknown]".into())
         );
     }
+
+    // TODO
+    #[test]
+    fn remove_from_parent() {
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
+        let block = Block::new(&[]);
+
+        let first_operation = block.append_operation(
+            OperationBuilder::new("foo", Location::unknown(&context))
+                .add_results(Type::index(&context))
+                .build()
+                .unwrap(),
+        );
+        block.append_operation(
+            OperationBuilder::new("bar", Location::unknown(&context))
+                .add_operands(first_operation.result(0))
+                .build()
+                .unwrap(),
+        );
+
+        assert_eq!(block.first_operation(), Some(first_operation));
+        assert_eq!(
+            block.first_operation().unwrap().next_in_block(),
+            Some(second_operation)
+        );
+    }
 }
