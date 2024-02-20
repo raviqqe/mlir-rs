@@ -72,7 +72,7 @@ impl<'c> Block<'c> {
     }
 
     /// Returns the first operation.
-    pub fn first_operation(&self) -> Option<OperationRef> {
+    pub fn first_operation(&self) -> Option<OperationRef<'c, '_>> {
         unsafe {
             let operation = mlirBlockGetFirstOperation(self.raw);
 
@@ -85,7 +85,7 @@ impl<'c> Block<'c> {
     }
 
     /// Returns a terminator operation.
-    pub fn terminator(&self) -> Option<OperationRef> {
+    pub fn terminator(&self) -> Option<OperationRef<'c, '_>> {
         unsafe { OperationRef::from_option_raw(mlirBlockGetTerminator(self.raw)) }
     }
 
@@ -97,7 +97,7 @@ impl<'c> Block<'c> {
     }
 
     /// Returns a parent operation.
-    pub fn parent_operation(&self) -> Option<OperationRef> {
+    pub fn parent_operation(&self) -> Option<OperationRef<'c, '_>> {
         unsafe { OperationRef::from_option_raw(mlirBlockGetParentOperation(self.raw)) }
     }
 
@@ -143,7 +143,7 @@ impl<'c> Block<'c> {
     /// Inserts an operation after another.
     pub fn insert_operation_after(
         &self,
-        one: OperationRef,
+        one: OperationRef<'c, '_>,
         other: Operation<'c>,
     ) -> OperationRef<'c, '_> {
         unsafe {

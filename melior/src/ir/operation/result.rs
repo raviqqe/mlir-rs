@@ -18,7 +18,7 @@ impl<'c, 'a> OperationResult<'c, 'a> {
     }
 
     /// Returns an owner operation.
-    pub fn owner(&self) -> OperationRef {
+    pub fn owner(&self) -> OperationRef<'c, '_> {
         unsafe { OperationRef::from_raw(mlirOpResultGetOwner(self.value.to_raw())) }
     }
 
