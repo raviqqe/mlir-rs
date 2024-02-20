@@ -83,12 +83,12 @@ impl<'c> Block<'c> {
         unsafe { OperationRefMut::from_option_raw(mlirBlockGetFirstOperation(self.raw)) }
     }
 
-    /// Returns a terminator operation.
+    /// Returns a reference to a terminator operation.
     pub fn terminator(&self) -> Option<OperationRef<'c, '_>> {
         unsafe { OperationRef::from_option_raw(mlirBlockGetTerminator(self.raw)) }
     }
 
-    /// Returns a terminator operation.
+    /// Returns a mutable reference to a terminator operation.
     pub fn terminator_mut(&mut self) -> Option<OperationRefMut<'c, '_>> {
         unsafe { OperationRefMut::from_option_raw(mlirBlockGetTerminator(self.raw)) }
     }
