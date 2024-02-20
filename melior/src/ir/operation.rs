@@ -731,16 +731,18 @@ mod tests {
     fn remove_from_parent() {
         let context = create_test_context();
         context.set_allow_unregistered_dialects(true);
+
+        let location = Location::unknown(&context);
         let mut block = Block::new(&[]);
 
         let first_operation = block.append_operation(
-            OperationBuilder::new("foo", Location::unknown(&context))
+            OperationBuilder::new("foo", location)
                 .add_results(&[Type::index(&context)])
                 .build()
                 .unwrap(),
         );
         block.append_operation(
-            OperationBuilder::new("bar", Location::unknown(&context))
+            OperationBuilder::new("bar", location)
                 .add_operands(&[first_operation.result(0).unwrap().into()])
                 .build()
                 .unwrap(),
