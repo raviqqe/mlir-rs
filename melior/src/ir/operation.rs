@@ -742,8 +742,6 @@ mod tests {
                 .unwrap(),
         );
 
-        assert_eq!(block.first_operation(), Some(first_operation));
-
-        block.dump();
+        assert_eq!(block.first_operation().unwrap().next_in_block(), None);
     }
 }
