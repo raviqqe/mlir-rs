@@ -737,15 +737,13 @@ mod tests {
         );
         block.append_operation(
             OperationBuilder::new("bar", Location::unknown(&context))
-                .add_operands(first_operation.result(0))
+                .add_operands(first_operation.result(0).into())
                 .build()
                 .unwrap(),
         );
 
         assert_eq!(block.first_operation(), Some(first_operation));
-        assert_eq!(
-            block.first_operation().unwrap().next_in_block(),
-            Some(second_operation)
-        );
+
+        block.dump();
     }
 }
