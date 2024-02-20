@@ -748,5 +748,9 @@ mod tests {
         block.first_operation_mut().unwrap().remove_from_parent();
 
         assert_eq!(block.first_operation().unwrap().next_in_block(), None);
+        assert_eq!(
+            block.first_operation().unwrap().to_string(),
+            "\"bar\"(<<UNKNOWN SSA VALUE>>) : (index) -> ()"
+        );
     }
 }
