@@ -791,6 +791,7 @@ mod tests {
                 .unwrap(),
         );
 
+        assert_eq!(operation.parent_operation(), None);
         assert_eq!(
             &operation
                 .region(0)
