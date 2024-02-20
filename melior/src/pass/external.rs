@@ -315,7 +315,7 @@ mod tests {
         let pass_manager = PassManager::new(&context);
 
         pass_manager.add_pass(create_external(
-            |operation: OperationRef, pass: ExternalPass<'_>| {
+            |operation: OperationRef, pass: ExternalPass| {
                 assert!(operation.verify());
                 assert!(
                     operation
