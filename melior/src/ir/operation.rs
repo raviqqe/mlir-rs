@@ -791,12 +791,17 @@ mod tests {
                 .unwrap(),
         );
 
-        assert!(operation
-            .region(0)
-            .unwrap()
-            .first_block()
-            .unwrap()
-            .first_operation()
-            .is_some());
+        assert_eq!(
+            &operation
+                .region(0)
+                .unwrap()
+                .first_block()
+                .unwrap()
+                .first_operation()
+                .unwrap()
+                .parent_operation()
+                .unwrap(),
+            &operation
+        );
     }
 }
