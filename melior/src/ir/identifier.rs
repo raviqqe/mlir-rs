@@ -26,7 +26,7 @@ impl<'c> Identifier<'c> {
         }
     }
 
-    /// Gets a context.
+    /// Returns a context.
     pub fn context(&self) -> ContextRef<'c> {
         unsafe { ContextRef::from_raw(mlirIdentifierGetContext(self.raw)) }
     }

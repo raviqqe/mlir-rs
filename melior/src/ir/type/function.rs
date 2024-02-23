@@ -27,7 +27,7 @@ impl<'c> FunctionType<'c> {
         }
     }
 
-    /// Gets an input at a position.
+    /// Returns an input at a position.
     pub fn input(&self, index: usize) -> Result<Type<'c>, Error> {
         if index < self.input_count() {
             unsafe {
@@ -45,7 +45,7 @@ impl<'c> FunctionType<'c> {
         }
     }
 
-    /// Gets a result at a position.
+    /// Returns a result at a position.
     pub fn result(&self, index: usize) -> Result<Type<'c>, Error> {
         if index < self.result_count() {
             unsafe {
@@ -63,12 +63,12 @@ impl<'c> FunctionType<'c> {
         }
     }
 
-    /// Gets a number of inputs.
+    /// Returns a number of inputs.
     pub fn input_count(&self) -> usize {
         unsafe { mlirFunctionTypeGetNumInputs(self.r#type.to_raw()) as usize }
     }
 
-    /// Gets a number of results.
+    /// Returns a number of results.
     pub fn result_count(&self) -> usize {
         unsafe { mlirFunctionTypeGetNumResults(self.r#type.to_raw()) as usize }
     }

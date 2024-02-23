@@ -29,12 +29,12 @@ pub struct Dialect<'c> {
 }
 
 impl<'c> Dialect<'c> {
-    /// Gets a context.
+    /// Returns a context.
     pub fn context(&self) -> ContextRef<'c> {
         unsafe { ContextRef::from_raw(mlirDialectGetContext(self.raw)) }
     }
 
-    /// Gets a namespace.
+    /// Returns a namespace.
     pub fn namespace(&self) -> Result<&str, Utf8Error> {
         unsafe { StringRef::from_raw(mlirDialectGetNamespace(self.raw)) }.as_str()
     }

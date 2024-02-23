@@ -1,4 +1,4 @@
-use super::{BlockRef, Location, Operation, OperationRef};
+use super::{operation::OperationRefMut, BlockRef, Location, Operation, OperationRef};
 use crate::{
     context::{Context, ContextRef},
     string_ref::StringRef,
@@ -33,16 +33,21 @@ impl<'c> Module<'c> {
     }
 
     /// Converts a module into an operation.
-    pub fn as_operation(&self) -> OperationRef {
+    pub fn as_operation(&self) -> OperationRef<'c, '_> {
         unsafe { OperationRef::from_raw(mlirModuleGetOperation(self.raw)) }
     }
 
-    /// Gets a context.
+    /// Converts a module into a mutable operation.
+    pub fn as_operation_mut(&mut self) -> OperationRefMut<'c, '_> {
+        unsafe { OperationRefMut::from_raw(mlirModuleGetOperation(self.raw)) }
+    }
+
+    /// Returns a context.
     pub fn context(&self) -> ContextRef<'c> {
         unsafe { ContextRef::from_raw(mlirModuleGetContext(self.raw)) }
     }
 
-    /// Gets a block of a module body.
+    /// Returns a block of a module body.
     pub fn body(&self) -> BlockRef<'c, '_> {
         unsafe { BlockRef::from_raw(mlirModuleGetBody(self.raw)) }
     }
@@ -93,7 +98,7 @@ impl<'c> Drop for Module<'c> {
 mod tests {
     use super::*;
     use crate::{
-        ir::{operation::OperationBuilder, Block, Region},
+        ir::{attribute::StringAttribute, operation::OperationBuilder, Block, Region},
         test::create_test_context,
     };
 
@@ -146,5 +151,18 @@ mod tests {
                 .unwrap()
         )
         .is_none());
+    }
+
+    #[test]
+    fn set_attribute() {
+        let context = create_test_context();
+
+        let mut module = Module::new(Location::unknown(&context));
+
+        module
+            .as_operation_mut()
+            .set_attribute("sym_name", StringAttribute::new(&context, "foo").into());
+
+        assert!(module.as_operation().verify());
     }
 }

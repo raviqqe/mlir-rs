@@ -45,7 +45,7 @@ impl<'c> RankedTensorType<'c> {
         }
     }
 
-    /// Gets an encoding.
+    /// Returns an encoding.
     pub fn encoding(&self) -> Option<Attribute<'c>> {
         unsafe { Attribute::from_option_raw(mlirRankedTensorTypeGetEncoding(self.r#type.to_raw())) }
     }

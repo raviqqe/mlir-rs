@@ -31,17 +31,17 @@ impl Context {
         }
     }
 
-    /// Gets a number of registered dialects.
+    /// Returns a number of registered dialects.
     pub fn registered_dialect_count(&self) -> usize {
         unsafe { mlirContextGetNumRegisteredDialects(self.raw) as usize }
     }
 
-    /// Gets a number of loaded dialects.
+    /// Returns a number of loaded dialects.
     pub fn loaded_dialect_count(&self) -> usize {
         unsafe { mlirContextGetNumLoadedDialects(self.raw) as usize }
     }
 
-    /// Gets or loads a dialect.
+    /// Returns or loads a dialect.
     pub fn get_or_load_dialect(&self, name: &str) -> Dialect {
         let name = StringRef::new(name);
 

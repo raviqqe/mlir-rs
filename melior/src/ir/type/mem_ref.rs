@@ -53,17 +53,17 @@ impl<'c> MemRefType<'c> {
         }
     }
 
-    /// Gets a layout.
+    /// Returns a layout.
     pub fn layout(&self) -> Attribute<'c> {
         unsafe { Attribute::from_raw(mlirMemRefTypeGetLayout(self.r#type.to_raw())) }
     }
 
-    /// Gets an affine map.
+    /// Returns an affine map.
     pub fn affine_map(&self) -> AffineMap<'c> {
         unsafe { AffineMap::from_raw(mlirMemRefTypeGetAffineMap(self.r#type.to_raw())) }
     }
 
-    /// Gets a memory space.
+    /// Returns a memory space.
     pub fn memory_space(&self) -> Option<Attribute<'c>> {
         unsafe { Attribute::from_option_raw(mlirMemRefTypeGetMemorySpace(self.r#type.to_raw())) }
     }

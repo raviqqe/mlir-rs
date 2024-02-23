@@ -23,15 +23,16 @@ use mlir_sys::{
     mlirOperationGetContext, mlirOperationGetName, mlirOperationGetNextInBlock,
     mlirOperationGetNumAttributes, mlirOperationGetNumOperands, mlirOperationGetNumRegions,
     mlirOperationGetNumResults, mlirOperationGetNumSuccessors, mlirOperationGetOperand,
-    mlirOperationGetRegion, mlirOperationGetResult, mlirOperationGetSuccessor, mlirOperationPrint,
-    mlirOperationPrintWithFlags, mlirOperationRemoveAttributeByName,
+    mlirOperationGetParentOperation, mlirOperationGetRegion, mlirOperationGetResult,
+    mlirOperationGetSuccessor, mlirOperationPrint, mlirOperationPrintWithFlags,
+    mlirOperationRemoveAttributeByName, mlirOperationRemoveFromParent,
     mlirOperationSetAttributeByName, mlirOperationVerify, MlirOperation,
 };
 use std::{
     ffi::c_void,
     fmt::{Debug, Display, Formatter},
     marker::PhantomData,
-    ops::Deref,
+    ops::{Deref, DerefMut},
 };
 
 /// An operation.
@@ -41,29 +42,29 @@ pub struct Operation<'c> {
 }
 
 impl<'c> Operation<'c> {
-    /// Gets a context.
+    /// Returns a context.
     pub fn context(&self) -> ContextRef<'c> {
         unsafe { ContextRef::from_raw(mlirOperationGetContext(self.raw)) }
     }
 
-    /// Gets a name.
+    /// Returns a name.
     pub fn name(&self) -> Identifier<'c> {
         unsafe { Identifier::from_raw(mlirOperationGetName(self.raw)) }
     }
 
-    /// Gets a block.
+    /// Returns a block.
     // TODO Store lifetime of block in operations, or create another type like
     // `AppendedOperationRef`?
     pub fn block(&self) -> Option<BlockRef<'c, '_>> {
         unsafe { BlockRef::from_option_raw(mlirOperationGetBlock(self.raw)) }
     }
 
-    /// Gets the number of operands.
+    /// Returns the number of operands.
     pub fn operand_count(&self) -> usize {
         unsafe { mlirOperationGetNumOperands(self.raw) as usize }
     }
 
-    /// Gets the operand at a position.
+    /// Returns the operand at a position.
     pub fn operand(&self, index: usize) -> Result<Value<'c, '_>, Error> {
         if index < self.operand_count() {
             Ok(unsafe { Value::from_raw(mlirOperationGetOperand(self.raw, index as isize)) })
@@ -76,17 +77,17 @@ impl<'c> Operation<'c> {
         }
     }
 
-    /// Gets all operands.
+    /// Returns all operands.
     pub fn operands(&self) -> impl Iterator<Item = Value<'c, '_>> {
         (0..self.operand_count()).map(|index| self.operand(index).expect("valid operand index"))
     }
 
-    /// Gets the number of results.
+    /// Returns the number of results.
     pub fn result_count(&self) -> usize {
         unsafe { mlirOperationGetNumResults(self.raw) as usize }
     }
 
-    /// Gets a result at a position.
+    /// Returns a result at a position.
     pub fn result(&self, index: usize) -> Result<OperationResult<'c, '_>, Error> {
         if index < self.result_count() {
             Ok(unsafe {
@@ -101,17 +102,17 @@ impl<'c> Operation<'c> {
         }
     }
 
-    /// Gets all results.
+    /// Returns all results.
     pub fn results(&self) -> impl Iterator<Item = OperationResult<'c, '_>> {
         (0..self.result_count()).map(|index| self.result(index).expect("valid result index"))
     }
 
-    /// Gets the number of regions.
+    /// Returns the number of regions.
     pub fn region_count(&self) -> usize {
         unsafe { mlirOperationGetNumRegions(self.raw) as usize }
     }
 
-    /// Gets a region at a position.
+    /// Returns a region at a position.
     pub fn region(&self, index: usize) -> Result<RegionRef<'c, '_>, Error> {
         if index < self.region_count() {
             Ok(unsafe { RegionRef::from_raw(mlirOperationGetRegion(self.raw, index as isize)) })
@@ -124,17 +125,17 @@ impl<'c> Operation<'c> {
         }
     }
 
-    /// Gets all regions.
+    /// Returns all regions.
     pub fn regions(&self) -> impl Iterator<Item = RegionRef<'c, '_>> {
         (0..self.region_count()).map(|index| self.region(index).expect("valid result index"))
     }
 
-    /// Gets the number of successors.
+    /// Returns the number of successors.
     pub fn successor_count(&self) -> usize {
         unsafe { mlirOperationGetNumSuccessors(self.raw) as usize }
     }
 
-    /// Gets a successor at a position.
+    /// Returns a successor at a position.
     pub fn successor(&self, index: usize) -> Result<BlockRef<'c, '_>, Error> {
         if index < self.successor_count() {
             Ok(unsafe { BlockRef::from_raw(mlirOperationGetSuccessor(self.raw, index as isize)) })
@@ -147,18 +148,18 @@ impl<'c> Operation<'c> {
         }
     }
 
-    /// Gets all successors.
+    /// Returns all successors.
     pub fn successors(&self) -> impl Iterator<Item = BlockRef<'c, '_>> {
         (0..self.successor_count())
             .map(|index| self.successor(index).expect("valid successor index"))
     }
 
-    /// Gets the number of attributes.
+    /// Returns the number of attributes.
     pub fn attribute_count(&self) -> usize {
         unsafe { mlirOperationGetNumAttributes(self.raw) as usize }
     }
 
-    /// Gets a attribute at a position.
+    /// Returns a attribute at a position.
     pub fn attribute_at(&self, index: usize) -> Result<(Identifier<'c>, Attribute<'c>), Error> {
         if index < self.attribute_count() {
             unsafe {
@@ -177,13 +178,13 @@ impl<'c> Operation<'c> {
         }
     }
 
-    /// Gets all attributes.
+    /// Returns all attributes.
     pub fn attributes(&self) -> impl Iterator<Item = (Identifier<'c>, Attribute<'c>)> + '_ {
         (0..self.attribute_count())
             .map(|index| self.attribute_at(index).expect("valid attribute index"))
     }
 
-    /// Gets a attribute with the given name.
+    /// Returns a attribute with the given name.
     pub fn attribute(&self, name: &str) -> Result<Attribute<'c>, Error> {
         unsafe {
             Attribute::from_option_raw(mlirOperationGetAttributeByName(
@@ -217,9 +218,29 @@ impl<'c> Operation<'c> {
             .ok_or(Error::AttributeNotFound(name.into()))
     }
 
-    /// Gets the next operation in the same block.
+    /// Returns a reference to the next operation in the same block.
     pub fn next_in_block(&self) -> Option<OperationRef<'c, '_>> {
         unsafe { OperationRef::from_option_raw(mlirOperationGetNextInBlock(self.raw)) }
+    }
+
+    /// Returns a mutable reference to the next operation in the same block.
+    pub fn next_in_block_mut(&self) -> Option<OperationRefMut<'c, '_>> {
+        unsafe { OperationRefMut::from_option_raw(mlirOperationGetNextInBlock(self.raw)) }
+    }
+
+    /// Returns a reference to the next operation in the same block.
+    pub fn previous_in_block(&self) -> Option<OperationRef<'c, '_>> {
+        unsafe { OperationRef::from_option_raw(mlirOperationGetNextInBlock(self.raw)) }
+    }
+
+    /// Returns a reference to a parent operation.
+    pub fn parent_operation(&self) -> Option<OperationRef<'c, '_>> {
+        unsafe { OperationRef::from_option_raw(mlirOperationGetParentOperation(self.raw)) }
+    }
+
+    /// Removes itself from a parent block.
+    pub fn remove_from_parent(&mut self) {
+        unsafe { mlirOperationRemoveFromParent(self.raw) }
     }
 
     /// Verifies an operation.
@@ -305,7 +326,7 @@ impl<'c> PartialEq for Operation<'c> {
 
 impl<'c> Eq for Operation<'c> {}
 
-impl<'a> Display for Operation<'a> {
+impl<'c> Display for Operation<'c> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         let mut data = (formatter, Ok(()));
 
@@ -337,12 +358,12 @@ pub struct OperationRef<'c, 'a> {
 }
 
 impl<'c, 'a> OperationRef<'c, 'a> {
-    /// Gets a result at a position.
+    /// Returns a result at a position.
     pub fn result(self, index: usize) -> Result<OperationResult<'c, 'a>, Error> {
         unsafe { self.to_ref() }.result(index)
     }
 
-    /// Gets an operation.
+    /// Returns an operation.
     ///
     /// This function is different from `deref` because the correct lifetime is
     /// kept for the return type.
@@ -390,7 +411,7 @@ impl<'c, 'a> OperationRef<'c, 'a> {
 }
 
 impl<'c, 'a> Deref for OperationRef<'c, 'a> {
-    type Target = Operation<'a>;
+    type Target = Operation<'c>;
 
     fn deref(&self) -> &Self::Target {
         unsafe { transmute(self) }
@@ -412,6 +433,79 @@ impl<'c, 'a> Display for OperationRef<'c, 'a> {
 }
 
 impl<'c, 'a> Debug for OperationRef<'c, 'a> {
+    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
+        Debug::fmt(self.deref(), formatter)
+    }
+}
+
+/// A mutable reference to an operation.
+#[derive(Clone, Copy)]
+pub struct OperationRefMut<'c, 'a> {
+    raw: MlirOperation,
+    _reference: PhantomData<&'a Operation<'c>>,
+}
+
+impl<'c, 'a> OperationRefMut<'c, 'a> {
+    /// Converts an operation reference into a raw object.
+    pub const fn to_raw(self) -> MlirOperation {
+        self.raw
+    }
+
+    /// Creates an operation reference from a raw object.
+    ///
+    /// # Safety
+    ///
+    /// A raw object must be valid.
+    pub unsafe fn from_raw(raw: MlirOperation) -> Self {
+        Self {
+            raw,
+            _reference: Default::default(),
+        }
+    }
+
+    /// Creates an optional operation reference from a raw object.
+    ///
+    /// # Safety
+    ///
+    /// A raw object must be valid.
+    pub unsafe fn from_option_raw(raw: MlirOperation) -> Option<Self> {
+        if raw.ptr.is_null() {
+            None
+        } else {
+            Some(Self::from_raw(raw))
+        }
+    }
+}
+
+impl<'c, 'a> Deref for OperationRefMut<'c, 'a> {
+    type Target = Operation<'c>;
+
+    fn deref(&self) -> &Self::Target {
+        unsafe { transmute(self) }
+    }
+}
+
+impl<'c, 'a> DerefMut for OperationRefMut<'c, 'a> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        unsafe { transmute(self) }
+    }
+}
+
+impl<'c, 'a> PartialEq for OperationRefMut<'c, 'a> {
+    fn eq(&self, other: &Self) -> bool {
+        unsafe { mlirOperationEqual(self.raw, other.raw) }
+    }
+}
+
+impl<'c, 'a> Eq for OperationRefMut<'c, 'a> {}
+
+impl<'c, 'a> Display for OperationRefMut<'c, 'a> {
+    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
+        Display::fmt(self.deref(), formatter)
+    }
+}
+
+impl<'c, 'a> Debug for OperationRefMut<'c, 'a> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Debug::fmt(self.deref(), formatter)
     }
@@ -641,6 +735,74 @@ mod tests {
                         .use_local_scope()
                 ),
             Ok("\"foo\"() : () -> () [unknown]".into())
+        );
+    }
+
+    #[test]
+    fn remove_from_parent() {
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
+
+        let location = Location::unknown(&context);
+        let mut block = Block::new(&[]);
+
+        let first_operation = block.append_operation(
+            OperationBuilder::new("foo", location)
+                .add_results(&[Type::index(&context)])
+                .build()
+                .unwrap(),
+        );
+        block.append_operation(
+            OperationBuilder::new("bar", location)
+                .add_operands(&[first_operation.result(0).unwrap().into()])
+                .build()
+                .unwrap(),
+        );
+        block.first_operation_mut().unwrap().remove_from_parent();
+
+        assert_eq!(block.first_operation().unwrap().next_in_block(), None);
+        assert_eq!(
+            block.first_operation().unwrap().to_string(),
+            "\"bar\"(<<UNKNOWN SSA VALUE>>) : (index) -> ()"
+        );
+    }
+
+    #[test]
+    fn parent_operation() {
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
+
+        let location = Location::unknown(&context);
+        let block = Block::new(&[]);
+
+        let operation = block.append_operation(
+            OperationBuilder::new("foo", location)
+                .add_results(&[Type::index(&context)])
+                .add_regions([{
+                    let region = Region::new();
+
+                    let block = Block::new(&[]);
+                    block.append_operation(OperationBuilder::new("bar", location).build().unwrap());
+
+                    region.append_block(block);
+                    region
+                }])
+                .build()
+                .unwrap(),
+        );
+
+        assert_eq!(operation.parent_operation(), None);
+        assert_eq!(
+            &operation
+                .region(0)
+                .unwrap()
+                .first_block()
+                .unwrap()
+                .first_operation()
+                .unwrap()
+                .parent_operation()
+                .unwrap(),
+            &operation
         );
     }
 }

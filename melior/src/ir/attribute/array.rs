@@ -22,7 +22,7 @@ impl<'c> ArrayAttribute<'c> {
         }
     }
 
-    /// Gets a length.
+    /// Returns a length.
     pub fn len(&self) -> usize {
         (unsafe { mlirArrayAttrGetNumElements(self.attribute.to_raw()) }) as usize
     }
@@ -32,7 +32,7 @@ impl<'c> ArrayAttribute<'c> {
         self.len() == 0
     }
 
-    /// Gets an element.
+    /// Returns an element.
     pub fn element(&self, index: usize) -> Result<Attribute<'c>, Error> {
         if index < self.len() {
             Ok(unsafe {

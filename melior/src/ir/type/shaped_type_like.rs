@@ -8,17 +8,17 @@ use mlir_sys::{
 
 /// Trait for shaped types.
 pub trait ShapedTypeLike<'c>: TypeLike<'c> {
-    /// Gets a element type.
+    /// Returns a element type.
     fn element(&self) -> Type<'c> {
         unsafe { Type::from_raw(mlirShapedTypeGetElementType(self.to_raw())) }
     }
 
-    /// Gets a rank.
+    /// Returns a rank.
     fn rank(&self) -> usize {
         (unsafe { mlirShapedTypeGetRank(self.to_raw()) }) as usize
     }
 
-    /// Gets a dimension size.
+    /// Returns a dimension size.
     fn dim_size(&self, index: usize) -> Result<usize, Error> {
         if index < self.rank() {
             Ok((unsafe { mlirShapedTypeGetDimSize(self.to_raw(), index as isize) }) as usize)

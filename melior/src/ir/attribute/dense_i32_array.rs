@@ -22,7 +22,7 @@ impl<'c> DenseI32ArrayAttribute<'c> {
         }
     }
 
-    /// Gets a length.
+    /// Returns a length.
     pub fn len(&self) -> usize {
         (unsafe { mlirDenseArrayGetNumElements(self.attribute.to_raw()) }) as usize
     }
@@ -32,7 +32,7 @@ impl<'c> DenseI32ArrayAttribute<'c> {
         self.len() == 0
     }
 
-    /// Gets an element.
+    /// Returns an element.
     pub fn element(&self, index: usize) -> Result<i32, Error> {
         if index < self.len() {
             Ok(unsafe { mlirDenseI32ArrayGetElement(self.attribute.to_raw(), index as isize) })
