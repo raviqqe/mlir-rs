@@ -57,43 +57,43 @@ impl TypeState {
     }
 
     pub fn results_without(&self, field: &str) -> impl Iterator<Item = GenericArgument> {
-        Self::parameters_without(&self.results, field)
+        Self::build_parameters_without(&self.results, field)
     }
 
     pub fn operands_without(&self, field: &str) -> impl Iterator<Item = GenericArgument> {
-        Self::parameters_without(&self.operands, field)
+        Self::build_parameters_without(&self.operands, field)
     }
 
     pub fn regions_without(&self, field: &str) -> impl Iterator<Item = GenericArgument> {
-        Self::parameters_without(&self.regions, field)
+        Self::build_parameters_without(&self.regions, field)
     }
 
     pub fn successors_without(&self, field: &str) -> impl Iterator<Item = GenericArgument> {
-        Self::parameters_without(&self.successors, field)
+        Self::build_parameters_without(&self.successors, field)
     }
 
     pub fn attributes_without(&self, field: &str) -> impl Iterator<Item = GenericArgument> {
-        Self::parameters_without(&self.attributes, field)
+        Self::build_parameters_without(&self.attributes, field)
     }
 
     pub fn results_with_all(&self, set: bool) -> impl Iterator<Item = GenericArgument> {
-        Self::arguments_with_all(&self.results, set)
+        Self::build_arguments_with_all(&self.results, set)
     }
 
     pub fn operands_with_all(&self, set: bool) -> impl Iterator<Item = GenericArgument> {
-        Self::arguments_with_all(&self.operands, set)
+        Self::build_arguments_with_all(&self.operands, set)
     }
 
     pub fn regions_with_all(&self, set: bool) -> impl Iterator<Item = GenericArgument> {
-        Self::arguments_with_all(&self.regions, set)
+        Self::build_arguments_with_all(&self.regions, set)
     }
 
     pub fn successors_with_all(&self, set: bool) -> impl Iterator<Item = GenericArgument> {
-        Self::arguments_with_all(&self.successors, set)
+        Self::build_arguments_with_all(&self.successors, set)
     }
 
     pub fn attributes_with_all(&self, set: bool) -> impl Iterator<Item = GenericArgument> {
-        Self::arguments_with_all(&self.attributes, set)
+        Self::build_arguments_with_all(&self.attributes, set)
     }
 
     fn build_parameters<'a>(
@@ -103,7 +103,10 @@ impl TypeState {
         (0..fields.len()).map(|index| Self::build_generic_argument(prefix, index))
     }
 
-    fn parameters_without(fields: &[String], field: &str) -> impl Iterator<Item = GenericArgument> {
+    fn build_parameters_without(
+        fields: &[String],
+        field: &str,
+    ) -> impl Iterator<Item = GenericArgument> {
         let index = fields.iter().position(|other| other == field).unwrap();
 
         repeat(Self::build_argument(true))
@@ -111,7 +114,7 @@ impl TypeState {
             .chain(repeat(Self::build_argument(false)).take(fields.len() - index))
     }
 
-    fn arguments_with<'a>(
+    fn build_arguments_with<'a>(
         fields: &'a [String],
         prefix: &'a str,
         field: &'a str,
@@ -126,7 +129,10 @@ impl TypeState {
         })
     }
 
-    fn arguments_with_all(fields: &[String], set: bool) -> impl Iterator<Item = GenericArgument> {
+    fn build_arguments_with_all(
+        fields: &[String],
+        set: bool,
+    ) -> impl Iterator<Item = GenericArgument> {
         repeat(Self::build_argument(set)).take(fields.len())
     }
 
