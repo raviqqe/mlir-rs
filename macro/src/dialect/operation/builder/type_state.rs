@@ -3,7 +3,7 @@ use std::iter::repeat;
 use syn::{parse_quote, GenericArgument};
 
 #[derive(Debug)]
-pub struct TypeStateList {
+pub struct TypeState {
     results: Vec<String>,
     operands: Vec<String>,
     regions: Vec<String>,
@@ -11,7 +11,7 @@ pub struct TypeStateList {
     attributes: Vec<String>,
 }
 
-impl TypeStateList {
+impl TypeState {
     pub fn new(
         results: Vec<String>,
         operands: Vec<String>,
@@ -103,13 +103,13 @@ impl TypeStateList {
             .chain(repeat(Self::build_argument(false)).take(fields.len() - index))
     }
 
-    fn arguments_with(
-        fields: &[String],
-        prefix: &str,
-        field: &str,
+    fn arguments_with<'a>(
+        fields: &'a [String],
+        prefix: &'a str,
+        field: &'a str,
         set: bool,
-    ) -> impl Iterator<Item = GenericArgument> {
-        fields.iter().enumerate().map(move |(index, &other)| {
+    ) -> impl Iterator<Item = GenericArgument> + 'a {
+        fields.iter().enumerate().map(move |(index, other)| {
             if other == field {
                 Self::build_argument(set)
             } else {

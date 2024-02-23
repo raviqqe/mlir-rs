@@ -41,15 +41,21 @@ pub fn generate_operation_builder(builder: &OperationBuilder) -> TokenStream {
         "A builder for {}.",
         builder.operation().documentation_name()
     );
-    let type_arguments = builder.type_state().parameters();
-    let state_types = builder.type_state().parameters();
+    let type_arguments = builder
+        .type_state()
+        .results()
+        .chain(builder.type_state().operands())
+        .chain(builder.type_state().regions())
+        .chain(builder.type_state().successors())
+        .chain(builder.type_state().attributes())
+        .collect::<Vec<_>>();
 
     quote! {
         #[doc = #doc]
         pub struct #identifier<'c, #(#type_arguments),*> {
             builder: ::melior::ir::operation::OperationBuilder<'c>,
             context: &'c ::melior::Context,
-            _state: ::std::marker::PhantomData<(#(#state_types),*)>,
+            _state: ::std::marker::PhantomData<(#(#type_arguments),*)>,
         }
 
         #new_fn
@@ -78,7 +84,13 @@ fn generate_field_fn(builder: &OperationBuilder, field: &impl OperationField) ->
     let add_arguments = field.add_arguments(identifier);
 
     if field.is_optional() {
-        let parameters = builder.type_state().parameters().collect::<Vec<_>>();
+        let parameters = builder
+            .type_state()
+            .results()
+            .chain(builder.type_state().operands())
+            .chain(builder.type_state().regions())
+            .chain(builder.type_state().successors())
+            .chain(builder.type_state().attributes());
 
         quote! {
             impl<'c, #(#parameters),*> #builder_identifier<'c, #(#parameters),*> {
