@@ -28,24 +28,32 @@ impl TypeState {
         }
     }
 
+    pub fn parameters(&self) -> impl Iterator<Item = GenericArgument> {
+        self.results()
+            .chain(self.operands())
+            .chain(self.regions())
+            .chain(self.successors())
+            .chain(self.attributes())
+    }
+
     pub fn results(&self) -> impl Iterator<Item = GenericArgument> {
-        Self::parameters(&self.results, "T")
+        Self::build_parameters(&self.results, "T")
     }
 
     pub fn operands(&self) -> impl Iterator<Item = GenericArgument> {
-        Self::parameters(&self.operands, "O")
+        Self::build_parameters(&self.operands, "O")
     }
 
     pub fn regions(&self) -> impl Iterator<Item = GenericArgument> {
-        Self::parameters(&self.regions, "R")
+        Self::build_parameters(&self.regions, "R")
     }
 
     pub fn successors(&self) -> impl Iterator<Item = GenericArgument> {
-        Self::parameters(&self.successors, "S")
+        Self::build_parameters(&self.successors, "S")
     }
 
     pub fn attributes(&self) -> impl Iterator<Item = GenericArgument> {
-        Self::parameters(&self.attributes, "A")
+        Self::build_parameters(&self.attributes, "A")
     }
 
     pub fn results_without(&self, field: &str) -> impl Iterator<Item = GenericArgument> {
@@ -88,7 +96,7 @@ impl TypeState {
         Self::arguments_with_all(&self.attributes, set)
     }
 
-    fn parameters<'a>(
+    fn build_parameters<'a>(
         fields: &[String],
         prefix: &'a str,
     ) -> impl Iterator<Item = GenericArgument> + 'a {

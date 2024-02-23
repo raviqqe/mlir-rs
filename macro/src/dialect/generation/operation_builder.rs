@@ -41,14 +41,7 @@ pub fn generate_operation_builder(builder: &OperationBuilder) -> TokenStream {
         "A builder for {}.",
         builder.operation().documentation_name()
     );
-    let type_arguments = builder
-        .type_state()
-        .results()
-        .chain(builder.type_state().operands())
-        .chain(builder.type_state().regions())
-        .chain(builder.type_state().successors())
-        .chain(builder.type_state().attributes())
-        .collect::<Vec<_>>();
+    let type_arguments = builder.type_state().parameters().collect::<Vec<_>>();
 
     quote! {
         #[doc = #doc]
@@ -84,13 +77,7 @@ fn generate_field_fn(builder: &OperationBuilder, field: &impl OperationField) ->
     let add_arguments = field.add_arguments(identifier);
 
     if field.is_optional() {
-        let parameters = builder
-            .type_state()
-            .results()
-            .chain(builder.type_state().operands())
-            .chain(builder.type_state().regions())
-            .chain(builder.type_state().successors())
-            .chain(builder.type_state().attributes());
+        let parameters = builder.type_state().parameters();
 
         quote! {
             impl<'c, #(#parameters),*> #builder_identifier<'c, #(#parameters),*> {
