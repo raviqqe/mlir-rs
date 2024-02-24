@@ -19,6 +19,7 @@ impl<'c> FlatSymbolRefAttribute<'c> {
         }
     }
 
+    /// Returns a value.
     pub fn value(&self) -> &str {
         unsafe { StringRef::from_raw(mlirFlatSymbolRefAttrGetValue(self.to_raw())) }
             .as_str()

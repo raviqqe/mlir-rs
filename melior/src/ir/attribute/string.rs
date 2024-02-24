@@ -1,6 +1,6 @@
 use super::{Attribute, AttributeLike};
 use crate::{Context, Error, StringRef};
-use mlir_sys::{mlirStringAttrGet, MlirAttribute};
+use mlir_sys::{mlirStringAttrGet, mlirStringAttrGetValue, MlirAttribute};
 
 /// A string attribute.
 #[derive(Clone, Copy)]
@@ -18,6 +18,29 @@ impl<'c> StringAttribute<'c> {
             ))
         }
     }
+
+    /// Returns a value.
+    pub fn value(&self) -> &'c str {
+        unsafe { StringRef::from_raw(mlirStringAttrGetValue(self.to_raw())) }
+            .as_str()
+            .unwrap()
+    }
 }
 
 attribute_traits!(StringAttribute, is_string, "string");
+
+#[cfg(test)]
+mod tests {
+    use crate::test::create_test_context;
+
+    use super::*;
+
+    #[test]
+    fn value() {
+        let context = create_test_context();
+
+        let value = StringAttribute::new(&context, "foo").value();
+
+        assert_eq!(value, "foo");
+    }
+}
