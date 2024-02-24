@@ -16,7 +16,7 @@ pub struct IntegerAttribute<'c> {
 
 impl<'c> IntegerAttribute<'c> {
     /// Creates an integer attribute.
-    pub fn new(integer: i64, r#type: Type<'c>) -> Self {
+    pub fn new(r#type: Type<'c>, integer: i64) -> Self {
         unsafe { Self::from_raw(mlirIntegerAttrGet(r#type.to_raw(), integer)) }
     }
 

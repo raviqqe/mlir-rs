@@ -13,7 +13,7 @@ pub struct FloatAttribute<'c> {
 
 impl<'c> FloatAttribute<'c> {
     /// Creates a float attribute.
-    pub fn new(context: &'c Context, number: f64, r#type: Type<'c>) -> Self {
+    pub fn new(context: &'c Context, r#type: Type<'c>, number: f64) -> Self {
         unsafe {
             Self::from_raw(mlirFloatAttrDoubleGet(
                 context.to_raw(),
@@ -41,7 +41,7 @@ mod tests {
         let context = create_test_context();
 
         assert_eq!(
-            FloatAttribute::new(&context, 42.0, Type::float64(&context)).value(),
+            FloatAttribute::new(&context, Type::float64(&context), 42.0).value(),
             42.0
         );
     }
