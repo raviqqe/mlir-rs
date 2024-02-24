@@ -182,7 +182,11 @@ impl<'a> Operation<'a> {
     }
 
     pub fn attributes(&self) -> impl Iterator<Item = &Attribute<'a>> {
-        self.attributes.iter().chain(&self.derived_attributes)
+        self.attributes.iter()
+    }
+
+    pub fn all_attributes(&self) -> impl Iterator<Item = &Attribute<'a>> {
+        self.attributes().chain(&self.derived_attributes)
     }
 
     pub fn required_results(&self) -> impl Iterator<Item = &OperationResult> {
