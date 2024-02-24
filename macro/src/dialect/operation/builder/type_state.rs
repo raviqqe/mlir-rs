@@ -61,8 +61,13 @@ impl TypeState {
         &'a self,
         field: &'a str,
     ) -> impl Iterator<Item = GenericArgument> + 'a {
-        self.all_fields()
-            .flat_map(|(fields, prefix)| Self::build_parameters_without(fields, prefix, field))
+        self.ordered_fields()
+            .flat_map(|(fields, prefix)| {
+                Self::build_ordered_parameters_without(fields, prefix, field)
+            })
+            .chain(self.unordered_fields().flat_map(|(fields, prefix)| {
+                Self::build_unordered_parameters_without(fields, prefix, field)
+            }))
     }
 
     pub fn arguments_with<'a>(
@@ -70,9 +75,13 @@ impl TypeState {
         field: &'a str,
         set: bool,
     ) -> impl Iterator<Item = GenericArgument> + 'a {
-        self.all_fields().flat_map(move |(fields, prefix)| {
-            Self::build_arguments_with(fields, prefix, field, set)
-        })
+        self.ordered_fields()
+            .flat_map(move |(fields, prefix)| {
+                Self::build_ordered_arguments_with(fields, prefix, field, set)
+            })
+            .chain(self.unordered_fields().flat_map(move |(fields, prefix)| {
+                Self::build_unordered_arguments_with(fields, prefix, field, set)
+            }))
     }
 
     pub fn arguments_with_all(&self, set: bool) -> impl Iterator<Item = GenericArgument> + '_ {
@@ -87,7 +96,8 @@ impl TypeState {
         (0..fields.len()).map(|index| Self::build_generic_argument(prefix, index))
     }
 
-    fn build_parameters_without<'a>(
+    // TODO
+    fn build_ordered_parameters_without<'a>(
         fields: &'a [String],
         prefix: &'a str,
         field: &'a str,
@@ -99,7 +109,35 @@ impl TypeState {
             .map(|(index, _)| Self::build_generic_argument(prefix, index))
     }
 
-    fn build_arguments_with<'a>(
+    fn build_unordered_parameters_without<'a>(
+        fields: &'a [String],
+        prefix: &'a str,
+        field: &'a str,
+    ) -> impl Iterator<Item = GenericArgument> + 'a {
+        fields
+            .iter()
+            .enumerate()
+            .filter(move |(_, other)| *other != field)
+            .map(|(index, _)| Self::build_generic_argument(prefix, index))
+    }
+
+    // TODO
+    fn build_ordered_arguments_with<'a>(
+        fields: &'a [String],
+        prefix: &'a str,
+        field: &'a str,
+        set: bool,
+    ) -> impl Iterator<Item = GenericArgument> + 'a {
+        fields.iter().enumerate().map(move |(index, other)| {
+            if other == field {
+                Self::build_argument(set)
+            } else {
+                Self::build_generic_argument(prefix, index)
+            }
+        })
+    }
+
+    fn build_unordered_arguments_with<'a>(
         fields: &'a [String],
         prefix: &'a str,
         field: &'a str,
