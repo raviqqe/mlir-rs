@@ -207,7 +207,7 @@ impl<'a> Operation<'a> {
     }
 
     pub fn required_attributes(&self) -> impl Iterator<Item = &Attribute> {
-        self.attributes().filter(|field| !field.is_optional())
+        self.attributes.iter().filter(|field| !field.is_optional())
     }
 
     pub fn required_fields(&self) -> impl Iterator<Item = &dyn OperationField> {
@@ -215,17 +215,12 @@ impl<'a> Operation<'a> {
             field
         }
 
-        (if self.can_infer_type {
-            Default::default()
-        } else {
-            self.results.iter()
-        })
-        .map(convert)
-        .chain(self.operands.iter().map(convert))
-        .chain(self.regions.iter().map(convert))
-        .chain(self.successors.iter().map(convert))
-        .chain(self.attributes().map(convert))
-        .filter(|field| !field.is_optional())
+        self.required_results()
+            .map(convert)
+            .chain(self.required_operands().map(convert))
+            .chain(self.required_regions().map(convert))
+            .chain(self.required_successors().map(convert))
+            .chain(self.required_attributes().map(convert))
     }
 
     fn collect_successors(definition: Record<'a>) -> Result<Vec<Successor>, Error> {
