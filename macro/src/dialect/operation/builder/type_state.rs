@@ -194,15 +194,6 @@ impl TypeState {
         prefix: &'a str,
         field: &'a str,
     ) -> impl Iterator<Item = GenericArgument> + 'a {
-        // let index = fields
-        //     .iter()
-        //     .position(|other| other == field)
-        //     .unwrap_or(fields.len());
-
-        // repeat(Self::build_argument(true))
-        //     .take(index)
-        //     .chain(repeat(Self::build_argument(false)).take(fields.len() - index));
-
         fields
             .iter()
             .enumerate()
