@@ -108,16 +108,8 @@ impl<'a> Attribute<'a> {
         &self.remove_identifier
     }
 
-    pub fn is_optional(&self) -> bool {
-        self.optional
-    }
-
     pub fn is_unit(&self) -> bool {
         self.storage_type_string == mlir_attribute!(UnitAttr)
-    }
-
-    pub fn has_default_value(&self) -> bool {
-        self.default
     }
 }
 
@@ -152,7 +144,7 @@ impl OperationField for Attribute<'_> {
     }
 
     fn is_optional(&self) -> bool {
-        self.is_optional() || self.has_default_value()
+        self.optional || self.default
     }
 
     fn add_arguments(&self, name: &Ident) -> TokenStream {
