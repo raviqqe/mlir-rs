@@ -2,6 +2,12 @@ use quote::format_ident;
 use std::iter::repeat;
 use syn::{parse_quote, GenericArgument};
 
+const RESULT_PREFIX: &str = "T";
+const OPERAND_PREFIX: &str = "O";
+const REGION_PREFIX: &str = "R";
+const SUCCESSOR_PREFIX: &str = "S";
+const ATTRIBUTE_PREFIX: &str = "A";
+
 #[derive(Debug)]
 pub struct TypeState {
     results: Vec<String>,
@@ -37,23 +43,31 @@ impl TypeState {
     }
 
     fn results(&self) -> impl Iterator<Item = GenericArgument> {
-        Self::build_parameters(&self.results, "T")
+        Self::build_parameters(&self.results, RESULT_PREFIX)
     }
 
     fn operands(&self) -> impl Iterator<Item = GenericArgument> {
-        Self::build_parameters(&self.operands, "O")
+        Self::build_parameters(&self.operands, OPERAND_PREFIX)
     }
 
     fn regions(&self) -> impl Iterator<Item = GenericArgument> {
-        Self::build_parameters(&self.regions, "R")
+        Self::build_parameters(&self.regions, REGION_PREFIX)
     }
 
     fn successors(&self) -> impl Iterator<Item = GenericArgument> {
-        Self::build_parameters(&self.successors, "S")
+        Self::build_parameters(&self.successors, SUCCESSOR_PREFIX)
     }
 
     fn attributes(&self) -> impl Iterator<Item = GenericArgument> {
-        Self::build_parameters(&self.attributes, "A")
+        Self::build_parameters(&self.attributes, ATTRIBUTE_PREFIX)
+    }
+
+    pub fn parameters_without(&self, field: &str) -> impl Iterator<Item = GenericArgument> {
+        self.results_without(field)
+            .chain(self.operands_without(field))
+            .chain(self.regions_without(field))
+            .chain(self.successors_without(field))
+            .chain(self.attributes_without(field))
     }
 
     fn results_without(&self, field: &str) -> impl Iterator<Item = GenericArgument> {
@@ -74,6 +88,14 @@ impl TypeState {
 
     fn attributes_without(&self, field: &str) -> impl Iterator<Item = GenericArgument> {
         Self::build_parameters_without(&self.attributes, field)
+    }
+
+    pub fn arguments_with_all(&self, set: bool) -> impl Iterator<Item = GenericArgument> {
+        self.results_with_all(set)
+            .chain(self.operands_with_all(set))
+            .chain(self.regions_with_all(set))
+            .chain(self.successors_with_all(set))
+            .chain(self.attributes_with_all(set))
     }
 
     fn results_with_all(&self, set: bool) -> impl Iterator<Item = GenericArgument> {
