@@ -1,6 +1,6 @@
 use super::TypeId;
-use crate::context::ContextRef;
-use mlir_sys::{mlirTypeDump, mlirTypeGetContext, mlirTypeGetTypeID, MlirType};
+use crate::{context::ContextRef, dialect::Dialect};
+use mlir_sys::{mlirTypeDump, mlirTypeGetContext, mlirTypeGetDialect, mlirTypeGetTypeID, MlirType};
 
 /// Trait for type-like types.
 pub trait TypeLike<'c> {
@@ -15,6 +15,11 @@ pub trait TypeLike<'c> {
     /// Returns an ID.
     fn id(&self) -> TypeId<'c> {
         unsafe { TypeId::from_raw(mlirTypeGetTypeID(self.to_raw())) }
+    }
+
+    /// Returns a dialect.
+    fn dialect(&self) -> Dialect<'c> {
+        unsafe { Dialect::from_raw(mlirTypeGetDialect(self.to_raw())) }
     }
 
     /// Dumps a type.
