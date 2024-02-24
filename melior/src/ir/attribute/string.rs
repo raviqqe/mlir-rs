@@ -38,7 +38,6 @@ mod tests {
     #[test]
     fn value() {
         let context = create_test_context();
-
         let value = StringAttribute::new(&context, "foo").value();
 
         assert_eq!(value, "foo");

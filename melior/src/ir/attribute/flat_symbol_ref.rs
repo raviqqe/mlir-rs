@@ -35,13 +35,21 @@ attribute_traits!(
 
 #[cfg(test)]
 mod tests {
-    use crate::test::create_test_context;
-
     use super::*;
+    use crate::test::create_test_context;
 
     #[test]
     fn new() {
         let context = create_test_context();
-        assert_eq!(FlatSymbolRefAttribute::new(&context, "foo").value(), "foo");
+
+        FlatSymbolRefAttribute::new(&context, "foo");
+    }
+
+    #[test]
+    fn value() {
+        let context = create_test_context();
+        let value = FlatSymbolRefAttribute::new(&context, "foo").value();
+
+        assert_eq!(value, "foo");
     }
 }
