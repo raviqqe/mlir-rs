@@ -90,6 +90,58 @@ impl TypeState {
         Self::build_parameters_without(&self.attributes, field)
     }
 
+    pub fn arguments_with<'a>(
+        &'a self,
+        field: &'a str,
+        set: bool,
+    ) -> impl Iterator<Item = GenericArgument> + 'a {
+        self.results_with(field, set)
+            .chain(self.operands_with(field, set))
+            .chain(self.regions_with(field, set))
+            .chain(self.successors_with(field, set))
+            .chain(self.attributes_with(field, set))
+    }
+
+    fn results_with<'a>(
+        &'a self,
+        field: &'a str,
+        set: bool,
+    ) -> impl Iterator<Item = GenericArgument> + 'a {
+        Self::build_arguments_with(&self.results, RESULT_PREFIX, field, set)
+    }
+
+    fn operands_with<'a>(
+        &'a self,
+        field: &'a str,
+        set: bool,
+    ) -> impl Iterator<Item = GenericArgument> + 'a {
+        Self::build_arguments_with(&self.operands, OPERAND_PREFIX, field, set)
+    }
+
+    fn regions_with<'a>(
+        &'a self,
+        field: &'a str,
+        set: bool,
+    ) -> impl Iterator<Item = GenericArgument> + 'a {
+        Self::build_arguments_with(&self.regions, REGION_PREFIX, field, set)
+    }
+
+    fn successors_with<'a>(
+        &'a self,
+        field: &'a str,
+        set: bool,
+    ) -> impl Iterator<Item = GenericArgument> + 'a {
+        Self::build_arguments_with(&self.successors, SUCCESSOR_PREFIX, field, set)
+    }
+
+    fn attributes_with<'a>(
+        &'a self,
+        field: &'a str,
+        set: bool,
+    ) -> impl Iterator<Item = GenericArgument> + 'a {
+        Self::build_arguments_with(&self.attributes, ATTRIBUTE_PREFIX, field, set)
+    }
+
     pub fn arguments_with_all(&self, set: bool) -> impl Iterator<Item = GenericArgument> {
         self.results_with_all(set)
             .chain(self.operands_with_all(set))

@@ -77,7 +77,7 @@ fn generate_field_fn(builder: &OperationBuilder, field: &impl OperationField) ->
     let add_arguments = field.add_arguments(identifier);
 
     if field.is_optional() {
-        let parameters = builder.type_state().parameters();
+        let parameters = builder.type_state().parameters().collect::<Vec<_>>();
 
         quote! {
             impl<'c, #(#parameters),*> #builder_identifier<'c, #(#parameters),*> {
