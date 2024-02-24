@@ -483,7 +483,10 @@ mod tests {
                 .into(),
             ),
             true,
-            Some(IntegerAttribute::new(IntegerType::new(&context, 64).into(), 8)),
+            Some(IntegerAttribute::new(
+                IntegerType::new(&context, 64).into(),
+                8,
+            )),
             location,
         ));
 

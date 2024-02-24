@@ -335,7 +335,10 @@ pub fn intr_abs<'c>(
     OperationBuilder::new("llvm.intr.abs", location)
         .add_attributes(&[(
             Identifier::new(context, "is_int_min_poison"),
-            IntegerAttribute::new(IntegerType::new(context, 1).into(), is_int_min_poison.into())
+            IntegerAttribute::new(
+                IntegerType::new(context, 1).into(),
+                is_int_min_poison.into(),
+            )
             .into(),
         )])
         .add_operands(&[value])
