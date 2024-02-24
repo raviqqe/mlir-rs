@@ -31,9 +31,8 @@ attribute_traits!(StringAttribute, is_string, "string");
 
 #[cfg(test)]
 mod tests {
-    use crate::test::create_test_context;
-
     use super::*;
+    use crate::test::create_test_context;
 
     #[test]
     fn value() {
