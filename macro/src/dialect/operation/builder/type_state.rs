@@ -40,13 +40,20 @@ impl TypeState {
             (&self.operands, OPERAND_PREFIX),
             (&self.regions, REGION_PREFIX),
             (&self.successors, SUCCESSOR_PREFIX),
-            (&self.attributes, ATTRIBUTE_PREFIX),
         ]
         .into_iter()
     }
 
+    fn unordered_fields(&self) -> impl Iterator<Item = (&[String], &'static str)> {
+        [(self.attributes.as_slice(), ATTRIBUTE_PREFIX)].into_iter()
+    }
+
+    fn all_fields(&self) -> impl Iterator<Item = (&[String], &'static str)> {
+        self.ordered_fields().chain(self.unordered_fields())
+    }
+
     pub fn parameters(&self) -> impl Iterator<Item = GenericArgument> + '_ {
-        self.ordered_fields()
+        self.all_fields()
             .flat_map(|(fields, prefix)| Self::build_parameters(fields, prefix))
     }
 
@@ -54,7 +61,7 @@ impl TypeState {
         &'a self,
         field: &'a str,
     ) -> impl Iterator<Item = GenericArgument> + 'a {
-        self.ordered_fields()
+        self.all_fields()
             .flat_map(|(fields, prefix)| Self::build_parameters_without(fields, prefix, field))
     }
 
@@ -63,13 +70,13 @@ impl TypeState {
         field: &'a str,
         set: bool,
     ) -> impl Iterator<Item = GenericArgument> + 'a {
-        self.ordered_fields().flat_map(move |(fields, prefix)| {
+        self.all_fields().flat_map(move |(fields, prefix)| {
             Self::build_arguments_with(fields, prefix, field, set)
         })
     }
 
     pub fn arguments_with_all(&self, set: bool) -> impl Iterator<Item = GenericArgument> + '_ {
-        self.ordered_fields()
+        self.all_fields()
             .flat_map(move |(fields, _)| Self::build_arguments_with_all(fields, set))
     }
 
