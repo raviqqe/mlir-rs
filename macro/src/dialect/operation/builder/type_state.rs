@@ -181,7 +181,10 @@ impl TypeState {
         fields: &[String],
         field: &str,
     ) -> impl Iterator<Item = GenericArgument> {
-        let index = fields.iter().position(|other| other == field).unwrap();
+        let index = fields
+            .iter()
+            .position(|other| other == field)
+            .unwrap_or(fields.len());
 
         repeat(Self::build_argument(true))
             .take(index)
