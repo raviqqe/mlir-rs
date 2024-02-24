@@ -41,12 +41,15 @@ attribute_traits!(IntegerAttribute, is_integer, "integer");
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::test::create_test_context;
+    use crate::{ir::r#type::IntegerType, test::create_test_context};
 
     #[test]
     fn value() {
         let context = create_test_context();
 
-        assert_eq!(IntegerAttribute::new(&context, 42).value(), 42);
+        assert_eq!(
+            IntegerAttribute::new(42, IntegerType::new(&context, 64)).value(),
+            42
+        );
     }
 }
