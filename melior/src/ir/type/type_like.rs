@@ -88,6 +88,16 @@ mod tests {
     }
 
     #[test]
+    fn dialect() {
+        let context = Context::new();
+
+        assert_eq!(
+            Type::index(&context).dialect().namespace().unwrap(),
+            "builtin"
+        );
+    }
+
+    #[test]
     fn is_integer() {
         let context = Context::new();
 
