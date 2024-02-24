@@ -207,7 +207,9 @@ impl<'a> Operation<'a> {
     }
 
     pub fn required_attributes(&self) -> impl Iterator<Item = &Attribute> {
-        self.attributes().filter(|field| !field.is_optional())
+        self.derived_attributes
+            .iter()
+            .filter(|field| !field.is_optional())
     }
 
     pub fn required_fields(&self) -> impl Iterator<Item = &dyn OperationField> {
@@ -224,7 +226,7 @@ impl<'a> Operation<'a> {
         .chain(self.operands.iter().map(convert))
         .chain(self.regions.iter().map(convert))
         .chain(self.successors.iter().map(convert))
-        .chain(self.attributes().map(convert))
+        .chain(self.attributes.iter().map(convert))
         .filter(|field| !field.is_optional())
     }
 
