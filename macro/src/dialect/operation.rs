@@ -207,7 +207,7 @@ impl<'a> Operation<'a> {
     }
 
     pub fn required_attributes(&self) -> impl Iterator<Item = &Attribute> {
-        self.attributes.iter().filter(|field| !field.is_optional())
+        self.attributes().filter(|field| !field.is_optional())
     }
 
     pub fn required_fields(&self) -> impl Iterator<Item = &dyn OperationField> {
