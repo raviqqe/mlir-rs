@@ -139,7 +139,7 @@ mod tests {
             |_| {
                 constant(
                     &context,
-                    IntegerAttribute::new(42, index_type),
+                    IntegerAttribute::new(index_type, 42),
                     Location::unknown(&context),
                 )
             },

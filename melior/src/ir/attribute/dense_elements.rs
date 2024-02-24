@@ -101,7 +101,7 @@ mod tests {
         let integer_type = IntegerType::new(&context, 32).into();
         let attribute = DenseElementsAttribute::new(
             MemRefType::new(integer_type, &[3], None, None).into(),
-            &[IntegerAttribute::new(42, integer_type).into()],
+            &[IntegerAttribute::new(integer_type, 42).into()],
         )
         .unwrap();
 
@@ -124,7 +124,7 @@ mod tests {
         let integer_type = IntegerType::new(&context, 64).into();
         let attribute = DenseElementsAttribute::new(
             MemRefType::new(integer_type, &[3], None, None).into(),
-            &[IntegerAttribute::new(42, integer_type).into()],
+            &[IntegerAttribute::new(integer_type, 42).into()],
         )
         .unwrap();
 
@@ -147,7 +147,7 @@ mod tests {
         let integer_type = IntegerType::new(&context, 64).into();
         let attribute = DenseElementsAttribute::new(
             MemRefType::new(integer_type, &[3], None, None).into(),
-            &[IntegerAttribute::new(0, integer_type).into()],
+            &[IntegerAttribute::new(integer_type, 0).into()],
         )
         .unwrap();
 

@@ -256,7 +256,7 @@ pub fn intr_ctlz<'c>(
     OperationBuilder::new("llvm.intr.ctlz", location)
         .add_attributes(&[(
             Identifier::new(context, "is_zero_poison"),
-            IntegerAttribute::new(is_zero_poison.into(), IntegerType::new(context, 1).into())
+            IntegerAttribute::new(IntegerType::new(context, 1).into(), is_zero_poison.into())
                 .into(),
         )])
         .add_operands(&[value])
@@ -276,7 +276,7 @@ pub fn intr_cttz<'c>(
     OperationBuilder::new("llvm.intr.cttz", location)
         .add_attributes(&[(
             Identifier::new(context, "is_zero_poison"),
-            IntegerAttribute::new(is_zero_poison.into(), IntegerType::new(context, 1).into())
+            IntegerAttribute::new(IntegerType::new(context, 1).into(), is_zero_poison.into())
                 .into(),
         )])
         .add_operands(&[value])
@@ -335,10 +335,7 @@ pub fn intr_abs<'c>(
     OperationBuilder::new("llvm.intr.abs", location)
         .add_attributes(&[(
             Identifier::new(context, "is_int_min_poison"),
-            IntegerAttribute::new(
-                is_int_min_poison.into(),
-                IntegerType::new(context, 1).into(),
-            )
+            IntegerAttribute::new(IntegerType::new(context, 1).into(), is_int_min_poison.into())
             .into(),
         )])
         .add_operands(&[value])
@@ -498,7 +495,7 @@ mod tests {
                 let index = block
                     .append_operation(arith::constant(
                         &context,
-                        IntegerAttribute::new(42, integer_type).into(),
+                        IntegerAttribute::new(integer_type, 42).into(),
                         location,
                     ))
                     .result(0)
@@ -548,7 +545,7 @@ mod tests {
                 let value = block
                     .append_operation(arith::constant(
                         &context,
-                        IntegerAttribute::new(42, integer_type).into(),
+                        IntegerAttribute::new(integer_type, 42).into(),
                         location,
                     ))
                     .result(0)
@@ -789,7 +786,7 @@ mod tests {
                     block.argument(0).unwrap().into(),
                     location,
                     LoadStoreOptions::new()
-                        .align(Some(IntegerAttribute::new(4, integer_type)))
+                        .align(Some(IntegerAttribute::new(integer_type, 4)))
                         .volatile(true)
                         .nontemporal(true),
                 ));

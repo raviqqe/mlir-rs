@@ -67,9 +67,9 @@ mod tests {
         let context = create_test_context();
         let r#type = IntegerType::new(&context, 64).into();
         let attributes = [
-            IntegerAttribute::new(1, r#type).into(),
-            IntegerAttribute::new(2, r#type).into(),
-            IntegerAttribute::new(3, r#type).into(),
+            IntegerAttribute::new(r#type, 1).into(),
+            IntegerAttribute::new(r#type, 2).into(),
+            IntegerAttribute::new(r#type, 3).into(),
         ];
 
         let attribute = ArrayAttribute::new(&context, &attributes);
@@ -88,7 +88,7 @@ mod tests {
         let context = create_test_context();
         let attribute = ArrayAttribute::new(
             &context,
-            &[IntegerAttribute::new(1, Type::index(&context)).into()],
+            &[IntegerAttribute::new(Type::index(&context), 1).into()],
         );
 
         assert_eq!(attribute.len(), 1);

@@ -144,7 +144,7 @@ mod tests {
 
                         let value = block.append_operation(arith::constant(
                             &context,
-                            IntegerAttribute::new(0, index_type).into(),
+                            IntegerAttribute::new(index_type, 0).into(),
                             location,
                         ));
 
@@ -257,7 +257,7 @@ mod tests {
 
                     let condition = block.append_operation(arith::constant(
                         &context,
-                        IntegerAttribute::new(0, IntegerType::new(&context, 1).into()).into(),
+                        IntegerAttribute::new(IntegerType::new(&context, 1).into(), 0).into(),
                         location,
                     ));
 
@@ -269,7 +269,7 @@ mod tests {
 
                             let result = block.append_operation(arith::constant(
                                 &context,
-                                IntegerAttribute::new(42, index_type).into(),
+                                IntegerAttribute::new(index_type, 42).into(),
                                 location,
                             ));
 
@@ -287,7 +287,7 @@ mod tests {
 
                             let result = block.append_operation(arith::constant(
                                 &context,
-                                IntegerAttribute::new(13, index_type).into(),
+                                IntegerAttribute::new(index_type, 13).into(),
                                 location,
                             ));
 
@@ -337,7 +337,7 @@ mod tests {
 
                     let condition = block.append_operation(arith::constant(
                         &context,
-                        IntegerAttribute::new(0, IntegerType::new(&context, 1).into()).into(),
+                        IntegerAttribute::new(IntegerType::new(&context, 1).into(), 0).into(),
                         location,
                     ));
 
@@ -389,7 +389,7 @@ mod tests {
 
                 let condition = block.append_operation(arith::constant(
                     &context,
-                    IntegerAttribute::new(0, Type::index(&context)).into(),
+                    IntegerAttribute::new(Type::index(&context), 0).into(),
                     location,
                 ));
 
@@ -465,7 +465,7 @@ mod tests {
 
                     let initial = block.append_operation(arith::constant(
                         &context,
-                        IntegerAttribute::new(0, index_type).into(),
+                        IntegerAttribute::new(index_type, 0).into(),
                         location,
                     ));
 
@@ -477,14 +477,14 @@ mod tests {
 
                             let condition = block.append_operation(arith::constant(
                                 &context,
-                                IntegerAttribute::new(0, IntegerType::new(&context, 1).into())
+                                IntegerAttribute::new(IntegerType::new(&context, 1).into(), 0)
                                     .into(),
                                 location,
                             ));
 
                             let result = block.append_operation(arith::constant(
                                 &context,
-                                IntegerAttribute::new(42, Type::index(&context)).into(),
+                                IntegerAttribute::new(Type::index(&context), 42).into(),
                                 location,
                             ));
 
@@ -503,7 +503,7 @@ mod tests {
 
                             let result = block.append_operation(arith::constant(
                                 &context,
-                                IntegerAttribute::new(42, index_type).into(),
+                                IntegerAttribute::new(index_type, 42).into(),
                                 location,
                             ));
 
@@ -552,7 +552,7 @@ mod tests {
 
                     let initial = block.append_operation(arith::constant(
                         &context,
-                        IntegerAttribute::new(0, index_type).into(),
+                        IntegerAttribute::new(index_type, 0).into(),
                         location,
                     ));
 
@@ -564,14 +564,14 @@ mod tests {
 
                             let condition = block.append_operation(arith::constant(
                                 &context,
-                                IntegerAttribute::new(0, IntegerType::new(&context, 1).into())
+                                IntegerAttribute::new(IntegerType::new(&context, 1).into(), 0)
                                     .into(),
                                 location,
                             ));
 
                             let result = block.append_operation(arith::constant(
                                 &context,
-                                FloatAttribute::new(&context, 42.0, float_type).into(),
+                                FloatAttribute::new(&context, float_type, 42.0).into(),
                                 location,
                             ));
 
@@ -590,7 +590,7 @@ mod tests {
 
                             let result = block.append_operation(arith::constant(
                                 &context,
-                                IntegerAttribute::new(42, Type::index(&context)).into(),
+                                IntegerAttribute::new(Type::index(&context), 42).into(),
                                 location,
                             ));
 
@@ -638,7 +638,7 @@ mod tests {
 
                     let initial = block.append_operation(arith::constant(
                         &context,
-                        IntegerAttribute::new(0, index_type).into(),
+                        IntegerAttribute::new(index_type, 0).into(),
                         location,
                     ));
 
@@ -654,14 +654,14 @@ mod tests {
 
                             let condition = block.append_operation(arith::constant(
                                 &context,
-                                IntegerAttribute::new(0, IntegerType::new(&context, 1).into())
+                                IntegerAttribute::new(IntegerType::new(&context, 1).into(), 0)
                                     .into(),
                                 location,
                             ));
 
                             let result = block.append_operation(arith::constant(
                                 &context,
-                                IntegerAttribute::new(42, Type::index(&context)).into(),
+                                IntegerAttribute::new(Type::index(&context), 42).into(),
                                 location,
                             ));
 
@@ -684,7 +684,7 @@ mod tests {
 
                             let result = block.append_operation(arith::constant(
                                 &context,
-                                IntegerAttribute::new(42, index_type).into(),
+                                IntegerAttribute::new(index_type, 42).into(),
                                 location,
                             ));
 

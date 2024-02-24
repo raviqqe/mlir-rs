@@ -100,7 +100,7 @@ pub fn switch<'c>(
                     RankedTensorType::new(&[case_values.len() as u64], flag_type, None).into(),
                     &case_values
                         .iter()
-                        .map(|value| IntegerAttribute::new(*value, flag_type).into())
+                        .map(|value| IntegerAttribute::new(flag_type, *value).into())
                         .collect::<Vec<_>>(),
                 )?
                 .into(),
@@ -178,7 +178,7 @@ mod tests {
                 let operand = block
                     .append_operation(arith::constant(
                         &context,
-                        IntegerAttribute::new(1, bool_type).into(),
+                        IntegerAttribute::new(bool_type, 1).into(),
                         location,
                     ))
                     .result(0)
@@ -220,7 +220,7 @@ mod tests {
                 let operand = block
                     .append_operation(index::constant(
                         &context,
-                        IntegerAttribute::new(1, index_type),
+                        IntegerAttribute::new(index_type, 1),
                         location,
                     ))
                     .result(0)
@@ -264,7 +264,7 @@ mod tests {
                 let operand = block
                     .append_operation(index::constant(
                         &context,
-                        IntegerAttribute::new(1, index_type),
+                        IntegerAttribute::new(index_type, 1),
                         location,
                     ))
                     .result(0)
@@ -332,7 +332,7 @@ mod tests {
                 let operand = block
                     .append_operation(arith::constant(
                         &context,
-                        IntegerAttribute::new(1, i32_type).into(),
+                        IntegerAttribute::new(i32_type, 1).into(),
                         location,
                     ))
                     .result(0)

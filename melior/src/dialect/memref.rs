@@ -389,7 +389,7 @@ mod tests {
 
             let index = block.append_operation(index::constant(
                 &context,
-                IntegerAttribute::new(0, Type::index(&context)),
+                IntegerAttribute::new(Type::index(&context), 0),
                 location,
             ));
 
@@ -477,16 +477,13 @@ mod tests {
             Some(
                 DenseElementsAttribute::new(
                     RankedTensorType::new(&[], r#type, None).into(),
-                    &[IntegerAttribute::new(42, r#type).into()],
+                    &[IntegerAttribute::new(r#type, 42).into()],
                 )
                 .unwrap()
                 .into(),
             ),
             true,
-            Some(IntegerAttribute::new(
-                8,
-                IntegerType::new(&context, 64).into(),
-            )),
+            Some(IntegerAttribute::new(IntegerType::new(&context, 64).into(), 8)),
             location,
         ));
 
@@ -529,7 +526,7 @@ mod tests {
 
             let index = block.append_operation(index::constant(
                 &context,
-                IntegerAttribute::new(0, Type::index(&context)),
+                IntegerAttribute::new(Type::index(&context), 0),
                 location,
             ));
 
@@ -576,7 +573,7 @@ mod tests {
 
             let value = block.append_operation(index::constant(
                 &context,
-                IntegerAttribute::new(42, Type::index(&context)),
+                IntegerAttribute::new(Type::index(&context), 42),
                 location,
             ));
 
@@ -606,13 +603,13 @@ mod tests {
 
             let value = block.append_operation(index::constant(
                 &context,
-                IntegerAttribute::new(42, Type::index(&context)),
+                IntegerAttribute::new(Type::index(&context), 42),
                 location,
             ));
 
             let index = block.append_operation(index::constant(
                 &context,
-                IntegerAttribute::new(0, Type::index(&context)),
+                IntegerAttribute::new(Type::index(&context), 0),
                 location,
             ));
 

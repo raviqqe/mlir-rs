@@ -48,7 +48,7 @@ mod tests {
         let context = create_test_context();
 
         assert_eq!(
-            IntegerAttribute::new(42, IntegerType::new(&context, 64).into()).value(),
+            IntegerAttribute::new(IntegerType::new(&context, 64).into(), 42).value(),
             42
         );
     }
