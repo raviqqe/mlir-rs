@@ -41,14 +41,14 @@ pub fn generate_operation_builder(builder: &OperationBuilder) -> TokenStream {
         "A builder for {}.",
         builder.operation().documentation_name()
     );
-    let type_arguments = builder.type_state().parameters().collect::<Vec<_>>();
+    let type_parameters = builder.type_state().parameters().collect::<Vec<_>>();
 
     quote! {
         #[doc = #doc]
-        pub struct #identifier<'c, #(#type_arguments),*> {
+        pub struct #identifier<'c, #(#type_parameters),*> {
             builder: ::melior::ir::operation::OperationBuilder<'c>,
             context: &'c ::melior::Context,
-            _state: ::std::marker::PhantomData<(#(#type_arguments),*)>,
+            _state: ::std::marker::PhantomData<(#(#type_parameters),*)>,
         }
 
         #new_fn
