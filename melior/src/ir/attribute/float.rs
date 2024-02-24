@@ -3,7 +3,7 @@ use crate::{
     ir::{Type, TypeLike},
     Context, Error,
 };
-use mlir_sys::{mlirFloatAttrDoubleGet, MlirAttribute};
+use mlir_sys::{mlirFloatAttrDoubleGet, mlirFloatAttrGetValueDouble, MlirAttribute};
 
 /// A float attribute.
 #[derive(Clone, Copy)]
@@ -22,6 +22,28 @@ impl<'c> FloatAttribute<'c> {
             ))
         }
     }
+
+    /// Returns a value.
+    pub fn value(&self) -> f64 {
+        unsafe { mlirFloatAttrGetValueDouble(self.to_raw()) }
+    }
 }
 
 attribute_traits!(FloatAttribute, is_float, "float");
+
+#[cfg(test)]
+mod tests {
+    use crate::test::create_test_context;
+
+    use super::*;
+
+    #[test]
+    fn value() {
+        let context = create_test_context();
+
+        assert_eq!(
+            FloatAttribute::new(&context, 42.0, Type::float64(&context)).value(),
+            42.0
+        );
+    }
+}
