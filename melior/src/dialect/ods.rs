@@ -210,8 +210,8 @@ mod tests {
         test_operation("addf_builder", &context, &[r#type, r#type], |block| {
             block.append_operation(
                 arith::AddFOperationBuilder::new(&context, location)
-                    .rhs(block.argument(1).unwrap().into())
                     .lhs(block.argument(0).unwrap().into())
+                    .rhs(block.argument(1).unwrap().into())
                     .build()
                     .into(),
             );

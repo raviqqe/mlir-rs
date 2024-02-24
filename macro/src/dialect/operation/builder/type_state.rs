@@ -96,17 +96,18 @@ impl TypeState {
         (0..fields.len()).map(|index| Self::build_generic_argument(prefix, index))
     }
 
-    // TODO
     fn build_ordered_parameters_without<'a>(
         fields: &'a [String],
         prefix: &'a str,
         field: &'a str,
     ) -> impl Iterator<Item = GenericArgument> + 'a {
-        fields
-            .iter()
-            .enumerate()
-            .filter(move |(_, other)| *other != field)
-            .map(|(index, _)| Self::build_generic_argument(prefix, index))
+        Self::build_parameters(fields, prefix).skip(
+            fields
+                .iter()
+                .position(|other| *other == field)
+                .map(|index| index + 1)
+                .unwrap_or(0),
+        )
     }
 
     fn build_unordered_parameters_without<'a>(
@@ -121,20 +122,22 @@ impl TypeState {
             .map(|(index, _)| Self::build_generic_argument(prefix, index))
     }
 
-    // TODO
     fn build_ordered_arguments_with<'a>(
         fields: &'a [String],
         prefix: &'a str,
         field: &'a str,
         set: bool,
-    ) -> impl Iterator<Item = GenericArgument> + 'a {
-        fields.iter().enumerate().map(move |(index, other)| {
-            if other == field {
-                Self::build_argument(set)
-            } else {
-                Self::build_generic_argument(prefix, index)
-            }
-        })
+    ) -> Box<dyn Iterator<Item = GenericArgument> + 'a> {
+        let Some(index) = fields.iter().position(|other| *other == field) else {
+            return Box::new(Self::build_parameters(fields, prefix));
+        };
+
+        Box::new(
+            repeat(Self::build_argument(true))
+                .take(index)
+                .chain([Self::build_argument(set)])
+                .chain(Self::build_parameters(fields, prefix).skip(index + 1)),
+        )
     }
 
     fn build_unordered_arguments_with<'a>(
