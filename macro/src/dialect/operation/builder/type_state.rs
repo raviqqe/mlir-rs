@@ -34,72 +34,28 @@ impl TypeState {
         }
     }
 
-    pub fn parameters(&self) -> impl Iterator<Item = GenericArgument> {
-        self.results()
-            .chain(self.operands())
-            .chain(self.regions())
-            .chain(self.successors())
-            .chain(self.attributes())
+    fn ordered_fields(&self) -> impl Iterator<Item = (&[String], &'static str)> {
+        [
+            (self.results.as_slice(), RESULT_PREFIX),
+            (&self.operands, OPERAND_PREFIX),
+            (&self.regions, REGION_PREFIX),
+            (&self.successors, SUCCESSOR_PREFIX),
+            (&self.attributes, ATTRIBUTE_PREFIX),
+        ]
+        .into_iter()
     }
 
-    fn results(&self) -> impl Iterator<Item = GenericArgument> {
-        Self::build_parameters(&self.results, RESULT_PREFIX)
-    }
-
-    fn operands(&self) -> impl Iterator<Item = GenericArgument> {
-        Self::build_parameters(&self.operands, OPERAND_PREFIX)
-    }
-
-    fn regions(&self) -> impl Iterator<Item = GenericArgument> {
-        Self::build_parameters(&self.regions, REGION_PREFIX)
-    }
-
-    fn successors(&self) -> impl Iterator<Item = GenericArgument> {
-        Self::build_parameters(&self.successors, SUCCESSOR_PREFIX)
-    }
-
-    fn attributes(&self) -> impl Iterator<Item = GenericArgument> {
-        Self::build_parameters(&self.attributes, ATTRIBUTE_PREFIX)
+    pub fn parameters(&self) -> impl Iterator<Item = GenericArgument> + '_ {
+        self.ordered_fields()
+            .flat_map(|(fields, prefix)| Self::build_parameters(fields, prefix))
     }
 
     pub fn parameters_without<'a>(
         &'a self,
         field: &'a str,
     ) -> impl Iterator<Item = GenericArgument> + 'a {
-        self.results_without(field)
-            .chain(self.operands_without(field))
-            .chain(self.regions_without(field))
-            .chain(self.successors_without(field))
-            .chain(self.attributes_without(field))
-    }
-
-    fn results_without<'a>(&'a self, field: &'a str) -> impl Iterator<Item = GenericArgument> + 'a {
-        Self::build_parameters_without(&self.results, RESULT_PREFIX, field)
-    }
-
-    fn operands_without<'a>(
-        &'a self,
-        field: &'a str,
-    ) -> impl Iterator<Item = GenericArgument> + 'a {
-        Self::build_parameters_without(&self.operands, OPERAND_PREFIX, field)
-    }
-
-    fn regions_without<'a>(&'a self, field: &'a str) -> impl Iterator<Item = GenericArgument> + 'a {
-        Self::build_parameters_without(&self.regions, REGION_PREFIX, field)
-    }
-
-    fn successors_without<'a>(
-        &'a self,
-        field: &'a str,
-    ) -> impl Iterator<Item = GenericArgument> + 'a {
-        Self::build_parameters_without(&self.successors, SUCCESSOR_PREFIX, field)
-    }
-
-    fn attributes_without<'a>(
-        &'a self,
-        field: &'a str,
-    ) -> impl Iterator<Item = GenericArgument> + 'a {
-        Self::build_parameters_without(&self.attributes, ATTRIBUTE_PREFIX, field)
+        self.ordered_fields()
+            .flat_map(|(fields, prefix)| Self::build_parameters_without(fields, prefix, field))
     }
 
     pub fn arguments_with<'a>(
@@ -107,79 +63,14 @@ impl TypeState {
         field: &'a str,
         set: bool,
     ) -> impl Iterator<Item = GenericArgument> + 'a {
-        self.results_with(field, set)
-            .chain(self.operands_with(field, set))
-            .chain(self.regions_with(field, set))
-            .chain(self.successors_with(field, set))
-            .chain(self.attributes_with(field, set))
+        self.ordered_fields().flat_map(move |(fields, prefix)| {
+            Self::build_arguments_with(fields, prefix, field, set)
+        })
     }
 
-    fn results_with<'a>(
-        &'a self,
-        field: &'a str,
-        set: bool,
-    ) -> impl Iterator<Item = GenericArgument> + 'a {
-        Self::build_arguments_with(&self.results, RESULT_PREFIX, field, set)
-    }
-
-    fn operands_with<'a>(
-        &'a self,
-        field: &'a str,
-        set: bool,
-    ) -> impl Iterator<Item = GenericArgument> + 'a {
-        Self::build_arguments_with(&self.operands, OPERAND_PREFIX, field, set)
-    }
-
-    fn regions_with<'a>(
-        &'a self,
-        field: &'a str,
-        set: bool,
-    ) -> impl Iterator<Item = GenericArgument> + 'a {
-        Self::build_arguments_with(&self.regions, REGION_PREFIX, field, set)
-    }
-
-    fn successors_with<'a>(
-        &'a self,
-        field: &'a str,
-        set: bool,
-    ) -> impl Iterator<Item = GenericArgument> + 'a {
-        Self::build_arguments_with(&self.successors, SUCCESSOR_PREFIX, field, set)
-    }
-
-    fn attributes_with<'a>(
-        &'a self,
-        field: &'a str,
-        set: bool,
-    ) -> impl Iterator<Item = GenericArgument> + 'a {
-        Self::build_arguments_with(&self.attributes, ATTRIBUTE_PREFIX, field, set)
-    }
-
-    pub fn arguments_with_all(&self, set: bool) -> impl Iterator<Item = GenericArgument> {
-        self.results_with_all(set)
-            .chain(self.operands_with_all(set))
-            .chain(self.regions_with_all(set))
-            .chain(self.successors_with_all(set))
-            .chain(self.attributes_with_all(set))
-    }
-
-    fn results_with_all(&self, set: bool) -> impl Iterator<Item = GenericArgument> {
-        Self::build_arguments_with_all(&self.results, set)
-    }
-
-    fn operands_with_all(&self, set: bool) -> impl Iterator<Item = GenericArgument> {
-        Self::build_arguments_with_all(&self.operands, set)
-    }
-
-    fn regions_with_all(&self, set: bool) -> impl Iterator<Item = GenericArgument> {
-        Self::build_arguments_with_all(&self.regions, set)
-    }
-
-    fn successors_with_all(&self, set: bool) -> impl Iterator<Item = GenericArgument> {
-        Self::build_arguments_with_all(&self.successors, set)
-    }
-
-    fn attributes_with_all(&self, set: bool) -> impl Iterator<Item = GenericArgument> {
-        Self::build_arguments_with_all(&self.attributes, set)
+    pub fn arguments_with_all(&self, set: bool) -> impl Iterator<Item = GenericArgument> + '_ {
+        self.ordered_fields()
+            .flat_map(move |(fields, _)| Self::build_arguments_with_all(fields, set))
     }
 
     fn build_parameters<'a>(
