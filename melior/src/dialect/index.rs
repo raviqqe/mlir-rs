@@ -126,7 +126,7 @@ mod tests {
         module.body().append_operation(function);
 
         assert!(module.as_operation().verify());
-        insta::assert_display_snapshot!(name, module.as_operation());
+        insta::assert_snapshot!(name, module.as_operation());
     }
 
     #[test]
@@ -257,6 +257,6 @@ mod tests {
         module.body().append_operation(function);
 
         assert!(module.as_operation().verify());
-        insta::assert_display_snapshot!(module.as_operation());
+        insta::assert_snapshot!(module.as_operation());
     }
 }

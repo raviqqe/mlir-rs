@@ -214,7 +214,7 @@ mod tests {
         let context = Context::new();
         let manager = PassManager::new(&context);
 
-        insta::assert_display_snapshot!(parse_pass_pipeline(
+        insta::assert_snapshot!(parse_pass_pipeline(
             manager.as_operation_pass_manager(),
             "builtin.module(func.func(print-op-stats{json=false}),\
                 func.func(print-op-stats{json=false}))"
