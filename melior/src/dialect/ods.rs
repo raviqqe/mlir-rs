@@ -113,7 +113,6 @@ melior_macro::dialect! {
 mod tests {
     use super::*;
     use crate::{
-        dialect::{self, func},
         ir::{
             attribute::{IntegerAttribute, StringAttribute, TypeAttribute},
             r#type::{FunctionType, IntegerType},
@@ -232,7 +231,7 @@ mod tests {
             block.append_operation(
                 llvm::alloca(
                     &context,
-                    dialect::llvm::r#type::pointer(integer_type, 0),
+                    llvm::r#type::pointer(integer_type, 0),
                     alloca_size,
                     location,
                 )
@@ -248,7 +247,7 @@ mod tests {
         let context = create_test_context();
         let location = Location::unknown(&context);
         let integer_type = IntegerType::new(&context, 64).into();
-        let ptr_type = dialect::llvm::r#type::opaque_pointer(&context);
+        let ptr_type = llvm::r#type::opaque_pointer(&context);
 
         test_operation("alloc_builder", &context, &[integer_type], |block| {
             let alloca_size = block.argument(0).unwrap().into();
@@ -261,6 +260,27 @@ mod tests {
                     .res(ptr_type)
                     .build()
                     .into(),
+            );
+
+            block.append_operation(func::r#return(&[], location));
+        });
+    }
+
+    #[test]
+    fn compile_func_indirect_call() {
+        let context = create_test_context();
+        let location = Location::unknown(&context);
+        let r#type = Type::float32(&context);
+
+        test_operation("addf", &context, &[r#type, r#type], |block| {
+            block.append_operation(
+                func::call_indirect(
+                    &context,
+                    block.argument(0).unwrap().into(),
+                    block.argument(1).unwrap().into(),
+                    location,
+                )
+                .into(),
             );
 
             block.append_operation(func::r#return(&[], location));
