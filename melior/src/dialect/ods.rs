@@ -32,6 +32,10 @@ melior_macro::dialect! {
     table_gen: r#"include "mlir/Dialect/Async/IR/AsyncOps.td""#
 }
 melior_macro::dialect! {
+    name: "builtin",
+    table_gen: r#"include "mlir/IR/BuiltinOps.td""#
+}
+melior_macro::dialect! {
     name: "bufferization",
     table_gen: r#"include "mlir/Dialect/Bufferization/IR/BufferizationOps.td""#
 }
