@@ -37,6 +37,6 @@ mod tests {
         let context = create_test_context();
         let value = BoolAttribute::new(&context, true).value();
 
-        assert_eq!(value, true);
+        assert!(value);
     }
 }
