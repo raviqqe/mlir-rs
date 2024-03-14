@@ -4,6 +4,7 @@
 mod r#macro;
 mod array;
 mod attribute_like;
+mod bool;
 mod dense_elements;
 mod dense_i32_array;
 mod dense_i64_array;
@@ -14,10 +15,11 @@ mod string;
 mod r#type;
 
 pub use self::{
-    array::ArrayAttribute, attribute_like::AttributeLike, dense_elements::DenseElementsAttribute,
-    dense_i32_array::DenseI32ArrayAttribute, dense_i64_array::DenseI64ArrayAttribute,
-    flat_symbol_ref::FlatSymbolRefAttribute, float::FloatAttribute, integer::IntegerAttribute,
-    r#type::TypeAttribute, string::StringAttribute,
+    array::ArrayAttribute, attribute_like::AttributeLike, bool::BoolAttribute,
+    dense_elements::DenseElementsAttribute, dense_i32_array::DenseI32ArrayAttribute,
+    dense_i64_array::DenseI64ArrayAttribute, flat_symbol_ref::FlatSymbolRefAttribute,
+    float::FloatAttribute, integer::IntegerAttribute, r#type::TypeAttribute,
+    string::StringAttribute,
 };
 use crate::{context::Context, string_ref::StringRef, utility::print_callback};
 use mlir_sys::{
@@ -123,6 +125,7 @@ impl<'c> Debug for Attribute<'c> {
 from_subtypes!(
     Attribute,
     ArrayAttribute,
+    BoolAttribute,
     DenseElementsAttribute,
     DenseI32ArrayAttribute,
     DenseI64ArrayAttribute,
