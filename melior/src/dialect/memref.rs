@@ -3,8 +3,8 @@
 use crate::{
     ir::{
         attribute::{
-            DenseI32ArrayAttribute, FlatSymbolRefAttribute, IntegerAttribute, StringAttribute,
-            TypeAttribute,
+            DenseI32ArrayAttribute, DenseI64ArrayAttribute, FlatSymbolRefAttribute,
+            IntegerAttribute, StringAttribute, TypeAttribute,
         },
         operation::OperationBuilder,
         r#type::MemRefType,
@@ -129,6 +129,78 @@ pub fn get_global<'c>(
             FlatSymbolRefAttribute::new(context, name).into(),
         )])
         .add_results(&[r#type.into()])
+        .build()
+        .expect("valid operation")
+}
+
+/// Create a `memref.view` operation.
+pub fn view<'c>(
+    context: &'c Context,
+    source: Value<'c, '_>,
+    byte_shift: Value<'c, '_>,
+    sizes: &[Value<'c, '_>],
+    result_type: MemRefType<'c>,
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new("memref.view", location)
+        .add_operands(&[source])
+        .add_operands(&[byte_shift])
+        .add_operands(sizes)
+        .add_results(&[result_type.into()])
+        .add_attributes(&[(
+            Identifier::new(context, "operand_segment_sizes"),
+            DenseI32ArrayAttribute::new(context, &[1, 1, sizes.len() as i32]).into(),
+        )])
+        .build()
+        .expect("valid operation")
+}
+
+/// Create a `memref.subview` operation.
+pub fn subview<'c>(
+    context: &'c Context,
+    source: Value<'c, '_>,
+    offsets: &[Value<'c, '_>],
+    sizes: &[Value<'c, '_>],
+    strides: &[Value<'c, '_>],
+    static_offsets: &[i64],
+    static_sizes: &[i64],
+    static_strides: &[i64],
+    result_type: MemRefType<'c>,
+    location: Location<'c>,
+) -> Operation<'c> {
+    OperationBuilder::new("memref.subview", location)
+        .add_operands(&[source])
+        .add_operands(offsets)
+        .add_operands(sizes)
+        .add_operands(strides)
+        .add_results(&[result_type.into()])
+        .add_attributes(&[
+            (
+                Identifier::new(context, "operand_segment_sizes"),
+                DenseI32ArrayAttribute::new(
+                    context,
+                    &[
+                        1,
+                        offsets.len() as i32,
+                        sizes.len() as i32,
+                        strides.len() as i32,
+                    ],
+                )
+                .into(),
+            ),
+            (
+                Identifier::new(context, "static_offsets"),
+                DenseI64ArrayAttribute::new(context, static_offsets).into(),
+            ),
+            (
+                Identifier::new(context, "static_sizes"),
+                DenseI64ArrayAttribute::new(context, static_sizes).into(),
+            ),
+            (
+                Identifier::new(context, "static_strides"),
+                DenseI64ArrayAttribute::new(context, static_strides).into(),
+            ),
+        ])
         .build()
         .expect("valid operation")
 }
@@ -281,7 +353,6 @@ mod tests {
         };
 
         module.body().append_operation(function);
-
         assert!(module.as_operation().verify());
         insta::assert_snapshot!(name, module.as_operation());
     }
@@ -623,5 +694,69 @@ mod tests {
                 location,
             ));
         })
+    }
+
+    #[test]
+    fn compile_view() {
+        let context = create_test_context();
+        let location = Location::unknown(&context);
+
+        compile_operation("view", &context, |block| {
+            let byte_type = IntegerType::new(&context, 8).into();
+
+            let memref = block.append_operation(alloc(
+                &context,
+                MemRefType::new(byte_type, &[8], None, None),
+                &[],
+                &[],
+                None,
+                location,
+            ));
+
+            let byte_shift = block.append_operation(index::constant(
+                &context,
+                IntegerAttribute::new(Type::index(&context), 0),
+                location,
+            ));
+
+            block.append_operation(view(
+                &context,
+                memref.result(0).unwrap().into(),
+                byte_shift.result(0).unwrap().into(),
+                &[],
+                MemRefType::new(byte_type, &[1], None, None),
+                location,
+            ));
+        });
+    }
+
+    #[test]
+    fn compile_subview() {
+        let context = create_test_context();
+        let location = Location::unknown(&context);
+
+        compile_operation("subview", &context, |block| {
+            let memref = block.append_operation(alloc(
+                &context,
+                MemRefType::new(Type::index(&context), &[8, 8], None, None),
+                &[],
+                &[],
+                None,
+                location,
+            ));
+
+            block.append_operation(subview(
+                &context,
+                memref.result(0).unwrap().into(),
+                &[],
+                &[],
+                &[],
+                &[0, 0],
+                &[4, 4],
+                &[1, 1],
+                MemRefType::new(Type::index(&context), &[4, 4], None, None),
+                location,
+            ));
+        });
     }
 }
