@@ -1067,6 +1067,9 @@ dependencies = [
 [[package]]
 name = "toy"
 version = "0.1.0"
+dependencies = [
+ "melior",
+]
 
 [[package]]
 name = "typed-arena"
