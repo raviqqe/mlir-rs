@@ -1065,6 +1065,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "toy"
+version = "0.1.0"
+
+[[package]]
 name = "typed-arena"
 version = "2.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"

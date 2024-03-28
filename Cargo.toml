@@ -1,5 +1,5 @@
 [workspace]
-members = ["macro", "melior"]
+members = [ "examples/toy","macro", "melior"]
 resolver = "2"
 
 [profile.release]
