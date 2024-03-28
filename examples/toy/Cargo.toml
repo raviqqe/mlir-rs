@@ -6,4 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-melior = { version = "0.17.0", path = "../../melior" }
+melior = { version = "0.17.0", path = "../../melior", features = [
+    "ods-dialects",
+] }
