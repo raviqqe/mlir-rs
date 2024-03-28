@@ -1,0 +1,6 @@
+[book]
+authors = ["Gavrilikhin Daniil"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Melior"
