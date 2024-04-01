@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v4
+      - uses: actions/configure-pages@v5
       - uses: swatinem/rust-cache@v2
       - uses: homebrew/actions/setup-homebrew@master
       - run: tools/setup.sh
