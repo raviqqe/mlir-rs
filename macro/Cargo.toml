@@ -13,7 +13,7 @@ keywords = ["mlir", "llvm"]
 proc-macro = true
 
 [dependencies]
-comrak = "0.21.0"
+comrak = "0.22.0"
 convert_case = "0.6.0"
 once_cell = "1.19.0"
 proc-macro2 = "1"
