@@ -599,6 +599,7 @@ dependencies = [
  "dashmap",
  "indoc",
  "insta",
+ "libc",
  "melior-macro",
  "mlir-sys",
  "once_cell",
