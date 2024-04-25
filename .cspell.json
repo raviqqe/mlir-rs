@@ -43,6 +43,7 @@
     "spirv",
     "stdc",
     "strided",
+    "subview",
     "tablegen",
     "tblgen",
     "tosa",
