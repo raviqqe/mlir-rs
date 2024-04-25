@@ -156,7 +156,7 @@ pub fn view<'c>(
 }
 
 /// Create a `memref.subview` operation.
-#[allow(too_many_arguments)]
+#[allow(clippy::too_many_arguments)]
 pub fn subview<'c>(
     context: &'c Context,
     source: Value<'c, '_>,
