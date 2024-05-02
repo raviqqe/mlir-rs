@@ -3,13 +3,18 @@
 melior_macro::passes!(
     "SparseTensor",
     [
-        mlirCreateSparseTensorPostSparsificationRewrite,
+        mlirCreateSparseTensorLowerForeachToSCF,
+        mlirCreateSparseTensorLowerSparseOpsToForeach,
         mlirCreateSparseTensorPreSparsificationRewrite,
         mlirCreateSparseTensorSparseBufferRewrite,
+        mlirCreateSparseTensorSparseGPUCodegen,
+        mlirCreateSparseTensorSparseReinterpretMap,
         mlirCreateSparseTensorSparseTensorCodegen,
         mlirCreateSparseTensorSparseTensorConversionPass,
         mlirCreateSparseTensorSparseVectorization,
+        mlirCreateSparseTensorSparsificationAndBufferization,
         mlirCreateSparseTensorSparsificationPass,
+        mlirCreateSparseTensorStageSparseOperations,
         mlirCreateSparseTensorStorageSpecifierToLLVM,
     ]
 );

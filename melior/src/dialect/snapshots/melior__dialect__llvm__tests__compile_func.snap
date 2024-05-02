@@ -2,7 +2,6 @@
 source: melior/src/dialect/llvm.rs
 expression: module.as_operation()
 ---
-module attributes {llvm.data_layout = ""} {
+module {
   llvm.func @printf(!llvm.ptr, ...) -> i32
 }
-

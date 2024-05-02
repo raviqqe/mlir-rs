@@ -2,10 +2,9 @@
 source: melior/src/dialect/ods.rs
 expression: module.as_operation()
 ---
-module attributes {llvm.data_layout = ""} {
+module {
   llvm.func @foo(%arg0: f32, %arg1: f32) {
     %0 = llvm.fadd %arg0, %arg1  : f32
     llvm.return
   }
 }
-

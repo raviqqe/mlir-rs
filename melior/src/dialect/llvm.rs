@@ -362,13 +362,15 @@ pub fn zext<'c>(
 
 #[cfg(test)]
 mod tests {
+    use tests::r#type::pointer;
+
     use super::*;
     use crate::{
         dialect::{
             arith, func,
             llvm::{
                 attributes::{linkage, Linkage},
-                r#type::{function, opaque_pointer},
+                r#type::function,
             },
         },
         ir::{
@@ -445,7 +447,7 @@ mod tests {
         let location = Location::unknown(&context);
         let mut module = Module::new(location);
         let integer_type = IntegerType::new(&context, 64).into();
-        let ptr_type = r#type::opaque_pointer(&context);
+        let ptr_type = r#type::pointer(&context, 0);
 
         module.body().append_operation(func::func(
             &context,
@@ -486,7 +488,7 @@ mod tests {
         let location = Location::unknown(&context);
         let mut module = Module::new(location);
         let integer_type = IntegerType::new(&context, 64).into();
-        let ptr_type = r#type::opaque_pointer(&context);
+        let ptr_type = r#type::pointer(&context, 0);
 
         module.body().append_operation(func::func(
             &context,
@@ -654,7 +656,7 @@ mod tests {
         let location = Location::unknown(&context);
         let mut module = Module::new(location);
         let integer_type = IntegerType::new(&context, 64).into();
-        let ptr_type = r#type::opaque_pointer(&context);
+        let ptr_type = r#type::pointer(&context, 0);
 
         module.body().append_operation(func::func(
             &context,
@@ -694,7 +696,7 @@ mod tests {
         let location = Location::unknown(&context);
         let mut module = Module::new(location);
         let integer_type = IntegerType::new(&context, 64).into();
-        let ptr_type = r#type::opaque_pointer(&context);
+        let ptr_type = r#type::pointer(&context, 0);
 
         module.body().append_operation(func::func(
             &context,
@@ -734,7 +736,7 @@ mod tests {
         let location = Location::unknown(&context);
         let mut module = Module::new(location);
         let integer_type = IntegerType::new(&context, 64).into();
-        let ptr_type = r#type::opaque_pointer(&context);
+        let ptr_type = r#type::pointer(&context, 0);
 
         module.body().append_operation(func::func(
             &context,
@@ -774,7 +776,7 @@ mod tests {
         let location = Location::unknown(&context);
         let mut module = Module::new(location);
         let integer_type = IntegerType::new(&context, 64).into();
-        let ptr_type = r#type::opaque_pointer(&context);
+        let ptr_type = r#type::pointer(&context, 0);
 
         module.body().append_operation(func::func(
             &context,
@@ -821,7 +823,7 @@ mod tests {
         module.body().append_operation(func(
             &context,
             StringAttribute::new(&context, "printf"),
-            TypeAttribute::new(function(integer_type, &[opaque_pointer(&context)], true)),
+            TypeAttribute::new(function(integer_type, &[pointer(&context, 0)], true)),
             Region::new(),
             &[(
                 Identifier::new(&context, "linkage"),

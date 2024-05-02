@@ -14,7 +14,7 @@ ods-dialects = []
 [dependencies]
 dashmap = "5.5.3"
 melior-macro = { version = "0.10.3", path = "../macro" }
-mlir-sys = "0.2"
+mlir-sys = "0.2.2"
 once_cell = "1"
 
 [dev-dependencies]

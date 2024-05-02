@@ -2,10 +2,9 @@
 source: melior/src/dialect/llvm.rs
 expression: module.as_operation()
 ---
-module attributes {llvm.data_layout = ""} {
+module {
   llvm.func @foo(%arg0: i64) -> i64 {
     %0 = "llvm.intr.cttz"(%arg0) <{is_zero_poison = true}> : (i64) -> i64
     llvm.return %0 : i64
   }
 }
-

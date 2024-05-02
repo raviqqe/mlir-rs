@@ -236,13 +236,12 @@ mod tests {
             let alloca_size = block.argument(0).unwrap().into();
 
             block.append_operation(
-                llvm::alloca(
-                    &context,
-                    dialect::llvm::r#type::pointer(integer_type, 0),
-                    alloca_size,
-                    location,
-                )
-                .into(),
+                llvm::AllocaOperation::builder(&context, location)
+                    .array_size(alloca_size)
+                    .elem_type(TypeAttribute::new(integer_type.into()))
+                    .res(dialect::llvm::r#type::pointer(&context, 0))
+                    .build()
+                    .into(),
             );
 
             block.append_operation(func::r#return(&context, &[], location).into());
@@ -254,7 +253,7 @@ mod tests {
         let context = create_test_context();
         let location = Location::unknown(&context);
         let integer_type = IntegerType::new(&context, 64).into();
-        let ptr_type = dialect::llvm::r#type::opaque_pointer(&context);
+        let ptr_type = dialect::llvm::r#type::pointer(&context, 0);
 
         test_operation("alloc_builder", &context, &[integer_type], |block| {
             let alloca_size = block.argument(0).unwrap().into();

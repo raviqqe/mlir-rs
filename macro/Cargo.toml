@@ -20,10 +20,10 @@ proc-macro2 = "1"
 quote = "1"
 regex = "1.10.4"
 syn = { version = "2", features = ["full"] }
-tblgen = { version = "0.3.0", features = ["llvm17-0"], default-features = false }
+tblgen = { version = "0.3.3", features = ["llvm18-0"], default-features = false, package = "tblgen-alt" }
 unindent = "0.2.3"
 
 [dev-dependencies]
 melior = { path = "../melior", features = ["ods-dialects"] }
-mlir-sys = "0.2"
+mlir-sys = "0.2.2"
 pretty_assertions = "1.4.0"

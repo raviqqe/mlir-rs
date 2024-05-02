@@ -2,7 +2,7 @@
 source: melior/src/dialect/llvm.rs
 expression: module.as_operation()
 ---
-module attributes {llvm.data_layout = ""} {
+module {
   llvm.func @foo_none() {
     llvm.return
   }
@@ -10,4 +10,3 @@ module attributes {llvm.data_layout = ""} {
     llvm.return %arg0 : !llvm.struct<(i64)>
   }
 }
-
