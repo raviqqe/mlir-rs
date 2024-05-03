@@ -86,6 +86,8 @@ fn generate_dialect_module(
     })
 }
 
+// TODO Move this into a `build.rs` script and pass down configuration values
+// (e.g. `include_directories`) via environment variables.
 fn llvm_config(argument: &str) -> Result<String, Box<dyn std::error::Error>> {
     let prefix = env::var(format!("MLIR_SYS_{}0_PREFIX", LLVM_MAJOR_VERSION))
         .map(|path| Path::new(&path).join("bin"))
