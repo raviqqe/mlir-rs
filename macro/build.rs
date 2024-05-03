@@ -1,1 +1,5 @@
-fn main() -> Result<(), Box<dyn Error>> {}
+use std::error::Error;
+
+fn main() -> Result<(), Box<dyn Error>> {
+    Ok(())
+}
