@@ -19,7 +19,7 @@ use quote::quote;
 use std::{env, fmt::Display, path::Path, process::Command, str};
 use tblgen::{record::Record, record_keeper::RecordKeeper, TableGenParser};
 
-const LLVM_MAJOR_VERSION: usize = 17;
+const LLVM_MAJOR_VERSION: usize = 18;
 
 pub fn generate_dialect(input: DialectInput) -> Result<TokenStream, Box<dyn std::error::Error>> {
     let mut parser = TableGenParser::new();
