@@ -32,6 +32,10 @@ melior_macro::dialect! {
     table_gen: r#"include "mlir/Dialect/Async/IR/AsyncOps.td""#
 }
 melior_macro::dialect! {
+    name: "amx",
+    table_gen: r#"include "mlir/Dialect/AMX/AMX.td""#
+}
+melior_macro::dialect! {
     name: "builtin",
     table_gen: r#"include "mlir/IR/BuiltinOps.td""#
 }
@@ -40,8 +44,16 @@ melior_macro::dialect! {
     table_gen: r#"include "mlir/Dialect/Bufferization/IR/BufferizationOps.td""#
 }
 melior_macro::dialect! {
+    name: "complex",
+    table_gen: r#"include "mlir/Dialect/Complex/IR/ComplexBase.td" include "mlir/Dialect/Complex/IR/ComplexOps.td""#
+}
+melior_macro::dialect! {
     name: "cf",
     table_gen: r#"include "mlir/Dialect/ControlFlow/IR/ControlFlowOps.td""#
+}
+melior_macro::dialect! {
+    name: "dlti",
+    table_gen: r#"include "mlir/Dialect/DLTI/DLTI.td""#
 }
 melior_macro::dialect! {
     name: "func",
@@ -50,6 +62,10 @@ melior_macro::dialect! {
 melior_macro::dialect! {
     name: "index",
     table_gen: r#"include "mlir/Dialect/Index/IR/IndexOps.td""#
+}
+melior_macro::dialect! {
+    name: "irdl",
+    table_gen: r#"include "mlir/Dialect/IRDL/IR/IRDL.td""#
 }
 melior_macro::dialect! {
     name: "llvm",
@@ -111,6 +127,10 @@ melior_macro::dialect! {
 melior_macro::dialect! {
     name: "vector",
     table_gen: r#"include "mlir/Dialect/Vector/IR/VectorOps.td""#
+}
+melior_macro::dialect! {
+    name: "x86vector",
+    table_gen: r#"include "mlir/Dialect/X86Vector/X86Vector.td""#
 }
 
 #[cfg(test)]
@@ -238,7 +258,7 @@ mod tests {
             block.append_operation(
                 llvm::AllocaOperation::builder(&context, location)
                     .array_size(alloca_size)
-                    .elem_type(TypeAttribute::new(integer_type.into()))
+                    .elem_type(TypeAttribute::new(integer_type))
                     .res(dialect::llvm::r#type::pointer(&context, 0))
                     .build()
                     .into(),
