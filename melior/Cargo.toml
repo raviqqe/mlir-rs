@@ -1,7 +1,7 @@
 [package]
 name = "melior"
 description = "The rustic MLIR bindings in Rust"
-version = "0.17.1"
+version = "0.18.0"
 edition = "2021"
 license = "Apache-2.0"
 repository = "https://github.com/raviqqe/melior"
@@ -13,7 +13,7 @@ ods-dialects = []
 
 [dependencies]
 dashmap = "5.5.3"
-melior-macro = { version = "0.10.3", path = "../macro" }
+melior-macro = { version = "0.11.0", path = "../macro" }
 mlir-sys = "0.2.2"
 once_cell = "1"
 
