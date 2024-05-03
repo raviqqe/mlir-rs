@@ -23,11 +23,10 @@ melior_macro::dialect! {
     name: "arm_neon",
     table_gen: r#"include "mlir/Dialect/ArmNeon/ArmNeon.td""#
 }
-// todo: fix
-// melior_macro::dialect! {
-//     name: "arm_sve",
-//     table_gen: r#"include "mlir/Dialect/ArmSVE/IR/ArmSVE.td""#
-// }
+melior_macro::dialect! {
+    name: "arm_sve",
+    table_gen: r#"include "mlir/Dialect/ArmSVE/IR/ArmSVE.td""#
+}
 melior_macro::dialect! {
     name: "async",
     table_gen: r#"include "mlir/Dialect/Async/IR/AsyncOps.td""#
