@@ -8,6 +8,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("cargo:rerun-if-env-changed={version_variable}");
     println!(
         "cargo:rustc-env=LLVM_INCLUDE_DIRECTORY={}",
+        // spell-checker: disable-next-line
         llvm_config("--includedir", &version_variable)?
     );
 
