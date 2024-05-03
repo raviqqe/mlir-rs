@@ -16,10 +16,8 @@ use operation::Operation;
 use proc_macro::TokenStream;
 use proc_macro2::Span;
 use quote::quote;
-use std::{env, fmt::Display, path::Path, process::Command, str};
+use std::{env, fmt::Display, str};
 use tblgen::{record::Record, record_keeper::RecordKeeper, TableGenParser};
-
-const LLVM_MAJOR_VERSION: usize = 18;
 
 pub fn generate_dialect(input: DialectInput) -> Result<TokenStream, Box<dyn std::error::Error>> {
     let mut parser = TableGenParser::new();
@@ -32,12 +30,9 @@ pub fn generate_dialect(input: DialectInput) -> Result<TokenStream, Box<dyn std:
         parser = parser.add_source_file(file).map_err(create_syn_error)?;
     }
 
-    // spell-checker: disable-next-line
-    let llvm_include_directory = llvm_config("--includedir")?;
-
     for path in input
         .include_directories()
-        .chain([llvm_include_directory.as_str()])
+        .chain([env!("LLVM_INCLUDE_DIRECTORY")])
     {
         parser = parser.add_include_path(path);
     }
@@ -84,30 +79,6 @@ fn generate_dialect_module(
             #(#operations)*
         }
     })
-}
-
-// TODO Move this into a `build.rs` script and pass down configuration values
-// (e.g. `include_directories`) via environment variables.
-fn llvm_config(argument: &str) -> Result<String, Box<dyn std::error::Error>> {
-    let prefix = env::var(format!("MLIR_SYS_{}0_PREFIX", LLVM_MAJOR_VERSION))
-        .map(|path| Path::new(&path).join("bin"))
-        .unwrap_or_default();
-    let call = format!(
-        "{} --link-static {}",
-        prefix.join("llvm-config").display(),
-        argument
-    );
-
-    Ok(str::from_utf8(
-        &if cfg!(target_os = "windows") {
-            Command::new("cmd").args(["/C", &call]).output()?
-        } else {
-            Command::new("sh").arg("-c").arg(&call).output()?
-        }
-        .stdout,
-    )?
-    .trim()
-    .to_string())
 }
 
 fn create_syn_error(error: impl Display) -> syn::Error {
