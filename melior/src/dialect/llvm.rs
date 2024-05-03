@@ -123,9 +123,9 @@ pub fn poison<'c>(result_type: Type<'c>, location: Location<'c>) -> Operation<'c
         .expect("valid operation")
 }
 
-/// Creates a `llvm.mlir.null` operation. A null pointer.
+/// Creates a null pointer.
 pub fn nullptr<'c>(ptr_type: Type<'c>, location: Location<'c>) -> Operation<'c> {
-    OperationBuilder::new("llvm.mlir.null", location)
+    OperationBuilder::new("llvm.mlir.zero", location)
         .add_results(&[ptr_type])
         .build()
         .expect("valid operation")
