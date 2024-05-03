@@ -48,6 +48,9 @@
     "tblgen",
     "tosa",
     "unranked",
+    "irdl",
+    "IRDL",
+    "DLTI",
     "vulkan"
   ]
 }
