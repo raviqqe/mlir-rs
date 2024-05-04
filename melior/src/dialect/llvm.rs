@@ -603,7 +603,7 @@ mod tests {
 
                 let operation = block.append_operation(zero(integer_type, location));
 
-                block.append_operation(func::r#return(&[operation.result(0)], location));
+                block.append_operation(func::r#return(&[operation.result(0).unwrap()], location));
 
                 let region = Region::new();
                 region.append_block(block);
