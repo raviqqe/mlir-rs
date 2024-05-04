@@ -587,6 +587,39 @@ mod tests {
     }
 
     #[test]
+    fn compile_zero() {
+        let context = create_test_context();
+
+        let location = Location::unknown(&context);
+        let mut module = Module::new(location);
+        let integer_type = IntegerType::new(&context, 64).into();
+
+        module.body().append_operation(func::func(
+            &context,
+            StringAttribute::new(&context, "foo"),
+            TypeAttribute::new(FunctionType::new(&context, &[], &[integer_type]).into()),
+            {
+                let block = Block::new(&[]);
+
+                let operation = block.append_operation(zero(integer_type, location));
+
+                block.append_operation(func::r#return(&[operation.result(0)], location));
+
+                let region = Region::new();
+                region.append_block(block);
+                region
+            },
+            &[],
+            location,
+        ));
+
+        convert_module(&context, &mut module);
+
+        assert!(module.as_operation().verify());
+        insta::assert_snapshot!(module.as_operation());
+    }
+
+    #[test]
     fn compile_undefined() {
         let context = create_test_context();
 
