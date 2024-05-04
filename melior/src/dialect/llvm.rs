@@ -123,12 +123,17 @@ pub fn poison<'c>(result_type: Type<'c>, location: Location<'c>) -> Operation<'c
         .expect("valid operation")
 }
 
-/// Creates a null pointer.
-pub fn nullptr<'c>(ptr_type: Type<'c>, location: Location<'c>) -> Operation<'c> {
+/// Creates a zero value.
+pub fn zero<'c>(r#type: Type<'c>, location: Location<'c>) -> Operation<'c> {
     OperationBuilder::new("llvm.mlir.zero", location)
-        .add_results(&[ptr_type])
+        .add_results(&[r#type])
         .build()
         .expect("valid operation")
+}
+
+/// Creates a null pointer.
+pub fn nullptr<'c>(ptr_type: Type<'c>, location: Location<'c>) -> Operation<'c> {
+    zero(ptr_type, location)
 }
 
 /// Creates a `llvm.unreachable` operation.
