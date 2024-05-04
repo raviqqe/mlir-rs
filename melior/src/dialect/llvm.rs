@@ -132,6 +132,7 @@ pub fn zero<'c>(r#type: Type<'c>, location: Location<'c>) -> Operation<'c> {
 }
 
 /// Creates a null pointer.
+#[deprecated]
 pub fn nullptr<'c>(ptr_type: Type<'c>, location: Location<'c>) -> Operation<'c> {
     zero(ptr_type, location)
 }
