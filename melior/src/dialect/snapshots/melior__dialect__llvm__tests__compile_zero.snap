@@ -1,0 +1,10 @@
+---
+source: melior/src/dialect/llvm.rs
+expression: module.as_operation()
+---
+module {
+  llvm.func @foo() -> i64 {
+    %0 = llvm.mlir.zero : i64
+    llvm.return %0 : i64
+  }
+}
