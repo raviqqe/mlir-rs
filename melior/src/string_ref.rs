@@ -17,7 +17,7 @@ impl<'a> StringRef<'a> {
     /// Creates a string reference.
     pub fn new(string: &'a str) -> Self {
         let string = MlirStringRef {
-            data: string.as_bytes().as_ptr() as *const i8,
+            data: string.as_bytes().as_ptr() as *const _,
             length: string.len(),
         };
 
