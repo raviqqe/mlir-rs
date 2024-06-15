@@ -78,7 +78,7 @@ impl<'c> OperationBuilder<'c> {
             mlirOperationStateAddOwnedRegions(
                 &mut self.raw,
                 regions.len() as isize,
-                transmute::<_, Vec<ManuallyDrop<Region>>>(regions).as_ptr() as *const _,
+                transmute::<Vec<Region>, Vec<ManuallyDrop<Region>>>(regions).as_ptr() as *const _,
             )
         }
 
