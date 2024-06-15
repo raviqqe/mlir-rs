@@ -10,7 +10,7 @@ use mlir_sys::{
     mlirCreateExternalPass, mlirExternalPassSignalFailure, MlirContext, MlirExternalPass,
     MlirExternalPassCallbacks, MlirLogicalResult, MlirOperation,
 };
-use std::{marker::PhantomData, mem::transmute, ptr::drop_in_place};
+use std::{ffi::c_void, marker::PhantomData, mem::transmute, ptr::drop_in_place};
 
 #[derive(Clone, Copy, Debug)]
 pub struct ExternalPass<'a> {
@@ -185,16 +185,20 @@ pub fn create_external<'c, T: RunExternalPass<'c>>(
             dependent_dialects.len() as isize,
             dependent_dialects.as_ptr() as _,
             MlirExternalPassCallbacks {
-                construct: Some(transmute::<*const (), _>(
+                construct: Some(transmute::<*const (), unsafe extern "C" fn(*mut c_void)>(
                     callback_construct::<T> as *const (),
                 )),
-                destruct: Some(transmute::<*const (), _>(
+                destruct: Some(transmute::<*const (), unsafe extern "C" fn(*mut c_void)>(
                     callback_destruct::<T> as *const (),
                 )),
-                initialize: Some(transmute::<*const (), _>(
-                    callback_initialize::<T> as *const (),
-                )),
-                run: Some(transmute::<*const (), _>(callback_run::<T> as *const ())),
+                initialize: Some(transmute::<
+                    *const (),
+                    unsafe extern "C" fn(MlirContext, *mut c_void) -> MlirLogicalResult,
+                >(callback_initialize::<T> as *const ())),
+                run: Some(transmute::<
+                    *const (),
+                    unsafe extern "C" fn(MlirContext, *mut c_void) -> MlirLogicalResult,
+                >(callback_run::<T> as *const ())),
                 clone: Some(transmute::<*const (), _>(callback_clone::<T> as *const ())),
             },
             Box::into_raw(Box::new(pass)) as _,
