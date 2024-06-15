@@ -197,7 +197,7 @@ pub fn create_external<'c, T: RunExternalPass<'c>>(
                 >(callback_initialize::<T> as *const ())),
                 run: Some(transmute::<
                     *const (),
-                    unsafe extern "C" fn(MlirContext, *mut c_void) -> MlirLogicalResult,
+                    unsafe extern "C" fn(MlirOperation, MlirExternalPass, *mut c_void),
                 >(callback_run::<T> as *const ())),
                 clone: Some(transmute::<*const (), _>(callback_clone::<T> as *const ())),
             },
