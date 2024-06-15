@@ -185,11 +185,17 @@ pub fn create_external<'c, T: RunExternalPass<'c>>(
             dependent_dialects.len() as isize,
             dependent_dialects.as_ptr() as _,
             MlirExternalPassCallbacks {
-                construct: Some(transmute(callback_construct::<T> as *const ())),
-                destruct: Some(transmute(callback_destruct::<T> as *const ())),
-                initialize: Some(transmute(callback_initialize::<T> as *const ())),
-                run: Some(transmute(callback_run::<T> as *const ())),
-                clone: Some(transmute(callback_clone::<T> as *const ())),
+                construct: Some(transmute::<*const (), _>(
+                    callback_construct::<T> as *const (),
+                )),
+                destruct: Some(transmute::<*const (), _>(
+                    callback_destruct::<T> as *const (),
+                )),
+                initialize: Some(transmute::<*const (), _>(
+                    callback_initialize::<T> as *const (),
+                )),
+                run: Some(transmute::<*const (), _>(callback_run::<T> as *const ())),
+                clone: Some(transmute::<*const (), _>(callback_clone::<T> as *const ())),
             },
             Box::into_raw(Box::new(pass)) as _,
         ))
