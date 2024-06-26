@@ -228,9 +228,9 @@ impl<'c> Operation<'c> {
         unsafe { OperationRefMut::from_option_raw(mlirOperationGetNextInBlock(self.raw)) }
     }
 
-    /// Returns a reference to the next operation in the same block.
+    /// Returns a reference to the previous operation in the same block.
     pub fn previous_in_block(&self) -> Option<OperationRef<'c, '_>> {
-        unsafe { OperationRef::from_option_raw(mlirOperationGetNextInBlock(self.raw)) }
+        todo!("mlirOperationGetPrevInBlock is not exposed in the C API")
     }
 
     /// Returns a reference to a parent operation.
