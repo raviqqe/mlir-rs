@@ -7,7 +7,7 @@ mod result;
 pub use self::{
     builder::OperationBuilder, printing_flags::OperationPrintingFlags, result::OperationResult,
 };
-use super::{Attribute, AttributeLike, BlockRef, Identifier, RegionRef, Value};
+use super::{Attribute, AttributeLike, BlockRef, Identifier, Location, RegionRef, Value};
 use crate::{
     context::{Context, ContextRef},
     utility::{print_callback, print_string_callback},
@@ -20,12 +20,12 @@ use core::{
 use mlir_sys::{
     mlirOperationClone, mlirOperationDestroy, mlirOperationDump, mlirOperationEqual,
     mlirOperationGetAttribute, mlirOperationGetAttributeByName, mlirOperationGetBlock,
-    mlirOperationGetContext, mlirOperationGetName, mlirOperationGetNextInBlock,
-    mlirOperationGetNumAttributes, mlirOperationGetNumOperands, mlirOperationGetNumRegions,
-    mlirOperationGetNumResults, mlirOperationGetNumSuccessors, mlirOperationGetOperand,
-    mlirOperationGetParentOperation, mlirOperationGetRegion, mlirOperationGetResult,
-    mlirOperationGetSuccessor, mlirOperationPrint, mlirOperationPrintWithFlags,
-    mlirOperationRemoveAttributeByName, mlirOperationRemoveFromParent,
+    mlirOperationGetContext, mlirOperationGetLocation, mlirOperationGetName,
+    mlirOperationGetNextInBlock, mlirOperationGetNumAttributes, mlirOperationGetNumOperands,
+    mlirOperationGetNumRegions, mlirOperationGetNumResults, mlirOperationGetNumSuccessors,
+    mlirOperationGetOperand, mlirOperationGetParentOperation, mlirOperationGetRegion,
+    mlirOperationGetResult, mlirOperationGetSuccessor, mlirOperationPrint,
+    mlirOperationPrintWithFlags, mlirOperationRemoveAttributeByName, mlirOperationRemoveFromParent,
     mlirOperationSetAttributeByName, mlirOperationVerify, MlirOperation,
 };
 use std::{
@@ -128,6 +128,11 @@ impl<'c> Operation<'c> {
     /// Returns all regions.
     pub fn regions(&self) -> impl Iterator<Item = RegionRef<'c, '_>> {
         (0..self.region_count()).map(|index| self.region(index).expect("valid result index"))
+    }
+
+    /// Gets the location of the operation.
+    pub fn location(&self) -> Location<'c> {
+        unsafe { Location::from_raw(mlirOperationGetLocation(self.raw)) }
     }
 
     /// Returns the number of successors.
@@ -642,6 +647,20 @@ mod tests {
             operation.regions().collect::<Vec<_>>(),
             vec![operation.region(0).unwrap()]
         );
+    }
+
+    #[test]
+    fn location() {
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
+        let location = Location::new(&context, "test", 1, 1);
+
+        let operation = OperationBuilder::new("foo", location)
+            .add_regions([Region::new()])
+            .build()
+            .unwrap();
+
+        assert_eq!(operation.location(), location);
     }
 
     #[test]
