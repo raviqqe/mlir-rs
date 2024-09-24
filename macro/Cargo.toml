@@ -21,6 +21,7 @@ quote = "1"
 regex = "1.10.6"
 syn = { version = "2", features = ["full"] }
 tblgen = { version = "0.3.6", features = [
+  # TODO Use a `llvm19-0` flag.
   "llvm18-0",
 ], default-features = false, package = "tblgen-alt" }
 unindent = "0.2.3"
