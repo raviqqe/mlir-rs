@@ -28,6 +28,7 @@ pub trait TypeLike<'c> {
     }
 
     melior_macro::type_check_functions!(
+        // spell-checker: disable
         mlirTypeIsAAnyQuantizedType,
         mlirTypeIsABF16,
         mlirTypeIsACalibratedQuantizedType,
@@ -74,6 +75,7 @@ pub trait TypeLike<'c> {
         mlirTypeIsAUnrankedMemRef,
         mlirTypeIsAUnrankedTensor,
         mlirTypeIsAVector,
+        // spell-checker: enable
     );
 }
 
