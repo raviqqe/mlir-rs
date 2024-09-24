@@ -17,6 +17,7 @@
     "dashmap",
     "dealloc",
     "detensorize",
+    "dlti",
     "elementwise",
     "femtomc",
     "funcs",
@@ -24,9 +25,12 @@
     "indoc",
     "insta",
     "interp",
+    "irdl",
+    "irdl",
     "jit",
     "libm",
     "linalg",
+    "matmul",
     "melior",
     "memref",
     "mlir",
@@ -48,9 +52,6 @@
     "tblgen",
     "tosa",
     "unranked",
-    "irdl",
-    "IRDL",
-    "DLTI",
     "vulkan"
   ]
 }

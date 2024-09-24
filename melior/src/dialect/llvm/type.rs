@@ -35,7 +35,7 @@ pub fn function<'c>(
 /// Creates an LLVM opaque pointer type at address space 0.
 #[deprecated(
     since = "0.11.0",
-    note = "please use the pointer method, all pointers are opaque in LLVM 18"
+    note = "please use the pointer method, all pointers are opaque in LLVM 19"
 )]
 pub fn opaque_pointer(context: &Context) -> Type {
     pointer(context, 0)
