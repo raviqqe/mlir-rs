@@ -1,7 +1,7 @@
-use once_cell::sync::Lazy;
 use regex::{Captures, Regex};
+use std::cell::LazyCell;
 
-static NAME_PATTERN: Lazy<Regex> = Lazy::new(|| {
+static NAME_PATTERN: LazyCell<Regex> = LazyCell::new(|| {
     Regex::new(r#"(bf_16|f_16|f_32|f_64|i_8|i_16|i_32|i_64|float_8_e_[0-9]_m_[0-9](_fn)?)"#)
         .unwrap()
 });
