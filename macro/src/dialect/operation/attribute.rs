@@ -3,10 +3,10 @@ use crate::dialect::{
     operation::operation_field::OperationField,
     utility::{generate_result_type, sanitize_snake_case_identifier},
 };
-use once_cell::sync::Lazy;
 use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use std::collections::HashMap;
+use std::sync::LazyLock;
 use syn::{parse_quote, Ident, Type};
 use tblgen::{error::TableGenError, Record};
 
@@ -28,7 +28,7 @@ macro_rules! melior_attribute {
     };
 }
 
-static ATTRIBUTE_TYPES: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
+static ATTRIBUTE_TYPES: LazyLock<HashMap<&'static str, &'static str>> = LazyLock::new(|| {
     let mut map = HashMap::new();
 
     macro_rules! initialize_attributes {
