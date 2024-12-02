@@ -209,7 +209,7 @@ impl<'c> Block<'c> {
     }
 
     /// Converts a block into a raw object.
-    pub fn into_raw(self) -> MlirBlock {
+    pub const fn into_raw(self) -> MlirBlock {
         let block = self.raw;
 
         forget(self);

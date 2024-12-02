@@ -65,7 +65,7 @@ impl<'c> LoadStoreOptions<'c> {
     }
 
     /// Sets TBAA metadata.
-    pub fn tbaa(mut self, tbaa: ArrayAttribute<'c>) -> Self {
+    pub const fn tbaa(mut self, tbaa: ArrayAttribute<'c>) -> Self {
         self.tbaa = Some(tbaa);
         self
     }

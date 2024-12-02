@@ -108,15 +108,15 @@ impl<'a> Operation<'a> {
         &self.name
     }
 
-    pub fn can_infer_type(&self) -> bool {
+    pub const fn can_infer_type(&self) -> bool {
         self.can_infer_type
     }
 
-    pub fn dialect_name(&self) -> &str {
+    pub const fn dialect_name(&self) -> &str {
         self.dialect_name
     }
 
-    pub fn operation_name(&self) -> &str {
+    pub const fn operation_name(&self) -> &str {
         self.operation_name
     }
 
@@ -153,7 +153,7 @@ impl<'a> Operation<'a> {
         &self.description
     }
 
-    pub fn constructor_identifier(&self) -> &Ident {
+    pub const fn constructor_identifier(&self) -> &Ident {
         &self.constructor_identifier
     }
 

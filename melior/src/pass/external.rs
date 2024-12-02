@@ -25,7 +25,7 @@ impl ExternalPass<'_> {
     }
 
     /// Converts an external pass to a raw object.
-    pub fn to_raw(self) -> MlirExternalPass {
+    pub const fn to_raw(self) -> MlirExternalPass {
         self.raw
     }
 
@@ -183,7 +183,7 @@ pub fn create_external<'c, T: RunExternalPass<'c>>(
             StringRef::new(description).to_raw(),
             StringRef::new(op_name).to_raw(),
             dependent_dialects.len() as isize,
-            dependent_dialects.as_ptr() as _,
+            dependent_dialects.as_ptr().cast_mut() as _,
             MlirExternalPassCallbacks {
                 construct: Some(transmute::<*const (), unsafe extern "C" fn(*mut c_void)>(
                     callback_construct::<T> as *const (),

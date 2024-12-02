@@ -23,7 +23,7 @@ impl<'a> Region<'a> {
         })
     }
 
-    pub fn is_variadic(&self) -> bool {
+    pub const fn is_variadic(&self) -> bool {
         self.variadic
     }
 }

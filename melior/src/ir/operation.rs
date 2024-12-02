@@ -197,7 +197,7 @@ impl<'c> Operation<'c> {
                 StringRef::new(name).to_raw(),
             ))
         }
-        .ok_or(Error::AttributeNotFound(name.into()))
+        .ok_or_else(|| Error::AttributeNotFound(name.into()))
     }
 
     /// Checks if the operation has a attribute with the given name.
@@ -220,7 +220,7 @@ impl<'c> Operation<'c> {
     pub fn remove_attribute(&mut self, name: &str) -> Result<(), Error> {
         unsafe { mlirOperationRemoveAttributeByName(self.raw, StringRef::new(name).to_raw()) }
             .then_some(())
-            .ok_or(Error::AttributeNotFound(name.into()))
+            .ok_or_else(|| Error::AttributeNotFound(name.into()))
     }
 
     /// Returns a reference to the next operation in the same block.
@@ -302,7 +302,7 @@ impl<'c> Operation<'c> {
     }
 
     /// Converts an operation into a raw object.
-    pub fn into_raw(self) -> MlirOperation {
+    pub const fn into_raw(self) -> MlirOperation {
         let operation = self.raw;
 
         forget(self);

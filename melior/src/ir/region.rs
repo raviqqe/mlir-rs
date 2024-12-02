@@ -73,7 +73,7 @@ impl<'c> Region<'c> {
     }
 
     /// Converts a region into a raw object.
-    pub fn into_raw(self) -> mlir_sys::MlirRegion {
+    pub const fn into_raw(self) -> mlir_sys::MlirRegion {
         let region = self.raw;
 
         forget(self);
