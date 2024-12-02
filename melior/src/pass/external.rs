@@ -18,7 +18,7 @@ pub struct ExternalPass<'a> {
     _reference: PhantomData<&'a MlirExternalPass>,
 }
 
-impl<'a> ExternalPass<'a> {
+impl ExternalPass<'_> {
     /// Signals that the pass has failed.
     pub fn signal_failure(self) {
         unsafe { mlirExternalPassSignalFailure(self.raw) }
@@ -291,7 +291,7 @@ mod tests {
             }
         }
 
-        impl<'c> TestPass<'c> {
+        impl TestPass<'_> {
             fn into_pass(self) -> Pass {
                 create_external(
                     self,

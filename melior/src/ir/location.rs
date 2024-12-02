@@ -91,13 +91,13 @@ impl<'c> Location<'c> {
     }
 }
 
-impl<'c> PartialEq for Location<'c> {
+impl PartialEq for Location<'_> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirLocationEqual(self.raw, other.raw) }
     }
 }
 
-impl<'c> Display for Location<'c> {
+impl Display for Location<'_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         let mut data = (formatter, Ok(()));
 

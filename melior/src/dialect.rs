@@ -52,13 +52,13 @@ impl<'c> Dialect<'c> {
     }
 }
 
-impl<'c> PartialEq for Dialect<'c> {
+impl PartialEq for Dialect<'_> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirDialectEqual(self.raw, other.raw) }
     }
 }
 
-impl<'c> Eq for Dialect<'c> {}
+impl Eq for Dialect<'_> {}
 
 #[cfg(test)]
 mod tests {

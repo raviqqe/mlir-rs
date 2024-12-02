@@ -311,27 +311,27 @@ impl<'c> Operation<'c> {
     }
 }
 
-impl<'c> Clone for Operation<'c> {
+impl Clone for Operation<'_> {
     fn clone(&self) -> Self {
         unsafe { Self::from_raw(mlirOperationClone(self.raw)) }
     }
 }
 
-impl<'c> Drop for Operation<'c> {
+impl Drop for Operation<'_> {
     fn drop(&mut self) {
         unsafe { mlirOperationDestroy(self.raw) };
     }
 }
 
-impl<'c> PartialEq for Operation<'c> {
+impl PartialEq for Operation<'_> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirOperationEqual(self.raw, other.raw) }
     }
 }
 
-impl<'c> Eq for Operation<'c> {}
+impl Eq for Operation<'_> {}
 
-impl<'c> Display for Operation<'c> {
+impl Display for Operation<'_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         let mut data = (formatter, Ok(()));
 
@@ -347,7 +347,7 @@ impl<'c> Display for Operation<'c> {
     }
 }
 
-impl<'c> Debug for Operation<'c> {
+impl Debug for Operation<'_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         writeln!(formatter, "Operation(")?;
         Display::fmt(self, formatter)?;
@@ -415,7 +415,7 @@ impl<'c, 'a> OperationRef<'c, 'a> {
     }
 }
 
-impl<'c, 'a> Deref for OperationRef<'c, 'a> {
+impl<'c> Deref for OperationRef<'c, '_> {
     type Target = Operation<'c>;
 
     fn deref(&self) -> &Self::Target {
@@ -423,21 +423,21 @@ impl<'c, 'a> Deref for OperationRef<'c, 'a> {
     }
 }
 
-impl<'c, 'a> PartialEq for OperationRef<'c, 'a> {
+impl PartialEq for OperationRef<'_, '_> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirOperationEqual(self.raw, other.raw) }
     }
 }
 
-impl<'c, 'a> Eq for OperationRef<'c, 'a> {}
+impl Eq for OperationRef<'_, '_> {}
 
-impl<'c, 'a> Display for OperationRef<'c, 'a> {
+impl Display for OperationRef<'_, '_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Display::fmt(self.deref(), formatter)
     }
 }
 
-impl<'c, 'a> Debug for OperationRef<'c, 'a> {
+impl Debug for OperationRef<'_, '_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Debug::fmt(self.deref(), formatter)
     }
@@ -450,7 +450,7 @@ pub struct OperationRefMut<'c, 'a> {
     _reference: PhantomData<&'a Operation<'c>>,
 }
 
-impl<'c, 'a> OperationRefMut<'c, 'a> {
+impl OperationRefMut<'_, '_> {
     /// Converts an operation reference into a raw object.
     pub const fn to_raw(self) -> MlirOperation {
         self.raw
@@ -482,7 +482,7 @@ impl<'c, 'a> OperationRefMut<'c, 'a> {
     }
 }
 
-impl<'c, 'a> Deref for OperationRefMut<'c, 'a> {
+impl<'c> Deref for OperationRefMut<'c, '_> {
     type Target = Operation<'c>;
 
     fn deref(&self) -> &Self::Target {
@@ -490,27 +490,27 @@ impl<'c, 'a> Deref for OperationRefMut<'c, 'a> {
     }
 }
 
-impl<'c, 'a> DerefMut for OperationRefMut<'c, 'a> {
+impl DerefMut for OperationRefMut<'_, '_> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         unsafe { transmute(self) }
     }
 }
 
-impl<'c, 'a> PartialEq for OperationRefMut<'c, 'a> {
+impl PartialEq for OperationRefMut<'_, '_> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirOperationEqual(self.raw, other.raw) }
     }
 }
 
-impl<'c, 'a> Eq for OperationRefMut<'c, 'a> {}
+impl Eq for OperationRefMut<'_, '_> {}
 
-impl<'c, 'a> Display for OperationRefMut<'c, 'a> {
+impl Display for OperationRefMut<'_, '_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Display::fmt(self.deref(), formatter)
     }
 }
 
-impl<'c, 'a> Debug for OperationRefMut<'c, 'a> {
+impl Debug for OperationRefMut<'_, '_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Debug::fmt(self.deref(), formatter)
     }

@@ -65,13 +65,13 @@ impl<'a> StringRef<'a> {
     }
 }
 
-impl<'a> PartialEq for StringRef<'a> {
+impl PartialEq for StringRef<'_> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirStringRefEqual(self.raw, other.raw) }
     }
 }
 
-impl<'a> Eq for StringRef<'a> {}
+impl Eq for StringRef<'_> {}
 
 #[cfg(test)]
 mod tests {

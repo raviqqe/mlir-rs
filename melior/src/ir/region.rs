@@ -82,25 +82,25 @@ impl<'c> Region<'c> {
     }
 }
 
-impl<'c> Default for Region<'c> {
+impl Default for Region<'_> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<'c> Drop for Region<'c> {
+impl Drop for Region<'_> {
     fn drop(&mut self) {
         unsafe { mlirRegionDestroy(self.raw) }
     }
 }
 
-impl<'c> PartialEq for Region<'c> {
+impl PartialEq for Region<'_> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirRegionEqual(self.raw, other.raw) }
     }
 }
 
-impl<'c> Eq for Region<'c> {}
+impl Eq for Region<'_> {}
 
 /// A reference to a region.
 #[derive(Clone, Copy, Debug)]
@@ -109,7 +109,7 @@ pub struct RegionRef<'c, 'a> {
     _region: PhantomData<&'a Region<'c>>,
 }
 
-impl<'c, 'a> RegionRef<'c, 'a> {
+impl RegionRef<'_, '_> {
     /// Creates a region from a raw object.
     ///
     /// # Safety
@@ -136,7 +136,7 @@ impl<'c, 'a> RegionRef<'c, 'a> {
     }
 }
 
-impl<'c, 'a> Deref for RegionRef<'c, 'a> {
+impl<'c> Deref for RegionRef<'c, '_> {
     type Target = Region<'c>;
 
     fn deref(&self) -> &Self::Target {
@@ -144,13 +144,13 @@ impl<'c, 'a> Deref for RegionRef<'c, 'a> {
     }
 }
 
-impl<'c, 'a> PartialEq for RegionRef<'c, 'a> {
+impl PartialEq for RegionRef<'_, '_> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirRegionEqual(self.raw, other.raw) }
     }
 }
 
-impl<'c, 'a> Eq for RegionRef<'c, 'a> {}
+impl Eq for RegionRef<'_, '_> {}
 
 #[cfg(test)]
 mod tests {

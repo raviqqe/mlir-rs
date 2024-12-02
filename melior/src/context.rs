@@ -184,19 +184,19 @@ impl<'c> ContextRef<'c> {
     }
 }
 
-impl<'c> PartialEq for ContextRef<'c> {
+impl PartialEq for ContextRef<'_> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirContextEqual(self.raw, other.raw) }
     }
 }
 
-impl<'c> PartialEq<Context> for ContextRef<'c> {
+impl PartialEq<Context> for ContextRef<'_> {
     fn eq(&self, other: &Context) -> bool {
         self == &other.to_ref()
     }
 }
 
-impl<'c> Eq for ContextRef<'c> {}
+impl Eq for ContextRef<'_> {}
 
 #[cfg(test)]
 mod tests {
@@ -320,7 +320,7 @@ mod tests {
     fn context_to_ref() {
         let ctx = Context::new();
         let ctx_ref = ctx.to_ref();
-        let ctx_ref_to_ref: &Context = unsafe { &ctx_ref.to_ref() };
+        let ctx_ref_to_ref: &Context = unsafe { ctx_ref.to_ref() };
 
         assert_eq!(&ctx_ref, ctx_ref_to_ref);
     }

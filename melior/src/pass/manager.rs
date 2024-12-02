@@ -17,7 +17,7 @@ pub struct PassManager<'c> {
     _context: PhantomData<&'c Context>,
 }
 
-impl<'c> PassManager<'c> {
+impl PassManager<'_> {
     /// Creates a pass manager.
     pub fn new(context: &Context) -> Self {
         Self {
@@ -70,7 +70,7 @@ impl<'c> PassManager<'c> {
     }
 }
 
-impl<'c> Drop for PassManager<'c> {
+impl Drop for PassManager<'_> {
     fn drop(&mut self) {
         unsafe { mlirPassManagerDestroy(self.raw) }
     }

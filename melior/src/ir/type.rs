@@ -137,15 +137,15 @@ impl<'c> TypeLike<'c> for Type<'c> {
     }
 }
 
-impl<'c> PartialEq for Type<'c> {
+impl PartialEq for Type<'_> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirTypeEqual(self.raw, other.raw) }
     }
 }
 
-impl<'c> Eq for Type<'c> {}
+impl Eq for Type<'_> {}
 
-impl<'c> Display for Type<'c> {
+impl Display for Type<'_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         let mut data = (formatter, Ok(()));
 
@@ -161,7 +161,7 @@ impl<'c> Display for Type<'c> {
     }
 }
 
-impl<'c> Debug for Type<'c> {
+impl Debug for Type<'_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         write!(formatter, "Type(")?;
         Display::fmt(self, formatter)?;

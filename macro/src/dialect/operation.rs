@@ -227,7 +227,7 @@ impl<'a> Operation<'a> {
             .chain(self.required_attributes().map(convert))
     }
 
-    fn collect_successors(definition: Record<'a>) -> Result<Vec<Successor>, Error> {
+    fn collect_successors(definition: Record<'a>) -> Result<Vec<Successor<'a>>, Error> {
         definition
             .dag_value("successors")?
             .args()
@@ -242,7 +242,7 @@ impl<'a> Operation<'a> {
             .collect()
     }
 
-    fn collect_regions(definition: Record<'a>) -> Result<Vec<Region>, Error> {
+    fn collect_regions(definition: Record<'a>) -> Result<Vec<Region<'a>>, Error> {
         definition
             .dag_value("regions")?
             .args()
@@ -307,7 +307,7 @@ impl<'a> Operation<'a> {
         definition: Record<'a>,
         same_size: bool,
         attribute_sized: bool,
-    ) -> Result<(Vec<OperationResult>, usize), Error> {
+    ) -> Result<(Vec<OperationResult<'a>>, usize), Error> {
         Self::collect_elements(
             &Self::dag_constraints(definition, "results")?
                 .into_iter()
