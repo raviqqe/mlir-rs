@@ -755,7 +755,13 @@ mod tests {
                 &[0, 0],
                 &[4, 4],
                 &[1, 1],
-                MemRefType::new(Type::index(&context), &[4, 4], None, None),
+                MemRefType::new(
+                    Type::index(&context),
+                    &[4, 4],
+                    // TODO Construct a strided attribute using the C API without parsing.
+                    Some(Attribute::parse(&context, "strided<[8, 1]>").unwrap()),
+                    None,
+                ),
                 location,
             ));
         });

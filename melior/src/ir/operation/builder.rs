@@ -75,10 +75,13 @@ impl<'c> OperationBuilder<'c> {
     /// Adds regions in a [`Vec`](std::vec::Vec).
     pub fn add_regions_vec(mut self, regions: Vec<Region<'c>>) -> Self {
         unsafe {
+            // This may fire with -D clippy::nursery, however, it is
+            // guaranteed by the std that ManuallyDrop<T> has the same layout as T
+            #[allow(clippy::transmute_undefined_repr)]
             mlirOperationStateAddOwnedRegions(
                 &mut self.raw,
                 regions.len() as isize,
-                transmute::<_, Vec<ManuallyDrop<Region>>>(regions).as_ptr() as *const _,
+                transmute::<Vec<Region>, Vec<ManuallyDrop<Region>>>(regions).as_ptr() as *const _,
             )
         }
 

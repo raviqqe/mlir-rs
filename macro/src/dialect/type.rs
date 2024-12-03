@@ -16,21 +16,21 @@ impl Type {
         }
     }
 
-    pub fn is_optional(&self) -> bool {
+    pub const fn is_optional(&self) -> bool {
         self.optional
     }
 
-    pub fn is_variadic(&self) -> bool {
+    pub const fn is_variadic(&self) -> bool {
         self.variadic
     }
 
     // TODO Support variadic-of-variadic.
     #[allow(unused)]
-    pub fn is_variadic_of_variadic(&self) -> bool {
+    pub const fn is_variadic_of_variadic(&self) -> bool {
         self.variadic_of_variadic
     }
 
-    pub fn is_unfixed(&self) -> bool {
+    pub const fn is_unfixed(&self) -> bool {
         self.is_variadic() || self.is_optional()
     }
 }

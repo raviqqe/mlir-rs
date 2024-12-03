@@ -92,15 +92,15 @@ impl<'c> AttributeLike<'c> for Attribute<'c> {
     }
 }
 
-impl<'c> PartialEq for Attribute<'c> {
+impl PartialEq for Attribute<'_> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirAttributeEqual(self.raw, other.raw) }
     }
 }
 
-impl<'c> Eq for Attribute<'c> {}
+impl Eq for Attribute<'_> {}
 
-impl<'c> Display for Attribute<'c> {
+impl Display for Attribute<'_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         let mut data = (formatter, Ok(()));
 
@@ -116,7 +116,7 @@ impl<'c> Display for Attribute<'c> {
     }
 }
 
-impl<'c> Debug for Attribute<'c> {
+impl Debug for Attribute<'_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Display::fmt(self, formatter)
     }

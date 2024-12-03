@@ -18,7 +18,7 @@ pub struct TypeState {
 }
 
 impl TypeState {
-    pub fn new(
+    pub const fn new(
         results: Vec<String>,
         operands: Vec<String>,
         regions: Vec<String>,

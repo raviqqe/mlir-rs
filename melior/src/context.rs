@@ -12,7 +12,7 @@ use mlir_sys::{
     mlirContextIsRegisteredOperation, mlirContextLoadAllAvailableDialects,
     mlirContextSetAllowUnregisteredDialects, MlirContext, MlirDiagnostic, MlirLogicalResult,
 };
-use std::{ffi::c_void, marker::PhantomData};
+use std::{ffi::c_void, marker::PhantomData, mem::transmute};
 
 /// A context of IR, dialects, and passes.
 ///
@@ -166,21 +166,37 @@ impl<'c> ContextRef<'c> {
             _reference: Default::default(),
         }
     }
+
+    /// Returns a context.
+    ///
+    /// This function is different from `deref` because the correct lifetime is
+    /// kept for the return type.
+    ///
+    /// # Safety
+    ///
+    /// The returned reference is safe to use only in the lifetime scope of the
+    /// context reference.
+    pub unsafe fn to_ref(&self) -> &'c Context {
+        // As we can't deref ContextRef<'a> into `&'a Context`, we forcibly cast its
+        // lifetime here to extend it from the lifetime of `ObjectRef<'a>` itself into
+        // `'a`.
+        transmute(self)
+    }
 }
 
-impl<'c> PartialEq for ContextRef<'c> {
+impl PartialEq for ContextRef<'_> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirContextEqual(self.raw, other.raw) }
     }
 }
 
-impl<'c> PartialEq<Context> for ContextRef<'c> {
+impl PartialEq<Context> for ContextRef<'_> {
     fn eq(&self, other: &Context) -> bool {
         self == &other.to_ref()
     }
 }
 
-impl<'c> Eq for ContextRef<'c> {}
+impl Eq for ContextRef<'_> {}
 
 #[cfg(test)]
 mod tests {
@@ -298,5 +314,14 @@ mod tests {
 
         assert_ne!(&other, &one_ref);
         assert_ne!(&one_ref, &other);
+    }
+
+    #[test]
+    fn context_to_ref() {
+        let ctx = Context::new();
+        let ctx_ref = ctx.to_ref();
+        let ctx_ref_to_ref: &Context = unsafe { ctx_ref.to_ref() };
+
+        assert_eq!(&ctx_ref, ctx_ref_to_ref);
     }
 }

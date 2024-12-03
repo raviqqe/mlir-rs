@@ -28,6 +28,7 @@ pub trait TypeLike<'c> {
     }
 
     melior_macro::type_check_functions!(
+        // spell-checker: disable
         mlirTypeIsAAnyQuantizedType,
         mlirTypeIsABF16,
         mlirTypeIsACalibratedQuantizedType,
@@ -35,13 +36,22 @@ pub trait TypeLike<'c> {
         mlirTypeIsAF16,
         mlirTypeIsAF32,
         mlirTypeIsAF64,
+        mlirTypeIsAFloat,
+        mlirTypeIsAFloat8E4M3,
+        mlirTypeIsAFloat8E4M3B11FNUZ,
         mlirTypeIsAFloat8E4M3FN,
+        mlirTypeIsAFloat8E4M3FNUZ,
         mlirTypeIsAFloat8E5M2,
+        mlirTypeIsAFloat8E5M2FNUZ,
         mlirTypeIsAFunction,
+        mlirTypeIsAGPUAsyncTokenType,
         mlirTypeIsAIndex,
         mlirTypeIsAInteger,
+        mlirTypeIsALLVMPointerType,
+        mlirTypeIsALLVMStructType,
         mlirTypeIsAMemRef,
         mlirTypeIsANone,
+        mlirTypeIsANVGPUTensorMapDescriptorType,
         mlirTypeIsAOpaque,
         mlirTypeIsAPDLAttributeType,
         mlirTypeIsAPDLOperationType,
@@ -53,14 +63,19 @@ pub trait TypeLike<'c> {
         mlirTypeIsARankedTensor,
         mlirTypeIsAShaped,
         mlirTypeIsATensor,
+        mlirTypeIsATF32,
         mlirTypeIsATransformAnyOpType,
+        mlirTypeIsATransformAnyParamType,
+        mlirTypeIsATransformAnyValueType,
         mlirTypeIsATransformOperationType,
+        mlirTypeIsATransformParamType,
         mlirTypeIsATuple,
         mlirTypeIsAUniformQuantizedPerAxisType,
         mlirTypeIsAUniformQuantizedType,
         mlirTypeIsAUnrankedMemRef,
         mlirTypeIsAUnrankedTensor,
         mlirTypeIsAVector,
+        // spell-checker: enable
     );
 }
 

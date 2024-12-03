@@ -10,7 +10,7 @@ use mlir_sys::{
     mlirCreateExternalPass, mlirExternalPassSignalFailure, MlirContext, MlirExternalPass,
     MlirExternalPassCallbacks, MlirLogicalResult, MlirOperation,
 };
-use std::{marker::PhantomData, mem::transmute, ptr::drop_in_place};
+use std::{ffi::c_void, marker::PhantomData, mem::transmute, ptr::drop_in_place};
 
 #[derive(Clone, Copy, Debug)]
 pub struct ExternalPass<'a> {
@@ -18,14 +18,14 @@ pub struct ExternalPass<'a> {
     _reference: PhantomData<&'a MlirExternalPass>,
 }
 
-impl<'a> ExternalPass<'a> {
+impl ExternalPass<'_> {
     /// Signals that the pass has failed.
     pub fn signal_failure(self) {
         unsafe { mlirExternalPassSignalFailure(self.raw) }
     }
 
     /// Converts an external pass to a raw object.
-    pub fn to_raw(self) -> MlirExternalPass {
+    pub const fn to_raw(self) -> MlirExternalPass {
         self.raw
     }
 
@@ -183,13 +183,26 @@ pub fn create_external<'c, T: RunExternalPass<'c>>(
             StringRef::new(description).to_raw(),
             StringRef::new(op_name).to_raw(),
             dependent_dialects.len() as isize,
-            dependent_dialects.as_ptr() as _,
+            dependent_dialects.as_ptr().cast_mut() as _,
             MlirExternalPassCallbacks {
-                construct: Some(transmute(callback_construct::<T> as *const ())),
-                destruct: Some(transmute(callback_destruct::<T> as *const ())),
-                initialize: Some(transmute(callback_initialize::<T> as *const ())),
-                run: Some(transmute(callback_run::<T> as *const ())),
-                clone: Some(transmute(callback_clone::<T> as *const ())),
+                construct: Some(transmute::<*const (), unsafe extern "C" fn(*mut c_void)>(
+                    callback_construct::<T> as *const (),
+                )),
+                destruct: Some(transmute::<*const (), unsafe extern "C" fn(*mut c_void)>(
+                    callback_destruct::<T> as *const (),
+                )),
+                initialize: Some(transmute::<
+                    *const (),
+                    unsafe extern "C" fn(MlirContext, *mut c_void) -> MlirLogicalResult,
+                >(callback_initialize::<T> as *const ())),
+                run: Some(transmute::<
+                    *const (),
+                    unsafe extern "C" fn(MlirOperation, MlirExternalPass, *mut c_void),
+                >(callback_run::<T> as *const ())),
+                clone: Some(transmute::<
+                    *const (),
+                    unsafe extern "C" fn(*mut c_void) -> *mut c_void,
+                >(callback_clone::<T> as *const ())),
             },
             Box::into_raw(Box::new(pass)) as _,
         ))
@@ -278,7 +291,7 @@ mod tests {
             }
         }
 
-        impl<'c> TestPass<'c> {
+        impl TestPass<'_> {
             fn into_pass(self) -> Pass {
                 create_external(
                     self,

@@ -17,7 +17,7 @@ impl<'a> StringRef<'a> {
     /// Creates a string reference.
     pub fn new(string: &'a str) -> Self {
         let string = MlirStringRef {
-            data: string.as_bytes().as_ptr() as *const i8,
+            data: string.as_bytes().as_ptr() as *const _,
             length: string.len(),
         };
 
@@ -65,13 +65,13 @@ impl<'a> StringRef<'a> {
     }
 }
 
-impl<'a> PartialEq for StringRef<'a> {
+impl PartialEq for StringRef<'_> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirStringRefEqual(self.raw, other.raw) }
     }
 }
 
-impl<'a> Eq for StringRef<'a> {}
+impl Eq for StringRef<'_> {}
 
 #[cfg(test)]
 mod tests {

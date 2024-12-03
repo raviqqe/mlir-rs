@@ -14,7 +14,7 @@ pub struct BlockArgument<'c, 'a> {
     value: Value<'c, 'a>,
 }
 
-impl<'c, 'a> BlockArgument<'c, 'a> {
+impl<'c> BlockArgument<'c, '_> {
     /// Returns an argument number.
     pub fn argument_number(&self) -> usize {
         unsafe { mlirBlockArgumentGetArgNumber(self.value.to_raw()) as usize }
@@ -42,13 +42,13 @@ impl<'c, 'a> BlockArgument<'c, 'a> {
     }
 }
 
-impl<'c, 'a> ValueLike<'c> for BlockArgument<'c, 'a> {
+impl<'c> ValueLike<'c> for BlockArgument<'c, '_> {
     fn to_raw(&self) -> MlirValue {
         self.value.to_raw()
     }
 }
 
-impl<'c, 'a> Display for BlockArgument<'c, 'a> {
+impl Display for BlockArgument<'_, '_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Value::from(*self).fmt(formatter)
     }

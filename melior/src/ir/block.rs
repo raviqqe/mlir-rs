@@ -209,7 +209,7 @@ impl<'c> Block<'c> {
     }
 
     /// Converts a block into a raw object.
-    pub fn into_raw(self) -> MlirBlock {
+    pub const fn into_raw(self) -> MlirBlock {
         let block = self.raw;
 
         forget(self);
@@ -223,21 +223,21 @@ impl<'c> Block<'c> {
     }
 }
 
-impl<'c> Drop for Block<'c> {
+impl Drop for Block<'_> {
     fn drop(&mut self) {
         unsafe { mlirBlockDestroy(self.raw) };
     }
 }
 
-impl<'c> PartialEq for Block<'c> {
+impl PartialEq for Block<'_> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirBlockEqual(self.raw, other.raw) }
     }
 }
 
-impl<'c> Eq for Block<'c> {}
+impl Eq for Block<'_> {}
 
-impl<'c> Display for Block<'c> {
+impl Display for Block<'_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         let mut data = (formatter, Ok(()));
 
@@ -253,7 +253,7 @@ impl<'c> Display for Block<'c> {
     }
 }
 
-impl<'c> Debug for Block<'c> {
+impl Debug for Block<'_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         writeln!(formatter, "Block(")?;
         Display::fmt(self, formatter)?;
@@ -268,7 +268,7 @@ pub struct BlockRef<'c, 'a> {
     _reference: PhantomData<&'a Block<'c>>,
 }
 
-impl<'c, 'a> BlockRef<'c, 'a> {
+impl BlockRef<'_, '_> {
     /// Creates a block reference from a raw object.
     ///
     /// # Safety
@@ -295,7 +295,7 @@ impl<'c, 'a> BlockRef<'c, 'a> {
     }
 }
 
-impl<'c, 'a> Deref for BlockRef<'c, 'a> {
+impl<'a> Deref for BlockRef<'_, 'a> {
     type Target = Block<'a>;
 
     fn deref(&self) -> &Self::Target {
@@ -303,21 +303,21 @@ impl<'c, 'a> Deref for BlockRef<'c, 'a> {
     }
 }
 
-impl<'c, 'a> PartialEq for BlockRef<'c, 'a> {
+impl PartialEq for BlockRef<'_, '_> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirBlockEqual(self.raw, other.raw) }
     }
 }
 
-impl<'c, 'a> Eq for BlockRef<'c, 'a> {}
+impl Eq for BlockRef<'_, '_> {}
 
-impl<'c, 'a> Display for BlockRef<'c, 'a> {
+impl Display for BlockRef<'_, '_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Display::fmt(self.deref(), formatter)
     }
 }
 
-impl<'c, 'a> Debug for BlockRef<'c, 'a> {
+impl Debug for BlockRef<'_, '_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Debug::fmt(self.deref(), formatter)
     }

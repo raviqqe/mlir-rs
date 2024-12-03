@@ -108,15 +108,15 @@ impl<'a> Operation<'a> {
         &self.name
     }
 
-    pub fn can_infer_type(&self) -> bool {
+    pub const fn can_infer_type(&self) -> bool {
         self.can_infer_type
     }
 
-    pub fn dialect_name(&self) -> &str {
+    pub const fn dialect_name(&self) -> &str {
         self.dialect_name
     }
 
-    pub fn operation_name(&self) -> &str {
+    pub const fn operation_name(&self) -> &str {
         self.operation_name
     }
 
@@ -153,7 +153,7 @@ impl<'a> Operation<'a> {
         &self.description
     }
 
-    pub fn constructor_identifier(&self) -> &Ident {
+    pub const fn constructor_identifier(&self) -> &Ident {
         &self.constructor_identifier
     }
 
@@ -227,7 +227,7 @@ impl<'a> Operation<'a> {
             .chain(self.required_attributes().map(convert))
     }
 
-    fn collect_successors(definition: Record<'a>) -> Result<Vec<Successor>, Error> {
+    fn collect_successors(definition: Record<'a>) -> Result<Vec<Successor<'a>>, Error> {
         definition
             .dag_value("successors")?
             .args()
@@ -242,7 +242,7 @@ impl<'a> Operation<'a> {
             .collect()
     }
 
-    fn collect_regions(definition: Record<'a>) -> Result<Vec<Region>, Error> {
+    fn collect_regions(definition: Record<'a>) -> Result<Vec<Region<'a>>, Error> {
         definition
             .dag_value("regions")?
             .args()
@@ -307,7 +307,7 @@ impl<'a> Operation<'a> {
         definition: Record<'a>,
         same_size: bool,
         attribute_sized: bool,
-    ) -> Result<(Vec<OperationResult>, usize), Error> {
+    ) -> Result<(Vec<OperationResult<'a>>, usize), Error> {
         Self::collect_elements(
             &Self::dag_constraints(definition, "results")?
                 .into_iter()

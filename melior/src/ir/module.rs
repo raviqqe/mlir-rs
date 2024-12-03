@@ -88,7 +88,7 @@ impl<'c> Module<'c> {
     }
 }
 
-impl<'c> Drop for Module<'c> {
+impl Drop for Module<'_> {
     fn drop(&mut self) {
         unsafe { mlirModuleDestroy(self.raw) };
     }

@@ -20,15 +20,15 @@ impl<'a> OperationBuilder<'a> {
         }
     }
 
-    pub fn operation(&self) -> &Operation {
+    pub const fn operation(&self) -> &Operation {
         self.operation
     }
 
-    pub fn identifier(&self) -> &Ident {
+    pub const fn identifier(&self) -> &Ident {
         &self.identifier
     }
 
-    pub fn type_state(&self) -> &TypeState {
+    pub const fn type_state(&self) -> &TypeState {
         &self.type_state
     }
 

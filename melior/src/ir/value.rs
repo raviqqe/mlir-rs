@@ -20,7 +20,7 @@ pub struct Value<'c, 'a> {
     _parent: PhantomData<&'a ()>,
 }
 
-impl<'c, 'a> Value<'c, 'a> {
+impl Value<'_, '_> {
     /// Creates a value from a raw object.
     ///
     /// # Safety
@@ -35,21 +35,21 @@ impl<'c, 'a> Value<'c, 'a> {
     }
 }
 
-impl<'c, 'a> ValueLike<'c> for Value<'c, 'a> {
+impl<'c> ValueLike<'c> for Value<'c, '_> {
     fn to_raw(&self) -> MlirValue {
         self.raw
     }
 }
 
-impl<'c, 'a> PartialEq for Value<'c, 'a> {
+impl PartialEq for Value<'_, '_> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirValueEqual(self.raw, other.raw) }
     }
 }
 
-impl<'c, 'a> Eq for Value<'c, 'a> {}
+impl Eq for Value<'_, '_> {}
 
-impl<'c, 'a> Display for Value<'c, 'a> {
+impl Display for Value<'_, '_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         let mut data = (formatter, Ok(()));
 
@@ -65,7 +65,7 @@ impl<'c, 'a> Display for Value<'c, 'a> {
     }
 }
 
-impl<'c, 'a> Debug for Value<'c, 'a> {
+impl Debug for Value<'_, '_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         writeln!(formatter, "Value(")?;
         Display::fmt(self, formatter)?;

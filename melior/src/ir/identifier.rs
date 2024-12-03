@@ -54,13 +54,13 @@ impl<'c> Identifier<'c> {
     }
 }
 
-impl<'c> PartialEq for Identifier<'c> {
+impl PartialEq for Identifier<'_> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirIdentifierEqual(self.raw, other.raw) }
     }
 }
 
-impl<'c> Eq for Identifier<'c> {}
+impl Eq for Identifier<'_> {}
 
 #[cfg(test)]
 mod tests {

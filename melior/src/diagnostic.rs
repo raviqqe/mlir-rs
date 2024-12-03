@@ -21,7 +21,7 @@ pub struct Diagnostic<'c> {
     phantom: PhantomData<&'c ()>,
 }
 
-impl<'c> Diagnostic<'c> {
+impl Diagnostic<'_> {
     pub fn location(&self) -> Location {
         unsafe { Location::from_raw(mlirDiagnosticGetLocation(self.raw)) }
     }
@@ -60,7 +60,7 @@ impl<'c> Diagnostic<'c> {
     }
 }
 
-impl<'a> Display for Diagnostic<'a> {
+impl Display for Diagnostic<'_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         let mut data = (formatter, Ok(()));
 

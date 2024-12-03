@@ -7,7 +7,7 @@ mod result;
 pub use self::{
     builder::OperationBuilder, printing_flags::OperationPrintingFlags, result::OperationResult,
 };
-use super::{Attribute, AttributeLike, BlockRef, Identifier, RegionRef, Value};
+use super::{Attribute, AttributeLike, BlockRef, Identifier, Location, RegionRef, Value};
 use crate::{
     context::{Context, ContextRef},
     utility::{print_callback, print_string_callback},
@@ -20,12 +20,12 @@ use core::{
 use mlir_sys::{
     mlirOperationClone, mlirOperationDestroy, mlirOperationDump, mlirOperationEqual,
     mlirOperationGetAttribute, mlirOperationGetAttributeByName, mlirOperationGetBlock,
-    mlirOperationGetContext, mlirOperationGetName, mlirOperationGetNextInBlock,
-    mlirOperationGetNumAttributes, mlirOperationGetNumOperands, mlirOperationGetNumRegions,
-    mlirOperationGetNumResults, mlirOperationGetNumSuccessors, mlirOperationGetOperand,
-    mlirOperationGetParentOperation, mlirOperationGetRegion, mlirOperationGetResult,
-    mlirOperationGetSuccessor, mlirOperationPrint, mlirOperationPrintWithFlags,
-    mlirOperationRemoveAttributeByName, mlirOperationRemoveFromParent,
+    mlirOperationGetContext, mlirOperationGetLocation, mlirOperationGetName,
+    mlirOperationGetNextInBlock, mlirOperationGetNumAttributes, mlirOperationGetNumOperands,
+    mlirOperationGetNumRegions, mlirOperationGetNumResults, mlirOperationGetNumSuccessors,
+    mlirOperationGetOperand, mlirOperationGetParentOperation, mlirOperationGetRegion,
+    mlirOperationGetResult, mlirOperationGetSuccessor, mlirOperationPrint,
+    mlirOperationPrintWithFlags, mlirOperationRemoveAttributeByName, mlirOperationRemoveFromParent,
     mlirOperationSetAttributeByName, mlirOperationVerify, MlirOperation,
 };
 use std::{
@@ -130,6 +130,11 @@ impl<'c> Operation<'c> {
         (0..self.region_count()).map(|index| self.region(index).expect("valid result index"))
     }
 
+    /// Gets the location of the operation.
+    pub fn location(&self) -> Location<'c> {
+        unsafe { Location::from_raw(mlirOperationGetLocation(self.raw)) }
+    }
+
     /// Returns the number of successors.
     pub fn successor_count(&self) -> usize {
         unsafe { mlirOperationGetNumSuccessors(self.raw) as usize }
@@ -192,7 +197,7 @@ impl<'c> Operation<'c> {
                 StringRef::new(name).to_raw(),
             ))
         }
-        .ok_or(Error::AttributeNotFound(name.into()))
+        .ok_or_else(|| Error::AttributeNotFound(name.into()))
     }
 
     /// Checks if the operation has a attribute with the given name.
@@ -215,7 +220,7 @@ impl<'c> Operation<'c> {
     pub fn remove_attribute(&mut self, name: &str) -> Result<(), Error> {
         unsafe { mlirOperationRemoveAttributeByName(self.raw, StringRef::new(name).to_raw()) }
             .then_some(())
-            .ok_or(Error::AttributeNotFound(name.into()))
+            .ok_or_else(|| Error::AttributeNotFound(name.into()))
     }
 
     /// Returns a reference to the next operation in the same block.
@@ -228,9 +233,9 @@ impl<'c> Operation<'c> {
         unsafe { OperationRefMut::from_option_raw(mlirOperationGetNextInBlock(self.raw)) }
     }
 
-    /// Returns a reference to the next operation in the same block.
+    /// Returns a reference to the previous operation in the same block.
     pub fn previous_in_block(&self) -> Option<OperationRef<'c, '_>> {
-        unsafe { OperationRef::from_option_raw(mlirOperationGetNextInBlock(self.raw)) }
+        todo!("mlirOperationGetPrevInBlock is not exposed in the C API")
     }
 
     /// Returns a reference to a parent operation.
@@ -297,7 +302,7 @@ impl<'c> Operation<'c> {
     }
 
     /// Converts an operation into a raw object.
-    pub fn into_raw(self) -> MlirOperation {
+    pub const fn into_raw(self) -> MlirOperation {
         let operation = self.raw;
 
         forget(self);
@@ -306,27 +311,27 @@ impl<'c> Operation<'c> {
     }
 }
 
-impl<'c> Clone for Operation<'c> {
+impl Clone for Operation<'_> {
     fn clone(&self) -> Self {
         unsafe { Self::from_raw(mlirOperationClone(self.raw)) }
     }
 }
 
-impl<'c> Drop for Operation<'c> {
+impl Drop for Operation<'_> {
     fn drop(&mut self) {
         unsafe { mlirOperationDestroy(self.raw) };
     }
 }
 
-impl<'c> PartialEq for Operation<'c> {
+impl PartialEq for Operation<'_> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirOperationEqual(self.raw, other.raw) }
     }
 }
 
-impl<'c> Eq for Operation<'c> {}
+impl Eq for Operation<'_> {}
 
-impl<'c> Display for Operation<'c> {
+impl Display for Operation<'_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         let mut data = (formatter, Ok(()));
 
@@ -342,7 +347,7 @@ impl<'c> Display for Operation<'c> {
     }
 }
 
-impl<'c> Debug for Operation<'c> {
+impl Debug for Operation<'_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         writeln!(formatter, "Operation(")?;
         Display::fmt(self, formatter)?;
@@ -410,7 +415,7 @@ impl<'c, 'a> OperationRef<'c, 'a> {
     }
 }
 
-impl<'c, 'a> Deref for OperationRef<'c, 'a> {
+impl<'c> Deref for OperationRef<'c, '_> {
     type Target = Operation<'c>;
 
     fn deref(&self) -> &Self::Target {
@@ -418,21 +423,21 @@ impl<'c, 'a> Deref for OperationRef<'c, 'a> {
     }
 }
 
-impl<'c, 'a> PartialEq for OperationRef<'c, 'a> {
+impl PartialEq for OperationRef<'_, '_> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirOperationEqual(self.raw, other.raw) }
     }
 }
 
-impl<'c, 'a> Eq for OperationRef<'c, 'a> {}
+impl Eq for OperationRef<'_, '_> {}
 
-impl<'c, 'a> Display for OperationRef<'c, 'a> {
+impl Display for OperationRef<'_, '_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Display::fmt(self.deref(), formatter)
     }
 }
 
-impl<'c, 'a> Debug for OperationRef<'c, 'a> {
+impl Debug for OperationRef<'_, '_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Debug::fmt(self.deref(), formatter)
     }
@@ -445,7 +450,7 @@ pub struct OperationRefMut<'c, 'a> {
     _reference: PhantomData<&'a Operation<'c>>,
 }
 
-impl<'c, 'a> OperationRefMut<'c, 'a> {
+impl OperationRefMut<'_, '_> {
     /// Converts an operation reference into a raw object.
     pub const fn to_raw(self) -> MlirOperation {
         self.raw
@@ -477,7 +482,7 @@ impl<'c, 'a> OperationRefMut<'c, 'a> {
     }
 }
 
-impl<'c, 'a> Deref for OperationRefMut<'c, 'a> {
+impl<'c> Deref for OperationRefMut<'c, '_> {
     type Target = Operation<'c>;
 
     fn deref(&self) -> &Self::Target {
@@ -485,27 +490,27 @@ impl<'c, 'a> Deref for OperationRefMut<'c, 'a> {
     }
 }
 
-impl<'c, 'a> DerefMut for OperationRefMut<'c, 'a> {
+impl DerefMut for OperationRefMut<'_, '_> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         unsafe { transmute(self) }
     }
 }
 
-impl<'c, 'a> PartialEq for OperationRefMut<'c, 'a> {
+impl PartialEq for OperationRefMut<'_, '_> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirOperationEqual(self.raw, other.raw) }
     }
 }
 
-impl<'c, 'a> Eq for OperationRefMut<'c, 'a> {}
+impl Eq for OperationRefMut<'_, '_> {}
 
-impl<'c, 'a> Display for OperationRefMut<'c, 'a> {
+impl Display for OperationRefMut<'_, '_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Display::fmt(self.deref(), formatter)
     }
 }
 
-impl<'c, 'a> Debug for OperationRefMut<'c, 'a> {
+impl Debug for OperationRefMut<'_, '_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Debug::fmt(self.deref(), formatter)
     }
@@ -642,6 +647,20 @@ mod tests {
             operation.regions().collect::<Vec<_>>(),
             vec![operation.region(0).unwrap()]
         );
+    }
+
+    #[test]
+    fn location() {
+        let context = create_test_context();
+        context.set_allow_unregistered_dialects(true);
+        let location = Location::new(&context, "test", 1, 1);
+
+        let operation = OperationBuilder::new("foo", location)
+            .add_regions([Region::new()])
+            .build()
+            .unwrap();
+
+        assert_eq!(operation.location(), location);
     }
 
     #[test]

@@ -11,7 +11,7 @@ pub struct OperationResult<'c, 'a> {
     value: Value<'c, 'a>,
 }
 
-impl<'c, 'a> OperationResult<'c, 'a> {
+impl<'c> OperationResult<'c, '_> {
     /// Returns a result number.
     pub fn result_number(&self) -> usize {
         unsafe { mlirOpResultGetResultNumber(self.value.to_raw()) as usize }
@@ -34,13 +34,13 @@ impl<'c, 'a> OperationResult<'c, 'a> {
     }
 }
 
-impl<'c, 'a> ValueLike<'c> for OperationResult<'c, 'a> {
+impl<'c> ValueLike<'c> for OperationResult<'c, '_> {
     fn to_raw(&self) -> MlirValue {
         self.value.to_raw()
     }
 }
 
-impl<'c, 'a> Display for OperationResult<'c, 'a> {
+impl Display for OperationResult<'_, '_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Value::from(*self).fmt(formatter)
     }

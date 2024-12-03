@@ -36,7 +36,7 @@ fn sanitize_name(name: &str) -> Result<Ident, Error> {
 
     // Try to parse the string as an ident, and prefix the identifier
     // with "r#" if it is not a valid identifier.
-    Ok(syn::parse_str::<Ident>(&name).unwrap_or(format_ident!("r#{}", name)))
+    Ok(syn::parse_str::<Ident>(&name).unwrap_or_else(|_| format_ident!("r#{}", name)))
 }
 
 pub fn sanitize_documentation(string: &str) -> Result<String, Error> {

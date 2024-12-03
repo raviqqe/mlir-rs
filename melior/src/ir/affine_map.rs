@@ -43,15 +43,15 @@ impl<'c> AffineMap<'c> {
     }
 }
 
-impl<'c> PartialEq for AffineMap<'c> {
+impl PartialEq for AffineMap<'_> {
     fn eq(&self, other: &Self) -> bool {
         unsafe { mlirAffineMapEqual(self.raw, other.raw) }
     }
 }
 
-impl<'c> Eq for AffineMap<'c> {}
+impl Eq for AffineMap<'_> {}
 
-impl<'c> Display for AffineMap<'c> {
+impl Display for AffineMap<'_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         let mut data = (formatter, Ok(()));
 
@@ -67,7 +67,7 @@ impl<'c> Display for AffineMap<'c> {
     }
 }
 
-impl<'c> Debug for AffineMap<'c> {
+impl Debug for AffineMap<'_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         Display::fmt(self, formatter)
     }

@@ -17,7 +17,7 @@ pub struct OperationPassManager<'c, 'a> {
     _parent: PhantomData<&'a PassManager<'c>>,
 }
 
-impl<'c, 'a> OperationPassManager<'c, 'a> {
+impl OperationPassManager<'_, '_> {
     /// Returns an operation pass manager for nested operations corresponding to
     /// a given name.
     pub fn nested_under(&self, name: &str) -> Self {
@@ -49,7 +49,7 @@ impl<'c, 'a> OperationPassManager<'c, 'a> {
     }
 }
 
-impl<'c, 'a> Display for OperationPassManager<'c, 'a> {
+impl Display for OperationPassManager<'_, '_> {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         let mut data = (formatter, Ok(()));
 
