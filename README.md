@@ -1,8 +1,8 @@
 # Melior
 
-[![GitHub Action](https://img.shields.io/github/actions/workflow/status/mlir-sys/melior/test.yaml?branch=main&style=flat-square)](https://github.com/mlir-sys/melior/actions?query=workflow%3Atest)
+[![GitHub Action](https://img.shields.io/github/actions/workflow/status/mlir-rs/melior/test.yaml?branch=main&style=flat-square)](https://github.com/mlir-rs/melior/actions?query=workflow%3Atest)
 [![Crate](https://img.shields.io/crates/v/melior.svg?style=flat-square)](https://crates.io/crates/melior)
-[![License](https://img.shields.io/github/license/mlir-sys/melior.svg?style=flat-square)](https://github.com/mlir-sys/melior/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/mlir-rs/melior.svg?style=flat-square)](https://github.com/mlir-rs/melior/blob/main/LICENSE)
 
 Melior is the MLIR bindings for Rust. It aims to provide a simple,
 safe, and complete API for MLIR with a reasonably sane ownership model
@@ -76,7 +76,7 @@ brew install llvm@19
 
 ## Documentation
 
-On [GitHub Pages](https://mlir-sys.github.io/melior/melior/).
+On [GitHub Pages](https://mlir-rs.github.io/melior/melior/).
 
 ## Contribution
 
@@ -115,9 +115,9 @@ not.
 
 ## References
 
-- The raw C binding generation depends on [femtomc/mlir-sys](https://github.com/femtomc/mlir-sys).
+- The raw C binding generation depends on [femtomc/mlir-rs](https://github.com/femtomc/mlir-rs).
 - The overall design is inspired by [TheDan64/inkwell](https://github.com/TheDan64/inkwell).
 
 ## License
 
-[Apache 2.0](https://github.com/mlir-sys/melior/blob/main/LICENSE)
+[Apache 2.0](https://github.com/mlir-rs/melior/blob/main/LICENSE)
