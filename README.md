@@ -115,7 +115,7 @@ not.
 
 ## References
 
-- The raw C binding generation depends on [femtomc/mlir-rs](https://github.com/femtomc/mlir-rs).
+- The raw C binding generation depends on [mlir-rs/mlir-sys](https://github.com/melior/mlir-sys).
 - The overall design is inspired by [TheDan64/inkwell](https://github.com/TheDan64/inkwell).
 
 ## License

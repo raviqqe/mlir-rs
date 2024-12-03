@@ -19,7 +19,6 @@
     "detensorize",
     "dlti",
     "elementwise",
-    "femtomc",
     "funcs",
     "hasher",
     "indoc",
