@@ -1,8 +1,8 @@
 # Melior
 
-[![GitHub Action](https://img.shields.io/github/actions/workflow/status/raviqqe/melior/test.yaml?branch=main&style=flat-square)](https://github.com/raviqqe/melior/actions?query=workflow%3Atest)
+[![GitHub Action](https://img.shields.io/github/actions/workflow/status/mlir-sys/melior/test.yaml?branch=main&style=flat-square)](https://github.com/mlir-sys/melior/actions?query=workflow%3Atest)
 [![Crate](https://img.shields.io/crates/v/melior.svg?style=flat-square)](https://crates.io/crates/melior)
-[![License](https://img.shields.io/github/license/raviqqe/melior.svg?style=flat-square)](https://github.com/raviqqe/melior/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/mlir-sys/melior.svg?style=flat-square)](https://github.com/mlir-sys/melior/blob/main/LICENSE)
 
 Melior is the MLIR bindings for Rust. It aims to provide a simple,
 safe, and complete API for MLIR with a reasonably sane ownership model
@@ -76,7 +76,7 @@ brew install llvm@19
 
 ## Documentation
 
-On [GitHub Pages](https://raviqqe.github.io/melior/melior/).
+On [GitHub Pages](https://mlir-sys.github.io/melior/melior/).
 
 ## Contribution
 
@@ -120,4 +120,4 @@ not.
 
 ## License
 
-[Apache 2.0](https://github.com/raviqqe/melior/blob/main/LICENSE)
+[Apache 2.0](https://github.com/mlir-sys/melior/blob/main/LICENSE)
