@@ -197,8 +197,8 @@ pub trait BlockExt<'ctx> {
         &self,
         context: &'ctx Context,
         location: Location<'ctx>,
-        elem_type: Type<'ctx>,
-        num_elems: Value<'ctx, '_>,
+        element_type: Type<'ctx>,
+        element_count: Value<'ctx, '_>,
         align: usize,
     ) -> Result<Value<'ctx, '_>, Error>;
 
@@ -207,7 +207,7 @@ pub trait BlockExt<'ctx> {
         &self,
         context: &'ctx Context,
         location: Location<'ctx>,
-        elem_type: Type<'ctx>,
+        element_type: Type<'ctx>,
         align: usize,
     ) -> Result<Value<'ctx, '_>, Error>;
 
@@ -264,7 +264,7 @@ pub trait BlockExt<'ctx> {
         location: Location<'ctx>,
         ptr: Value<'ctx, '_>,
         indexes: &[GepIndex<'ctx, '_>],
-        elem_type: Type<'ctx>,
+        element_type: Type<'ctx>,
     ) -> Result<Value<'ctx, '_>, Error>;
 }
 
@@ -568,19 +568,19 @@ impl<'ctx> BlockExt<'ctx> for Block<'ctx> {
         &self,
         context: &'ctx Context,
         location: Location<'ctx>,
-        elem_type: Type<'ctx>,
-        num_elems: Value<'ctx, '_>,
+        element_type: Type<'ctx>,
+        element_count: Value<'ctx, '_>,
         align: usize,
     ) -> Result<Value<'ctx, '_>, Error> {
         let mut op = ods::llvm::alloca(
             context,
             pointer(context, 0),
-            num_elems,
-            TypeAttribute::new(elem_type),
+            element_count,
+            TypeAttribute::new(element_type),
             location,
         );
 
-        op.set_elem_type(TypeAttribute::new(elem_type));
+        op.set_element_type(TypeAttribute::new(element_type));
         op.set_alignment(IntegerAttribute::new(
             IntegerType::new(context, 64).into(),
             align.try_into().unwrap(),
@@ -594,11 +594,11 @@ impl<'ctx> BlockExt<'ctx> for Block<'ctx> {
         &self,
         context: &'ctx Context,
         location: Location<'ctx>,
-        elem_type: Type<'ctx>,
+        element_type: Type<'ctx>,
         align: usize,
     ) -> Result<Value<'ctx, '_>, Error> {
-        let num_elems = self.const_int(context, location, 1, 64)?;
-        self.alloca(context, location, elem_type, num_elems, align)
+        let element_count = self.const_int(context, location, 1, 64)?;
+        self.alloca(context, location, element_type, element_count, align)
     }
 
     #[inline]
@@ -609,12 +609,12 @@ impl<'ctx> BlockExt<'ctx> for Block<'ctx> {
         bits: u32,
         align: usize,
     ) -> Result<Value<'ctx, '_>, Error> {
-        let num_elems = self.const_int(context, location, 1, 64)?;
+        let element_count = self.const_int(context, location, 1, 64)?;
         self.alloca(
             context,
             location,
             IntegerType::new(context, bits).into(),
-            num_elems,
+            element_count,
             align,
         )
     }
@@ -626,7 +626,7 @@ impl<'ctx> BlockExt<'ctx> for Block<'ctx> {
         location: Location<'ctx>,
         ptr: Value<'ctx, '_>,
         indexes: &[GepIndex<'ctx, '_>],
-        elem_type: Type<'ctx>,
+        element_type: Type<'ctx>,
     ) -> Result<Value<'ctx, '_>, Error> {
         let mut dynamic_indices = Vec::with_capacity(indexes.len());
         let mut raw_constant_indices = Vec::with_capacity(indexes.len());
@@ -647,7 +647,7 @@ impl<'ctx> BlockExt<'ctx> for Block<'ctx> {
             ptr,
             &dynamic_indices,
             DenseI32ArrayAttribute::new(context, &raw_constant_indices),
-            TypeAttribute::new(elem_type),
+            TypeAttribute::new(element_type),
             location,
         );
         op.set_inbounds(Attribute::unit(context));
