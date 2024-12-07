@@ -15,7 +15,7 @@ helpers = ["ods-dialects"]
 
 [dependencies]
 melior-macro = { version = "0.12.2", path = "../macro" }
-mlir-sys = { git = "https://github.com/mlir-rs/mlir-sys" }
+mlir-sys = "0.4.1"
 
 [dev-dependencies]
 indoc = "2.0.5"
