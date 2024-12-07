@@ -99,7 +99,7 @@ pub trait LlvmBlockExt<'c>: BuiltinBlockExt<'c> + ArithBlockExt<'c> {
         value: Value<'c, '_>,
     ) -> Result<(), Error>;
 
-    /// Creates a memcpy operation.
+    /// Creates an `llvm.memcpy` operation.
     fn memcpy(
         &self,
         context: &'c Context,
