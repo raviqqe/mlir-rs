@@ -109,7 +109,7 @@ pub trait LlvmBlockExt<'c>: BuiltinBlockExt<'c> + ArithBlockExt<'c> {
         len_bytes: Value<'c, '_>,
     );
 
-    /// Creates an `llvm.getelementptr` operation. Returns a pointer to the indexed element.
+    /// Creates an `llvm.getelementptr` operation.
     ///
     /// This method allows combining both compile time indexes and runtime value indexes.
     fn gep(
