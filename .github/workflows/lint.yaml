@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: streetsidesoftware/cspell-action@main
+      - uses: streetsidesoftware/cspell-action@v6
         with:
           files: "**/*.{md,rs}"
   readme:
