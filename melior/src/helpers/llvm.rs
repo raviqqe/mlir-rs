@@ -298,7 +298,7 @@ impl<'c> LlvmBlockExt<'c> for Block<'c> {
 
         for index in indexes {
             match index {
-                GepIndex::Const(idx) => raw_constant_indices.push(*idx),
+                GepIndex::Const(index) => raw_constant_indices.push(*index),
                 GepIndex::Value(value) => {
                     dynamic_indices.push(*value);
                     raw_constant_indices.push(i32::MIN); // marker for dynamic index
