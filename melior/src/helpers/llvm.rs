@@ -1,7 +1,7 @@
 use super::arith::ArithBlockExt;
 use super::builtin::BuiltinBlockExt;
 use crate::{
-    dialect::ods,
+    dialect::{llvm::r#type, ods},
     ir::{
         attribute::{
             DenseI32ArrayAttribute, DenseI64ArrayAttribute, IntegerAttribute, TypeAttribute,
@@ -137,7 +137,7 @@ impl<'c> LlvmBlockExt<'c> for Block<'c> {
                 context,
                 value_type,
                 container,
-                DenseI64ArrayAttribute::new(context, &[index.try_into().unwrap()]).into(),
+                DenseI64ArrayAttribute::new(context, &[index as _]).into(),
                 location,
             )
             .into(),
@@ -159,7 +159,7 @@ impl<'c> LlvmBlockExt<'c> for Block<'c> {
                 container.r#type(),
                 container,
                 value,
-                DenseI64ArrayAttribute::new(context, &[index.try_into().unwrap()]).into(),
+                DenseI64ArrayAttribute::new(context, &[index as _]).into(),
                 location,
             )
             .into(),
@@ -234,21 +234,21 @@ impl<'c> LlvmBlockExt<'c> for Block<'c> {
         element_count: Value<'c, '_>,
         align: usize,
     ) -> Result<Value<'c, '_>, Error> {
-        let mut op = ods::llvm::alloca(
+        let mut operation = ods::llvm::alloca(
             context,
-            pointer(context, 0),
+            r#type::pointer(context, 0),
             element_count,
             TypeAttribute::new(element_type),
             location,
         );
 
-        op.set_elem_type(TypeAttribute::new(element_type));
-        op.set_alignment(IntegerAttribute::new(
+        operation.set_elem_type(TypeAttribute::new(element_type));
+        operation.set_alignment(IntegerAttribute::new(
             IntegerType::new(context, 64).into(),
-            align.try_into().unwrap(),
+            align as _,
         ));
 
-        self.append_op_result(op.into())
+        self.append_op_result(operation.into())
     }
 
     #[inline]
@@ -293,30 +293,30 @@ impl<'c> LlvmBlockExt<'c> for Block<'c> {
         indexes: &[GepIndex<'c, '_>],
         element_type: Type<'c>,
     ) -> Result<Value<'c, '_>, Error> {
+        let mut static_indices = Vec::with_capacity(indexes.len());
         let mut dynamic_indices = Vec::with_capacity(indexes.len());
-        let mut raw_constant_indices = Vec::with_capacity(indexes.len());
 
         for index in indexes {
             match index {
-                GepIndex::Const(index) => raw_constant_indices.push(*index),
+                GepIndex::Const(index) => static_indices.push(*index),
                 GepIndex::Value(value) => {
+                    static_indices.push(i32::MIN); // marker for dynamic index
                     dynamic_indices.push(*value);
-                    raw_constant_indices.push(i32::MIN); // marker for dynamic index
                 }
             }
         }
 
-        let mut op = ods::llvm::getelementptr(
+        let mut operation = ods::llvm::getelementptr(
             context,
-            llvm::r#type::pointer(context, 0),
+            r#type::pointer(context, 0),
             pointer,
             &dynamic_indices,
-            DenseI32ArrayAttribute::new(context, &raw_constant_indices),
+            DenseI32ArrayAttribute::new(context, &static_indices),
             TypeAttribute::new(element_type),
             location,
         );
-        op.set_inbounds(Attribute::unit(context));
+        operation.set_inbounds(Attribute::unit(context));
 
-        self.append_op_result(op.into())
+        self.append_op_result(operation.into())
     }
 }
