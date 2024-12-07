@@ -388,8 +388,8 @@ checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
 
 [[package]]
 name = "mlir-sys"
-version = "0.4.0"
-source = "git+https://github.com/mlir-rs/mlir-sys#00c9eb427b35c38a75c181adc698a9f7138ab028"
+version = "0.4.1"
+source = "git+https://github.com/mlir-rs/mlir-sys#d2e468941fe1f7d8e0a3bb57ea85316995e6ec45"
 dependencies = [
  "bindgen 0.71.0",
 ]
