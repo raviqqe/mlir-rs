@@ -10,7 +10,7 @@ use crate::{
     ir::{r#type::IntegerType, Attribute, Block, Location, Type, Value},
     Context, Error,
 };
-use core::fmt;
+use core::fmt::Display;
 
 pub trait ArithBlockExt<'c>: BuiltinBlockExt<'c> {
     /// Creates an `arith.cmpi` operation.
@@ -128,20 +128,20 @@ pub trait ArithBlockExt<'c>: BuiltinBlockExt<'c> {
     ) -> Result<Value<'c, '_>, Error>;
 
     /// Creates a constant of the given integer bit width.
-    fn const_int<T: fmt::Display>(
+    fn const_int(
         &self,
         context: &'c Context,
         location: Location<'c>,
-        value: T,
+        value: impl Display,
         bits: u32,
     ) -> Result<Value<'c, '_>, Error>;
 
     /// Creates a constant of the given integer type.
-    fn const_int_from_type<T: fmt::Display>(
+    fn const_int_from_type(
         &self,
         context: &'c Context,
         location: Location<'c>,
-        value: T,
+        value: impl Display,
         r#type: Type<'c>,
     ) -> Result<Value<'c, '_>, Error>;
 }
@@ -290,11 +290,11 @@ impl<'c> ArithBlockExt<'c> for Block<'c> {
     }
 
     #[inline]
-    fn const_int<T: fmt::Display>(
+    fn const_int(
         &self,
         context: &'c Context,
         location: Location<'c>,
-        value: T,
+        value: impl Display,
         bits: u32,
     ) -> Result<Value<'c, '_>, Error> {
         self.const_int_from_type(
@@ -306,11 +306,11 @@ impl<'c> ArithBlockExt<'c> for Block<'c> {
     }
 
     #[inline]
-    fn const_int_from_type<T: fmt::Display>(
+    fn const_int_from_type(
         &self,
         context: &'c Context,
         location: Location<'c>,
-        value: T,
+        value: impl Display,
         r#type: Type<'c>,
     ) -> Result<Value<'c, '_>, Error> {
         let attribute = format!("{value} : {type}");
