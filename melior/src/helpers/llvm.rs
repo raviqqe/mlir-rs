@@ -110,24 +110,8 @@ pub trait LlvmBlockExt<'c>: BuiltinBlockExt<'c> + ArithBlockExt<'c> {
     );
 
     /// Creates an `llvm.getelementptr` operation. Returns a pointer to the indexed element.
+    ///
     /// This method allows combining both compile time indexes and runtime value indexes.
-    ///
-    /// See:
-    /// - https://llvm.org/docs/LangRef.html#getelementptr-instruction
-    /// - https://llvm.org/docs/GetElementPtr.html
-    ///
-    /// Get Element Pointer is used to index into pointers, it uses the given
-    /// element type to compute the offsets, it allows indexing deep into a structure (field of field of a ptr for example),
-    /// this is why it accepts a array of indexes, it indexes through the list, offsetting depending on the element type,
-    /// for example it knows when you index into a struct field, the following index will use the struct field type for offsets, etc.
-    ///
-    /// Address computation is done at compile time.
-    ///
-    /// Note: This GEP sets the inbounds attribute:
-    ///
-    /// The base pointer has an in bounds address of the allocated object that it is based on. This means that it points into that allocated object, or to its end. Note that the object does not have to be live anymore; being in-bounds of a deallocated object is sufficient.
-    ///
-    /// During the successive addition of offsets to the address, the resulting pointer must remain in bounds of the allocated object at each step.
     fn gep(
         &self,
         context: &'c Context,
