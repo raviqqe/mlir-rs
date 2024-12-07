@@ -23,7 +23,7 @@ pub enum GepIndex<'c, 'a> {
 
 /// A block extension for an `llvm` dialect.
 pub trait LlvmBlockExt<'c>: BuiltinBlockExt<'c> + ArithBlockExt<'c> {
-    /// Uses a llvm::extract_value operation to return the value at the given index of a container (e.g struct).
+    /// Creates an `llvm.extractvalue` operation.
     fn extract_value(
         &self,
         context: &'c Context,
@@ -33,8 +33,7 @@ pub trait LlvmBlockExt<'c>: BuiltinBlockExt<'c> + ArithBlockExt<'c> {
         index: usize,
     ) -> Result<Value<'c, '_>, Error>;
 
-    /// Uses a llvm::insert_value operation to insert the value at the given index of a container (e.g struct),
-    /// the result is the container with the value.
+    /// Creates an `llvm.insertvalue` operation.
     fn insert_value(
         &self,
         context: &'c Context,
@@ -44,8 +43,8 @@ pub trait LlvmBlockExt<'c>: BuiltinBlockExt<'c> + ArithBlockExt<'c> {
         index: usize,
     ) -> Result<Value<'c, '_>, Error>;
 
-    /// Uses a llvm::insert_value operation to insert the values starting from index 0 into a container (e.g struct),
-    /// the result is the container with the values.
+    /// Creates an `llvm.insertvalue` operation that insert multiple elements into an aggregate
+    /// from the first index.
     fn insert_values<'block>(
         &'block self,
         context: &'c Context,
@@ -54,7 +53,7 @@ pub trait LlvmBlockExt<'c>: BuiltinBlockExt<'c> + ArithBlockExt<'c> {
         values: &[Value<'c, 'block>],
     ) -> Result<Value<'c, 'block>, Error>;
 
-    /// Loads a value from the given addr.
+    /// Creates an `llvm.load` operation.
     fn load(
         &self,
         context: &'c Context,
@@ -63,7 +62,7 @@ pub trait LlvmBlockExt<'c>: BuiltinBlockExt<'c> + ArithBlockExt<'c> {
         value_type: Type<'c>,
     ) -> Result<Value<'c, '_>, Error>;
 
-    /// Allocates the given number of elements of type in memory on the stack, returning a opaque pointer.
+    /// Creates an `llvm.alloca` operation.
     fn alloca(
         &self,
         context: &'c Context,
@@ -73,16 +72,16 @@ pub trait LlvmBlockExt<'c>: BuiltinBlockExt<'c> + ArithBlockExt<'c> {
         align: usize,
     ) -> Result<Value<'c, '_>, Error>;
 
-    /// Allocates one element of the given type in memory on the stack, returning a opaque pointer.
+    /// Creates an `llvm.alloca` operation that allocates one element.
     fn alloca1(
         &self,
         context: &'c Context,
         location: Location<'c>,
-        element_type: Type<'c>,
+        r#type: Type<'c>,
         align: usize,
     ) -> Result<Value<'c, '_>, Error>;
 
-    /// Allocates one integer of the given bit width.
+    /// Creates an `llvm.alloca` operation that allocates one element of the given size of an integer.
     fn alloca_int(
         &self,
         context: &'c Context,
@@ -91,12 +90,12 @@ pub trait LlvmBlockExt<'c>: BuiltinBlockExt<'c> + ArithBlockExt<'c> {
         align: usize,
     ) -> Result<Value<'c, '_>, Error>;
 
-    /// Stores a value at the given addr.
+    /// Creates an `llvm.store` operation.
     fn store(
         &self,
         context: &'c Context,
         location: Location<'c>,
-        addr: Value<'c, '_>,
+        address: Value<'c, '_>,
         value: Value<'c, '_>,
     ) -> Result<(), Error>;
 
@@ -273,11 +272,16 @@ impl<'c> LlvmBlockExt<'c> for Block<'c> {
         &self,
         context: &'c Context,
         location: Location<'c>,
-        element_type: Type<'c>,
+        r#type: Type<'c>,
         align: usize,
     ) -> Result<Value<'c, '_>, Error> {
-        let element_count = self.const_int(context, location, 1, 64)?;
-        self.alloca(context, location, element_type, element_count, align)
+        self.alloca(
+            context,
+            location,
+            r#type,
+            self.const_int(context, location, 1, 64)?,
+            align,
+        )
     }
 
     #[inline]
@@ -288,12 +292,10 @@ impl<'c> LlvmBlockExt<'c> for Block<'c> {
         bits: u32,
         align: usize,
     ) -> Result<Value<'c, '_>, Error> {
-        let element_count = self.const_int(context, location, 1, 64)?;
-        self.alloca(
+        self.alloca1(
             context,
             location,
             IntegerType::new(context, bits).into(),
-            element_count,
             align,
         )
     }
