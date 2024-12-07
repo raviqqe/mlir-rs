@@ -7,10 +7,7 @@ use crate::{
         },
         ods,
     },
-    ir::{
-        r#type::IntegerType,
-        Attribute, Block, Location, Type, Value,
-    },
+    ir::{r#type::IntegerType, Attribute, Block, Location, Type, Value},
     Context, Error,
 };
 use core::fmt;

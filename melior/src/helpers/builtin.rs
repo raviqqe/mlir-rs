@@ -1,7 +1,6 @@
 use crate::{
-    ir::{
-        Block, Operation, Value,
-    }, Error,
+    ir::{Block, Operation, Value},
+    Error,
 };
 
 pub trait BuiltinBlockExt<'c> {

@@ -1,10 +1,7 @@
 use super::arith::ArithBlockExt;
 use super::builtin::BuiltinBlockExt;
 use crate::{
-    dialect::{
-        llvm::r#type::pointer,
-        ods,
-    },
+    dialect::{llvm::r#type::pointer, ods},
     ir::{
         attribute::{
             DenseI32ArrayAttribute, DenseI64ArrayAttribute, IntegerAttribute, TypeAttribute,
