@@ -2,8 +2,8 @@ use super::builtin::BuiltinBlockExt;
 use crate::{
     dialect::{
         arith::{
-            addi, andi, cmpi, divsi, divui, extsi, extui, muli, ori, shli, shrui, subi, trunci,
-            xori, CmpiPredicate,
+            addi, andi, cmpi, divsi, divui, extsi, extui, muli, ori, shli, shrsi, shrui, subi,
+            trunci, xori, CmpiPredicate,
         },
         ods,
     },
@@ -12,7 +12,45 @@ use crate::{
 };
 use core::fmt::Display;
 
+macro_rules! binary_operation_declaration {
+    ($name:ident, $documentation:literal) => {
+        #[doc=$documentation]
+        fn $name(
+            &self,
+            lhs: Value<'c, '_>,
+            rhs: Value<'c, '_>,
+            location: Location<'c>,
+        ) -> Result<Value<'c, '_>, Error>;
+    };
+}
+
+macro_rules! binary_operation {
+    ($name:ident) => {
+        #[inline]
+        fn $name(
+            &self,
+            lhs: Value<'c, '_>,
+            rhs: Value<'c, '_>,
+            location: Location<'c>,
+        ) -> Result<Value<'c, '_>, Error> {
+            self.append_op_result($name(lhs, rhs, location))
+        }
+    };
+}
+
 pub trait ArithBlockExt<'c>: BuiltinBlockExt<'c> {
+    binary_operation_declaration!(addi, "Creates an `arith.addi` operation.");
+    binary_operation_declaration!(andi, "Creates an `arith.andi` operation.");
+    binary_operation_declaration!(divsi, "Creates an `arith.divsi` operation.");
+    binary_operation_declaration!(divui, "Creates an `arith.divui` operation.");
+    binary_operation_declaration!(muli, "Creates an `arith.muli` operation.");
+    binary_operation_declaration!(ori, "Creates an `arith.ori` operation.");
+    binary_operation_declaration!(shli, "Creates an `arith.shli` operation.");
+    binary_operation_declaration!(shrsi, "Creates an `arith.shrsi` operation.");
+    binary_operation_declaration!(shrui, "Creates an `arith.shrui` operation.");
+    binary_operation_declaration!(subi, "Creates an `arith.subi` operation.");
+    binary_operation_declaration!(xori, "Creates an `arith.xori` operation.");
+
     /// Creates an `arith.cmpi` operation.
     fn cmpi(
         &self,
@@ -47,86 +85,6 @@ pub trait ArithBlockExt<'c>: BuiltinBlockExt<'c> {
         location: Location<'c>,
     ) -> Result<Value<'c, '_>, Error>;
 
-    /// Creates an `arith.shri` operation.
-    fn shrui(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error>;
-
-    /// Creates an `arith.shli` operation.
-    fn shli(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error>;
-
-    /// Creates an `arith.addi` operation.
-    fn addi(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error>;
-
-    /// Creates an `arith.subi` operation.
-    fn subi(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error>;
-
-    /// Creates an `arith.muli` operation.
-    fn muli(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error>;
-
-    /// Creates an `arith.divui` operation.
-    fn divui(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error>;
-
-    /// Creates an `arith.divsi` operation.
-    fn divsi(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error>;
-
-    /// Creates an `arith.xori` operation.
-    fn xori(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error>;
-
-    /// Creates an `arith.ori` operation.
-    fn ori(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error>;
-
-    /// Creates an `arith.andi` operation.
-    fn andi(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error>;
-
     /// Creates a constant of the given integer bit width.
     fn const_int(
         &self,
@@ -147,6 +105,18 @@ pub trait ArithBlockExt<'c>: BuiltinBlockExt<'c> {
 }
 
 impl<'c> ArithBlockExt<'c> for Block<'c> {
+    binary_operation!(addi);
+    binary_operation!(andi);
+    binary_operation!(divsi);
+    binary_operation!(divui);
+    binary_operation!(muli);
+    binary_operation!(ori);
+    binary_operation!(shli);
+    binary_operation!(shrsi);
+    binary_operation!(shrui);
+    binary_operation!(subi);
+    binary_operation!(xori);
+
     #[inline]
     fn cmpi(
         &self,
@@ -187,106 +157,6 @@ impl<'c> ArithBlockExt<'c> for Block<'c> {
         location: Location<'c>,
     ) -> Result<Value<'c, '_>, Error> {
         self.append_op_result(trunci(lhs, target_type, location))
-    }
-
-    #[inline]
-    fn shli(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error> {
-        self.append_op_result(shli(lhs, rhs, location))
-    }
-
-    #[inline]
-    fn shrui(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error> {
-        self.append_op_result(shrui(lhs, rhs, location))
-    }
-
-    #[inline]
-    fn addi(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error> {
-        self.append_op_result(addi(lhs, rhs, location))
-    }
-
-    #[inline]
-    fn subi(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error> {
-        self.append_op_result(subi(lhs, rhs, location))
-    }
-
-    #[inline]
-    fn divui(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error> {
-        self.append_op_result(divui(lhs, rhs, location))
-    }
-
-    #[inline]
-    fn divsi(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error> {
-        self.append_op_result(divsi(lhs, rhs, location))
-    }
-
-    #[inline]
-    fn xori(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error> {
-        self.append_op_result(xori(lhs, rhs, location))
-    }
-
-    #[inline]
-    fn ori(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error> {
-        self.append_op_result(ori(lhs, rhs, location))
-    }
-
-    #[inline]
-    fn andi(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error> {
-        self.append_op_result(andi(lhs, rhs, location))
-    }
-
-    #[inline]
-    fn muli(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error> {
-        self.append_op_result(muli(lhs, rhs, location))
     }
 
     #[inline]
