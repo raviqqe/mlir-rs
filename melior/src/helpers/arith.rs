@@ -303,13 +303,13 @@ impl<'c> ArithBlockExt<'c> for Block<'c> {
         context: &'c Context,
         location: Location<'c>,
         value: T,
-        ty: Type<'c>,
+        r#type: Type<'c>,
     ) -> Result<Value<'c, '_>, Error> {
         self.append_op_result(
             ods::arith::constant(
                 context,
-                ty,
-                Attribute::parse(context, &format!("{} : {}", value, ty)).unwrap(),
+                r#type,
+                Attribute::parse(context, &format!("{value} : {type}")).unwrap(),
                 location,
             )
             .into(),
