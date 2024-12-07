@@ -130,7 +130,7 @@ pub trait ArithBlockExt<'c>: BuiltinBlockExt<'c> {
         context: &'c Context,
         location: Location<'c>,
         value: T,
-        int_type: Type<'c>,
+        r#type: Type<'c>,
     ) -> Result<Value<'c, '_>, Error>;
 }
 
