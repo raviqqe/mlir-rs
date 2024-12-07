@@ -1,7 +1,7 @@
 use super::arith::ArithBlockExt;
 use super::builtin::BuiltinBlockExt;
 use crate::{
-    dialect::{llvm::r#type::pointer, ods},
+    dialect::ods,
     ir::{
         attribute::{
             DenseI32ArrayAttribute, DenseI64ArrayAttribute, IntegerAttribute, TypeAttribute,
@@ -308,7 +308,7 @@ impl<'c> LlvmBlockExt<'c> for Block<'c> {
 
         let mut op = ods::llvm::getelementptr(
             context,
-            pointer(context, 0),
+            llvm::r#type::pointer(context, 0),
             pointer,
             &dynamic_indices,
             DenseI32ArrayAttribute::new(context, &raw_constant_indices),
