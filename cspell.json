@@ -50,6 +50,7 @@
     "rustc",
     "sccp",
     "shli",
+    "shrsi",
     "shrui",
     "sigabrt",
     "signless",
