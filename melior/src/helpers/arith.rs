@@ -31,6 +31,7 @@ pub trait ArithBlockExt<'c>: BuiltinBlockExt<'c> {
         location: Location<'c>,
     ) -> Result<Value<'c, '_>, Error>;
 
+    /// Creates an `arith.extui` operation.
     fn extsi(
         &self,
         lhs: Value<'c, '_>,
@@ -38,6 +39,7 @@ pub trait ArithBlockExt<'c>: BuiltinBlockExt<'c> {
         location: Location<'c>,
     ) -> Result<Value<'c, '_>, Error>;
 
+    /// Creates an `arith.extui` operation.
     fn trunci(
         &self,
         lhs: Value<'c, '_>,
@@ -45,6 +47,7 @@ pub trait ArithBlockExt<'c>: BuiltinBlockExt<'c> {
         location: Location<'c>,
     ) -> Result<Value<'c, '_>, Error>;
 
+    /// Creates an `arith.shri` operation.
     fn shrui(
         &self,
         lhs: Value<'c, '_>,
@@ -52,6 +55,7 @@ pub trait ArithBlockExt<'c>: BuiltinBlockExt<'c> {
         location: Location<'c>,
     ) -> Result<Value<'c, '_>, Error>;
 
+    /// Creates an `arith.shli` operation.
     fn shli(
         &self,
         lhs: Value<'c, '_>,
@@ -59,6 +63,7 @@ pub trait ArithBlockExt<'c>: BuiltinBlockExt<'c> {
         location: Location<'c>,
     ) -> Result<Value<'c, '_>, Error>;
 
+    /// Creates an `arith.addi` operation.
     fn addi(
         &self,
         lhs: Value<'c, '_>,
@@ -66,6 +71,7 @@ pub trait ArithBlockExt<'c>: BuiltinBlockExt<'c> {
         location: Location<'c>,
     ) -> Result<Value<'c, '_>, Error>;
 
+    /// Creates an `arith.subi` operation.
     fn subi(
         &self,
         lhs: Value<'c, '_>,
@@ -73,41 +79,7 @@ pub trait ArithBlockExt<'c>: BuiltinBlockExt<'c> {
         location: Location<'c>,
     ) -> Result<Value<'c, '_>, Error>;
 
-    fn divui(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error>;
-
-    fn divsi(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error>;
-
-    fn xori(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error>;
-
-    fn ori(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error>;
-
-    fn andi(
-        &self,
-        lhs: Value<'c, '_>,
-        rhs: Value<'c, '_>,
-        location: Location<'c>,
-    ) -> Result<Value<'c, '_>, Error>;
-
+    /// Creates an `arith.muli` operation.
     fn muli(
         &self,
         lhs: Value<'c, '_>,
@@ -115,7 +87,47 @@ pub trait ArithBlockExt<'c>: BuiltinBlockExt<'c> {
         location: Location<'c>,
     ) -> Result<Value<'c, '_>, Error>;
 
-    /// Creates a constant of the given integer bit width. Do not use for felt252.
+    /// Creates an `arith.divui` operation.
+    fn divui(
+        &self,
+        lhs: Value<'c, '_>,
+        rhs: Value<'c, '_>,
+        location: Location<'c>,
+    ) -> Result<Value<'c, '_>, Error>;
+
+    /// Creates an `arith.divsi` operation.
+    fn divsi(
+        &self,
+        lhs: Value<'c, '_>,
+        rhs: Value<'c, '_>,
+        location: Location<'c>,
+    ) -> Result<Value<'c, '_>, Error>;
+
+    /// Creates an `arith.xori` operation.
+    fn xori(
+        &self,
+        lhs: Value<'c, '_>,
+        rhs: Value<'c, '_>,
+        location: Location<'c>,
+    ) -> Result<Value<'c, '_>, Error>;
+
+    /// Creates an `arith.ori` operation.
+    fn ori(
+        &self,
+        lhs: Value<'c, '_>,
+        rhs: Value<'c, '_>,
+        location: Location<'c>,
+    ) -> Result<Value<'c, '_>, Error>;
+
+    /// Creates an `arith.andi` operation.
+    fn andi(
+        &self,
+        lhs: Value<'c, '_>,
+        rhs: Value<'c, '_>,
+        location: Location<'c>,
+    ) -> Result<Value<'c, '_>, Error>;
+
+    /// Creates a constant of the given integer bit width.
     fn const_int<T: fmt::Display>(
         &self,
         context: &'c Context,
@@ -124,7 +136,7 @@ pub trait ArithBlockExt<'c>: BuiltinBlockExt<'c> {
         bits: u32,
     ) -> Result<Value<'c, '_>, Error>;
 
-    /// Creates a constant of the given integer type. Do not use for felt252.
+    /// Creates a constant of the given integer type.
     fn const_int_from_type<T: fmt::Display>(
         &self,
         context: &'c Context,
