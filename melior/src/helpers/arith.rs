@@ -285,15 +285,11 @@ impl<'c> ArithBlockExt<'c> for Block<'c> {
         value: T,
         bits: u32,
     ) -> Result<Value<'c, '_>, Error> {
-        let ty = IntegerType::new(context, bits).into();
-        self.append_op_result(
-            ods::arith::constant(
-                context,
-                ty,
-                Attribute::parse(context, &format!("{} : {}", value, ty)).unwrap(),
-                location,
-            )
-            .into(),
+        self.const_int_from_type(
+            context,
+            location,
+            value,
+            IntegerType::new(context, bits).into(),
         )
     }
 
@@ -305,11 +301,13 @@ impl<'c> ArithBlockExt<'c> for Block<'c> {
         value: T,
         r#type: Type<'c>,
     ) -> Result<Value<'c, '_>, Error> {
+        let attribute = format!("{value} : {type}");
+
         self.append_op_result(
             ods::arith::constant(
                 context,
                 r#type,
-                Attribute::parse(context, &format!("{value} : {type}")).unwrap(),
+                Attribute::parse(context, &attribute).ok_or(Error::AttributeParse(attribute))?,
                 location,
             )
             .into(),

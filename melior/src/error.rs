@@ -10,6 +10,7 @@ use std::{
 pub enum Error {
     AttributeExpected(&'static str, String),
     AttributeNotFound(String),
+    AttributeParse(String),
     BlockArgumentExpected(String),
     ElementExpected {
         r#type: &'static str,
@@ -40,6 +41,9 @@ impl Display for Error {
             }
             Self::AttributeNotFound(name) => {
                 write!(formatter, "attribute {name} not found")
+            }
+            Self::AttributeParse(string) => {
+                write!(formatter, "failed to parse attribute: {string}")
             }
             Self::BlockArgumentExpected(value) => {
                 write!(formatter, "block argument expected: {value}")
