@@ -580,7 +580,7 @@ impl<'ctx> BlockExt<'ctx> for Block<'ctx> {
             location,
         );
 
-        op.set_element_type(TypeAttribute::new(element_type));
+        op.set_elem_type(TypeAttribute::new(element_type));
         op.set_alignment(IntegerAttribute::new(
             IntegerType::new(context, 64).into(),
             align.try_into().unwrap(),
