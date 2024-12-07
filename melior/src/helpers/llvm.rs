@@ -95,7 +95,7 @@ pub trait LlvmBlockExt<'c>: BuiltinBlockExt<'c> + ArithBlockExt<'c> {
         &self,
         context: &'c Context,
         location: Location<'c>,
-        address: Value<'c, '_>,
+        pointer: Value<'c, '_>,
         value: Value<'c, '_>,
     ) -> Result<(), Error>;
 
@@ -116,7 +116,7 @@ pub trait LlvmBlockExt<'c>: BuiltinBlockExt<'c> + ArithBlockExt<'c> {
         &self,
         context: &'c Context,
         location: Location<'c>,
-        ptr: Value<'c, '_>,
+        pointer: Value<'c, '_>,
         indexes: &[GepIndex<'c, '_>],
         element_type: Type<'c>,
     ) -> Result<Value<'c, '_>, Error>;
@@ -289,7 +289,7 @@ impl<'c> LlvmBlockExt<'c> for Block<'c> {
         &self,
         context: &'c Context,
         location: Location<'c>,
-        ptr: Value<'c, '_>,
+        pointer: Value<'c, '_>,
         indexes: &[GepIndex<'c, '_>],
         element_type: Type<'c>,
     ) -> Result<Value<'c, '_>, Error> {
@@ -309,7 +309,7 @@ impl<'c> LlvmBlockExt<'c> for Block<'c> {
         let mut op = ods::llvm::getelementptr(
             context,
             pointer(context, 0),
-            ptr,
+            pointer,
             &dynamic_indices,
             DenseI32ArrayAttribute::new(context, &raw_constant_indices),
             TypeAttribute::new(element_type),
