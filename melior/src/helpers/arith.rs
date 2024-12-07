@@ -121,42 +121,42 @@ impl<'c> ArithBlockExt<'c> for Block<'c> {
     fn cmpi(
         &self,
         context: &'c Context,
-        pred: CmpiPredicate,
+        predicate: CmpiPredicate,
         lhs: Value<'c, '_>,
         rhs: Value<'c, '_>,
         location: Location<'c>,
     ) -> Result<Value<'c, '_>, Error> {
-        self.append_op_result(cmpi(context, pred, lhs, rhs, location))
+        self.append_op_result(cmpi(context, predicate, lhs, rhs, location))
     }
 
     #[inline]
     fn extsi(
         &self,
-        lhs: Value<'c, '_>,
+        value: Value<'c, '_>,
         target_type: Type<'c>,
         location: Location<'c>,
     ) -> Result<Value<'c, '_>, Error> {
-        self.append_op_result(extsi(lhs, target_type, location))
+        self.append_op_result(extsi(value, target_type, location))
     }
 
     #[inline]
     fn extui(
         &self,
-        lhs: Value<'c, '_>,
+        value: Value<'c, '_>,
         target_type: Type<'c>,
         location: Location<'c>,
     ) -> Result<Value<'c, '_>, Error> {
-        self.append_op_result(extui(lhs, target_type, location))
+        self.append_op_result(extui(value, target_type, location))
     }
 
     #[inline]
     fn trunci(
         &self,
-        lhs: Value<'c, '_>,
+        value: Value<'c, '_>,
         target_type: Type<'c>,
         location: Location<'c>,
     ) -> Result<Value<'c, '_>, Error> {
-        self.append_op_result(trunci(lhs, target_type, location))
+        self.append_op_result(trunci(value, target_type, location))
     }
 
     #[inline]
