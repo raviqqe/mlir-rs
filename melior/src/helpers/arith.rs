@@ -38,6 +38,7 @@ macro_rules! binary_operation {
     };
 }
 
+/// A block extension for an `arith` dialect.
 pub trait ArithBlockExt<'c>: BuiltinBlockExt<'c> {
     binary_operation_declaration!(addi, "Creates an `arith.addi` operation.");
     binary_operation_declaration!(andi, "Creates an `arith.andi` operation.");

@@ -3,6 +3,7 @@ use crate::{
     Error,
 };
 
+/// A block extension for a `builtin` dialect and constructs.
 pub trait BuiltinBlockExt<'c> {
     /// Returns a block argument as a value.
     fn arg(&self, index: usize) -> Result<Value<'c, '_>, Error>;

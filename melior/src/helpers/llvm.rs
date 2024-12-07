@@ -12,7 +12,7 @@ use crate::{
     Context, Error,
 };
 
-/// Index types for LLVM GEP.
+/// An index for an `llvm.getelementptr` instruction.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GepIndex<'c, 'a> {
     /// A compile time known index.
@@ -21,6 +21,7 @@ pub enum GepIndex<'c, 'a> {
     Value(Value<'c, 'a>),
 }
 
+/// A block extension for an `llvm` dialect.
 pub trait LlvmBlockExt<'c>: BuiltinBlockExt<'c> + ArithBlockExt<'c> {
     /// Uses a llvm::extract_value operation to return the value at the given index of a container (e.g struct).
     fn extract_value(
