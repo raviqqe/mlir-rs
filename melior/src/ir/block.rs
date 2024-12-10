@@ -5,17 +5,10 @@ mod block_like;
 
 pub use self::argument::BlockArgument;
 pub use self::block_like::BlockLike;
-use super::{
-    operation::OperationRefMut, Location, Operation, OperationRef, RegionRef, Type, TypeLike, Value,
-};
-use crate::{context::Context, utility::print_callback, Error};
+use super::{Location, Type, TypeLike, Value};
+use crate::{context::Context, utility::print_callback};
 use mlir_sys::{
-    mlirBlockAddArgument, mlirBlockAppendOwnedOperation, mlirBlockCreate, mlirBlockDestroy,
-    mlirBlockDetach, mlirBlockEqual, mlirBlockGetArgument, mlirBlockGetFirstOperation,
-    mlirBlockGetNextInRegion, mlirBlockGetNumArguments, mlirBlockGetParentOperation,
-    mlirBlockGetParentRegion, mlirBlockGetTerminator, mlirBlockInsertOwnedOperation,
-    mlirBlockInsertOwnedOperationAfter, mlirBlockInsertOwnedOperationBefore, mlirBlockPrint,
-    MlirBlock,
+    mlirBlockCreate, mlirBlockDestroy, mlirBlockDetach, mlirBlockEqual, mlirBlockPrint, MlirBlock,
 };
 use std::{
     ffi::c_void,
@@ -96,112 +89,9 @@ impl<'c> Block<'c> {
     }
 }
 
-impl<'c, 'v> BlockLike<'c, 'v> for Block<'c> {
-    fn argument(&self, index: usize) -> Result<BlockArgument<'c, 'v>, Error> {
-        unsafe {
-            if index < self.argument_count() {
-                Ok(BlockArgument::from_raw(mlirBlockGetArgument(
-                    self.raw,
-                    index as isize,
-                )))
-            } else {
-                Err(Error::PositionOutOfBounds {
-                    name: "block argument",
-                    value: self.to_string(),
-                    index,
-                })
-            }
-        }
-    }
-
-    fn argument_count(&self) -> usize {
-        unsafe { mlirBlockGetNumArguments(self.raw) as usize }
-    }
-
-    fn first_operation(&self) -> Option<OperationRef<'c, 'v>> {
-        unsafe { OperationRef::from_option_raw(mlirBlockGetFirstOperation(self.raw)) }
-    }
-
-    fn first_operation_mut(&mut self) -> Option<OperationRefMut<'c, 'v>> {
-        unsafe { OperationRefMut::from_option_raw(mlirBlockGetFirstOperation(self.raw)) }
-    }
-
-    fn terminator(&self) -> Option<OperationRef<'c, 'v>> {
-        unsafe { OperationRef::from_option_raw(mlirBlockGetTerminator(self.raw)) }
-    }
-
-    fn terminator_mut(&mut self) -> Option<OperationRefMut<'c, 'v>> {
-        unsafe { OperationRefMut::from_option_raw(mlirBlockGetTerminator(self.raw)) }
-    }
-
-    fn parent_region(&self) -> Option<RegionRef<'c, 'v>> {
-        unsafe { RegionRef::from_option_raw(mlirBlockGetParentRegion(self.raw)) }
-    }
-
-    fn parent_operation(&self) -> Option<OperationRef<'c, 'v>> {
-        unsafe { OperationRef::from_option_raw(mlirBlockGetParentOperation(self.raw)) }
-    }
-
-    fn add_argument(&self, r#type: Type<'c>, location: Location<'c>) -> Value<'c, 'v> {
-        unsafe {
-            Value::from_raw(mlirBlockAddArgument(
-                self.raw,
-                r#type.to_raw(),
-                location.to_raw(),
-            ))
-        }
-    }
-
-    fn append_operation(&self, operation: Operation<'c>) -> OperationRef<'c, 'v> {
-        unsafe {
-            let operation = operation.into_raw();
-
-            mlirBlockAppendOwnedOperation(self.raw, operation);
-
-            OperationRef::from_raw(operation)
-        }
-    }
-
-    fn insert_operation(&self, position: usize, operation: Operation<'c>) -> OperationRef<'c, 'v> {
-        unsafe {
-            let operation = operation.into_raw();
-
-            mlirBlockInsertOwnedOperation(self.raw, position as isize, operation);
-
-            OperationRef::from_raw(operation)
-        }
-    }
-
-    fn insert_operation_after(
-        &self,
-        one: OperationRef<'c, 'v>,
-        other: Operation<'c>,
-    ) -> OperationRef<'c, 'v> {
-        unsafe {
-            let other = other.into_raw();
-
-            mlirBlockInsertOwnedOperationAfter(self.raw, one.to_raw(), other);
-
-            OperationRef::from_raw(other)
-        }
-    }
-
-    fn insert_operation_before(
-        &self,
-        one: OperationRef<'c, 'v>,
-        other: Operation<'c>,
-    ) -> OperationRef<'c, 'v> {
-        unsafe {
-            let other = other.into_raw();
-
-            mlirBlockInsertOwnedOperationBefore(self.raw, one.to_raw(), other);
-
-            OperationRef::from_raw(other)
-        }
-    }
-
-    fn next_in_region(&self) -> Option<BlockRef<'c, 'v>> {
-        unsafe { BlockRef::from_option_raw(mlirBlockGetNextInRegion(self.raw)) }
+impl<'c, 'a> BlockLike<'c, 'a> for &'a Block<'c> {
+    fn to_raw(self) -> MlirBlock {
+        self.raw
     }
 }
 
@@ -277,111 +167,9 @@ impl BlockRef<'_, '_> {
     }
 }
 
-impl<'c, 'v> BlockLike<'c, 'v> for BlockRef<'c, 'v> {
-    fn argument(&self, index: usize) -> Result<BlockArgument<'c, 'v>, Error> {
-        let block = unsafe { Block::from_raw(self.raw) };
-        let result = block.argument(index);
-        Block::into_raw(block);
-        result
-    }
-
-    fn argument_count(&self) -> usize {
-        let block = unsafe { Block::from_raw(self.raw) };
-        let result = block.argument_count();
-        Block::into_raw(block);
-        result
-    }
-
-    fn first_operation(&self) -> Option<OperationRef<'c, 'v>> {
-        let block = unsafe { Block::from_raw(self.raw) };
-        let result = block.first_operation();
-        Block::into_raw(block);
-        result
-    }
-
-    fn first_operation_mut(&mut self) -> Option<OperationRefMut<'c, 'v>> {
-        let mut block = unsafe { Block::from_raw(self.raw) };
-        let result = block.first_operation_mut();
-        Block::into_raw(block);
-        result
-    }
-
-    fn terminator(&self) -> Option<OperationRef<'c, 'v>> {
-        let block = unsafe { Block::from_raw(self.raw) };
-        let result = block.terminator();
-        Block::into_raw(block);
-        result
-    }
-
-    fn terminator_mut(&mut self) -> Option<OperationRefMut<'c, 'v>> {
-        let mut block = unsafe { Block::from_raw(self.raw) };
-        let result = block.terminator_mut();
-        Block::into_raw(block);
-        result
-    }
-
-    fn parent_region(&self) -> Option<RegionRef<'c, 'v>> {
-        let block = unsafe { Block::from_raw(self.raw) };
-        let result = block.parent_region();
-        Block::into_raw(block);
-        result
-    }
-
-    fn parent_operation(&self) -> Option<OperationRef<'c, 'v>> {
-        let block = unsafe { Block::from_raw(self.raw) };
-        let result = block.parent_operation();
-        Block::into_raw(block);
-        result
-    }
-
-    fn add_argument(&self, r#type: Type<'c>, location: Location<'c>) -> Value<'c, 'v> {
-        let block = unsafe { Block::from_raw(self.raw) };
-        let result = block.add_argument(r#type, location);
-        Block::into_raw(block);
-        result
-    }
-
-    fn append_operation(&self, operation: Operation<'c>) -> OperationRef<'c, 'v> {
-        let block = unsafe { Block::from_raw(self.raw) };
-        let result = block.append_operation(operation);
-        Block::into_raw(block);
-        result
-    }
-
-    fn insert_operation(&self, position: usize, operation: Operation<'c>) -> OperationRef<'c, 'v> {
-        let block = unsafe { Block::from_raw(self.raw) };
-        let result = block.insert_operation(position, operation);
-        Block::into_raw(block);
-        result
-    }
-
-    fn insert_operation_after(
-        &self,
-        one: OperationRef<'c, 'v>,
-        other: Operation<'c>,
-    ) -> OperationRef<'c, 'v> {
-        let block = unsafe { Block::from_raw(self.raw) };
-        let result = block.insert_operation_after(one, other);
-        Block::into_raw(block);
-        result
-    }
-
-    fn insert_operation_before(
-        &self,
-        one: OperationRef<'c, 'v>,
-        other: Operation<'c>,
-    ) -> OperationRef<'c, 'v> {
-        let block = unsafe { Block::from_raw(self.raw) };
-        let result = block.insert_operation_before(one, other);
-        Block::into_raw(block);
-        result
-    }
-
-    fn next_in_region(&self) -> Option<BlockRef<'c, 'v>> {
-        let block = unsafe { Block::from_raw(self.raw) };
-        let result = block.next_in_region();
-        Block::into_raw(block);
-        result
+impl<'c, 'a> BlockLike<'c, 'a> for BlockRef<'c, 'a> {
+    fn to_raw(self) -> MlirBlock {
+        self.raw
     }
 }
 
@@ -419,6 +207,7 @@ mod tests {
     use crate::{
         ir::{operation::OperationBuilder, r#type::IntegerType, Module, Region, ValueLike},
         test::create_test_context,
+        Error,
     };
     use pretty_assertions::assert_eq;
 
