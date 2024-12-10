@@ -143,7 +143,7 @@ impl<'c> Block<'c> {
     }
 }
 
-impl<'c, 'v> BlockApi<'c, 'v> for Block<'c> {
+impl<'c, 'v> BlockApi<'c, 'v> for &'v Block<'c> {
     fn argument(&self, index: usize) -> Result<BlockArgument<'c, 'v>, Error> {
         unsafe {
             if index < self.argument_count() {
