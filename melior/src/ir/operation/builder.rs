@@ -137,7 +137,7 @@ impl<'c> OperationBuilder<'c> {
 mod tests {
     use super::*;
     use crate::{
-        ir::{block::BlockApi, Block, ValueLike},
+        ir::{block::BlockLike, Block, ValueLike},
         test::create_test_context,
     };
 

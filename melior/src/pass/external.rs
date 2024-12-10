@@ -216,7 +216,7 @@ mod tests {
         dialect::func,
         ir::{
             attribute::{StringAttribute, TypeAttribute},
-            block::BlockApi,
+            block::BlockLike,
             r#type::FunctionType,
             Block, Identifier, Location, Module, Region,
         },

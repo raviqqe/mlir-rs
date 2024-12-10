@@ -381,7 +381,7 @@ mod tests {
         },
         ir::{
             attribute::{IntegerAttribute, StringAttribute, TypeAttribute},
-            block::BlockApi,
+            block::BlockLike,
             r#type::{FunctionType, IntegerType},
             Block, Module, Region,
         },

@@ -87,7 +87,7 @@ pub fn r#return<'c>(operands: &[Value<'c, '_>], location: Location<'c>) -> Opera
 mod tests {
     use super::*;
     use crate::{
-        ir::{block::BlockApi, Block, Module, Type},
+        ir::{block::BlockLike, Block, Module, Type},
         test::create_test_context,
     };
 

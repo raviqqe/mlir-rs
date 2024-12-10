@@ -521,7 +521,7 @@ mod tests {
     use super::*;
     use crate::{
         context::Context,
-        ir::{attribute::StringAttribute, block::BlockApi, Block, Location, Region, Type},
+        ir::{attribute::StringAttribute, block::BlockLike, Block, Location, Region, Type},
         test::create_test_context,
     };
     use pretty_assertions::assert_eq;

@@ -114,7 +114,7 @@ mod tests {
         dialect::{arith, func},
         ir::{
             attribute::{FloatAttribute, IntegerAttribute, StringAttribute, TypeAttribute},
-            block::BlockApi,
+            block::BlockLike,
             r#type::{FunctionType, IntegerType, Type},
             Attribute, Block, Module,
         },
