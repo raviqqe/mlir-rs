@@ -1,10 +1,12 @@
 //! Utility functions.
 
 use crate::{
-    context::Context, dialect::DialectRegistry, ir::Module, logical_result::LogicalResult, pass, string_ref::StringRef, Error
+    context::Context, dialect::DialectRegistry, ir::Module, logical_result::LogicalResult, pass,
+    string_ref::StringRef, Error,
 };
 use mlir_sys::{
-    mlirLoadIRDLDialects, mlirParsePassPipeline, mlirRegisterAllDialects, mlirRegisterAllLLVMTranslations, mlirRegisterAllPasses, MlirStringRef
+    mlirLoadIRDLDialects, mlirParsePassPipeline, mlirRegisterAllDialects,
+    mlirRegisterAllLLVMTranslations, mlirRegisterAllPasses, MlirStringRef,
 };
 use std::{
     ffi::c_void,
@@ -54,9 +56,7 @@ pub fn parse_pass_pipeline(manager: pass::OperationPassManager, source: &str) ->
 
 /// Loads all IRDL dialects in the provided module, registering the dialects in the module's associated context.
 pub fn load_irdl_dialects(module: &Module) -> bool {
-    unsafe {
-        mlirLoadIRDLDialects(module.to_raw()).value == 1
-    }
+    unsafe { mlirLoadIRDLDialects(module.to_raw()).value == 1 }
 }
 
 unsafe extern "C" fn handle_parse_error(raw_string: MlirStringRef, data: *mut c_void) {

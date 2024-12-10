@@ -65,7 +65,7 @@ melior_macro::dialect! {
 }
 melior_macro::dialect! {
     name: "irdl",
-    table_gen: r#"include "mlir/Dialect/IRDL/IR/IRDL.td""#
+    table_gen: r#"include "mlir/Dialect/IRDL/IR/IRDLOps.td""#
 }
 melior_macro::dialect! {
     name: "llvm",
