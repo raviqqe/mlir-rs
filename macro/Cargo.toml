@@ -1,11 +1,11 @@
 [package]
 name = "melior-macro"
 description = "Internal macros for Melior"
-version = "0.12.2"
+version = "0.13.2"
 edition = "2021"
 license = "Apache-2.0"
-repository = "https://github.com/mlir-sys/melior"
-documentation = "https://mlir-sys.github.io/melior/melior/"
+repository = "https://github.com/mlir-rs/melior"
+documentation = "https://mlir-rs.github.io/melior/melior/"
 readme = "../README.md"
 keywords = ["mlir", "llvm"]
 
@@ -13,7 +13,7 @@ keywords = ["mlir", "llvm"]
 proc-macro = true
 
 [dependencies]
-comrak = { version = "0.31.0", default-features = false }
+comrak = { version = "0.32.0", default-features = false }
 convert_case = "0.6.0"
 proc-macro2 = "1"
 quote = "1"

@@ -9,7 +9,7 @@ use mlir_sys::{
     mlirPassManagerGetAsOpPassManager, mlirPassManagerGetNestedUnder, mlirPassManagerRunOnOp,
     MlirPassManager,
 };
-use std::marker::PhantomData;
+use std::{marker::PhantomData, mem::forget};
 
 /// A pass manager.
 pub struct PassManager<'c> {
@@ -67,6 +67,29 @@ impl PassManager<'_> {
     /// Converts a pass manager to an operation pass manager.
     pub fn as_operation_pass_manager(&self) -> OperationPassManager {
         unsafe { OperationPassManager::from_raw(mlirPassManagerGetAsOpPassManager(self.raw)) }
+    }
+
+    /// Creates a PassManager from the given raw pointer.
+    ///
+    /// # Safety
+    /// Caller must ensure this is a valid PassManager pointer.
+    pub unsafe fn from_raw(raw: MlirPassManager) -> Self {
+        Self {
+            raw,
+            _context: Default::default(),
+        }
+    }
+
+    /// Gets the raw object of this pass manager.
+    pub const fn to_raw(&self) -> MlirPassManager {
+        self.raw
+    }
+
+    /// Converts a PassManager into an owned raw object.
+    pub const fn into_raw(self) -> MlirPassManager {
+        let raw = self.raw;
+        forget(self);
+        raw
     }
 }
 
