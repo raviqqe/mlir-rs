@@ -5,7 +5,7 @@ use utility::*;
 
 melior_macro::dialect! {
     name: "operand_test",
-    td_file: "macro/tests/ods_include/operand.td",
+    files: ["macro/tests/ods_include/operand.td"],
 }
 
 #[test]

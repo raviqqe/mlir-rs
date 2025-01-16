@@ -7,6 +7,8 @@ pub enum InputField {
     TableGen(LitStr),
     TdFile(LitStr),
     IncludeDirectories(Punctuated<LitStr, Token![,]>),
+    Files(Punctuated<LitStr, Token![,]>),
+    Directories(Punctuated<LitStr, Token![,]>),
 }
 
 impl Parse for InputField {
@@ -25,6 +27,18 @@ impl Parse for InputField {
             let content;
             bracketed!(content in input);
             Ok(Self::IncludeDirectories(
+                Punctuated::<LitStr, Token![,]>::parse_terminated(&content)?,
+            ))
+        } else if ident == format_ident!("files") {
+            let content;
+            bracketed!(content in input);
+            Ok(Self::Files(
+                Punctuated::<LitStr, Token![,]>::parse_terminated(&content)?,
+            ))
+        } else if ident == format_ident!("include_directories") {
+            let content;
+            bracketed!(content in input);
+            Ok(Self::Directories(
                 Punctuated::<LitStr, Token![,]>::parse_terminated(&content)?,
             ))
         } else {

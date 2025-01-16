@@ -6,9 +6,14 @@ use syn::{parse::Parse, punctuated::Punctuated, Token};
 
 pub struct DialectInput {
     name: String,
+    // TODO Remove this field.
     table_gen: Option<String>,
+    // TODO Remove this field.
     td_file: Option<String>,
+    // TODO Remove this field.
     include_directories: Vec<String>,
+    files: Vec<String>,
+    directories: Vec<String>,
 }
 
 impl DialectInput {
@@ -27,6 +32,14 @@ impl DialectInput {
     pub fn include_directories(&self) -> impl Iterator<Item = &str> {
         self.include_directories.iter().map(Deref::deref)
     }
+
+    pub fn files(&self) -> impl Iterator<Item = &str> {
+        self.files.iter().map(Deref::deref)
+    }
+
+    pub fn directories(&self) -> impl Iterator<Item = &str> {
+        self.directories.iter().map(Deref::deref)
+    }
 }
 
 impl Parse for DialectInput {
@@ -35,6 +48,8 @@ impl Parse for DialectInput {
         let mut table_gen = None;
         let mut td_file = None;
         let mut includes = vec![];
+        let mut files = vec![];
+        let mut directories = vec![];
 
         for item in Punctuated::<InputField, Token![,]>::parse_terminated(input)? {
             match item {
@@ -44,6 +59,12 @@ impl Parse for DialectInput {
                 InputField::IncludeDirectories(field) => {
                     includes = field.into_iter().map(|literal| literal.value()).collect()
                 }
+                InputField::Files(field) => {
+                    files = field.into_iter().map(|literal| literal.value()).collect()
+                }
+                InputField::Directories(field) => {
+                    directories = field.into_iter().map(|literal| literal.value()).collect()
+                }
             }
         }
 
@@ -52,6 +73,8 @@ impl Parse for DialectInput {
             table_gen,
             td_file,
             include_directories: includes,
+            files,
+            directories,
         })
     }
 }

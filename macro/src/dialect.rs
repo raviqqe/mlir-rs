@@ -16,39 +16,48 @@ use operation::Operation;
 use proc_macro::TokenStream;
 use proc_macro2::Span;
 use quote::quote;
-use std::{env, fmt::Display, path::Path, str};
+use std::{
+    env,
+    fmt::Display,
+    path::{Component, Path},
+    str,
+};
 use tblgen::{record::Record, record_keeper::RecordKeeper, TableGenParser};
+
+const LLVM_INCLUDE_DIRECTORY: &str = env!("LLVM_INCLUDE_DIRECTORY");
 
 pub fn generate_dialect(input: DialectInput) -> Result<TokenStream, Box<dyn std::error::Error>> {
     let mut parser = TableGenParser::new();
 
     if let Some(source) = input.table_gen() {
-        let base = Path::new(env!("LLVM_INCLUDE_DIRECTORY"));
-
-        // Here source looks like `include "foo.td" include "bar.td"`.
-        for (index, path) in source.split_ascii_whitespace().enumerate() {
-            if index % 2 == 0 {
-                continue; // skip "include"
-            }
-
-            let path = &path[1..(path.len() - 1)]; // remove ""
-            let path = Path::new(path).parent().unwrap();
-            let path = base.join(path);
-            parser = parser.add_include_path(&path.to_string_lossy());
-        }
-
         parser = parser.add_source(source).map_err(create_syn_error)?;
     }
 
     if let Some(file) = input.td_file() {
-        parser = parser.add_source_file(file).map_err(create_syn_error)?;
+        parser = parser.add_source_file(file);
     }
 
-    for path in input
-        .include_directories()
-        .chain([env!("LLVM_INCLUDE_DIRECTORY")])
-    {
-        parser = parser.add_include_path(path);
+    for path in input.include_directories().chain([LLVM_INCLUDE_DIRECTORY]) {
+        parser = parser.add_include_directory(path);
+    }
+
+    for path in input.directories() {
+        let path = if matches!(
+            Path::new(path).components().next(),
+            Some(Component::CurDir | Component::ParentDir)
+        ) {
+            path.into()
+        } else {
+            Path::new(LLVM_INCLUDE_DIRECTORY).join(path)
+        };
+
+        parser = parser.add_include_directory(&path.display().to_string());
+    }
+
+    if input.files().count() > 0 {
+        parser = parser.add_source(&input.files().fold(String::new(), |source, path| {
+            source + "include \"" + path + "\""
+        }))?;
     }
 
     let keeper = parser.parse().map_err(Error::Parse)?;

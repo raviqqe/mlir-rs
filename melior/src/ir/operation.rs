@@ -763,7 +763,7 @@ mod tests {
         context.set_allow_unregistered_dialects(true);
 
         let location = Location::unknown(&context);
-        let mut block = Block::new(&[]);
+        let block = Block::new(&[]);
 
         let first_operation = block.append_operation(
             OperationBuilder::new("foo", location)
